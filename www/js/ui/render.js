@@ -1,6 +1,8 @@
 // Vẽ canvas (hình khối màu tạm, chưa có art). Không chứa logic game.
 import { COLS, ROWS } from '../core/board.js';
 
+import { getImg } from './assets.js';
+
 export const W = 540;
 export const H = 960;
 export const CELL = 90;
@@ -23,6 +25,19 @@ export function cellAt(px, py) {
 export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
   g.save();
   g.globalAlpha = alpha;
+  const im = getImg(`orb:${type}`);
+  if (im) {
+    g.drawImage(im, x - r, y - r, r * 2, r * 2);
+    if (enhanced) {
+      g.strokeStyle = '#ffffff';
+      g.lineWidth = 5;
+      g.beginPath();
+      g.arc(x, y, r + 6, 0, Math.PI * 2);
+      g.stroke();
+    }
+    g.restore();
+    return;
+  }
   g.fillStyle = COLORS[type];
   g.strokeStyle = 'rgba(255,255,255,0.85)';
   g.lineWidth = 3;
@@ -111,6 +126,8 @@ export function draw(g, view, t) {
   g.clearRect(0, 0, W, H);
   g.fillStyle = '#12152b';
   g.fillRect(0, 0, W, H);
+  const bg = getImg('bg:battle');
+  if (bg) g.drawImage(bg, 0, 0, W, H);
 
   // quái
   const n = view.enemies.length;
@@ -135,6 +152,15 @@ export function draw(g, view, t) {
       if (e.effects?.length) badges(g, e.effects, cx, 314, view, 'center');
     }
   });
+
+  for (const q of view.particles || []) {
+    g.globalAlpha = 1 - q.age / q.life;
+    g.fillStyle = COLORS[q.col] || '#fff';
+    g.beginPath();
+    g.arc(q.x, q.y, 5, 0, Math.PI * 2);
+    g.fill();
+  }
+  g.globalAlpha = 1;
 
   // HUD
   text(g, view.t('battle.turn', { n: view.turn + 1 }), 16, 24, 15, '#9aa2ff', 'left');

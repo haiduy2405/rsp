@@ -435,9 +435,13 @@
   "tut.go": "Vào trận",
   "set.title": "Cài đặt",
   "set.volume": "Âm lượng: {n}%",
-  "set.volumeNote": "Âm thanh sẽ có ở bản sau; mức này được lưu sẵn.",
+  "set.volumeNote": "Âm thanh hiện là tiếng tổng hợp tạm, sẽ thay bằng bản thu thật.",
   "set.delete": "Xóa dữ liệu",
   "set.deleteConfirm": "Xóa toàn bộ tiến trình trên máy này? Không thể hoàn tác (nên xuất file lưu trước).",
   "set.deleteYes": "Xóa hết",
-  "set.deleted": "Đã xóa dữ liệu"
+  "set.deleted": "Đã xóa dữ liệu",
+  "load.text": "Đang tải…",
+  "set.music": "Nhạc nền",
+  "set.sfx": "Hiệu ứng âm thanh",
+  "set.haptic": "Rung"
 }

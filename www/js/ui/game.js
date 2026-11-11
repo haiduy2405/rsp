@@ -17,7 +17,9 @@ const easeOut = (k) => 1 - (1 - k) * (1 - k);
 
 // stepper(state, action) -> { state, events }: do bên ngoài cung cấp (chuyến leo tháp ghi lại hành động).
 // onEnd(finalState) gọi sau khi hoạt ảnh kết thúc và trận đã phân thắng thua.
-export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd }) {
+const NOFX = { sfx() {}, vibrate() {} };
+
+export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX }) {
   const g = canvas.getContext('2d');
   let state = initial;
   let busy = false;
@@ -45,6 +47,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     drag: null,
     timer: null,
     floaters: [],
+    particles: [],
     shake: null,
     canAct: true,
   };
@@ -68,12 +71,14 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   function applyHits(hits) {
     for (const h of hits) {
       if (h.kind === 'damage') {
+        fx.sfx('hit');
         view.enemies[h.enemy].hp -= h.amount;
         floater(h.amount === 0 && h.absorbed ? t('battle.blocked') : `-${h.amount}`, enemyX(h.enemy), 150, '#ffd84a');
       } else if (h.kind === 'reflect') {
         view.hp = Math.max(0, view.hp - h.amount);
         floater(`-${h.amount}`, W / 2, 350, '#ff9f6b');
       } else {
+        fx.sfx('heal');
         view.hp = Math.min(view.maxHp, view.hp + h.amount);
         floater(`+${h.amount}`, W / 2, 350, '#7dffa0');
       }
@@ -88,8 +93,17 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         view.board = structuredClone(st.boardBefore);
         view.hl = new Set(st.groups.flatMap((x) => x.cells));
         view.combo = e.combos;
+        fx.sfx(e.combos > 1 ? 'combo' : 'match');
         await sleep(330);
         applyHits(e.hits);
+        for (const i of st.cleared) {
+          const c = cellCenter(i);
+          const col = st.boardBefore.cells[i];
+          for (let k = 0; k < 5; k++) {
+            const a = (k / 5) * Math.PI * 2 + i;
+            view.particles.push({ x: c.x, y: c.y, vx: Math.cos(a) * 0.18, vy: Math.sin(a) * 0.18 - 0.05, col, age: 0, life: 420 });
+          }
+        }
         const cleared = structuredClone(st.boardBefore);
         for (const i of st.cleared) cleared.cells[i] = -1;
         view.board = cleared;
@@ -101,11 +115,16 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         view.fall = null;
         view.fallT = 1;
       } else if (e.type === 'skill' || e.type === 'duo') {
+        fx.sfx('skill');
         applyHits(e.hits);
         view.board = structuredClone(e.board);
         await sleep(350);
       } else if (e.type === 'enemyAttack') {
         view.shake = { enemy: e.enemy };
+        if (e.amount > 0) {
+          fx.sfx('hurt');
+          fx.vibrate(40);
+        }
         if (e.blocked > 0) floater(t('battle.blocked'), W / 2 - 80, 350, '#6bd5ff', 26);
         if (e.amount > 0) {
           view.hp = Math.max(0, view.hp - e.amount);
@@ -179,6 +198,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     const c = cellAt(p.x, p.y);
     if (c < 0 || state.locked.includes(c)) return;
     canvas.setPointerCapture?.(ev.pointerId);
+    fx.sfx('pick');
     drag = { path: [c], x: p.x, y: p.y, t0: 0 };
     view.drag = drag;
   }
@@ -198,6 +218,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       drag.path.pop();
     } else if (!drag.path.includes(c) && areAdjacent(last, c, allowDiag)) {
       drag.path.push(c);
+      fx.sfx('move');
       if (!drag.t0) drag.t0 = performance.now();
     } else return;
     view.board = drag.path.length >= 2 ? applyPath(state.board, drag.path) : structuredClone(state.board);
@@ -220,6 +241,13 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     }
     for (const f of view.floaters) f.age += dt;
     view.floaters = view.floaters.filter((f) => f.age < f.life);
+    for (const q of view.particles) {
+      q.age += dt;
+      q.x += q.vx * dt;
+      q.y += q.vy * dt;
+      q.vy += 0.0004 * dt;
+    }
+    view.particles = view.particles.filter((q) => q.age < q.life);
     draw(g, view, now);
     requestAnimationFrame(frame);
   }

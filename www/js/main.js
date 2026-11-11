@@ -10,10 +10,12 @@ import { finishOnboarding, completeTutorial, storyUnlocked } from './core/onboar
 import { newProgress } from './core/progress.js';
 import { createT, detectLang } from './i18n/index.js';
 import { startGame } from './ui/game.js';
+import { preloadAssets, getImg } from './ui/assets.js';
+import { createAudio } from './ui/audio.js';
 
 const $ = (id) => document.getElementById(id);
 const load = (f) => fetch(`js/${f}`).then((r) => r.json());
-const [config, characters, monsters, zones, events, duos, banners, story, vi, en] = await Promise.all([
+const [config, characters, monsters, zones, events, duos, banners, story, audioCfg, vi, en] = await Promise.all([
   load('data/config.json'),
   load('data/characters.json'),
   load('data/monsters.json'),
@@ -22,6 +24,7 @@ const [config, characters, monsters, zones, events, duos, banners, story, vi, en
   load('data/duos.json'),
   load('data/banners.json'),
   load('data/story.json'),
+  load('data/audio.json'),
   load('i18n/vi.json'),
   load('i18n/en.json'),
 ]);
@@ -41,6 +44,14 @@ let t = createT(dicts[lang], en);
 const loaded = storage.load();
 let progress = loaded.progress;
 let notice = loaded.recovered ? 'hub.recovered' : null;
+const audio = createAudio(audioCfg, {
+  get volume() { return progress.settings.volume; },
+  get music() { return progress.settings.music; },
+  get sfx() { return progress.settings.sfx; },
+  get haptic() { return progress.settings.haptic; },
+});
+document.addEventListener('pointerdown', () => audio.unlock(), { capture: true });
+document.addEventListener('click', (e) => { if (e.target.closest?.('#screen button')) audio.sfx('ui'); }, { capture: true });
 let run = null;
 let record = null;
 let game = null;
@@ -59,6 +70,8 @@ function h(tag, props = {}, ...kids) {
 }
 const btn = (label, onclick, cls = '', extra = {}) => h('button', { class: cls, onclick, ...extra }, label);
 const screen = (...kids) => {
+  audio.playMusic('hub');
+  $('screen').style.backgroundImage = '';
   game?.destroy();
   game = null;
   const el = $('screen');
@@ -136,6 +149,8 @@ function showHub() {
       h('p', { class: 'muted' }, t('hub.progress')),
     ),
   );
+  if (getImg('bg:hub')) $('screen').style.backgroundImage = `linear-gradient(rgba(8,9,22,.72),rgba(8,9,22,.72)),url(${getImg('bg:hub').src})`;
+  if ($('screen')) $('screen').style.backgroundSize = 'cover';
   notice = null;
 }
 
@@ -168,7 +183,12 @@ function unitText(u) {
 }
 const leaderText = (l) => t(`leader.${l.template}`, { pct: pct(l.pct || 0), element: l.element != null ? el(l.element) : '', n: l.n });
 const keysOf = (units) => [...new Set(units.filter((u) => u.type === 'applyEffect').map((u) => u.key))];
-const chip = (id) => h('span', { class: 'chip', style: `background:${COLORS[ctx.characters[id].element]}` }, el(ctx.characters[id].element));
+const chip = (id) => {
+  const e = ctx.characters[id].element;
+  const im = getImg(`icon:${id}`);
+  const c = h('span', { class: 'chip', style: `background:${COLORS[e]}` }, el(e));
+  return im ? h('span', {}, h('img', { src: im.src, alt: '', width: '36', height: '36', style: 'border-radius:8px;vertical-align:middle;margin-right:4px' }), c) : c;
+};
 const stars = (id) => '★'.repeat(ctx.characters[id].rarity);
 const owned = () => ctx.characterList.filter((c) => progress.characters[c.id]);
 
@@ -213,6 +233,7 @@ function showChar(id, msg) {
     } else showChar(id, `err.${r.reason}`);
   };
   screen(
+    getImg(`card:${id}`) ? h('img', { src: getImg(`card:${id}`).src, alt: t(`char.${id}`), style: 'width:60%;max-width:240px;border-radius:14px' }) : null,
     h('h2', {}, t(`char.${id}`), ' ', chip(id), ' ', stars(id)),
     msg ? h('div', { class: 'notice' }, t(msg)) : null,
     h('div', { class: 'row' }, h('span', { class: 'res' }, t('char.level', { n: pc.level, max: ctx.config.progression.levelMax })), h('span', { class: 'res' }, t('char.awaken', { n: pc.awaken }))),
@@ -291,6 +312,7 @@ function showSummon(bannerId, pending = null, msg = null) {
     if (!r.ok) return showSummon(bannerId, null, `err.${r.reason}`);
     progress = r.progress;
     save();
+    audio.sfx('summon');
     showSummonResult(bannerId, r.results);
   };
   const ask = (count) => {
@@ -340,6 +362,7 @@ function showSummonResult(bannerId, results) {
   const paint = (i, el) => {
     const r = results[i];
     shown.add(i);
+    audio.sfx(r.rarity >= 4 ? 'rare' : 'reveal');
     el.className = `card sumcard ${rarityCls(r.rarity)}`;
     el.replaceChildren(
       h('h3', {}, t(`char.${r.id}`), ' ', chip(r.id), ' ', h('small', {}, '★'.repeat(r.rarity))),
@@ -411,7 +434,15 @@ function showSettings(msg = null, confirmDelete = false) {
     h('label', {}, h('span', { id: 'vol-l' }, t('set.volume', { n: progress.settings.volume })), h('input', { id: 'vol', type: 'range', min: '0', max: '100', value: String(progress.settings.volume), oninput: (e) => {
       progress.settings.volume = Number(e.target.value);
       $('vol-l').textContent = t('set.volume', { n: progress.settings.volume });
+      audio.applyGains();
     }, onchange: () => save() })),
+    ...[['music', 'set.music'], ['sfx', 'set.sfx'], ['haptic', 'set.haptic']].map(([k, label]) =>
+      h('label', { style: 'flex-direction:row;gap:10px' }, h('input', { type: 'checkbox', id: `opt-${k}`, ...(progress.settings[k] !== false ? { checked: '' } : {}), onchange: (e) => {
+        progress.settings[k] = e.target.checked;
+        audio.applyGains();
+        save();
+        if (k === 'haptic' && e.target.checked) audio.vibrate(30);
+      } }), t(label))),
     h('p', { class: 'muted' }, t('set.volumeNote')),
     btn(t('hub.export'), () => (exportBox.value = storage.exportText(progress)), '', { id: 'export' }),
     exportBox,
@@ -580,6 +611,7 @@ function showTutorial(n) {
 }
 
 function startBattleUI() {
+  audio.playMusic(run.node === 'boss' ? 'boss' : 'battle');
   $('screen').classList.remove('show');
   game?.destroy();
   game = startGame({
@@ -595,7 +627,9 @@ function startBattleUI() {
       pending = r.run;
       return { state: r.run.battle, events: r.events };
     },
-    onEnd() {
+    fx: audio,
+    onEnd(st) {
+      audio.sfx(st.status === 'won' ? 'win' : 'lose');
       run = pending;
       render();
     },
@@ -689,5 +723,10 @@ if (DEBUG) {
 }
 document.title = t('game.title');
 document.documentElement.lang = lang;
+screen(h('h1', {}, t('game.title')), h('div', { class: 'hpbar', style: 'max-width:260px' }, h('i', { id: 'load-bar', style: 'width:0%;background:#6b79ff' })), h('p', { class: 'sub' }, t('load.text')));
+await preloadAssets((d, n) => {
+  const b = $('load-bar');
+  if (b && n) b.style.width = `${(d / n) * 100}%`;
+});
 if (progress.onboarding.done) showHub();
 else showOnboarding();

@@ -435,9 +435,13 @@
   "tut.go": "Start",
   "set.title": "Settings",
   "set.volume": "Volume: {n}%",
-  "set.volumeNote": "Sound arrives in a later version; this level is saved for it.",
+  "set.volumeNote": "Audio is temporary synthesized sound, to be replaced by real recordings.",
   "set.delete": "Delete data",
   "set.deleteConfirm": "Delete all progress on this device? This cannot be undone (export a save first).",
   "set.deleteYes": "Delete everything",
-  "set.deleted": "Data deleted"
+  "set.deleted": "Data deleted",
+  "load.text": "Loading…",
+  "set.music": "Music",
+  "set.sfx": "Sound effects",
+  "set.haptic": "Vibration"
 }
