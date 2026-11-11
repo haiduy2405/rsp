@@ -2,21 +2,25 @@ import { buildCtx } from './core/ctx.js';
 import { createRun, runStep, newRunRecord, debugWinBattle } from './core/run.js';
 import { applyRunResult } from './core/progress.js';
 import { createStorage, browserAdapter } from './save/storage.js';
+import { grantCharacter, levelCost, levelUp, awakenCost, awaken, setTeam, teamRoster } from './core/upgrade.js';
+import { statsFor, skillCooldown } from './core/stats.js';
+import { KEYS } from './core/effects.js';
 import { createT, detectLang } from './i18n/index.js';
 import { startGame } from './ui/game.js';
 
 const $ = (id) => document.getElementById(id);
 const load = (f) => fetch(`js/${f}`).then((r) => r.json());
-const [config, characters, monsters, zones, events, vi, en] = await Promise.all([
+const [config, characters, monsters, zones, events, duos, vi, en] = await Promise.all([
   load('data/config.json'),
   load('data/characters.json'),
   load('data/monsters.json'),
   load('data/zones.json'),
   load('data/events.json'),
+  load('data/duos.json'),
   load('i18n/vi.json'),
   load('i18n/en.json'),
 ]);
-const ctx = buildCtx({ config, characters, monsters, zones, events });
+const ctx = buildCtx({ config, characters, monsters, zones, events, duos });
 const dicts = { vi, en };
 const storage = createStorage(browserAdapter(), ctx);
 const DEBUG = new URLSearchParams(location.search).has('debug');
@@ -105,6 +109,13 @@ function showHub() {
       h('span', { class: 'res' }, `${t('res.spirit')}: ${inv.spirit}`),
       h('span', { class: 'res' }, `${t('res.shard')}: ${inv.shards}`),
     ),
+    h(
+      'div',
+      { class: 'row' },
+      btn(t('hub.collection'), () => showCollection(), '', { id: 'b-col' }),
+      btn(t('hub.team'), () => showTeam(0), '', { id: 'b-team' }),
+      btn(t('hub.glossary'), () => showGlossary(), '', { id: 'b-glos' }),
+    ),
     h('h3', {}, t('hub.zones')),
     zoneCards,
     h(
@@ -146,6 +157,123 @@ function setLang(l) {
   showHub();
 }
 
+// ---- mô tả kỹ năng từ dữ liệu (không viết cứng từng nhân vật)
+const pct = (v) => Math.round(v * 100);
+const el = (n) => t(`element.${n}`);
+const COLORS = ['#3b9cff', '#ff5a3c', '#4cc46a', '#ffd84a', '#9a5cff', '#ff7fb0'];
+function unitText(u) {
+  if (u.type === 'damage') {
+    const target = t(`target.${u.target}`);
+    return u.element != null ? t('unit.damage.el', { mult: u.mult, target, element: el(u.element) }) : t('unit.damage', { mult: u.mult, target });
+  }
+  if (u.type === 'heal') return t('unit.heal', { pct: pct(u.pctMax) });
+  if (u.type === 'convert') return t('unit.convert', { count: u.count, element: el(u.to) });
+  const val = u.value ? `, ${pct(u.value)}%` : '';
+  return t('unit.apply', { effect: t(`effect.${u.key}.name`), target: t(`target.${u.target}`), turns: u.turns, value: val });
+}
+const leaderText = (l) => t(`leader.${l.template}`, { pct: pct(l.pct || 0), element: l.element != null ? el(l.element) : '', n: l.n });
+const keysOf = (units) => [...new Set(units.filter((u) => u.type === 'applyEffect').map((u) => u.key))];
+const chip = (id) => h('span', { class: 'chip', style: `background:${COLORS[ctx.characters[id].element]}` }, el(ctx.characters[id].element));
+const stars = (id) => '★'.repeat(ctx.characters[id].rarity);
+const owned = () => ctx.characterList.filter((c) => progress.characters[c.id]);
+
+function charCard(id, onclick, extra) {
+  const c = progress.characters[id];
+  return h(
+    'div',
+    { class: 'card btn' + (c ? '' : ' locked'), 'data-char': id, onclick: c ? onclick : null },
+    h('h3', {}, t(`char.${id}`), ' ', chip(id), ' ', h('small', {}, stars(id))),
+    h('small', {}, c ? `${t('char.level', { n: c.level, max: ctx.config.progression.levelMax })} · ${t('char.awaken', { n: c.awaken })}` : '???'),
+    extra,
+  );
+}
+
+function showCollection() {
+  const list = ctx.characterList.slice().sort((a, b) => a.element - b.element || b.rarity - a.rarity);
+  screen(
+    h('h2', {}, `${t('hub.collection')} ${owned().length}/${list.length}`),
+    list.map((c) => charCard(c.id, () => showChar(c.id))),
+    btn(t('back'), showHub, '', { id: 'back' }),
+  );
+}
+
+function keywordBlock(keys) {
+  return keys.map((k) => h('div', { class: 'muted' }, h('b', {}, t(`effect.${k}.name`)), ': ', t(`effect.${k}.desc`)));
+}
+
+function showChar(id, msg) {
+  const c = ctx.characters[id];
+  const pc = progress.characters[id];
+  const st = statsFor(ctx, id, pc.level, pc.awaken);
+  const lvCost = levelCost(ctx, id, pc.level);
+  const aw = awakenCost(ctx, id, pc.awaken + 1);
+  const duos = ctx.duoList.filter((d) => d.a === id || d.b === id);
+  const keys = [...new Set([...keysOf(c.skill.units), ...duos.flatMap((d) => keysOf(d.skill.units))])];
+  const act = (fn) => {
+    const r = fn();
+    if (r.ok) {
+      progress = r.progress;
+      save();
+      showChar(id);
+    } else showChar(id, `err.${r.reason}`);
+  };
+  screen(
+    h('h2', {}, t(`char.${id}`), ' ', chip(id), ' ', stars(id)),
+    msg ? h('div', { class: 'notice' }, t(msg)) : null,
+    h('div', { class: 'row' }, h('span', { class: 'res' }, t('char.level', { n: pc.level, max: ctx.config.progression.levelMax })), h('span', { class: 'res' }, t('char.awaken', { n: pc.awaken }))),
+    h('div', { class: 'row' }, h('span', { class: 'res' }, `${t('stat.hp')} ${st.hp}`), h('span', { class: 'res' }, `${t('stat.atk')} ${st.atk}`), h('span', { class: 'res' }, `${t('stat.heal')} ${st.heal}`)),
+    h('div', { class: 'card' }, h('b', {}, `${t('char.skill')}: ${t(`skill.${id}`)}`), h('div', { class: 'muted' }, t('char.cooldown', { n: skillCooldown(ctx, id, pc.awaken) })), c.skill.units.map((u) => h('div', {}, unitText(u)))),
+    h('div', { class: 'card' }, h('b', {}, t('char.leader')), h('div', {}, leaderText(c.leader))),
+    h('div', { class: 'card' }, h('b', {}, t('char.duo')), duos.length ? duos.map((d) => { const other = d.a === id ? d.b : d.a; return h('div', {}, h('b', {}, t(`duo.${d.id}`)), ` · ${t('char.duoWith', { name: t(`char.${other}`) })}`, d.skill.units.map((u) => h('div', { class: 'muted' }, unitText(u)))); }) : h('div', { class: 'muted' }, t('char.noDuo'))),
+    keys.length ? h('div', { class: 'card' }, keywordBlock(keys)) : null,
+    lvCost === null ? h('div', { class: 'muted' }, t('char.maxLevel')) : btn(t('char.levelUp', { cost: lvCost }), () => act(() => levelUp(ctx, progress, id)), '', { id: 'lvup' }),
+    aw
+      ? [h('div', { class: 'muted' }, t('char.awakenCost', { shards: aw.shards, stones: aw.stones, kind: t(`stone.${aw.stone}`), element: el(aw.element), gold: aw.gold })), btn(t('char.awakenBtn'), () => act(() => awaken(ctx, progress, id)), '', { id: 'awaken' })]
+      : h('div', { class: 'muted' }, t('char.maxAwaken')),
+    h('div', { class: 'muted' }, `${t('res.essence')} ${progress.inventory.essence} · ${t('res.shard')} ${progress.inventory.shards} · ${t('res.gold')} ${progress.inventory.gold} · ${t('res.stone')} ${el(c.element)}: ${progress.inventory.stones[c.element].normal}/${progress.inventory.stones[c.element].rare}`),
+    btn(t('back'), showCollection, '', { id: 'back' }),
+  );
+}
+
+function showTeam(slot, msg) {
+  const team = progress.team;
+  const duos = [];
+  for (let i = 0; i + 1 < 5; i++) {
+    const d = ctx.duoByPair[`${team[i]}|${team[i + 1]}`];
+    if (d) duos.push(d);
+  }
+  const pick = (id) => {
+    const t2 = team.slice();
+    const at = t2.indexOf(id);
+    if (at >= 0) [t2[at], t2[slot]] = [t2[slot], t2[at]];
+    else t2[slot] = id;
+    const r = setTeam(progress, t2);
+    if (r.ok) {
+      progress = r.progress;
+      save();
+    }
+    showTeam(slot);
+  };
+  screen(
+    h('h2', {}, t('hub.team')),
+    h('p', { class: 'muted' }, t('team.hint')),
+    h('div', { class: 'row' }, team.map((id, i) => h('div', { class: 'card btn', style: `width:88px;padding:6px;${i === slot ? 'border-color:#ffd84a;' : ''}`, 'data-slot': i, onclick: () => showTeam(i) }, h('small', {}, i === 0 ? t('team.leader') : t('team.slot', { n: i + 1 })), h('div', {}, t(`char.${id}`)), chip(id)))),
+    h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(ctx.characters[team[0]].leader)}`),
+    h('div', { class: 'muted' }, duos.length ? `${t('team.duoActive')}: ${duos.map((d) => t(`duo.${d.id}`)).join(', ')}` : t('team.noDuo')),
+    h('h3', {}, t('team.pick')),
+    owned().map((c) => charCard(c.id, () => pick(c.id))),
+    btn(t('back'), showHub, '', { id: 'back' }),
+  );
+}
+
+function showGlossary() {
+  screen(
+    h('h2', {}, t('hub.glossary')),
+    KEYS.map((k) => h('div', { class: 'card' }, h('b', {}, t(`effect.${k}.name`), ' ', h('small', {}, t(`effect.${k}.short`))), h('div', { class: 'muted' }, t(`effect.${k}.desc`)))),
+    btn(t('back'), showHub, '', { id: 'back' }),
+  );
+}
+
 // ---- chuyến leo tháp
 function pickSeed() {
   const raw = seedText.trim();
@@ -156,8 +284,9 @@ function pickSeed() {
 function startRun(zoneId) {
   const seed = pickSeed();
   const pity = !!progress.pity[zoneId];
-  run = createRun(ctx, { seed, zoneId, team: progress.team, pityMissed: pity });
-  record = newRunRecord(seed, zoneId, progress.team, pity);
+  const team = teamRoster(progress);
+  run = createRun(ctx, { seed, zoneId, team, pityMissed: pity });
+  record = newRunRecord(seed, zoneId, team, pity);
   render();
 }
 
@@ -297,6 +426,20 @@ function showEnd() {
 }
 
 if (DEBUG) {
+  window.__cheat = (ids = []) => {
+    const p = structuredClone(progress);
+    p.inventory.essence += 5000;
+    p.inventory.gold += 20000;
+    p.inventory.shards += 100;
+    for (let e = 0; e < 6; e++) {
+      p.inventory.stones[e].normal += 30;
+      p.inventory.stones[e].rare += 10;
+    }
+    progress = p;
+    for (const id of ids) progress = grantCharacter(ctx, progress, id).progress;
+    save();
+    showHub();
+  };
   window.__debugWin = () => {
     if (run?.phase !== 'battle') return;
     run = debugWinBattle(ctx, run);

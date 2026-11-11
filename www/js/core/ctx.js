@@ -10,6 +10,7 @@ export function buildCtx(raw) {
   return {
     config: raw.config,
     characters: indexById(raw.characters),
+    characterList: raw.characters,
     monsters: indexById(raw.monsters),
     zones: indexById(zoneList),
     zoneList,

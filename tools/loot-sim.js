@@ -36,17 +36,17 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   for (const z of ctx.zoneList) {
     let seed = 1;
     let pity = false;
-    const st = { normal: 0, rare: 0, withRare: 0, floors: 0, pityHits: 0, gold: 0, essence: 0 };
+    const st = { normal: 0, rare: 0, withRare: 0, floors: 0, pityHits: 0, gold: 0, essence: 0, shards: 0 };
     for (let i = 0; i < N; i++) {
       const r = simulateRun(ctx, seed++, z.id, pity);
       pity = r.rareMissed;
       st.normal += r.loot.stones.normal; st.rare += r.loot.stones.rare;
       st.withRare += r.loot.stones.rare > 0 ? 1 : 0; st.floors += r.floors;
-      st.pityHits += r.pityGranted ? 1 : 0; st.gold += r.loot.gold; st.essence += r.loot.essence;
+      st.pityHits += r.pityGranted ? 1 : 0; st.gold += r.loot.gold; st.essence += r.loot.essence; st.shards += r.loot.shards;
     }
     const f = (x) => (x / N).toFixed(2);
     console.log(
-      `${z.id.padEnd(11)} ải ${f(st.floors)} | Vàng ${f(st.gold)} | Tinh Hoa ${f(st.essence)} | Thường ${f(st.normal)} | Hiếm ${f(st.rare)}` +
+      `${z.id.padEnd(11)} ải ${f(st.floors)} | Vàng ${f(st.gold)} | Tinh Hoa ${f(st.essence)} | Mảnh ${f(st.shards)} | Thường ${f(st.normal)} | Hiếm ${f(st.rare)}` +
         ` | có Hiếm ${(100 * st.withRare / N).toFixed(0)}% | bảo hiểm ${(100 * st.pityHits / N).toFixed(0)}%` +
         ` | chuyến/bậc Thường ${(needN / (st.normal / N)).toFixed(2)}, Hiếm ${(needR / (st.rare / N)).toFixed(2)}`
     );

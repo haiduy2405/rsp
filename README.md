@@ -34,3 +34,12 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 - Mô phỏng loot: `node tools/loot-sim.js [N]`.
 - Gỡ lỗi: mở `?debug` để dùng `window.__debugWin()`; ô Seed trong "Tùy chọn gỡ lỗi".
 - Tạm thời: Khiên là cơ chế riêng cho vật phẩm (M3 thay bằng hiệu ứng Khiên); đội và quái là bản demo; chuyến chưa lưu giữa chừng.
+
+## M3: nhân vật, kỹ năng, Duo, hiệu ứng, Thức tỉnh
+- 24 nhân vật (`data/characters.json`), 15 Duo (`data/duos.json`), 12 hiệu ứng (`docs/EFFECTS.md`, `core/effects.js`).
+- Leader = ô 1, 4 khuôn mẫu cố định (`atk_element`, `hp_element`, `heal_boost`, `start_cd`). Duo: hai nhân vật liền ô thuộc một cặp.
+- Level (Tinh Hoa) và Thức tỉnh 5 bậc (`core/upgrade.js`, chi phí ở `config.upgrade`); ngân sách chỉ số ở `config.budget`, có test.
+- Save v3 (thêm `characters`); migrate v2→v3 chuyển đội mẫu cũ sang đội khởi đầu (5 nhân vật 3★).
+- UI: Cupola có Bộ sưu tập, chi tiết nhân vật (nâng cấp), Đội hình, Từ khóa; trận có nút Duo, biểu tượng hiệu ứng, ô khóa.
+- Cân bằng: `node tools/balance-sim.js [đội/khu] [lượt/đội] [level] [thức tỉnh] [đường thử] [seed]`. Độ khó theo khu ở `config.run.zoneScale`.
+- Đã đổi so với M2: Bùa Khiên tạo bể chắn 25% máu đội (thay vì chặn N đòn).

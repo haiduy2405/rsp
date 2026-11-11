@@ -1,6 +1,8 @@
-# Hiệu ứng (12 từ khóa, khóa cứng) — BẢN NHÁP CHỜ DUYỆT
+# Hiệu ứng (12 từ khóa, khóa cứng)
 
-Trạng thái: **chưa code**. Duy duyệt xong mới triển khai M3.
+Trạng thái: **Duy đã duyệt, đã triển khai** (`core/effects.js`, `core/battle.js`, test `tests/effects.test.js`).
+
+Ghi chú triển khai: ô bị khóa gắn với vị trí ô, mở khi ngọc ở ô đó được tiêu; khi hiệu ứng Khóa ngọc hết hạn thì mở hết. Khóa ngọc là hiệu ứng duy nhất chạm vào bàn.
 
 ## 1. Khái niệm chung
 - **Chủ thể (holder)**: *Đội* (một chủ thể duy nhất, máu chung) và từng *Quái*. Hiệu ứng nằm trên chủ thể, dạng `{key, turns, value}`.

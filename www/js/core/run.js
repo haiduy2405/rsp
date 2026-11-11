@@ -74,7 +74,11 @@ function startBattle(ctx, run, rng, kind) {
   else if (kind === 'elite') enemies = [pick(rng, zone.monsters.elite), pick(rng, normals)];
   else enemies = [pick(rng, zone.monsters.boss), pick(rng, normals)];
   const rc = ctx.config.run;
-  const scale = { hp: 1 + rc.floorScale.hp * run.floor, atk: 1 + rc.floorScale.atk * run.floor };
+  const zs = rc.zoneScale || { hp: [], atk: [] };
+  const scale = {
+    hp: (1 + rc.floorScale.hp * run.floor) * (zs.hp[zone.order] ?? 1),
+    atk: (1 + rc.floorScale.atk * run.floor) * (zs.atk[zone.order] ?? 1),
+  };
   const seed = rng.int(4294967296);
   run.battle = createBattle(ctx, {
     seed,
@@ -270,6 +274,18 @@ export function debugWinBattle(ctx, run) {
   const rng = mulberry32(nr.rng);
   nr.battle.status = 'won';
   onBattleWon(ctx, nr, rng);
+  nr.rng = rng.state;
+  return nr;
+}
+
+// Chỉ dành cho tools/balance-sim: đưa trạng thái trận đã chạy ngoài (b) vào chuyến, rồi xử lý thắng/thua như bình thường.
+export function debugFinishBattle(ctx, run, b) {
+  const nr = structuredClone(run);
+  const rng = mulberry32(nr.rng);
+  nr.battle = b;
+  nr.hp = b.hp;
+  if (b.status === 'won') onBattleWon(ctx, nr, rng);
+  else endRun(ctx, nr, rng, false);
   nr.rng = rng.state;
   return nr;
 }

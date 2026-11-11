@@ -83,6 +83,28 @@ function text(g, s, x, y, size, color = '#e8ebff', align = 'center', weight = '6
   g.fillText(s, x, y);
 }
 
+const NEG = new Set(['burn', 'poison', 'stun', 'freeze', 'atkDown', 'lock']);
+// Biểu tượng hiệu ứng: ô chữ viết tắt + số lượt, tiêu cực màu đỏ, tích cực màu xanh (khác nhau cả viền).
+function badges(g, effects, x, y, view, align = 'left') {
+  const w = 46;
+  const total = effects.length * (w + 4) - 4;
+  let bx = align === 'center' ? x - total / 2 : x;
+  for (const e of effects) {
+    const neg = NEG.has(e.key);
+    g.fillStyle = neg ? '#6b2a35' : '#1f5a42';
+    g.strokeStyle = neg ? '#ff8a98' : '#7dffb0';
+    g.lineWidth = neg ? 2 : 1;
+    g.beginPath();
+    g.roundRect(bx, y, w, 18, neg ? 3 : 9);
+    g.fill();
+    g.stroke();
+    let label = view.t(`effect.${e.key}.short`);
+    if (e.key === 'poison') label += `×${e.stacks}`;
+    text(g, `${label} ${e.turns > 99 ? '∞' : e.turns}`, bx + w / 2, y + 9, 11, '#ffffff');
+    bx += w + 4;
+  }
+}
+
 // view: { board:{cells,enh}, enemies:[{id,element,hp,maxHp,cd,every}], hp, maxHp, members:[{id,element,skillCd}],
 //         hl:Set, fall:array|null, fallT:0..1, drag:{path,x,y}|null, timer:0..1|null, floaters:[], shake, combo, turn, flash }
 export function draw(g, view, t) {
@@ -107,13 +129,19 @@ export function draw(g, view, t) {
     g.restore();
     bar(g, cx - 65, 255, 130, 12, e.hp / e.maxHp, '#ff6b6b');
     text(g, view.t(`monster.${e.id}`), cx, 280, 15);
-    if (!dead) text(g, view.t('battle.attackIn', { n: e.cd }), cx, 302, 13, '#ffb86b');
+    if (!dead) {
+      const off = e.effects?.some((x) => x.key === 'stun' || x.key === 'freeze');
+      text(g, off ? view.t('effect.stun.name') : view.t('battle.attackIn', { n: e.cd }), cx, 302, 13, off ? '#9ad0ff' : '#ffb86b');
+      if (e.effects?.length) badges(g, e.effects, cx, 314, view, 'center');
+    }
   });
 
   // HUD
   text(g, view.t('battle.turn', { n: view.turn + 1 }), 16, 24, 15, '#9aa2ff', 'left');
   text(g, view.titleText, W - 16, 24, 13, '#8a91d8', 'right');
-  if (view.shield > 0) text(g, view.t('battle.shield', { n: view.shield }), W - 16, 330, 16, '#6bd5ff', 'right');
+  const sh = (view.teamFx || []).find((e) => e.key === 'shield');
+  if (sh) text(g, view.t('battle.shield', { n: sh.pool }), W - 16, 330, 16, '#6bd5ff', 'right');
+  if (view.teamFx?.length) badges(g, view.teamFx, 16, 336, view);
   if (view.combo > 0) text(g, view.t('battle.combo', { n: view.combo }), W / 2, 330, 34, '#ffd84a');
 
   // máu đội chung
@@ -136,6 +164,17 @@ export function draw(g, view, t) {
       g.strokeRect(x, y, 98, 78);
     }
   });
+
+  // nút Duo nằm giữa hai ô liền kề
+  for (const d of view.duos || []) {
+    const cx = 12 + (d.slot + 1) * 104 - 3;
+    const ready = d.cd === 0;
+    g.fillStyle = ready ? '#ffb347' : '#3a3f78';
+    g.beginPath();
+    g.roundRect(cx - 30, 377, 60, 22, 11);
+    g.fill();
+    text(g, ready ? view.t('battle.duo') : `${view.t('battle.duo')} ${d.cd}`, cx, 388, 12, ready ? '#2a1600' : '#aab0ff');
+  }
 
   // đồng hồ kéo
   g.fillStyle = 'rgba(255,255,255,0.08)';
@@ -167,6 +206,23 @@ export function draw(g, view, t) {
   if (held >= 0) {
     const type = view.board.cells[held];
     drawOrb(g, type, view.drag.x, view.drag.y, 40, !!view.board.enh[held]);
+  }
+
+  for (const i of view.locked || []) {
+    const c = i % COLS;
+    const r = (i / COLS) | 0;
+    const x = BOARD_X + c * CELL;
+    const y = BOARD_Y + r * CELL;
+    g.fillStyle = 'rgba(10,10,20,0.55)';
+    g.fillRect(x + 4, y + 4, CELL - 8, CELL - 8);
+    g.strokeStyle = '#ff8a98';
+    g.lineWidth = 3;
+    g.strokeRect(x + 6, y + 6, CELL - 12, CELL - 12);
+    g.fillStyle = '#ffd0d6';
+    g.fillRect(x + CELL / 2 - 10, y + CELL / 2 - 2, 20, 16);
+    g.beginPath();
+    g.arc(x + CELL / 2, y + CELL / 2 - 2, 7, Math.PI, 0);
+    g.stroke();
   }
 
   // chữ nổi (sát thương, hồi máu)

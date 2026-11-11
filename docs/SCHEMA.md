@@ -45,3 +45,11 @@ Hành động: `{type:'move', path:[ô...]}` hoặc `{type:'skill', index}`. B�
 - `events.json`: `{id, choices:[{outcomes:[{weight, effects:[{type:gold|essence|item|stone|hpPct|none,...}]}]}]}`, chuỗi i18n `ev.<id>.title/body/c<i>/o<i>_<j>`.
 - Run: `{seed, zoneId, team, floors, floor, phase, doors, hp, loot, items, armed, battle, ...}`; record `{seed, zoneId, team, pityMissed, actions}`.
 - Progress v2 + save envelope `{v, sum, data}`; khóa `rsp.save`, `rsp.save.bak`.
+
+## M3
+- `characters.json`: `{id, element, rarity, role, hp, atk, heal, skill:{cooldown, startCooldown, units[]}, leader:{template, ...}}`. Đơn vị kỹ năng: `damage{target,mult,element?}`, `heal{pctMax}`, `convert{to,count}`, `applyEffect{target:one|all|team,key,turns,value}`. `key` thuộc 12 từ khóa nội bộ: burn, poison, stun, freeze, shield, regen, atkUp, atkDown, reflect, pierce, lock, immune.
+- Leader: `atk_element{element,pct}`, `hp_element{element,pct}`, `heal_boost{pct}`, `start_cd{n}`.
+- `duos.json`: `{id, a, b, reason, source?, skill}`.
+- `monsters.json`: thêm `onAttack: [{key,turns,value}]` (quái áp hiệu ứng lên đội khi đánh).
+- `config.json`: `progression` (levelMax, levelGrowth, awaken[]), `budget` + `budgetWeights`, `upgrade` (level, awaken, duplicateShards), `run.zoneScale`.
+- Progress v3: thêm `characters: {id: {level, awaken}}`; đội là 5 id khác nhau đã sở hữu.

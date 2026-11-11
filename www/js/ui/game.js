@@ -29,7 +29,9 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   const view = {
     t,
     titleText,
-    shield: 0,
+    locked: [],
+    teamFx: [],
+    duos: [],
     turn: 0,
     combo: 0,
     board: structuredClone(state.board),
@@ -54,7 +56,9 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.members = state.members.map((m) => ({ ...m }));
     view.hp = state.hp;
     view.maxHp = state.maxHp;
-    view.shield = state.shield || 0;
+    view.locked = state.locked.slice();
+    view.teamFx = state.team.effects.map((e) => ({ ...e }));
+    view.duos = state.duos.map((d) => ({ ...d }));
   }
   sync();
 
@@ -65,7 +69,10 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     for (const h of hits) {
       if (h.kind === 'damage') {
         view.enemies[h.enemy].hp -= h.amount;
-        floater(`-${h.amount}`, enemyX(h.enemy), 150, '#ffd84a');
+        floater(h.amount === 0 && h.absorbed ? t('battle.blocked') : `-${h.amount}`, enemyX(h.enemy), 150, '#ffd84a');
+      } else if (h.kind === 'reflect') {
+        view.hp = Math.max(0, view.hp - h.amount);
+        floater(`-${h.amount}`, W / 2, 350, '#ff9f6b');
       } else {
         view.hp = Math.min(view.maxHp, view.hp + h.amount);
         floater(`+${h.amount}`, W / 2, 350, '#7dffa0');
@@ -93,21 +100,29 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         await sleep(260, (k) => (view.fallT = easeOut(k)));
         view.fall = null;
         view.fallT = 1;
-      } else if (e.type === 'skill') {
+      } else if (e.type === 'skill' || e.type === 'duo') {
         applyHits(e.hits);
         view.board = structuredClone(e.board);
         await sleep(350);
       } else if (e.type === 'enemyAttack') {
         view.shake = { enemy: e.enemy };
-        if (e.absorbed) {
-          view.shield = Math.max(0, view.shield - 1);
-          floater(t('battle.blocked'), W / 2, 350, '#6bd5ff', 28);
-        } else {
+        if (e.blocked > 0) floater(t('battle.blocked'), W / 2 - 80, 350, '#6bd5ff', 26);
+        if (e.amount > 0) {
           view.hp = Math.max(0, view.hp - e.amount);
           floater(`-${e.amount}`, W / 2, 350, '#ff6b6b', 30);
         }
         await sleep(350);
         view.shake = null;
+      } else if (e.type === 'reflect') {
+        if (e.to === 'enemy') {
+          view.enemies[e.enemy].hp = Math.max(0, view.enemies[e.enemy].hp - e.amount);
+          floater(`-${e.amount}`, enemyX(e.enemy), 150, '#ff9f6b');
+        }
+      } else if (e.type === 'dot' || e.type === 'regen') {
+        const good = e.type === 'regen';
+        if (e.target === 'enemy') floater(`${good ? '+' : '-'}${e.amount}`, enemyX(e.enemy), 120, good ? '#7dffa0' : '#c58bff');
+        else floater(`${good ? '+' : '-'}${e.amount}`, W / 2, 350, good ? '#7dffa0' : '#c58bff');
+        await sleep(200);
       }
     }
   }
@@ -149,13 +164,20 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   function onDown(ev) {
     if (busy || state.status !== 'playing') return;
     const p = pos(ev);
+    for (const d of state.duos) {
+      const cx = 12 + (d.slot + 1) * 104 - 3;
+      if (Math.abs(p.x - cx) <= 30 && p.y >= 377 && p.y <= 399) {
+        if (d.cd === 0) run({ type: 'duo', index: d.slot });
+        return;
+      }
+    }
     if (p.y >= 388 && p.y <= 466) {
       const idx = Math.floor((p.x - 12) / 104);
       if (idx >= 0 && idx < state.members.length && state.members[idx].skillCd === 0) run({ type: 'skill', index: idx });
       return;
     }
     const c = cellAt(p.x, p.y);
-    if (c < 0) return;
+    if (c < 0 || state.locked.includes(c)) return;
     canvas.setPointerCapture?.(ev.pointerId);
     drag = { path: [c], x: p.x, y: p.y, t0: 0 };
     view.drag = drag;
@@ -167,7 +189,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     drag.x = p.x;
     drag.y = p.y;
     const c = cellAt(p.x, p.y);
-    if (c < 0) return;
+    if (c < 0 || state.locked.includes(c)) return;
     const ctr = cellCenter(c);
     if (Math.hypot(p.x - ctr.x, p.y - ctr.y) > CELL * 0.42) return; // chỉ đổi ô khi vào gần tâm ô
     const last = drag.path[drag.path.length - 1];
