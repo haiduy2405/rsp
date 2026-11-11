@@ -443,5 +443,8 @@
   "load.text": "Loading…",
   "set.music": "Music",
   "set.sfx": "Sound effects",
-  "set.haptic": "Vibration"
+  "set.haptic": "Vibration",
+  "battle.noCombo": "No combo",
+  "battle.turnTotal": "Total {n} damage",
+  "battle.noAttacker": "No unit of this element"
 }

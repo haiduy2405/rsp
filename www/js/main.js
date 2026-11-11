@@ -366,7 +366,14 @@ function showSummonResult(bannerId, results) {
     const r = results[i];
     shown.add(i);
     audio.sfx(r.rarity >= 4 ? 'rare' : 'reveal');
-    el.className = `card sumcard ${rarityCls(r.rarity)}`;
+    el.className = `card sumcard flip ${rarityCls(r.rarity)}`;
+    if (r.rarity >= 4) {
+      const f = $('flash');
+      f.classList.remove('go');
+      void f.offsetWidth;
+      f.classList.add('go');
+      audio.vibrate(r.rarity === 5 ? [60, 40, 90] : 40);
+    }
     el.replaceChildren(
       h('h3', {}, t(`char.${r.id}`), ' ', chip(r.id), ' ', h('small', {}, '★'.repeat(r.rarity))),
       h('small', {}, r.isNew ? t('summon.new') : t('summon.dup', { n: r.shards })),

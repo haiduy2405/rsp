@@ -48,6 +48,9 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     timer: null,
     floaters: [],
     particles: [],
+    shots: [],
+    rings: [],
+    hurt: 0,
     shake: null,
     canAct: true,
   };
@@ -66,25 +69,41 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   sync();
 
   const enemyX = (i) => (W / state.enemies.length) * i + W / state.enemies.length / 2;
-  const floater = (s, x, y, color, size = 26) => view.floaters.push({ s, x, y, color, size, age: 0, life: 700 });
+  const floater = (s, x, y, color, size = 26) => view.floaters.push({ s, x: Math.max(70, Math.min(W - 70, x)), y, color, size, age: 0, life: 1000 });
 
-  function applyHits(hits) {
+  const memberPos = (id) => {
+    const i = Math.max(0, state.members.findIndex((m) => m.id === id));
+    return { x: 12 + i * 104 + 49, y: 388 + 28, el: state.members[i]?.element ?? 3 };
+  };
+  const dmgSize = (a) => Math.min(54, 28 + Math.log10(Math.max(10, a)) * 6);
+
+  // Mỗi đòn: quả cầu bay từ nhân vật tới quái, tới nơi mới trừ máu + số nổi + rung quái.
+  function applyHits(hits, stagger = 90) {
+    let k = 0;
     for (const h of hits) {
       if (h.kind === 'damage') {
-        fx.sfx('hit');
-        view.enemies[h.enemy].hp -= h.amount;
-        floater(h.amount === 0 && h.absorbed ? t('battle.blocked') : `-${h.amount}`, enemyX(h.enemy), 150, '#ffd84a');
+        const src = memberPos(h.from);
+        const ex = enemyX(h.enemy);
+        view.shots.push({ x0: src.x, y0: src.y, x1: ex, y1: 160, col: src.el, delay: k * stagger, life: 260, age: 0, done: false, onHit: () => {
+          fx.sfx('hit');
+          const en = view.enemies[h.enemy];
+          en.hp -= h.amount;
+          en.hit = 1;
+          floater(h.amount === 0 && h.absorbed ? t('battle.blocked') : `-${h.amount}`, ex + ((k % 3) - 1) * 26, 150 - (k % 2) * 22, '#ffd84a', dmgSize(h.amount));
+          if (h.thawed) floater(t('effect.freeze.name'), ex, 200, '#9ad0ff', 20);
+        } });
+        k++;
       } else if (h.kind === 'reflect') {
         view.hp = Math.max(0, view.hp - h.amount);
         floater(`-${h.amount}`, W / 2, 350, '#ff9f6b');
-      } else {
+      } else if (h.amount > 0) {
         fx.sfx('heal');
         view.hp = Math.min(view.maxHp, view.hp + h.amount);
-        floater(`+${h.amount}`, W / 2, 350, '#7dffa0');
+        floater(`+${h.amount}`, W / 2, 350, '#7dffa0', 30);
       }
     }
+    return k ? k * stagger + 260 : 0; // thời gian cần chờ
   }
-
   async function animate(events) {
     for (const e of events) {
       if (!alive) return;
@@ -94,8 +113,16 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         view.hl = new Set(st.groups.flatMap((x) => x.cells));
         view.combo = e.combos;
         fx.sfx(e.combos > 1 ? 'combo' : 'match');
+        st.groups.forEach((g, gi) => {
+          const xs = g.cells.map((c) => cellCenter(c));
+          const cx = xs.reduce((a, q) => a + q.x, 0) / xs.length;
+          const cy = xs.reduce((a, q) => a + q.y, 0) / xs.length;
+          floater(t('battle.combo', { n: e.comboStart + gi }), cx, cy, '#ffffff', 22);
+          // Ngọc hệ không có ai trong đội: báo rõ vì sao không có sát thương.
+          if (g.type !== 5 && !state.members.some((m) => m.element === g.type)) floater(t('battle.noAttacker'), cx, cy + 26, '#ff9aa8', 16);
+        });
         await sleep(330);
-        applyHits(e.hits);
+        const wait = applyHits(e.hits);
         for (const i of st.cleared) {
           const c = cellCenter(i);
           const col = st.boardBefore.cells[i];
@@ -114,14 +141,20 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         await sleep(260, (k) => (view.fallT = easeOut(k)));
         view.fall = null;
         view.fallT = 1;
+        await sleep(Math.max(0, wait - 380));
       } else if (e.type === 'skill' || e.type === 'duo') {
         fx.sfx('skill');
-        applyHits(e.hits);
+        for (const who of e.type === 'duo' ? [e.slot, e.slot + 1] : [e.member]) {
+          const m = state.members[who];
+          if (m) view.rings.push({ x: 12 + who * 104 + 49, y: 416, col: m.element, age: 0, life: 600 });
+        }
+        const wait = applyHits(e.hits);
         view.board = structuredClone(e.board);
-        await sleep(350);
+        await sleep(Math.max(350, wait));
       } else if (e.type === 'enemyAttack') {
         view.shake = { enemy: e.enemy };
         if (e.amount > 0) {
+          view.hurt = 1;
           fx.sfx('hurt');
           fx.vibrate(40);
         }
@@ -156,7 +189,15 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       view.canAct = true;
       return;
     }
+    const hadStep = r.events.some((e) => e.type === 'step');
+    if (action.type === 'move' && !hadStep) floater(t('battle.noCombo'), W / 2, 700, '#c8ccff', 30);
+    const startHp = state.enemies.reduce((a, e) => a + e.hp, 0);
     await animate(r.events);
+    const total = startHp - r.state.enemies.reduce((a, e) => a + e.hp, 0);
+    if (total > 0 && r.events.filter((e) => e.type === 'step').length) {
+      floater(t('battle.turnTotal', { n: total }), W / 2, 440, '#ffd84a', 34);
+      await sleep(350);
+    }
     state = r.state;
     sync();
     view.combo = 0;
@@ -203,25 +244,48 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.drag = drag;
   }
 
-  function onMove(ev) {
-    if (!drag) return;
-    const p = pos(ev);
-    drag.x = p.x;
-    drag.y = p.y;
-    const c = cellAt(p.x, p.y);
-    if (c < 0 || state.locked.includes(c)) return;
-    const ctr = cellCenter(c);
-    if (Math.hypot(p.x - ctr.x, p.y - ctr.y) > CELL * 0.42) return; // chỉ đổi ô khi vào gần tâm ô
+  // Thử thêm ô (px,py); trả về true nếu đường kéo thay đổi.
+  function tryCell(c) {
+    if (c < 0 || state.locked.includes(c)) return false;
     const last = drag.path[drag.path.length - 1];
-    if (c === last) return;
+    if (c === last) return false;
     if (drag.path.length >= 2 && c === drag.path[drag.path.length - 2]) {
       drag.path.pop();
-    } else if (!drag.path.includes(c) && areAdjacent(last, c, allowDiag)) {
+      return true;
+    }
+    if (!drag.path.includes(c) && areAdjacent(last, c, allowDiag)) {
       drag.path.push(c);
       fx.sfx('move');
+      fx.vibrate(8);
       if (!drag.t0) drag.t0 = performance.now();
-    } else return;
-    view.board = drag.path.length >= 2 ? applyPath(state.board, drag.path) : structuredClone(state.board);
+      return true;
+    }
+    return false;
+  }
+
+  function onMove(ev) {
+    if (!drag) return;
+    // Ngón tay di chuyển nhanh có thể bỏ qua ô: nội suy từ vị trí trước tới vị trí mới, bước nhỏ hơn 1/4 ô.
+    const events = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [];
+    const pts = (events.length ? events : [ev]).map(pos);
+    let changed = false;
+    for (const p of pts) {
+      const dx = p.x - drag.x;
+      const dy = p.y - drag.y;
+      const n = Math.max(1, Math.ceil(Math.hypot(dx, dy) / (CELL / 4)));
+      for (let k = 1; k <= n; k++) {
+        const x = drag.x + (dx * k) / n;
+        const y = drag.y + (dy * k) / n;
+        const c = cellAt(x, y);
+        if (c < 0) continue;
+        const ctr = cellCenter(c);
+        if (Math.hypot(x - ctr.x, y - ctr.y) > CELL * 0.46) continue; // chỉ đổi ô khi vào gần tâm ô
+        if (tryCell(c)) changed = true;
+      }
+      drag.x = p.x;
+      drag.y = p.y;
+    }
+    if (changed) view.board = drag.path.length >= 2 ? applyPath(state.board, drag.path) : structuredClone(state.board);
   }
 
   canvas.addEventListener('pointerdown', onDown);
@@ -248,6 +312,21 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       q.vy += 0.0004 * dt;
     }
     view.particles = view.particles.filter((q) => q.age < q.life);
+    view.hurt = Math.max(0, view.hurt - dt / 450);
+    for (const r of view.rings) r.age += dt;
+    view.rings = view.rings.filter((r) => r.age < r.life);
+    for (const sh of view.shots) {
+      sh.age += dt;
+      if (!sh.done && sh.age >= sh.delay + sh.life) {
+        sh.done = true;
+        sh.onHit();
+      }
+    }
+    view.shots = view.shots.filter((sh) => !sh.done);
+    for (const en of view.enemies) {
+      en.hit = Math.max(0, (en.hit || 0) - dt / 260);
+      en.hpShow = en.hpShow == null ? en.hp : en.hpShow + (en.hp - en.hpShow) * Math.min(1, dt / 120);
+    }
     draw(g, view, now);
     requestAnimationFrame(frame);
   }

@@ -135,16 +135,24 @@ export function draw(g, view, t) {
   view.enemies.forEach((e, i) => {
     const cx = slot * i + slot / 2;
     const dead = e.hp <= 0;
-    const sh = view.shake && view.shake.enemy === i ? Math.sin(t * 0.06) * 8 : 0;
+    const sh = (view.shake && view.shake.enemy === i ? Math.sin(t * 0.06) * 8 : 0) + (e.hit ? Math.sin(t * 0.09) * 10 * e.hit : 0);
     g.save();
     g.globalAlpha = dead ? 0.2 : 1;
     g.fillStyle = COLORS[e.element];
     g.globalAlpha *= 0.25;
     g.fillRect(cx - 70 + sh, 90, 140, 150);
     g.globalAlpha = dead ? 0.2 : 1;
-    drawOrb(g, e.element, cx + sh, 160, 46);
+    drawOrb(g, e.element, cx + sh, 160, 46 * (1 + 0.12 * (e.hit || 0)));
+    if (e.hit) {
+      g.globalAlpha = 0.55 * e.hit;
+      g.fillStyle = '#ffffff';
+      g.beginPath();
+      g.arc(cx + sh, 160, 50, 0, Math.PI * 2);
+      g.fill();
+    }
     g.restore();
-    bar(g, cx - 65, 255, 130, 12, e.hp / e.maxHp, '#ff6b6b');
+    bar(g, cx - 65, 255, 130, 12, (e.hpShow ?? e.hp) / e.maxHp, '#ff6b6b');
+    text(g, `${Math.max(0, Math.round(e.hp))}`, cx, 266, 10, '#ffffff');
     text(g, view.t(`monster.${e.id}`), cx, 280, 15);
     if (!dead) {
       const off = e.effects?.some((x) => x.key === 'stun' || x.key === 'freeze');
@@ -153,6 +161,38 @@ export function draw(g, view, t) {
     }
   });
 
+  for (const r of view.rings || []) {
+    const k = r.age / r.life;
+    g.globalAlpha = 1 - k;
+    g.strokeStyle = COLORS[r.col];
+    g.lineWidth = 8 * (1 - k) + 2;
+    g.beginPath();
+    g.arc(r.x, r.y, 20 + k * 120, 0, Math.PI * 2);
+    g.stroke();
+  }
+  g.globalAlpha = 1;
+  for (const sh of view.shots || []) {
+    const k = (sh.age - sh.delay) / sh.life;
+    if (k < 0) continue;
+    const x = sh.x0 + (sh.x1 - sh.x0) * k;
+    const y = sh.y0 + (sh.y1 - sh.y0) * k - Math.sin(k * Math.PI) * 40;
+    for (let j = 3; j >= 0; j--) {
+      const kk = Math.max(0, k - j * 0.05);
+      const tx = sh.x0 + (sh.x1 - sh.x0) * kk;
+      const ty = sh.y0 + (sh.y1 - sh.y0) * kk - Math.sin(kk * Math.PI) * 40;
+      g.globalAlpha = 0.18 * (4 - j);
+      g.fillStyle = COLORS[sh.col];
+      g.beginPath();
+      g.arc(tx, ty, 14 - j * 2, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.globalAlpha = 1;
+    g.fillStyle = '#ffffff';
+    g.beginPath();
+    g.arc(x, y, 7, 0, Math.PI * 2);
+    g.fill();
+  }
+  g.globalAlpha = 1;
   for (const q of view.particles || []) {
     g.globalAlpha = 1 - q.age / q.life;
     g.fillStyle = COLORS[q.col] || '#fff';
@@ -251,12 +291,27 @@ export function draw(g, view, t) {
     g.stroke();
   }
 
+  if (view.hurt > 0) {
+    const gr = g.createRadialGradient(W / 2, H / 2, H * 0.25, W / 2, H / 2, H * 0.7);
+    gr.addColorStop(0, 'rgba(255,40,40,0)');
+    gr.addColorStop(1, `rgba(255,40,40,${0.55 * view.hurt})`);
+    g.fillStyle = gr;
+    g.fillRect(0, 0, W, H);
+  }
+
   // chữ nổi (sát thương, hồi máu)
   for (const f of view.floaters) {
     const k = f.age / f.life;
     g.save();
     g.globalAlpha = 1 - k * k;
-    text(g, f.s, f.x, f.y - k * 40, f.size || 24, f.color);
+    g.lineWidth = 5;
+    g.strokeStyle = 'rgba(10,10,25,0.85)';
+    g.lineJoin = 'round';
+    g.font = `800 ${f.size || 24}px system-ui, sans-serif`;
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.strokeText(f.s, f.x, f.y - k * 40);
+    text(g, f.s, f.x, f.y - k * 40, f.size || 24, f.color, 'center', '800');
     g.restore();
   }
 }

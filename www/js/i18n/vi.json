@@ -443,5 +443,8 @@
   "load.text": "Đang tải…",
   "set.music": "Nhạc nền",
   "set.sfx": "Hiệu ứng âm thanh",
-  "set.haptic": "Rung"
+  "set.haptic": "Rung",
+  "battle.noCombo": "Không có combo",
+  "battle.turnTotal": "Tổng {n} sát thương",
+  "battle.noAttacker": "Không ai cùng hệ"
 }
