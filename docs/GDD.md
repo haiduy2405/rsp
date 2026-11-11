@@ -217,9 +217,9 @@ Nhân vật thu thập qua loot. Tỉ lệ đề xuất, công khai trong game:
 
 | Độ hiếm | Tỉ lệ |
 |---|---|
-| 5★ | 2% |
-| 4★ | 13% |
-| 3★ | 85% |
+| 5★ | 2% (thực tế, đã tính pity; tỉ lệ gốc 0.5%) |
+| 4★ | ~16.4% (gốc 13%) |
+| 3★ | ~81.6% (gốc 86.5%) |
 
 - **Pity**: chắc chắn có 5★ sau 60 lượt; 10 lượt đảm bảo ít nhất 1 nhân vật 4★.
 - **Nhân vật trùng** thành "Mảnh Linh Hồn". Đủ 200 mảnh thì đổi 1 nhân vật tự chọn, là đường lùi cho người xui.

@@ -45,7 +45,7 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 - Đã đổi so với M2: Bùa Khiên tạo bể chắn 25% máu đội (thay vì chặn N đòn).
 
 ## M4 — Triệu hồi, Tín Vật, onboarding
-- `core/summon.js`: rút seed; 5★ 2% / 4★ 13% / 3★ 85%, bảo đảm 5★ ở lượt 60, ≥1 4★ mỗi 10 lượt, rate-up banner văn hóa 50%, trùng → Mảnh, đổi 200 Mảnh lấy nhân vật chưa có. Tỉ lệ thực (tính cả bảo đảm): 5★ 3.15%, 4★ 15.93%, 3★ 80.91% — UI hiện cả hai.
+- `core/summon.js`: rút seed; tỉ lệ gốc 5★ 0.5% / 4★ 13% / 3★ 86.5%, bảo đảm 5★ ở lượt 60, ≥1 4★ mỗi 10 lượt, rate-up banner văn hóa 50%, trùng → Mảnh, đổi 200 Mảnh lấy nhân vật chưa có. Tỉ lệ thực (tính cả bảo đảm): 5★ 2.00%, 4★ 16.44%, 3★ 81.57% — UI hiện cả hai; 5★ thực = 2% theo GDD.
 - Tín Vật: lượt đầu bắt buộc 4★ đúng văn hóa đã chọn, không tính vào pity.
 - `core/onboarding.js`: tạo phi hành gia (tên, biệt danh, quê tùy chọn, 8 avatar tạm), tặng 1000 Linh Thạch, hướng dẫn trận đầu (bỏ qua được).
 - Màn: Nghi Thức Triệu Hồi (xác nhận trước khi tiêu, lịch sử, đổi Mảnh), Nhật ký (7 mục, mở theo khu đã vượt), Cài đặt (ngôn ngữ, âm lượng, xuất/nhập, xóa dữ liệu).

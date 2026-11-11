@@ -51,11 +51,11 @@ test('mô phỏng 1.000.000 lượt: tỉ lệ cơ bản sát công bố, tỉ l
   const eff = effectiveRates(ctx.config);
   assert.ok(Math.abs(eff[5] + eff[4] + eff[3] - 1) < 1e-9);
   for (const r of [5, 4, 3]) assert.ok(Math.abs(got[r] / N - eff[r]) < 0.002, `${r}★ ${got[r] / N} vs ${eff[r]}`);
-  // 5★ thực tế cao hơn 2% nhờ pity nhưng vẫn gần: dưới 3.2%
-  assert.ok(eff[5] > 0.02 && eff[5] < 0.032, String(eff[5]));
+  // Duy duyệt: tỉ lệ 5★ thực tế (đã tính pity) phải xấp xỉ 2% công bố
+  assert.ok(Math.abs(eff[5] - 0.02) < 0.001, String(eff[5]));
 });
 
-test('lượt thường không bị bảo đảm đúng 2% / 13% / 85% (kiểm trên 200.000 lượt đầu mỗi chu kỳ)', () => {
+test('lượt thường không bị bảo đảm đúng tỉ lệ gốc trong config (kiểm trên 200.000 lượt đầu mỗi chu kỳ)', () => {
   const rng = mulberry32(99);
   const st = newSummonState();
   st.firstDone = true;
@@ -67,9 +67,9 @@ test('lượt thường không bị bảo đảm đúng 2% / 13% / 85% (kiểm t
     c[rollPull(ctx, st, ctx.banners.standard, rng, null).rarity]++;
     n++;
   }
-  assert.ok(Math.abs(c[5] / n - 0.02) < 0.002);
-  assert.ok(Math.abs(c[4] / n - 0.13) < 0.004);
-  assert.ok(Math.abs(c[3] / n - 0.85) < 0.004);
+  assert.ok(Math.abs(c[5] / n - ctx.config.summon.rates[5]) < 0.002);
+  assert.ok(Math.abs(c[4] / n - ctx.config.summon.rates[4]) < 0.004);
+  assert.ok(Math.abs(c[3] / n - ctx.config.summon.rates[3]) < 0.004);
 });
 
 test('xác định theo seed; seed khác cho kết quả khác; x10 luôn có ít nhất 1 nhân vật từ 4★', () => {
