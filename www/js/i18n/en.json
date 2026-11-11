@@ -446,5 +446,6 @@
   "set.haptic": "Vibration",
   "battle.noCombo": "No combo",
   "battle.turnTotal": "Total {n} damage",
-  "battle.noAttacker": "No unit of this element"
+  "battle.noAttacker": "No unit of this element",
+  "tut.hint": "Drag the orb along this path to match 3 of a kind"
 }

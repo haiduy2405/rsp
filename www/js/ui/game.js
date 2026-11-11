@@ -1,6 +1,7 @@
 // Điều khiển một trận: nhập liệu cảm ứng/chuột, hoạt ảnh, gọi core. Logic game nằm hết trong core/.
 import { applyPath } from '../core/move.js';
 import { areAdjacent } from '../core/board.js';
+import { step as coreStep } from '../core/battle.js';
 import { W, H, CELL, cellAt, cellCenter, draw } from './render.js';
 
 const sleep = (ms, fn) =>
@@ -19,7 +20,26 @@ const easeOut = (k) => 1 - (1 - k) * (1 - k);
 // onEnd(finalState) gọi sau khi hoạt ảnh kết thúc và trận đã phân thắng thua.
 const NOFX = { sfx() {}, vibrate() {} };
 
-export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX }) {
+// Gợi ý cho người mới: tìm một nước đổi 2 ô kề nhau tạo ra combo, ưu tiên hệ có trong đội.
+function findHint(ctx, state) {
+  let best = null;
+  for (let a = 0; a < 30; a++) {
+    if (state.locked.includes(a)) continue;
+    const ra = (a / 6) | 0;
+    for (const b of [a + 1, a + 6]) {
+      if (b >= 30 || state.locked.includes(b) || (b === a + 1 && b % 6 === 0)) continue;
+      void ra;
+      const r = coreStep(ctx, state, { type: 'move', path: [a, b] });
+      const st = r.events.find((e) => e.type === 'step');
+      if (!st) continue;
+      const dmg = st.hits.reduce((n, h) => n + (h.kind === 'damage' ? h.amount : 0), 0);
+      if (!best || dmg > best.dmg) best = { path: [a, b], dmg };
+    }
+  }
+  return best?.path ?? null;
+}
+
+export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false }) {
   const g = canvas.getContext('2d');
   let state = initial;
   let busy = false;
@@ -48,6 +68,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     timer: null,
     floaters: [],
     particles: [],
+    hint: null,
     shots: [],
     rings: [],
     hurt: 0,
@@ -67,6 +88,10 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.duos = state.duos.map((d) => ({ ...d }));
   }
   sync();
+  if (hint) {
+    const hp = findHint(ctx, state);
+    if (hp) view.hint = { path: hp, text: t('tut.hint') };
+  }
 
   const enemyX = (i) => (W / state.enemies.length) * i + W / state.enemies.length / 2;
   const floater = (s, x, y, color, size = 26) => view.floaters.push({ s, x: Math.max(70, Math.min(W - 70, x)), y, color, size, age: 0, life: 1000 });
@@ -238,6 +263,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     }
     const c = cellAt(p.x, p.y);
     if (c < 0 || state.locked.includes(c)) return;
+    view.hint = null;
     canvas.setPointerCapture?.(ev.pointerId);
     fx.sfx('pick');
     drag = { path: [c], x: p.x, y: p.y, t0: 0 };

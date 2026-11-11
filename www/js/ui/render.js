@@ -120,6 +120,69 @@ function badges(g, effects, x, y, view, align = 'left') {
   }
 }
 
+// Hiệu ứng trạng thái vẽ trên quái: Bỏng lửa bay lên, Độc bong bóng, Choáng sao xoay, Đóng băng khối băng, Khiên vòng sáng.
+function statusFx(g, effects, x, y, t) {
+  const has = (k) => effects.some((e) => e.key === k);
+  g.save();
+  if (has('freeze')) {
+    g.fillStyle = 'rgba(150,215,255,0.45)';
+    g.strokeStyle = '#d8f2ff';
+    g.lineWidth = 4;
+    g.beginPath();
+    g.roundRect(x - 56, y - 56, 112, 112, 14);
+    g.fill();
+    g.stroke();
+  }
+  if (has('burn')) {
+    for (let i = 0; i < 6; i++) {
+      const k = ((t * 0.0012 + i / 6) % 1);
+      g.globalAlpha = 1 - k;
+      g.fillStyle = i % 2 ? '#ffb347' : '#ff5a3c';
+      g.beginPath();
+      g.arc(x - 40 + i * 16 + Math.sin(t * 0.01 + i) * 4, y + 50 - k * 100, 7 * (1 - k) + 2, 0, Math.PI * 2);
+      g.fill();
+    }
+  }
+  if (has('poison')) {
+    for (let i = 0; i < 5; i++) {
+      const k = ((t * 0.0008 + i / 5) % 1);
+      g.globalAlpha = 0.9 * (1 - k);
+      g.strokeStyle = '#7dff6a';
+      g.lineWidth = 3;
+      g.beginPath();
+      g.arc(x - 36 + i * 18, y + 40 - k * 80, 6 + (i % 3) * 2, 0, Math.PI * 2);
+      g.stroke();
+    }
+  }
+  if (has('stun')) {
+    for (let i = 0; i < 3; i++) {
+      const a = t * 0.006 + (i * Math.PI * 2) / 3;
+      g.globalAlpha = 1;
+      g.fillStyle = '#ffe66b';
+      g.font = '700 22px system-ui';
+      g.textAlign = 'center';
+      g.textBaseline = 'middle';
+      g.fillText('★', x + Math.cos(a) * 46, y - 56 + Math.sin(a) * 12);
+    }
+  }
+  if (has('shield') || has('immune')) {
+    g.globalAlpha = 0.5 + Math.sin(t * 0.006) * 0.2;
+    g.strokeStyle = has('immune') ? '#ffe9a0' : '#6bd5ff';
+    g.lineWidth = 5;
+    g.beginPath();
+    g.arc(x, y, 62, 0, Math.PI * 2);
+    g.stroke();
+  }
+  if (has('atkDown')) {
+    g.globalAlpha = 1;
+    g.fillStyle = '#ff8a98';
+    g.font = '800 26px system-ui';
+    g.textAlign = 'center';
+    g.fillText('▼', x + 54, y - 40);
+  }
+  g.restore();
+}
+
 // view: { board:{cells,enh}, enemies:[{id,element,hp,maxHp,cd,every}], hp, maxHp, members:[{id,element,skillCd}],
 //         hl:Set, fall:array|null, fallT:0..1, drag:{path,x,y}|null, timer:0..1|null, floaters:[], shake, combo, turn, flash }
 export function draw(g, view, t) {
@@ -143,6 +206,7 @@ export function draw(g, view, t) {
     g.fillRect(cx - 70 + sh, 90, 140, 150);
     g.globalAlpha = dead ? 0.2 : 1;
     drawOrb(g, e.element, cx + sh, 160, 46 * (1 + 0.12 * (e.hit || 0)));
+    if (e.effects?.length && !dead) statusFx(g, e.effects, cx + sh, 160, t);
     if (e.hit) {
       g.globalAlpha = 0.55 * e.hit;
       g.fillStyle = '#ffffff';
@@ -272,6 +336,31 @@ export function draw(g, view, t) {
   if (held >= 0) {
     const type = view.board.cells[held];
     drawOrb(g, type, view.drag.x, view.drag.y, 40, !!view.board.enh[held]);
+  }
+
+  if (view.hint && !view.drag) {
+    const pts = view.hint.path.map(cellCenter);
+    g.strokeStyle = 'rgba(255,255,255,0.8)';
+    g.lineWidth = 6;
+    g.setLineDash([12, 10]);
+    g.beginPath();
+    pts.forEach((q, i) => (i ? g.lineTo(q.x, q.y) : g.moveTo(q.x, q.y)));
+    g.stroke();
+    g.setLineDash([]);
+    const k = (t % 1400) / 1400;
+    const q = { x: pts[0].x + (pts[1].x - pts[0].x) * Math.min(1, k * 1.4), y: pts[0].y + (pts[1].y - pts[0].y) * Math.min(1, k * 1.4) };
+    g.fillStyle = 'rgba(255,255,255,0.9)';
+    g.beginPath();
+    g.arc(q.x, q.y, 20, 0, Math.PI * 2);
+    g.fill();
+    g.strokeStyle = '#ffd84a';
+    g.lineWidth = 5;
+    g.beginPath();
+    g.arc(q.x, q.y, 28 + Math.sin(t * 0.01) * 4, 0, Math.PI * 2);
+    g.stroke();
+    g.fillStyle = 'rgba(8,9,22,0.85)';
+    g.fillRect(0, 932, W, 28);
+    text(g, view.hint.text, W / 2, 946, 15, '#ffe9a0');
   }
 
   for (const i of view.locked || []) {

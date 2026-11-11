@@ -109,15 +109,25 @@ function showHub() {
     const st = inv.stones[z.element];
     return h(
       'div',
-      { class: 'card btn' + (open ? '' : ' locked'), 'data-zone': z.id, onclick: open ? () => startRun(z.id) : null },
-      h('h3', {}, t(`zone.${z.id}`)),
-      h('small', {}, open ? `${t(`zone.final.${z.final}`)} · ${t('zone.clears', { n: progress.clears[z.id] || 0 })}` : t('zone.locked')),
-      open ? h('div', { class: 'muted' }, `${t('stone.normal')}: ${st.normal} · ${t('stone.rare')}: ${st.rare}`) : null,
+      { class: 'card btn charrow' + (open ? '' : ' locked'), 'data-zone': z.id, style: `border-left:6px solid ${COLORS[z.element]}`, onclick: open ? () => startRun(z.id) : null },
+      getImg(`orb:${z.element}`) ? h('img', { src: getImg(`orb:${z.element}`).src, alt: '', style: 'width:48px;height:48px;flex:none' }) : null,
+      h(
+        'div',
+        { style: 'flex:1' },
+        h('h3', {}, t(`zone.${z.id}`)),
+        h('small', {}, open ? `${t(`zone.final.${z.final}`)} · ${t('zone.clears', { n: progress.clears[z.id] || 0 })}` : t('zone.locked')),
+        open ? h('div', { class: 'muted' }, `${t('stone.normal')}: ${st.normal} · ${t('stone.rare')}: ${st.rare}`) : null,
+      ),
     );
   });
   screen(
     h('h1', {}, t('hub.title')),
-    h('p', { class: 'sub' }, `${t('hub.sub')} · ${t('player.line', { name: progress.player.name, callsign: progress.player.callsign })}`),
+    h(
+      'div',
+      { class: 'card charrow', style: 'align-items:center' },
+      h('div', { class: 'avatar', style: `background:${COLORS[progress.player.avatar % 6]};flex:none;cursor:default` }, (progress.player.name || '?')[0].toUpperCase()),
+      h('div', { style: 'flex:1' }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, `${progress.player.callsign} · ${t('hub.sub')}`)),
+    ),
     notice ? h('div', { class: 'notice' }, t(notice)) : null,
     h(
       'div',
@@ -151,7 +161,7 @@ function showHub() {
       h('p', { class: 'muted' }, t('hub.progress')),
     ),
   );
-  if (getImg('bg:hub')) $('screen').style.backgroundImage = `linear-gradient(rgba(8,9,22,.72),rgba(8,9,22,.72)),url(${getImg('bg:hub').src})`;
+  if (getImg('bg:hub')) $('screen').style.backgroundImage = `linear-gradient(rgba(8,9,22,.86),rgba(8,9,22,.86)),url(${getImg('bg:hub').src})`;
   if ($('screen')) $('screen').style.backgroundSize = 'cover';
   atHub = true;
   notice = null;
@@ -192,17 +202,33 @@ const chip = (id) => {
   const c = h('span', { class: 'chip', style: `background:${COLORS[e]}` }, el(e));
   return im ? h('span', {}, h('img', { src: im.src, alt: '', width: '36', height: '36', style: 'border-radius:8px;vertical-align:middle;margin-right:4px' }), c) : c;
 };
+// Ảnh chân dung vuông: icon nếu có, không thì ngọc hệ.
+function portrait(id, size = 64) {
+  const c = ctx.characters[id];
+  const im = getImg(`icon:${id}`);
+  const rar = c.rarity === 5 ? '#ffd84a' : c.rarity === 4 ? '#c58bff' : '#4a4f90';
+  const box = `width:${size}px;height:${size}px;border-radius:12px;border:3px solid ${rar};flex:none;background:${COLORS[c.element]}33;display:flex;align-items:center;justify-content:center;overflow:hidden`;
+  const inner = im ? h('img', { src: im.src, alt: '', width: String(size), height: String(size), style: 'width:100%;height:100%;object-fit:cover' }) : getImg(`orb:${c.element}`) ? h('img', { src: getImg(`orb:${c.element}`).src, alt: '', style: `width:${size * 0.7}px` }) : h('b', {}, el(c.element));
+  return h('div', { style: box }, inner);
+}
+
 const stars = (id) => '★'.repeat(ctx.characters[id].rarity);
 const owned = () => ctx.characterList.filter((c) => progress.characters[c.id]);
 
 function charCard(id, onclick, extra) {
   const c = progress.characters[id];
+  const def = ctx.characters[id];
   return h(
     'div',
-    { class: 'card btn' + (c ? '' : ' locked'), 'data-char': id, onclick: c ? onclick : null },
-    h('h3', {}, t(`char.${id}`), ' ', chip(id), ' ', h('small', {}, stars(id))),
-    h('small', {}, c ? `${t('char.level', { n: c.level, max: ctx.config.progression.levelMax })} · ${t('char.awaken', { n: c.awaken })}` : '???'),
-    extra,
+    { class: 'card btn charrow' + (c ? '' : ' locked'), 'data-char': id, onclick: c ? onclick : null },
+    c ? portrait(id, 64) : h('div', { style: 'width:64px;height:64px;border-radius:12px;border:3px solid #2a2f60;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px' }, '?'),
+    h(
+      'div',
+      { style: 'flex:1;min-width:0' },
+      h('h3', {}, t(`char.${id}`), ' ', h('small', {}, '★'.repeat(def.rarity))),
+      h('div', {}, h('span', { class: 'chip', style: `background:${COLORS[def.element]}` }, el(def.element)), ' ', h('small', {}, c ? `${t('char.level', { n: c.level, max: ctx.config.progression.levelMax })} · ${t('char.awaken', { n: c.awaken })}` : '???')),
+      extra,
+    ),
   );
 }
 
@@ -276,7 +302,7 @@ function showTeam(slot, msg) {
   screen(
     h('h2', {}, t('hub.team')),
     h('p', { class: 'muted' }, t('team.hint')),
-    h('div', { class: 'row' }, team.map((id, i) => h('div', { class: 'card btn', style: `width:88px;padding:6px;${i === slot ? 'border-color:#ffd84a;' : ''}`, 'data-slot': i, onclick: () => showTeam(i) }, h('small', {}, i === 0 ? t('team.leader') : t('team.slot', { n: i + 1 })), h('div', {}, t(`char.${id}`)), chip(id)))),
+    h('div', { class: 'row' }, team.map((id, i) => h('div', { class: 'card btn', style: `width:88px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px;${i === slot ? 'border-color:#ffd84a;box-shadow:0 0 10px #ffd84a66;' : ''}`, 'data-slot': i, onclick: () => showTeam(i) }, h('small', {}, i === 0 ? t('team.leader') : t('team.slot', { n: i + 1 })), portrait(id, 64), h('small', {}, t(`char.${id}`))))),
     h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(ctx.characters[team[0]].leader)}`),
     h('div', { class: 'muted' }, duos.length ? `${t('team.duoActive')}: ${duos.map((d) => t(`duo.${d.id}`)).join(', ')}` : t('team.noDuo')),
     h('h3', {}, t('team.pick')),
@@ -375,10 +401,17 @@ function showSummonResult(bannerId, results) {
       audio.vibrate(r.rarity === 5 ? [60, 40, 90] : 40);
     }
     el.replaceChildren(
-      h('h3', {}, t(`char.${r.id}`), ' ', chip(r.id), ' ', h('small', {}, '★'.repeat(r.rarity))),
-      h('small', {}, r.isNew ? t('summon.new') : t('summon.dup', { n: r.shards })),
-      r.forced ? h('div', { class: 'muted' }, t('summon.forced')) : null,
+      ...[
+        portrait(r.id, 96),
+        h('h3', {}, t(`char.${r.id}`), ' ', h('small', {}, '★'.repeat(r.rarity))),
+        h('small', {}, r.isNew ? t('summon.new') : t('summon.dup', { n: r.shards })),
+        r.forced ? h('div', { class: 'muted' }, t('summon.forced')) : null,
+      ].filter(Boolean),
     );
+    el.style.display = 'flex';
+    el.style.flexDirection = 'column';
+    el.style.alignItems = 'center';
+    el.style.gap = '6px';
   };
   const reveal = (i, el) => {
     if (!shown.has(i)) paint(i, el);
@@ -610,6 +643,7 @@ function showTutorial(n) {
   const finish = () => {
     progress = completeTutorial(progress);
     save();
+    showHint = true;
     startBattleUI();
   };
   screen(
@@ -620,7 +654,10 @@ function showTutorial(n) {
   );
 }
 
+let showHint = false;
 function startBattleUI() {
+  const hint = showHint;
+  showHint = false;
   audio.playMusic(run.node === 'boss' ? 'boss' : 'battle');
   $('screen').classList.remove('show');
   game?.destroy();
@@ -638,6 +675,7 @@ function startBattleUI() {
       return { state: r.run.battle, events: r.events };
     },
     fx: audio,
+    hint,
     onEnd(st) {
       audio.sfx(st.status === 'won' ? 'win' : 'lose');
       run = pending;

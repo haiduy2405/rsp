@@ -58,3 +58,11 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 - **Cân bằng**: `node tools/balance-sim.js --targets [đội] [lượt] [đường thử] [seed]` so tỉ lệ thắng và thời gian chuyến với `config.balance`; nhật ký ở `docs/BALANCE_LOG.md`.
 - **Polish**: particle khi xóa ngọc, rung khi bị đánh, nút Back (trong chuyến bị bỏ qua, màn khác về Hub), safe area, khóa dọc, vùng chạm ≥ 44 px.
 - E2E: `tests/e2e/m5-*.cjs` (cần `npm run serve`).
+
+### Polish đợt 2 (sau thử máy thật)
+- Kéo ngọc: nội suy theo đoạn giữa hai điểm chạm nên kéo nhanh không mất ô.
+- Chiến đấu: đòn bay từ nhân vật tới quái, chớp/rung quái, thanh máu mượt, số sát thương lớn, "Tổng N", vòng kỹ năng, viền đỏ khi bị đánh, báo "Không ai cùng hệ" khi ăn ngọc hệ đội không có.
+- Hiệu ứng trạng thái trên quái: Bỏng, Độc, Choáng, Đóng băng, Khiên/Miễn nhiễm, Giảm công.
+- Hướng dẫn trận đầu: bàn tay chỉ nước đi cụ thể (tìm bằng core).
+- Menu: thẻ nhân vật có chân dung, hồ sơ phi hành gia ở Hub, khu có biểu tượng hệ, lật thẻ triệu hồi.
+- Soak test: `NODE_PATH=$(npm root -g) node tests/e2e/m5-soak.cjs [phút]` (cần `npm run serve`).

@@ -446,5 +446,6 @@
   "set.haptic": "Rung",
   "battle.noCombo": "Không có combo",
   "battle.turnTotal": "Tổng {n} sát thương",
-  "battle.noAttacker": "Không ai cùng hệ"
+  "battle.noAttacker": "Không ai cùng hệ",
+  "tut.hint": "Kéo ngọc theo đường này để ghép 3 viên cùng loại"
 }
