@@ -10,13 +10,14 @@
     #stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
     #wrap { position: relative; aspect-ratio: 9 / 16; height: min(100vh, calc(100vw * 16 / 9)); max-width: 100vw; }
     canvas { width: 100%; height: 100%; display: block; background: #12152b; touch-action: none; }
+    :root { --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px); --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px); }
     .overlay { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(8, 9, 22, 0.88); text-align: center; padding: 24px; }
     .overlay.show { display: flex; }
     h1 { margin: 0 0 4px; font-size: 28px; letter-spacing: 0.5px; }
     p.sub { margin: 0 0 12px; opacity: 0.6; font-size: 14px; }
     button, input, select { font: inherit; border-radius: 12px; border: 1px solid #3a3f78; background: #1b1f45; color: #e8ebff; padding: 12px 18px; min-height: 44px; }
     button.primary { background: #4a5bff; border-color: #6b79ff; font-weight: 600; min-width: 200px; }
-    #screen { justify-content: flex-start; overflow-y: auto; touch-action: pan-y; gap: 10px; padding: 18px 16px; }
+    #screen { justify-content: flex-start; overflow-y: auto; touch-action: pan-y; gap: 10px; padding: calc(18px + var(--sat)) calc(16px + var(--sar)) calc(18px + var(--sab)) calc(16px + var(--sal)); overscroll-behavior: contain; }
     #screen.show { display: flex; }
     #screen > * { max-width: 100%; box-sizing: border-box; }
     .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%; }
@@ -24,7 +25,9 @@
     .card.btn { cursor: pointer; }
     .card.locked { opacity: 0.45; }
     .card h3 { margin: 0 0 4px; font-size: 16px; }
-    .card small, .muted { opacity: 0.65; font-size: 12px; }
+    .card small, .muted { opacity: 0.75; font-size: 13px; }
+    .avatar, .chip { min-height: 24px; }
+    button:focus-visible, .card.btn:focus-visible, input:focus-visible { outline: 3px solid #ffd84a; outline-offset: 2px; }
     .res { background: #151937; border-radius: 10px; padding: 6px 10px; font-size: 13px; }
     .hpbar { width: 100%; height: 14px; background: rgba(255,255,255,.12); border-radius: 7px; overflow: hidden; }
     .hpbar > i { display: block; height: 100%; background: #4cc46a; }

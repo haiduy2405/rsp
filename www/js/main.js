@@ -69,7 +69,9 @@ function h(tag, props = {}, ...kids) {
   return el;
 }
 const btn = (label, onclick, cls = '', extra = {}) => h('button', { class: cls, onclick, ...extra }, label);
+let atHub = false;
 const screen = (...kids) => {
+  atHub = false;
   audio.playMusic('hub');
   $('screen').style.backgroundImage = '';
   game?.destroy();
@@ -151,6 +153,7 @@ function showHub() {
   );
   if (getImg('bg:hub')) $('screen').style.backgroundImage = `linear-gradient(rgba(8,9,22,.72),rgba(8,9,22,.72)),url(${getImg('bg:hub').src})`;
   if ($('screen')) $('screen').style.backgroundSize = 'cover';
+  atHub = true;
   notice = null;
 }
 
@@ -720,6 +723,19 @@ if (DEBUG) {
     run = debugWinBattle(ctx, run);
     render();
   };
+}
+// Nút Back (Android/trình duyệt): trong chuyến thì bỏ qua để khỏi mất tiến trình, màn khác thì về Hub.
+history.pushState({ rsp: 1 }, '');
+window.addEventListener('popstate', () => {
+  history.pushState({ rsp: 1 }, '');
+  if (run || atHub || !progress.onboarding.done) return;
+  audio.sfx('back');
+  showHub();
+});
+try {
+  window.screen.orientation?.lock?.('portrait').catch(() => {});
+} catch {
+  /* bỏ qua */
 }
 document.title = t('game.title');
 document.documentElement.lang = lang;
