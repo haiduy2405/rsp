@@ -347,5 +347,31 @@
       "4": 30,
       "5": 100
     }
+  },
+  "summon": {
+    "rates": {
+      "5": 0.02,
+      "4": 0.13,
+      "3": 0.85
+    },
+    "pity5": 60,
+    "guarantee4Every": 10,
+    "costPerPull": 100,
+    "multiCount": 10,
+    "redeemShards": 200,
+    "welcomeSpirit": 1000,
+    "historyMax": 100,
+    "cultures": [
+      "viet",
+      "hylap",
+      "bacau",
+      "aicap"
+    ]
+  },
+  "onboarding": {
+    "avatars": 8,
+    "nameMax": 20,
+    "callsignMax": 12,
+    "hometownMax": 24
   }
 }

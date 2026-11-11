@@ -43,3 +43,11 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 - UI: Cupola có Bộ sưu tập, chi tiết nhân vật (nâng cấp), Đội hình, Từ khóa; trận có nút Duo, biểu tượng hiệu ứng, ô khóa.
 - Cân bằng: `node tools/balance-sim.js [đội/khu] [lượt/đội] [level] [thức tỉnh] [đường thử] [seed]`. Độ khó theo khu ở `config.run.zoneScale`.
 - Đã đổi so với M2: Bùa Khiên tạo bể chắn 25% máu đội (thay vì chặn N đòn).
+
+## M4 — Triệu hồi, Tín Vật, onboarding
+- `core/summon.js`: rút seed; 5★ 2% / 4★ 13% / 3★ 85%, bảo đảm 5★ ở lượt 60, ≥1 4★ mỗi 10 lượt, rate-up banner văn hóa 50%, trùng → Mảnh, đổi 200 Mảnh lấy nhân vật chưa có. Tỉ lệ thực (tính cả bảo đảm): 5★ 3.15%, 4★ 15.93%, 3★ 80.91% — UI hiện cả hai.
+- Tín Vật: lượt đầu bắt buộc 4★ đúng văn hóa đã chọn, không tính vào pity.
+- `core/onboarding.js`: tạo phi hành gia (tên, biệt danh, quê tùy chọn, 8 avatar tạm), tặng 1000 Linh Thạch, hướng dẫn trận đầu (bỏ qua được).
+- Màn: Nghi Thức Triệu Hồi (xác nhận trước khi tiêu, lịch sử, đổi Mảnh), Nhật ký (7 mục, mở theo khu đã vượt), Cài đặt (ngôn ngữ, âm lượng, xuất/nhập, xóa dữ liệu).
+- Save v4 (migrate từ v3). Data mới: `banners.json`, `story.json`.
+- E2E: `NODE_PATH=$(npm root -g) node tests/e2e/m4-newplayer.cjs` (cần `npm run serve`).

@@ -1,14 +1,117 @@
 [
-  { "id": "demo_thuy", "element": 0, "rarity": 3, "hp": 650, "atk": 130, "heal": 40,
-    "skill": { "cooldown": 4, "units": [{ "type": "damage", "target": "all", "mult": 2 }] } },
-  { "id": "demo_hoa", "element": 1, "rarity": 3, "hp": 600, "atk": 150, "heal": 20,
-    "skill": { "cooldown": 5, "units": [{ "type": "damage", "target": "one", "mult": 4 }] } },
-  { "id": "demo_moc", "element": 2, "rarity": 3, "hp": 700, "atk": 120, "heal": 50,
-    "skill": { "cooldown": 5, "units": [{ "type": "heal", "pctMax": 0.2 }] } },
-  { "id": "demo_quang", "element": 3, "rarity": 3, "hp": 600, "atk": 140, "heal": 30,
-    "skill": { "cooldown": 5, "units": [{ "type": "convert", "to": 3, "count": 6 }] } },
-  { "id": "demo_tim", "element": 5, "rarity": 3, "hp": 800, "atk": 80, "heal": 160,
-    "skill": { "cooldown": 6, "units": [{ "type": "heal", "pctMax": 0.35 }] } },
-  { "id": "demo_am", "element": 4, "rarity": 3, "hp": 620, "atk": 150, "heal": 20,
-    "skill": { "cooldown": 5, "units": [{ "type": "applyEffect", "target": "one", "effect": "weaken", "key": "weaken", "turns": 2, "value": 0.3 }] } }
+  {
+    "id": "demo_thuy",
+    "element": 0,
+    "rarity": 3,
+    "hp": 650,
+    "atk": 130,
+    "heal": 40,
+    "skill": {
+      "cooldown": 4,
+      "units": [
+        {
+          "type": "damage",
+          "target": "all",
+          "mult": 2
+        }
+      ]
+    },
+    "reserve": true
+  },
+  {
+    "id": "demo_hoa",
+    "element": 1,
+    "rarity": 3,
+    "hp": 600,
+    "atk": 150,
+    "heal": 20,
+    "skill": {
+      "cooldown": 5,
+      "units": [
+        {
+          "type": "damage",
+          "target": "one",
+          "mult": 4
+        }
+      ]
+    },
+    "reserve": true
+  },
+  {
+    "id": "demo_moc",
+    "element": 2,
+    "rarity": 3,
+    "hp": 700,
+    "atk": 120,
+    "heal": 50,
+    "skill": {
+      "cooldown": 5,
+      "units": [
+        {
+          "type": "heal",
+          "pctMax": 0.2
+        }
+      ]
+    },
+    "reserve": true
+  },
+  {
+    "id": "demo_quang",
+    "element": 3,
+    "rarity": 3,
+    "hp": 600,
+    "atk": 140,
+    "heal": 30,
+    "skill": {
+      "cooldown": 5,
+      "units": [
+        {
+          "type": "convert",
+          "to": 3,
+          "count": 6
+        }
+      ]
+    },
+    "reserve": true
+  },
+  {
+    "id": "demo_tim",
+    "element": 5,
+    "rarity": 3,
+    "hp": 800,
+    "atk": 80,
+    "heal": 160,
+    "skill": {
+      "cooldown": 6,
+      "units": [
+        {
+          "type": "heal",
+          "pctMax": 0.35
+        }
+      ]
+    },
+    "reserve": true
+  },
+  {
+    "id": "demo_am",
+    "element": 4,
+    "rarity": 3,
+    "hp": 620,
+    "atk": 150,
+    "heal": 20,
+    "skill": {
+      "cooldown": 5,
+      "units": [
+        {
+          "type": "applyEffect",
+          "target": "one",
+          "effect": "weaken",
+          "key": "weaken",
+          "turns": 2,
+          "value": 0.3
+        }
+      ]
+    },
+    "reserve": true
+  }
 ]

@@ -29,7 +29,8 @@
       "template": "atk_element",
       "element": 0,
       "pct": 0.25
-    }
+    },
+    "culture": "viet"
   },
   {
     "id": "ran",
@@ -61,7 +62,8 @@
       "template": "hp_element",
       "element": 0,
       "pct": 0.2
-    }
+    },
+    "culture": "bacau"
   },
   {
     "id": "thetis",
@@ -88,7 +90,8 @@
       "template": "hp_element",
       "element": 0,
       "pct": 0.15
-    }
+    },
+    "culture": "hylap"
   },
   {
     "id": "coc_kien_troi",
@@ -119,7 +122,8 @@
     "leader": {
       "template": "start_cd",
       "n": 1
-    }
+    },
+    "culture": "viet"
   },
   {
     "id": "thanh_giong",
@@ -151,7 +155,8 @@
       "template": "atk_element",
       "element": 1,
       "pct": 0.25
-    }
+    },
+    "culture": "viet"
   },
   {
     "id": "hephaestus",
@@ -185,7 +190,8 @@
       "template": "hp_element",
       "element": 1,
       "pct": 0.2
-    }
+    },
+    "culture": "hylap"
   },
   {
     "id": "surtr",
@@ -217,7 +223,8 @@
       "template": "atk_element",
       "element": 1,
       "pct": 0.2
-    }
+    },
+    "culture": "bacau"
   },
   {
     "id": "bennu",
@@ -247,7 +254,8 @@
     "leader": {
       "template": "heal_boost",
       "pct": 0.2
-    }
+    },
+    "culture": "aicap"
   },
   {
     "id": "son_tinh",
@@ -279,7 +287,8 @@
       "template": "hp_element",
       "element": 2,
       "pct": 0.25
-    }
+    },
+    "culture": "viet"
   },
   {
     "id": "mai_an_tiem",
@@ -307,7 +316,8 @@
     "leader": {
       "template": "heal_boost",
       "pct": 0.25
-    }
+    },
+    "culture": "viet"
   },
   {
     "id": "artemis",
@@ -339,7 +349,8 @@
       "template": "atk_element",
       "element": 2,
       "pct": 0.2
-    }
+    },
+    "culture": "hylap"
   },
   {
     "id": "atalanta",
@@ -370,7 +381,8 @@
     "leader": {
       "template": "start_cd",
       "n": 1
-    }
+    },
+    "culture": "hylap"
   },
   {
     "id": "apollo",
@@ -406,7 +418,8 @@
       "template": "atk_element",
       "element": 3,
       "pct": 0.25
-    }
+    },
+    "culture": "hylap"
   },
   {
     "id": "ra",
@@ -438,7 +451,8 @@
       "template": "atk_element",
       "element": 3,
       "pct": 0.2
-    }
+    },
+    "culture": "aicap"
   },
   {
     "id": "eos",
@@ -469,7 +483,8 @@
     "leader": {
       "template": "start_cd",
       "n": 1
-    }
+    },
+    "culture": "hylap"
   },
   {
     "id": "heimdall",
@@ -503,7 +518,8 @@
       "template": "hp_element",
       "element": 3,
       "pct": 0.15
-    }
+    },
+    "culture": "bacau"
   },
   {
     "id": "hel",
@@ -535,7 +551,8 @@
       "template": "atk_element",
       "element": 4,
       "pct": 0.25
-    }
+    },
+    "culture": "bacau"
   },
   {
     "id": "loki",
@@ -566,7 +583,8 @@
     "leader": {
       "template": "start_cd",
       "n": 2
-    }
+    },
+    "culture": "bacau"
   },
   {
     "id": "nyx",
@@ -593,7 +611,8 @@
       "template": "hp_element",
       "element": 4,
       "pct": 0.15
-    }
+    },
+    "culture": "hylap"
   },
   {
     "id": "fenrir",
@@ -625,7 +644,8 @@
       "template": "atk_element",
       "element": 4,
       "pct": 0.15
-    }
+    },
+    "culture": "bacau"
   },
   {
     "id": "co_tam",
@@ -662,7 +682,8 @@
     "leader": {
       "template": "heal_boost",
       "pct": 0.3
-    }
+    },
+    "culture": "viet"
   },
   {
     "id": "freyja",
@@ -690,7 +711,8 @@
     "leader": {
       "template": "heal_boost",
       "pct": 0.25
-    }
+    },
+    "culture": "bacau"
   },
   {
     "id": "eir",
@@ -714,7 +736,8 @@
       "template": "hp_element",
       "element": 5,
       "pct": 0.15
-    }
+    },
+    "culture": "bacau"
   },
   {
     "id": "orpheus",
@@ -744,6 +767,7 @@
     "leader": {
       "template": "heal_boost",
       "pct": 0.2
-    }
+    },
+    "culture": "hylap"
   }
 ]

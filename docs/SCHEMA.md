@@ -53,3 +53,7 @@ Hành động: `{type:'move', path:[ô...]}` hoặc `{type:'skill', index}`. B�
 - `monsters.json`: thêm `onAttack: [{key,turns,value}]` (quái áp hiệu ứng lên đội khi đánh).
 - `config.json`: `progression` (levelMax, levelGrowth, awaken[]), `budget` + `budgetWeights`, `upgrade` (level, awaken, duplicateShards), `run.zoneScale`.
 - Progress v3: thêm `characters: {id: {level, awaken}}`; đội là 5 id khác nhau đã sở hữu.
+
+## M4 (save v4)
+progress += `player{name,callsign,hometown,avatar}`, `onboarding{done,tutorialDone}`, `summon{pity5,pity4,pulls,firstDone,freeDay,history[]}`, `settings{volume}`.
+`banners.json`: {id,culture,rateUp}. `story.json`: {id,after(zoneId|null)}.

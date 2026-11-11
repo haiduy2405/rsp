@@ -13,6 +13,8 @@ export function loadCtx() {
     config: readJson('config.json'),
     characters: [...demo, ...readJson('characters.json')],
     duos: readJson('duos.json'),
+    banners: readJson('banners.json'),
+    story: readJson('story.json'),
     monsters: readJson('monsters.json'),
     zones: readJson('zones.json'),
     events: readJson('events.json'),

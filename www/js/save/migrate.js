@@ -1,7 +1,8 @@
 // Nâng cấp dữ liệu lưu qua các phiên bản. Hàm thuần, không đụng DOM hay lưu trữ.
 // v1 (giả lập, dạng phẳng): { version:1, gold, essence, spirit, shards, stones:{0..5: số}, clears:{zoneId:n}, team }
 // v2: Tinh Thạch tách Thường/Hiếm, có unlocked, pity, stats.
-// v3: thêm characters (level, awaken); xem core/progress.js.
+// v3: thêm characters (level, awaken).
+// v4: thêm player, onboarding, summon, settings; xem core/progress.js.
 import { SAVE_VERSION, DEFAULT_TEAM } from '../core/progress.js';
 
 const steps = {
@@ -37,6 +38,18 @@ const steps = {
     out.characters = Object.fromEntries(DEFAULT_TEAM.map((id) => [id, { level: 1, awaken: 0 }]));
     out.team = DEFAULT_TEAM.slice();
     return out;
+  },
+  3(data) {
+    // v4: người chơi, onboarding, triệu hồi, cài đặt. Ai đã chơi rồi thì coi như xong onboarding.
+    const played = (data.stats?.runs || 0) > 0;
+    return {
+      ...data,
+      version: 4,
+      player: { name: '', callsign: '', hometown: '', avatar: 0, culture: null },
+      onboarding: { done: played, tutorialDone: played },
+      summon: { pity5: 0, pity4: 0, pulls: 0, firstDone: false, freeDay: -1, history: [] },
+      settings: { volume: 80 },
+    };
   },
 };
 

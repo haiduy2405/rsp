@@ -1,0 +1,30 @@
+[
+  {
+    "id": "s0",
+    "after": null
+  },
+  {
+    "id": "s1",
+    "after": "zone_water"
+  },
+  {
+    "id": "s2",
+    "after": "zone_fire"
+  },
+  {
+    "id": "s3",
+    "after": "zone_wood"
+  },
+  {
+    "id": "s4",
+    "after": "zone_light"
+  },
+  {
+    "id": "s5",
+    "after": "zone_dark"
+  },
+  {
+    "id": "s6",
+    "after": "zone_heart"
+  }
+]

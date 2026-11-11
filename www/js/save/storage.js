@@ -63,6 +63,15 @@ export function createStorage(adapter, ctx) {
       }
       return { progress: newProgress(ctx), source: 'new', recovered: !!(rawMain || rawBak) };
     },
+    clear() {
+      try {
+        adapter.removeItem(KEY);
+        adapter.removeItem(BAK_KEY);
+        return true;
+      } catch {
+        return false;
+      }
+    },
     exportText: (progress) => encode(progress),
     importText(text) {
       const p = decode(text, ctx);

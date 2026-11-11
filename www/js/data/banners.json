@@ -1,0 +1,27 @@
+[
+  {
+    "id": "standard",
+    "culture": null,
+    "rateUp": 0
+  },
+  {
+    "id": "viet",
+    "culture": "viet",
+    "rateUp": 0.5
+  },
+  {
+    "id": "hylap",
+    "culture": "hylap",
+    "rateUp": 0.5
+  },
+  {
+    "id": "bacau",
+    "culture": "bacau",
+    "rateUp": 0.5
+  },
+  {
+    "id": "aicap",
+    "culture": "aicap",
+    "rateUp": 0.5
+  }
+]

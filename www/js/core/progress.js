@@ -1,5 +1,7 @@
+import { newSummonState } from './summon.js';
+import { newPlayer } from './onboarding.js';
 // Tiến trình người chơi (dữ liệu được lưu). Hàm thuần: nhận progress, trả progress mới.
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 export const DEFAULT_TEAM = ['thetis', 'bennu', 'atalanta', 'eos', 'eir'];
 
@@ -15,6 +17,10 @@ export function newProgress(ctx) {
     stats: { runs: 0, wins: 0, losses: 0 },
     characters: Object.fromEntries(DEFAULT_TEAM.map((id) => [id, { level: 1, awaken: 0 }])),
     team: DEFAULT_TEAM.slice(),
+    player: newPlayer(),
+    onboarding: { done: false, tutorialDone: false },
+    summon: newSummonState(),
+    settings: { volume: 80 },
   };
 }
 
@@ -33,6 +39,10 @@ export function isValidProgress(p) {
   if (!p.characters || typeof p.characters !== 'object') return false;
   for (const c of Object.values(p.characters)) if (!Number.isInteger(c.level) || c.level < 1 || !Number.isInteger(c.awaken) || c.awaken < 0 || c.awaken > 5) return false;
   if (!p.team.every((id) => p.characters[id])) return false;
+  if (!p.player || typeof p.player.name !== 'string' || !p.onboarding || typeof p.onboarding.done !== 'boolean') return false;
+  const sm = p.summon;
+  if (!sm || !Number.isInteger(sm.pity5) || !Number.isInteger(sm.pity4) || !Number.isInteger(sm.pulls) || !Array.isArray(sm.history)) return false;
+  if (!p.settings || typeof p.settings.volume !== 'number') return false;
   return true;
 }
 
