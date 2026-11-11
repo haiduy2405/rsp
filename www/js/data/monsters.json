@@ -1,0 +1,5 @@
+[
+  { "id": "m_ember", "element": 1, "hp": 2200, "atk": 220, "attackEvery": 2 },
+  { "id": "m_tide", "element": 0, "hp": 3200, "atk": 260, "attackEvery": 3 },
+  { "id": "m_shade", "element": 4, "hp": 4500, "atk": 320, "attackEvery": 3 }
+]

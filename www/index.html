@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0d1a" />
+  <title>Thiên Tháp Dị Điểm</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0b0d1a; color: #e8ebff; font-family: system-ui, sans-serif; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+    #stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+    #wrap { position: relative; aspect-ratio: 9 / 16; height: min(100vh, calc(100vw * 16 / 9)); max-width: 100vw; }
+    canvas { width: 100%; height: 100%; display: block; background: #12152b; touch-action: none; }
+    .overlay { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(8, 9, 22, 0.88); text-align: center; padding: 24px; }
+    .overlay.show { display: flex; }
+    h1 { margin: 0 0 4px; font-size: 28px; letter-spacing: 0.5px; }
+    p.sub { margin: 0 0 12px; opacity: 0.6; font-size: 14px; }
+    button, input, select { font: inherit; border-radius: 12px; border: 1px solid #3a3f78; background: #1b1f45; color: #e8ebff; padding: 12px 18px; min-height: 44px; }
+    button.primary { background: #4a5bff; border-color: #6b79ff; font-weight: 600; min-width: 200px; }
+    label { font-size: 13px; opacity: 0.8; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <div id="wrap">
+      <canvas id="cv" width="540" height="960"></canvas>
+      <div id="menu" class="overlay show">
+        <h1 id="m-title"></h1>
+        <p class="sub" id="m-sub"></p>
+        <label><span id="m-seed-l"></span><input id="m-seed" inputmode="numeric" placeholder="123" /></label>
+        <label><span id="m-lang-l"></span>
+          <select id="m-lang"><option value="vi">Tiếng Việt</option><option value="en">English</option></select>
+        </label>
+        <button class="primary" id="m-start"></button>
+      </div>
+      <div id="result" class="overlay">
+        <h1 id="r-title"></h1>
+        <p class="sub" id="r-seed"></p>
+        <button class="primary" id="r-again"></button>
+        <button id="r-menu"></button>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "board": { "allowDiagonal": false },
+  "dragTimeMs": 5000,
+  "elements": ["water", "fire", "wood", "light", "dark", "heart"],
+  "advantage": { "0": [1], "1": [2], "2": [0], "3": [4], "4": [3] },
+  "elementMult": { "strong": 1.5, "weak": 0.5 },
+  "combo": { "step": 0.25 },
+  "group": { "sizeBonus": 0.25, "fourOrbBoost": 1.5, "enhancedBonus": 0.25 },
+  "heal": { "base": 1.0 }
+}
