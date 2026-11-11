@@ -185,7 +185,7 @@ function showDoors() {
   const rc = ctx.config.run.items;
   const desc = {
     potion: t('item.desc.potion', { n: Math.round(rc.potion.healPct * 100) }),
-    shield: t('item.desc.shield', { n: rc.shield.charges }),
+    shield: t('item.desc.shield', { n: Math.round(rc.shield.pct * 100) }),
     time: t('item.desc.time', { n: rc.time.bonusMs / 1000 }),
   };
   const items = ['potion', 'shield', 'time'].map((it) =>

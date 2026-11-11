@@ -1,7 +1,8 @@
 // Nâng cấp dữ liệu lưu qua các phiên bản. Hàm thuần, không đụng DOM hay lưu trữ.
 // v1 (giả lập, dạng phẳng): { version:1, gold, essence, spirit, shards, stones:{0..5: số}, clears:{zoneId:n}, team }
-// v2: xem core/progress.js (Tinh Thạch tách Thường/Hiếm, có unlocked, pity, stats).
-import { SAVE_VERSION } from '../core/progress.js';
+// v2: Tinh Thạch tách Thường/Hiếm, có unlocked, pity, stats.
+// v3: thêm characters (level, awaken); xem core/progress.js.
+import { SAVE_VERSION, DEFAULT_TEAM } from '../core/progress.js';
 
 const steps = {
   1(data, ctx) {
@@ -29,6 +30,13 @@ const steps = {
       stats: { runs: wins, wins, losses: 0 },
       team: Array.isArray(data.team) && data.team.length === 5 ? data.team : ['demo_thuy', 'demo_hoa', 'demo_moc', 'demo_quang', 'demo_tim'],
     };
+  },
+  2(data) {
+    // Đội cũ dùng nhân vật mẫu không còn trong roster: chuyển sang đội khởi đầu.
+    const out = { ...data, version: 3 };
+    out.characters = Object.fromEntries(DEFAULT_TEAM.map((id) => [id, { level: 1, awaken: 0 }]));
+    out.team = DEFAULT_TEAM.slice();
+    return out;
   },
 };
 

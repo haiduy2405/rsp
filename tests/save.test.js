@@ -85,7 +85,7 @@ test('save: không ghi đè bản dự phòng tốt bằng bản chính đã h�
   assert.equal(ad.getItem(BAK_KEY), goodBak);
 });
 
-test('save: migrate v1 giả lập lên v2', () => {
+test('save: migrate v1 giả lập lên bản hiện tại', () => {
   const v1 = {
     version: 1,
     gold: 500,
@@ -107,7 +107,7 @@ test('save: migrate v1 giả lập lên v2', () => {
   // qua đường decode với checksum của v1
   const text = JSON.stringify({ v: 1, sum: hashV1(v1), data: v1 });
   const viaDecode = decode(text, ctx);
-  assert.ok(viaDecode && viaDecode.version === 2);
+  assert.ok(viaDecode && viaDecode.version === SAVE_VERSION);
   // phiên bản từ tương lai thì không nhận
   assert.equal(migrate({}, 99, ctx), null);
 });

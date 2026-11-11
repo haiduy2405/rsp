@@ -1,0 +1,380 @@
+[
+  {
+    "id": "duo01",
+    "a": "son_tinh",
+    "b": "thuy_tinh",
+    "reason": "Truyền thuyết Sơn Tinh Thủy Tinh",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "damage",
+          "target": "all",
+          "mult": 2.5,
+          "element": 0
+        },
+        {
+          "type": "applyEffect",
+          "target": "all",
+          "key": "atkDown",
+          "turns": 2,
+          "value": 0.3
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo02",
+    "a": "apollo",
+    "b": "artemis",
+    "reason": "Cặp song sinh trong thần thoại Hy Lạp",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "damage",
+          "target": "one",
+          "mult": 4
+        },
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "atkUp",
+          "turns": 3,
+          "value": 0.3
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo03",
+    "a": "hephaestus",
+    "b": "thetis",
+    "reason": "Thetis nhờ Hephaestus rèn áo giáp cho Achilles",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "shield",
+          "turns": 4,
+          "value": 0.3
+        },
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "reflect",
+          "turns": 3,
+          "value": 0.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo04",
+    "a": "hel",
+    "b": "loki",
+    "reason": "Hel là con gái của Loki",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "damage",
+          "target": "all",
+          "mult": 2
+        },
+        {
+          "type": "applyEffect",
+          "target": "one",
+          "key": "freeze",
+          "turns": 2,
+          "value": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo05",
+    "a": "freyja",
+    "b": "hel",
+    "reason": "Freyja và Hel cùng giữ linh hồn người chết",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "heal",
+          "pctMax": 0.3
+        },
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "immune",
+          "turns": 2,
+          "value": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo06",
+    "a": "thanh_giong",
+    "b": "mai_an_tiem",
+    "reason": "Cùng thời Hùng Vương",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "damage",
+          "target": "one",
+          "mult": 4
+        },
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "regen",
+          "turns": 3,
+          "value": 0.04
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo07",
+    "a": "co_tam",
+    "b": "eir",
+    "reason": "Cô Tấm hồi sinh, Eir chữa lành",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "heal",
+          "pctMax": 0.5
+        },
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "regen",
+          "turns": 4,
+          "value": 0.04
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo08",
+    "a": "ra",
+    "b": "bennu",
+    "reason": "Bennu gắn với thần Mặt Trời Ra",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "damage",
+          "target": "all",
+          "mult": 2.5,
+          "element": 1
+        },
+        {
+          "type": "applyEffect",
+          "target": "all",
+          "key": "burn",
+          "turns": 3,
+          "value": 0.05
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo09",
+    "a": "apollo",
+    "b": "orpheus",
+    "reason": "Orpheus là con của Apollo theo một dị bản (Calliope)",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "atkUp",
+          "turns": 3,
+          "value": 0.25
+        },
+        {
+          "type": "heal",
+          "pctMax": 0.2
+        }
+      ]
+    },
+    "source": "dị bản: Orpheus con của Apollo và Calliope"
+  },
+  {
+    "id": "duo10",
+    "a": "artemis",
+    "b": "atalanta",
+    "reason": "Hai nữ thợ săn nổi tiếng",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "damage",
+          "target": "one",
+          "mult": 5
+        },
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "pierce",
+          "turns": 3,
+          "value": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo11",
+    "a": "nyx",
+    "b": "eos",
+    "reason": "Đêm nhường chỗ cho bình minh",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "damage",
+          "target": "all",
+          "mult": 2
+        },
+        {
+          "type": "applyEffect",
+          "target": "all",
+          "key": "stun",
+          "turns": 1,
+          "value": 0
+        },
+        {
+          "type": "heal",
+          "pctMax": 0.15
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo12",
+    "a": "heimdall",
+    "b": "loki",
+    "reason": "Heimdall và Loki giết nhau trong Ragnarok",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "damage",
+          "target": "one",
+          "mult": 4
+        },
+        {
+          "type": "applyEffect",
+          "target": "one",
+          "key": "atkDown",
+          "turns": 3,
+          "value": 0.4
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo13",
+    "a": "mai_an_tiem",
+    "b": "coc_kien_troi",
+    "reason": "Hạn hán và mưa",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "heal",
+          "pctMax": 0.25
+        },
+        {
+          "type": "convert",
+          "to": 0,
+          "count": 4
+        },
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "regen",
+          "turns": 3,
+          "value": 0.03
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo14",
+    "a": "ran",
+    "b": "thuy_tinh",
+    "reason": "Hai chúa tể biển cả",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "damage",
+          "target": "all",
+          "mult": 3,
+          "element": 0
+        },
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "shield",
+          "turns": 3,
+          "value": 0.2
+        }
+      ]
+    }
+  },
+  {
+    "id": "duo15",
+    "a": "surtr",
+    "b": "fenrir",
+    "reason": "Surtr và Fenrir trong Ragnarok",
+    "skill": {
+      "cooldown": 7,
+      "startCooldown": 4,
+      "units": [
+        {
+          "type": "damage",
+          "target": "all",
+          "mult": 3.5
+        },
+        {
+          "type": "applyEffect",
+          "target": "all",
+          "key": "burn",
+          "turns": 3,
+          "value": 0.05
+        },
+        {
+          "type": "applyEffect",
+          "target": "all",
+          "key": "poison",
+          "turns": 4,
+          "value": 0.02
+        }
+      ]
+    }
+  }
+]

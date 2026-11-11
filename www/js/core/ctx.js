@@ -15,5 +15,8 @@ export function buildCtx(raw) {
     zoneList,
     events: indexById(raw.events),
     eventList: raw.events,
+    duos: indexById(raw.duos || []),
+    duoList: raw.duos || [],
+    duoByPair: Object.fromEntries((raw.duos || []).flatMap((d) => [[`${d.a}|${d.b}`, d], [`${d.b}|${d.a}`, d]])),
   };
 }

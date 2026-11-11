@@ -6,10 +6,13 @@ import { indexById, buildCtx } from '../www/js/core/ctx.js';
 const dataDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'www', 'js', 'data');
 export const readJson = (f) => JSON.parse(fs.readFileSync(path.join(dataDir, f), 'utf8'));
 
+const demo = JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'demo_characters.json'), 'utf8'));
+
 export function loadCtx() {
   return buildCtx({
     config: readJson('config.json'),
-    characters: readJson('characters.json'),
+    characters: [...demo, ...readJson('characters.json')],
+    duos: readJson('duos.json'),
     monsters: readJson('monsters.json'),
     zones: readJson('zones.json'),
     events: readJson('events.json'),

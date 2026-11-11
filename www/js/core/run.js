@@ -1,5 +1,5 @@
 import { mulberry32 } from './rng.js';
-import { createBattle, step } from './battle.js';
+import { createBattle, step, buildMembers } from './battle.js';
 import { rollLoot, emptyLoot, addLoot } from './loot.js';
 
 // Một chuyến leo tháp: máy trạng thái thuần, xác định theo seed.
@@ -32,7 +32,7 @@ export function createRun(ctx, { seed, zoneId, team, pityMissed = false }) {
   const rng = mulberry32(seed);
   const { min, max } = ctx.config.run.floors;
   const floors = min + rng.int(max - min + 1);
-  const maxHp = team.reduce((a, id) => a + ctx.characters[id].hp, 0);
+  const { maxHp } = buildMembers(ctx, team);
   const run = {
     version: 1,
     seed,
@@ -82,7 +82,7 @@ function startBattle(ctx, run, rng, kind) {
     enemies,
     scale,
     hp: run.hp,
-    shield: run.armed.shield ? rc.items.shield.charges : 0,
+    startEffects: run.armed.shield ? [{ key: 'shield', turns: 999, value: rc.items.shield.pct }] : [],
     dragBonusMs: run.armed.time ? rc.items.time.bonusMs : 0,
   });
   run.armed = { shield: false, time: false };

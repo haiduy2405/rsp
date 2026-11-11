@@ -183,7 +183,8 @@ test('items: bình hồi máu, bùa khiên và bùa thời gian chỉ dùng ở 
   r = runStep(ctx, r, { type: 'useItem', item: 'time' }).run;
   assert.deepEqual(r.armed, { shield: true, time: true });
   r = runStep(ctx, r, { type: 'door', index: idx }).run;
-  assert.equal(r.battle.shield, ctx.config.run.items.shield.charges);
+  assert.equal(r.battle.team.effects[0].key, 'shield');
+  assert.equal(r.battle.team.effects[0].pool, Math.round(r.battle.maxHp * ctx.config.run.items.shield.pct));
   assert.equal(r.battle.dragBonusMs, ctx.config.run.items.time.bonusMs);
   assert.deepEqual(r.armed, { shield: false, time: false });
   assert.equal(runStep(ctx, r, { type: 'useItem', item: 'potion' }).events[0].reason, 'items_only_at_doors');
@@ -197,11 +198,12 @@ test('items: Bùa Khiên chặn đòn đánh của quái', () => {
   r.battle.hp = 5000;
   r.hp = 5000;
   r.battle.maxHp = Math.max(r.battle.maxHp, 5000);
+  r.battle.enemies.forEach((e) => (e.atk = 100));
   const out = runStep(ctx, r, noMatchMove);
   const attacks = out.events.filter((e) => e.type === 'enemyAttack');
   assert.equal(attacks.length, 2);
-  assert.ok(attacks.every((e) => e.absorbed && e.amount === 0));
-  assert.equal(out.run.battle.shield, 0);
+  assert.ok(attacks.every((e) => e.blocked > 0 && e.amount === 0));
+  assert.ok(out.run.battle.team.effects[0].pool < Math.round(r.battle.maxHp * ctx.config.run.items.shield.pct));
   assert.equal(out.run.hp, 5000);
 });
 

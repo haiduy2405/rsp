@@ -26,10 +26,26 @@ export function validate(value, schema, path = '$') {
   return errs;
 }
 
-const skillUnit = {
+const EFFECT_KEYS = ['burn', 'poison', 'stun', 'freeze', 'shield', 'regen', 'atkUp', 'atkDown', 'reflect', 'pierce', 'lock', 'immune'];
+export const skillUnit = {
   type: 'object',
   required: ['type'],
-  properties: { type: { type: 'string', enum: ['damage', 'heal', 'convert', 'applyEffect'] } },
+  properties: {
+    type: { type: 'string', enum: ['damage', 'heal', 'convert', 'applyEffect'] },
+    key: { type: 'string', enum: EFFECT_KEYS },
+    target: { type: 'string', enum: ['one', 'all', 'team'] },
+    turns: { type: 'integer', min: 1 },
+  },
+};
+export const skillSchema = {
+  type: 'object',
+  required: ['cooldown', 'units'],
+  properties: { cooldown: { type: 'integer', min: 1 }, units: { type: 'array', minItems: 1, items: skillUnit } },
+};
+export const duoSchema = {
+  type: 'object',
+  required: ['id', 'a', 'b', 'skill'],
+  properties: { id: { type: 'string' }, a: { type: 'string' }, b: { type: 'string' }, skill: skillSchema },
 };
 
 export const characterSchema = {
@@ -42,14 +58,7 @@ export const characterSchema = {
     hp: { type: 'integer', min: 1 },
     atk: { type: 'integer', min: 0 },
     heal: { type: 'integer', min: 0 },
-    skill: {
-      type: 'object',
-      required: ['cooldown', 'units'],
-      properties: {
-        cooldown: { type: 'integer', min: 1 },
-        units: { type: 'array', minItems: 1, items: skillUnit },
-      },
-    },
+    skill: skillSchema,
   },
 };
 

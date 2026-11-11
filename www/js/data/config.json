@@ -68,7 +68,7 @@
         "price": 60
       },
       "shield": {
-        "charges": 2,
+        "pct": 0.25,
         "price": 80
       },
       "time": {
@@ -242,5 +242,92 @@
   "sim": {
     "awakenNormalStones": 6,
     "awakenRareStones": 2
+  },
+  "progression": {
+    "levelMax": 30,
+    "levelGrowth": 0.015,
+    "minCooldown": 2,
+    "awaken": [
+      {
+        "stat": 0.05
+      },
+      {
+        "stat": 0.05
+      },
+      {
+        "cd": 1
+      },
+      {
+        "stat": 0.1
+      },
+      {
+        "cd": 1
+      }
+    ]
+  },
+  "budget": {
+    "3": 330,
+    "4": 420,
+    "5": 520
+  },
+  "budgetWeights": {
+    "hp": 0.1,
+    "atk": 1,
+    "heal": 1
+  },
+  "upgrade": {
+    "level": {
+      "baseEssence": 30,
+      "growth": 0.1,
+      "rarityMult": {
+        "3": 1,
+        "4": 1.3,
+        "5": 1.6
+      }
+    },
+    "awaken": {
+      "rarityMult": {
+        "3": 1,
+        "4": 1.5,
+        "5": 2
+      },
+      "stages": [
+        {
+          "shards": 2,
+          "stone": "normal",
+          "stones": 6,
+          "gold": 300
+        },
+        {
+          "shards": 3,
+          "stone": "normal",
+          "stones": 6,
+          "gold": 500
+        },
+        {
+          "shards": 4,
+          "stone": "normal",
+          "stones": 6,
+          "gold": 800
+        },
+        {
+          "shards": 5,
+          "stone": "rare",
+          "stones": 2,
+          "gold": 1500
+        },
+        {
+          "shards": 6,
+          "stone": "rare",
+          "stones": 2,
+          "gold": 2500
+        }
+      ]
+    },
+    "duplicateShards": {
+      "3": 10,
+      "4": 30,
+      "5": 100
+    }
   }
 }

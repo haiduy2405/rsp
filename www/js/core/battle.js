@@ -1,31 +1,72 @@
 import { mulberry32 } from './rng.js';
-import { createBoard, N, ORB_TYPES, ORB_HEART } from './board.js';
+import { createBoard, N, ORB_HEART } from './board.js';
 import { validatePath, applyPath } from './move.js';
 import { resolve } from './match.js';
 import { elementMultiplier, comboMultiplier, groupFactor } from './damage.js';
-import { addEffect, tickEffects } from './effects.js';
+import {
+  addEffect,
+  hasEffect,
+  atkMult,
+  isDisabled,
+  takeDamage,
+  reflectCap,
+  dotDamage,
+  regenAmount,
+  expire,
+  lockCells,
+  shieldPool,
+} from './effects.js';
+import { statsFor, skillCooldown, normTeam } from './stats.js';
 
-// ctx = { config, characters: {id: def}, monsters: {id: def} } (dữ liệu từ JSON, không đổi)
+// ctx = { config, characters, monsters, duoByPair, ... } (dữ liệu từ JSON, không đổi)
 export { indexById } from './ctx.js';
 
-// Tùy chọn cho chuyến leo tháp: scale {hp, atk} nhân chỉ số quái, hp (máu đội mang theo),
-// shield (số đòn chặn), dragBonusMs (cộng thời gian kéo cho UI).
-export function createBattle(ctx, { seed, team, enemies, scale, hp, shield, dragBonusMs }) {
-  const rng = mulberry32(seed);
-  const board = createBoard(rng);
-  const members = team.map((id) => {
+// Dựng 5 thành viên (chỉ số theo Level/Thức tỉnh, thưởng đội trưởng). Dùng chung cho trận và chuyến.
+export function buildMembers(ctx, team) {
+  const roster = normTeam(team);
+  const members = roster.map(({ id, level, awaken }) => {
     const c = ctx.characters[id];
     if (!c) throw new Error('unknown character ' + id);
+    const st = statsFor(ctx, id, level, awaken);
     return {
       id,
       element: c.element,
-      hp: c.hp,
-      atk: c.atk,
-      heal: c.heal,
-      skillCd: c.skill?.startCooldown ?? 0,
+      level,
+      awaken,
+      hp: st.hp,
+      atk: st.atk,
+      heal: st.heal,
+      skillCd: c.skill ? (c.skill.startCooldown ?? 0) : 0,
+      skillMax: c.skill ? skillCooldown(ctx, id, awaken) : 0,
     };
   });
-  const maxHp = members.reduce((a, m) => a + m.hp, 0);
+  // Kỹ năng đội trưởng (khuôn mẫu cố định, tham số hóa trong JSON).
+  const lead = ctx.characters[members[0].id].leader || null;
+  if (lead) {
+    for (const m of members) {
+      if (lead.template === 'atk_element' && m.element === lead.element) m.atk = Math.round(m.atk * (1 + lead.pct));
+      else if (lead.template === 'hp_element' && m.element === lead.element) m.hp = Math.round(m.hp * (1 + lead.pct));
+      else if (lead.template === 'heal_boost') m.heal = Math.round(m.heal * (1 + lead.pct));
+      else if (lead.template === 'start_cd') m.skillCd = Math.max(0, m.skillCd - lead.n);
+    }
+  }
+  for (const m of members) m.skillCd = Math.min(m.skillCd, m.skillMax);
+  return { members, lead, maxHp: members.reduce((a, m) => a + m.hp, 0) };
+}
+
+// team: danh sách id hoặc {id, level, awaken}. Ô đầu là đội trưởng.
+// Tùy chọn cho chuyến leo tháp: scale {hp, atk} nhân chỉ số quái, hp (máu đội mang theo),
+// startEffects (hiệu ứng đội có sẵn, vd Bùa Khiên), dragBonusMs (cộng thời gian kéo cho UI).
+export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects, dragBonusMs }) {
+  const rng = mulberry32(seed);
+  const board = createBoard(rng);
+  const { members, lead, maxHp } = buildMembers(ctx, team);
+  // Duo: hai nhân vật đứng liền ô và thuộc một cặp định sẵn.
+  const duos = [];
+  for (let i = 0; i + 1 < members.length; i++) {
+    const d = ctx.duoByPair?.[`${members[i].id}|${members[i + 1].id}`];
+    if (d) duos.push({ id: d.id, slot: i, cd: d.skill.startCooldown ?? 0 });
+  }
   const foes = enemies.map((id) => {
     const m = ctx.monsters[id];
     if (!m) throw new Error('unknown monster ' + id);
@@ -39,18 +80,24 @@ export function createBattle(ctx, { seed, team, enemies, scale, hp, shield, drag
       every: m.attackEvery,
       cd: m.attackEvery,
       effects: [],
+      recover: 0,
     };
   });
+  const teamHolder = { effects: [], recover: 0, maxHp };
+  for (const e of startEffects || []) addEffect(teamHolder, e);
   return {
-    version: 1,
+    version: 2,
     turn: 0,
     status: 'playing',
     rng: rng.state,
     board,
     members,
+    leader: lead || null,
+    duos,
+    team: teamHolder,
+    locked: [],
     hp: Math.min(maxHp, hp ?? maxHp),
     maxHp,
-    shield: shield ?? 0,
     dragBonusMs: dragBonusMs ?? 0,
     enemies: foes,
   };
@@ -59,12 +106,20 @@ export function createBattle(ctx, { seed, team, enemies, scale, hp, shield, drag
 function firstAlive(s) {
   return s.enemies.findIndex((e) => e.hp > 0);
 }
+const aliveIdx = (s) => s.enemies.map((_, i) => i).filter((i) => s.enemies[i].hp > 0);
 
-function hitEnemy(s, idx, amount, hits, from) {
+// Sát thương của đội lên quái (qua tan băng, Khiên, Phản đòn).
+function hitEnemy(s, idx, amount, hits, from, element) {
   const e = s.enemies[idx];
-  const dealt = Math.min(e.hp, amount);
+  const r = takeDamage(e, amount, { element, pierce: hasEffect(s.team, 'pierce') });
+  const dealt = Math.min(e.hp, r.hpLoss);
   e.hp -= dealt;
-  hits.push({ kind: 'damage', enemy: idx, amount: dealt, raw: amount, from, killed: e.hp <= 0 });
+  hits.push({ kind: 'damage', enemy: idx, amount: dealt, raw: amount, absorbed: r.absorbed, thawed: r.thawed, from, killed: e.hp <= 0 });
+  if (r.reflect > 0) {
+    const back = Math.min(r.reflect, reflectCap(s.maxHp));
+    s.hp = Math.max(0, s.hp - back);
+    hits.push({ kind: 'reflect', to: 'team', amount: back });
+  }
 }
 
 function healTeam(s, amount, hits, from) {
@@ -78,23 +133,27 @@ function checkEnd(s) {
   else if (s.hp <= 0) s.status = 'lost';
 }
 
-function runSkill(ctx, s, rng, memberIdx) {
-  const m = s.members[memberIdx];
-  const def = ctx.characters[m.id].skill;
+// Áp hiệu ứng lên Đội (Khóa ngọc chọn ô bằng rng).
+function applyToTeam(s, rng, u, extraTurns = 0) {
+  const r = addEffect(s.team, { key: u.key, turns: u.turns + extraTurns, value: u.value });
+  if (r.applied && u.key === 'lock') lockCells(s.locked, u.value, rng, N);
+  return r;
+}
+
+// Chạy một danh sách đơn vị kỹ năng. caster: { atk, element, id }.
+function runUnits(ctx, s, rng, units, caster) {
   const hits = [];
-  for (const u of def.units) {
+  const teamAtk = atkMult(s.team);
+  for (const u of units) {
     if (u.type === 'damage') {
-      const targets =
-        u.target === 'all'
-          ? s.enemies.map((_, i) => i).filter((i) => s.enemies[i].hp > 0)
-          : [firstAlive(s)].filter((i) => i >= 0);
-      const el = u.element ?? m.element;
+      const targets = u.target === 'all' ? aliveIdx(s) : [firstAlive(s)].filter((i) => i >= 0);
+      const el = u.element ?? caster.element;
       for (const i of targets) {
         const mult = elementMultiplier(el, s.enemies[i].element, ctx.config);
-        hitEnemy(s, i, Math.round(m.atk * u.mult * mult), hits, m.id);
+        hitEnemy(s, i, Math.round(caster.atk * teamAtk * u.mult * mult), hits, caster.id, el);
       }
     } else if (u.type === 'heal') {
-      healTeam(s, Math.round(s.maxHp * u.pctMax), hits, m.id);
+      healTeam(s, Math.round(s.maxHp * u.pctMax), hits, caster.id);
     } else if (u.type === 'convert') {
       let left = u.count;
       let guard = 0;
@@ -107,44 +166,119 @@ function runSkill(ctx, s, rng, memberIdx) {
         }
       }
     } else if (u.type === 'applyEffect') {
-      const targets =
-        u.target === 'all'
-          ? s.enemies.map((_, i) => i).filter((i) => s.enemies[i].hp > 0)
-          : [firstAlive(s)].filter((i) => i >= 0);
-      for (const i of targets) addEffect(s.enemies[i], u);
+      if (u.target === 'team') applyToTeam(s, rng, u);
+      else {
+        const targets = u.target === 'all' ? aliveIdx(s) : [firstAlive(s)].filter((i) => i >= 0);
+        for (const i of targets) if (u.key !== 'lock') addEffect(s.enemies[i], u);
+      }
     }
   }
   return hits;
 }
 
-// action: { type: 'move', path: [cells] } | { type: 'skill', index }
+function enemyAttack(ctx, s, rng, i, events) {
+  const e = s.enemies[i];
+  const dmg = Math.round(e.atk * atkMult(e));
+  const r = takeDamage(s.team, dmg, { element: e.element, pierce: hasEffect(e, 'pierce') });
+  s.hp = Math.max(0, s.hp - r.hpLoss);
+  events.push({ type: 'enemyAttack', enemy: i, amount: r.hpLoss, blocked: r.absorbed, thawed: r.thawed });
+  if (r.reflect > 0) {
+    const back = Math.min(r.reflect, reflectCap(e.maxHp));
+    e.hp = Math.max(0, e.hp - back);
+    events.push({ type: 'reflect', to: 'enemy', enemy: i, amount: back });
+  }
+  for (const u of ctx.monsters[e.id].onAttack || []) {
+    if (s.hp <= 0) break;
+    // Hiệu ứng do quái áp trong pha quái tính từ lượt sau (+1).
+    const res = applyToTeam(s, rng, u, 1);
+    events.push({ type: 'effect', target: 'team', key: u.key, applied: res.applied });
+  }
+}
+
+// Cuối lượt: Bỏng/Độc quái -> thắng? -> Bỏng/Độc đội -> thua? -> Hồi máu quái, đội -> hết hạn.
+function endOfTurn(s, events) {
+  s.enemies.forEach((e, i) => {
+    if (e.hp <= 0) return;
+    const d = dotDamage(e);
+    if (d > 0) {
+      e.hp = Math.max(0, e.hp - d);
+      events.push({ type: 'dot', target: 'enemy', enemy: i, amount: d });
+    }
+  });
+  checkEnd(s);
+  if (s.status !== 'playing') return;
+  const td = dotDamage(s.team);
+  if (td > 0) {
+    s.hp = Math.max(0, s.hp - td);
+    events.push({ type: 'dot', target: 'team', amount: td });
+  }
+  checkEnd(s);
+  if (s.status !== 'playing') return;
+  s.enemies.forEach((e, i) => {
+    if (e.hp <= 0) return;
+    const h = Math.min(regenAmount(e), e.maxHp - e.hp);
+    if (h > 0) {
+      e.hp += h;
+      events.push({ type: 'regen', target: 'enemy', enemy: i, amount: h });
+    }
+  });
+  const th = Math.min(regenAmount(s.team), s.maxHp - s.hp);
+  if (th > 0) {
+    s.hp += th;
+    events.push({ type: 'regen', target: 'team', amount: th });
+  }
+  for (const e of s.enemies) if (e.hp > 0) expire(e);
+  expire(s.team);
+  if (!hasEffect(s.team, 'lock')) s.locked = [];
+}
+
+// action: { type: 'move', path } | { type: 'skill', index } | { type: 'duo', index }
 // Trả về { state, events }. State đầu vào không bị sửa.
 export function step(ctx, state, action) {
   if (state.status !== 'playing') return { state, events: [{ type: 'invalid', reason: 'battle_over' }] };
   const s = structuredClone(state);
   const rng = mulberry32(s.rng);
   const events = [];
+  const invalid = (reason) => ({ state, events: [{ type: 'invalid', reason }] });
 
   if (action.type === 'skill') {
     const m = s.members[action.index];
-    if (!m || !ctx.characters[m.id].skill) return { state, events: [{ type: 'invalid', reason: 'no_skill' }] };
-    if (m.skillCd > 0) return { state, events: [{ type: 'invalid', reason: 'skill_cooldown' }] };
-    const hits = runSkill(ctx, s, rng, action.index);
-    m.skillCd = ctx.characters[m.id].skill.cooldown;
+    if (!m || !ctx.characters[m.id].skill) return invalid('no_skill');
+    if (m.skillCd > 0) return invalid('skill_cooldown');
+    if (isDisabled(s.team)) return invalid('skill_locked');
+    const hits = runUnits(ctx, s, rng, ctx.characters[m.id].skill.units, { atk: m.atk, element: m.element, id: m.id });
+    m.skillCd = m.skillMax;
     events.push({ type: 'skill', member: action.index, hits, board: structuredClone(s.board) });
     checkEnd(s);
     s.rng = rng.state;
     return { state: s, events };
   }
 
-  if (action.type !== 'move') return { state, events: [{ type: 'invalid', reason: 'unknown_action' }] };
-  const err = validatePath(action.path, ctx.config.board.allowDiagonal);
-  if (err) return { state, events: [{ type: 'invalid', reason: err }] };
+  if (action.type === 'duo') {
+    const d = s.duos.find((x) => x.slot === action.index);
+    if (!d) return invalid('no_duo');
+    if (d.cd > 0) return invalid('skill_cooldown');
+    if (isDisabled(s.team)) return invalid('skill_locked');
+    const def = ctx.duos[d.id];
+    const a = s.members[d.slot];
+    const b = s.members[d.slot + 1];
+    const hits = runUnits(ctx, s, rng, def.skill.units, { atk: a.atk + b.atk, element: a.element, id: d.id });
+    d.cd = def.skill.cooldown;
+    events.push({ type: 'duo', slot: d.slot, hits, board: structuredClone(s.board) });
+    checkEnd(s);
+    s.rng = rng.state;
+    return { state: s, events };
+  }
+
+  if (action.type !== 'move') return invalid('unknown_action');
+  const err = validatePath(action.path, ctx.config.board.allowDiagonal, s.locked);
+  if (err) return invalid(err);
 
   s.board = applyPath(s.board, action.path);
   const { board, steps } = resolve(s.board, rng);
   s.board = board;
 
+  const teamAtk = atkMult(s.team);
   let comboN = 0;
   for (const st of steps) {
     const hits = [];
@@ -162,37 +296,38 @@ export function step(ctx, state, action) {
           const idx = firstAlive(s);
           if (idx < 0) break;
           const mult = elementMultiplier(m.element, s.enemies[idx].element, ctx.config);
-          hitEnemy(s, idx, Math.round(m.atk * gf * cm * mult), hits, m.id);
+          hitEnemy(s, idx, Math.round(m.atk * teamAtk * gf * cm * mult), hits, m.id, m.element);
         }
       }
     }
+    // Ô bị khóa mà ngọc đã được tiêu thì mở khóa.
+    if (s.locked.length) s.locked = s.locked.filter((c) => !st.cleared.includes(c));
     events.push({ type: 'step', step: st, comboStart, combos: comboN, hits });
   }
   s.combo = comboN;
 
   for (const m of s.members) m.skillCd = Math.max(0, m.skillCd - 1);
+  for (const d of s.duos) d.cd = Math.max(0, d.cd - 1);
   checkEnd(s);
 
   if (s.status === 'playing') {
     for (let i = 0; i < s.enemies.length; i++) {
       const e = s.enemies[i];
       if (e.hp <= 0) continue;
-      events.push(...tickEffects(e, { state: s }));
+      if (isDisabled(e)) continue; // Choáng/Đóng băng: đứng yên, bộ đếm không giảm
       e.cd -= 1;
       if (e.cd <= 0) {
         e.cd = e.every;
-        if (s.shield > 0) {
-          s.shield -= 1; // M3 sẽ chuyển Khiên sang hệ hiệu ứng
-          events.push({ type: 'enemyAttack', enemy: i, amount: 0, absorbed: true });
-        } else {
-          s.hp = Math.max(0, s.hp - e.atk);
-          events.push({ type: 'enemyAttack', enemy: i, amount: e.atk });
-        }
+        enemyAttack(ctx, s, rng, i, events);
+        checkEnd(s);
+        if (s.status !== 'playing') break;
       }
     }
-    checkEnd(s);
   }
+  if (s.status === 'playing') endOfTurn(s, events);
   s.turn += 1;
   s.rng = rng.state;
   return { state: s, events };
 }
+
+export { shieldPool };
