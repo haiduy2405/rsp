@@ -39,3 +39,9 @@ Hành động: `{type:'move', path:[ô...]}` hoặc `{type:'skill', index}`. B�
 - `events.json`: sự kiện bí ẩn, lựa chọn A/B, kết quả (M2)
 - `items.json`: vật phẩm trong chuyến, vật phẩm thời trang (M2/M6)
 - `banners.json`: tỉ lệ, pity, danh sách nhân vật (M4)
+
+## M2
+- `zones.json`: `{id, order, element, final:'elite'|'boss', monsters:{normal[],elite[],boss[]}}`.
+- `events.json`: `{id, choices:[{outcomes:[{weight, effects:[{type:gold|essence|item|stone|hpPct|none,...}]}]}]}`, chuỗi i18n `ev.<id>.title/body/c<i>/o<i>_<j>`.
+- Run: `{seed, zoneId, team, floors, floor, phase, doors, hp, loot, items, armed, battle, ...}`; record `{seed, zoneId, team, pityMissed, actions}`.
+- Progress v2 + save envelope `{v, sum, data}`; khóa `rsp.save`, `rsp.save.bak`.

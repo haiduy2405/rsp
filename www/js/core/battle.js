@@ -6,13 +6,11 @@ import { elementMultiplier, comboMultiplier, groupFactor } from './damage.js';
 import { addEffect, tickEffects } from './effects.js';
 
 // ctx = { config, characters: {id: def}, monsters: {id: def} } (dữ liệu từ JSON, không đổi)
-export function indexById(list) {
-  const out = {};
-  for (const x of list) out[x.id] = x;
-  return out;
-}
+export { indexById } from './ctx.js';
 
-export function createBattle(ctx, { seed, team, enemies }) {
+// Tùy chọn cho chuyến leo tháp: scale {hp, atk} nhân chỉ số quái, hp (máu đội mang theo),
+// shield (số đòn chặn), dragBonusMs (cộng thời gian kéo cho UI).
+export function createBattle(ctx, { seed, team, enemies, scale, hp, shield, dragBonusMs }) {
   const rng = mulberry32(seed);
   const board = createBoard(rng);
   const members = team.map((id) => {
@@ -31,12 +29,13 @@ export function createBattle(ctx, { seed, team, enemies }) {
   const foes = enemies.map((id) => {
     const m = ctx.monsters[id];
     if (!m) throw new Error('unknown monster ' + id);
+    const mh = Math.round(m.hp * (scale?.hp ?? 1));
     return {
       id,
       element: m.element,
-      hp: m.hp,
-      maxHp: m.hp,
-      atk: m.atk,
+      hp: mh,
+      maxHp: mh,
+      atk: Math.round(m.atk * (scale?.atk ?? 1)),
       every: m.attackEvery,
       cd: m.attackEvery,
       effects: [],
@@ -49,8 +48,10 @@ export function createBattle(ctx, { seed, team, enemies }) {
     rng: rng.state,
     board,
     members,
-    hp: maxHp,
+    hp: Math.min(maxHp, hp ?? maxHp),
     maxHp,
+    shield: shield ?? 0,
+    dragBonusMs: dragBonusMs ?? 0,
     enemies: foes,
   };
 }
@@ -179,9 +180,14 @@ export function step(ctx, state, action) {
       events.push(...tickEffects(e, { state: s }));
       e.cd -= 1;
       if (e.cd <= 0) {
-        s.hp = Math.max(0, s.hp - e.atk);
         e.cd = e.every;
-        events.push({ type: 'enemyAttack', enemy: i, amount: e.atk });
+        if (s.shield > 0) {
+          s.shield -= 1; // M3 sẽ chuyển Khiên sang hệ hiệu ứng
+          events.push({ type: 'enemyAttack', enemy: i, amount: 0, absorbed: true });
+        } else {
+          s.hp = Math.max(0, s.hp - e.atk);
+          events.push({ type: 'enemyAttack', enemy: i, amount: e.atk });
+        }
       }
     }
     checkEnd(s);

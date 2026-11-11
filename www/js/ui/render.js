@@ -112,7 +112,8 @@ export function draw(g, view, t) {
 
   // HUD
   text(g, view.t('battle.turn', { n: view.turn + 1 }), 16, 24, 15, '#9aa2ff', 'left');
-  text(g, view.t('battle.seed', { seed: view.seed }), W - 16, 24, 13, '#6a71b8', 'right');
+  text(g, view.titleText, W - 16, 24, 13, '#8a91d8', 'right');
+  if (view.shield > 0) text(g, view.t('battle.shield', { n: view.shield }), W - 16, 330, 16, '#6bd5ff', 'right');
   if (view.combo > 0) text(g, view.t('battle.combo', { n: view.combo }), W / 2, 330, 34, '#ffd84a');
 
   // máu đội chung

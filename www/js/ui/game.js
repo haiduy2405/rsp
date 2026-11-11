@@ -1,8 +1,6 @@
 // Điều khiển một trận: nhập liệu cảm ứng/chuột, hoạt ảnh, gọi core. Logic game nằm hết trong core/.
-import { createBattle, step } from '../core/battle.js';
 import { applyPath } from '../core/move.js';
 import { areAdjacent } from '../core/board.js';
-import { newRecord } from '../core/replay.js';
 import { W, H, CELL, cellAt, cellCenter, draw } from './render.js';
 
 const sleep = (ms, fn) =>
@@ -17,19 +15,21 @@ const sleep = (ms, fn) =>
   });
 const easeOut = (k) => 1 - (1 - k) * (1 - k);
 
-export function startGame({ canvas, ctx, t, seed, team, enemies, onEnd }) {
+// stepper(state, action) -> { state, events }: do bên ngoài cung cấp (chuyến leo tháp ghi lại hành động).
+// onEnd(finalState) gọi sau khi hoạt ảnh kết thúc và trận đã phân thắng thua.
+export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd }) {
   const g = canvas.getContext('2d');
-  let state = createBattle(ctx, { seed, team, enemies });
-  const record = newRecord(seed, team, enemies);
+  let state = initial;
   let busy = false;
   let alive = true;
   let drag = null;
-  const dragMs = ctx.config.dragTimeMs;
+  const dragMs = ctx.config.dragTimeMs + (initial.dragBonusMs || 0);
   const allowDiag = ctx.config.board.allowDiagonal;
 
   const view = {
     t,
-    seed,
+    titleText,
+    shield: 0,
     turn: 0,
     combo: 0,
     board: structuredClone(state.board),
@@ -54,6 +54,7 @@ export function startGame({ canvas, ctx, t, seed, team, enemies, onEnd }) {
     view.members = state.members.map((m) => ({ ...m }));
     view.hp = state.hp;
     view.maxHp = state.maxHp;
+    view.shield = state.shield || 0;
   }
   sync();
 
@@ -98,8 +99,13 @@ export function startGame({ canvas, ctx, t, seed, team, enemies, onEnd }) {
         await sleep(350);
       } else if (e.type === 'enemyAttack') {
         view.shake = { enemy: e.enemy };
-        view.hp = Math.max(0, view.hp - e.amount);
-        floater(`-${e.amount}`, W / 2, 350, '#ff6b6b', 30);
+        if (e.absorbed) {
+          view.shield = Math.max(0, view.shield - 1);
+          floater(t('battle.blocked'), W / 2, 350, '#6bd5ff', 28);
+        } else {
+          view.hp = Math.max(0, view.hp - e.amount);
+          floater(`-${e.amount}`, W / 2, 350, '#ff6b6b', 30);
+        }
         await sleep(350);
         view.shake = null;
       }
@@ -109,21 +115,20 @@ export function startGame({ canvas, ctx, t, seed, team, enemies, onEnd }) {
   async function run(action) {
     busy = true;
     view.canAct = false;
-    const r = step(ctx, state, action);
+    const r = stepper(state, action);
     if (r.events[0]?.type === 'invalid') {
       sync();
       busy = false;
       view.canAct = true;
       return;
     }
-    record.actions.push(action);
     await animate(r.events);
     state = r.state;
     sync();
     view.combo = 0;
     busy = false;
     view.canAct = state.status === 'playing';
-    if (state.status !== 'playing' && alive) onEnd(state.status, record);
+    if (state.status !== 'playing' && alive) onEnd(state);
   }
 
   function pos(ev) {
@@ -200,7 +205,6 @@ export function startGame({ canvas, ctx, t, seed, team, enemies, onEnd }) {
 
   return {
     getState: () => state,
-    getRecord: () => record,
     destroy() {
       alive = false;
       canvas.removeEventListener('pointerdown', onDown);

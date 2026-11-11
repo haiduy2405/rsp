@@ -46,3 +46,39 @@ test('i18n: t() thay tham số, dự phòng en rồi tới key; detectLang', () 
   assert.equal(detectLang('fr-FR'), 'en');
   assert.equal(detectLang(undefined), 'en');
 });
+
+test('data: zones, monsters, events tham chiếu đúng và đủ chuỗi i18n', () => {
+  const vi = JSON.parse(fs.readFileSync(path.join(root, 'www/js/i18n/vi.json'), 'utf8'));
+  const monsters = Object.fromEntries(readJson('monsters.json').map((m) => [m.id, m]));
+  const zones = readJson('zones.json');
+  assert.equal(zones.length, 6);
+  zones.forEach((z, i) => {
+    assert.equal(z.order, i);
+    assert.equal(z.element, i);
+    assert.equal(z.final, i % 2 === 1 ? 'boss' : 'elite');
+    assert.ok(vi['zone.' + z.id], z.id);
+    assert.ok(z.monsters.normal.length >= 2 && z.monsters.elite.length >= 1);
+    if (z.final === 'boss') assert.ok(z.monsters.boss.length >= 1, z.id);
+    for (const kind of ['normal', 'elite', 'boss'])
+      for (const id of z.monsters[kind]) {
+        assert.ok(monsters[id], id);
+        assert.equal(monsters[id].kind, kind);
+      }
+  });
+  const events = readJson('events.json');
+  assert.ok(events.length >= 8 && events.length <= 10);
+  for (const ev of events) {
+    assert.ok(vi[`ev.${ev.id}.title`] && vi[`ev.${ev.id}.body`], ev.id);
+    assert.equal(ev.choices.length, 2);
+    ev.choices.forEach((c, ci) => {
+      assert.ok(vi[`ev.${ev.id}.c${ci}`]);
+      c.outcomes.forEach((o, oi) => {
+        assert.ok(vi[`ev.${ev.id}.o${ci}_${oi}`]);
+        assert.ok(o.weight > 0 && o.effects.length > 0);
+      });
+    });
+  }
+  const cfg = readJson('config.json');
+  for (const k of ['normal', 'elite', 'boss', 'chest', 'completion']) assert.ok(cfg.loot[k], k);
+  for (const it of ['potion', 'shield', 'time']) assert.ok(vi['item.' + it]);
+});

@@ -25,4 +25,4 @@ Khi GDD và prompt mâu thuẫn, hoặc gặp quyết định thiết kế chưa
 - `npm run serve [cổng]` mở `www/` tại http://localhost:8080
 
 ## Mốc
-P0 khung dự án (xong) · M1 lõi chiến đấu (xong) · M2 tháp/khu/ải/loot/lưu game · M3 nhân vật, kỹ năng, Duo, 12 hiệu ứng, Thức tỉnh · M4 triệu hồi, Tín Vật, onboarding · M5 art, âm thanh, cân bằng (làm sau) · M6 Capacitor, gói ủng hộ, CH Play (làm sau)
+P0 khung dự án (xong) · M1 lõi chiến đấu (xong) · M2 tháp/khu/ải/loot/lưu game (xong) · M3 nhân vật, kỹ năng, Duo, 12 hiệu ứng, Thức tỉnh · M4 triệu hồi, Tín Vật, onboarding · M5 art, âm thanh, cân bằng (làm sau) · M6 Capacitor, gói ủng hộ, CH Play (làm sau)

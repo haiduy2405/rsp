@@ -1,0 +1,330 @@
+[
+  {
+    "id": "well",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 70,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": 0.2
+              }
+            ]
+          },
+          {
+            "weight": 30,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": -0.1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "none"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "merchant",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 50,
+            "effects": [
+              {
+                "type": "gold",
+                "amount": 80
+              }
+            ]
+          },
+          {
+            "weight": 50,
+            "effects": [
+              {
+                "type": "gold",
+                "amount": -40
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "item",
+                "item": "potion",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "altar",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 55,
+            "effects": [
+              {
+                "type": "item",
+                "item": "shield",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "weight": 45,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": -0.15
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "essence",
+                "amount": 25
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "crossroad",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 60,
+            "effects": [
+              {
+                "type": "gold",
+                "amount": 60
+              }
+            ]
+          },
+          {
+            "weight": 40,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": -0.1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 35,
+            "effects": [
+              {
+                "type": "stone",
+                "kind": "rare",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "weight": 65,
+            "effects": [
+              {
+                "type": "essence",
+                "amount": 15
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "whisper",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 50,
+            "effects": [
+              {
+                "type": "stone",
+                "kind": "normal",
+                "count": 2
+              }
+            ]
+          },
+          {
+            "weight": 50,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": -0.08
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "none"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "statue",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 70,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": 0.15
+              }
+            ]
+          },
+          {
+            "weight": 30,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": -0.12
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "none"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bridge",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 50,
+            "effects": [
+              {
+                "type": "gold",
+                "amount": 100
+              }
+            ]
+          },
+          {
+            "weight": 50,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": -0.2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "none"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cache",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 60,
+            "effects": [
+              {
+                "type": "item",
+                "item": "time",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "weight": 40,
+            "effects": [
+              {
+                "type": "none"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "none"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

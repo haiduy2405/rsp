@@ -16,6 +16,21 @@
     p.sub { margin: 0 0 12px; opacity: 0.6; font-size: 14px; }
     button, input, select { font: inherit; border-radius: 12px; border: 1px solid #3a3f78; background: #1b1f45; color: #e8ebff; padding: 12px 18px; min-height: 44px; }
     button.primary { background: #4a5bff; border-color: #6b79ff; font-weight: 600; min-width: 200px; }
+    #screen { justify-content: flex-start; overflow-y: auto; touch-action: pan-y; gap: 10px; padding: 18px 16px; }
+    #screen.show { display: flex; }
+    #screen > * { max-width: 100%; box-sizing: border-box; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%; }
+    .card { background: #151937; border: 1px solid #3a3f78; border-radius: 14px; padding: 12px; width: 100%; text-align: left; }
+    .card.btn { cursor: pointer; }
+    .card.locked { opacity: 0.45; }
+    .card h3 { margin: 0 0 4px; font-size: 16px; }
+    .card small, .muted { opacity: 0.65; font-size: 12px; }
+    .res { background: #151937; border-radius: 10px; padding: 6px 10px; font-size: 13px; }
+    .hpbar { width: 100%; height: 14px; background: rgba(255,255,255,.12); border-radius: 7px; overflow: hidden; }
+    .hpbar > i { display: block; height: 100%; background: #4cc46a; }
+    .notice { background: #3a2a10; border: 1px solid #a8741a; border-radius: 10px; padding: 8px 10px; font-size: 13px; }
+    details { width: 100%; font-size: 13px; }
+    textarea { width: 100%; min-height: 60px; background: #1b1f45; color: #e8ebff; border: 1px solid #3a3f78; border-radius: 10px; font-size: 11px; }
     label { font-size: 13px; opacity: 0.8; display: flex; flex-direction: column; gap: 6px; align-items: center; }
   </style>
 </head>
@@ -23,21 +38,7 @@
   <div id="stage">
     <div id="wrap">
       <canvas id="cv" width="540" height="960"></canvas>
-      <div id="menu" class="overlay show">
-        <h1 id="m-title"></h1>
-        <p class="sub" id="m-sub"></p>
-        <label><span id="m-seed-l"></span><input id="m-seed" inputmode="numeric" placeholder="123" /></label>
-        <label><span id="m-lang-l"></span>
-          <select id="m-lang"><option value="vi">Tiếng Việt</option><option value="en">English</option></select>
-        </label>
-        <button class="primary" id="m-start"></button>
-      </div>
-      <div id="result" class="overlay">
-        <h1 id="r-title"></h1>
-        <p class="sub" id="r-seed"></p>
-        <button class="primary" id="r-again"></button>
-        <button id="r-menu"></button>
-      </div>
+      <div id="screen" class="overlay show"></div>
     </div>
   </div>
   <script type="module" src="js/main.js"></script>

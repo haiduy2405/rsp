@@ -1,10 +1,246 @@
 {
-  "board": { "allowDiagonal": false },
+  "board": {
+    "allowDiagonal": false
+  },
   "dragTimeMs": 5000,
-  "elements": ["water", "fire", "wood", "light", "dark", "heart"],
-  "advantage": { "0": [1], "1": [2], "2": [0], "3": [4], "4": [3] },
-  "elementMult": { "strong": 1.5, "weak": 0.5 },
-  "combo": { "step": 0.25 },
-  "group": { "sizeBonus": 0.25, "fourOrbBoost": 1.5, "enhancedBonus": 0.25 },
-  "heal": { "base": 1.0 }
+  "elements": [
+    "water",
+    "fire",
+    "wood",
+    "light",
+    "dark",
+    "heart"
+  ],
+  "advantage": {
+    "0": [
+      1
+    ],
+    "1": [
+      2
+    ],
+    "2": [
+      0
+    ],
+    "3": [
+      4
+    ],
+    "4": [
+      3
+    ]
+  },
+  "elementMult": {
+    "strong": 1.5,
+    "weak": 0.5
+  },
+  "combo": {
+    "step": 0.25
+  },
+  "group": {
+    "sizeBonus": 0.25,
+    "fourOrbBoost": 1.5,
+    "enhancedBonus": 0.25
+  },
+  "heal": {
+    "base": 1.0
+  },
+  "run": {
+    "floors": {
+      "min": 3,
+      "max": 5
+    },
+    "floorScale": {
+      "hp": 0.15,
+      "atk": 0.1
+    },
+    "doorWeights": {
+      "normal": 50,
+      "elite": 14,
+      "chest": 10,
+      "rest": 10,
+      "event": 8,
+      "shop": 8
+    },
+    "restHealPct": 0.3,
+    "shopSlots": 3,
+    "items": {
+      "potion": {
+        "healPct": 0.25,
+        "price": 60
+      },
+      "shield": {
+        "charges": 2,
+        "price": 80
+      },
+      "time": {
+        "bonusMs": 2000,
+        "price": 70
+      }
+    }
+  },
+  "loot": {
+    "normal": {
+      "gold": [
+        30,
+        60
+      ],
+      "essence": [
+        15,
+        30
+      ],
+      "stone": {
+        "normalChance": 0.35,
+        "normalCount": [
+          1,
+          2
+        ],
+        "rareChance": 0.02
+      },
+      "shard": {
+        "chance": 0.02,
+        "count": [
+          1,
+          3
+        ]
+      },
+      "spirit": {
+        "chance": 0.05,
+        "count": [
+          5,
+          15
+        ]
+      }
+    },
+    "elite": {
+      "gold": [
+        70,
+        120
+      ],
+      "essence": [
+        35,
+        60
+      ],
+      "stone": {
+        "normalChance": 0.6,
+        "normalCount": [
+          1,
+          3
+        ],
+        "rareChance": 0.15
+      },
+      "shard": {
+        "chance": 0.08,
+        "count": [
+          2,
+          5
+        ]
+      },
+      "spirit": {
+        "chance": 0.15,
+        "count": [
+          10,
+          25
+        ]
+      }
+    },
+    "boss": {
+      "gold": [
+        120,
+        200
+      ],
+      "essence": [
+        60,
+        100
+      ],
+      "stone": {
+        "normalChance": 0.9,
+        "normalCount": [
+          2,
+          4
+        ],
+        "rareChance": 0.3
+      },
+      "shard": {
+        "chance": 0.2,
+        "count": [
+          3,
+          8
+        ]
+      },
+      "spirit": {
+        "chance": 0.3,
+        "count": [
+          15,
+          40
+        ]
+      }
+    },
+    "chest": {
+      "gold": [
+        60,
+        120
+      ],
+      "essence": [
+        30,
+        60
+      ],
+      "stone": {
+        "normalChance": 0.7,
+        "normalCount": [
+          1,
+          3
+        ],
+        "rareChance": 0.2
+      },
+      "shard": {
+        "chance": 0.1,
+        "count": [
+          2,
+          5
+        ]
+      },
+      "spirit": {
+        "chance": 0.2,
+        "count": [
+          10,
+          30
+        ]
+      }
+    },
+    "completion": {
+      "gold": [
+        150,
+        250
+      ],
+      "essence": [
+        80,
+        140
+      ],
+      "stone": {
+        "normalChance": 1.0,
+        "normalCount": [
+          2,
+          4
+        ],
+        "rareChance": 0.5
+      },
+      "shard": {
+        "chance": 0.3,
+        "count": [
+          3,
+          8
+        ]
+      },
+      "spirit": {
+        "chance": 0.5,
+        "count": [
+          20,
+          50
+        ]
+      }
+    }
+  },
+  "sim": {
+    "awakenNormalStones": 6,
+    "awakenRareStones": 2
+  }
 }

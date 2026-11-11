@@ -1,5 +1,191 @@
 [
-  { "id": "m_ember", "element": 1, "hp": 2200, "atk": 220, "attackEvery": 2 },
-  { "id": "m_tide", "element": 0, "hp": 3200, "atk": 260, "attackEvery": 3 },
-  { "id": "m_shade", "element": 4, "hp": 4500, "atk": 320, "attackEvery": 3 }
+  {
+    "id": "m_ember",
+    "element": 1,
+    "hp": 2200,
+    "atk": 220,
+    "attackEvery": 2
+  },
+  {
+    "id": "m_tide",
+    "element": 0,
+    "hp": 3200,
+    "atk": 260,
+    "attackEvery": 3
+  },
+  {
+    "id": "m_shade",
+    "element": 4,
+    "hp": 4500,
+    "atk": 320,
+    "attackEvery": 3
+  },
+  {
+    "id": "water_n1",
+    "element": 0,
+    "hp": 1600,
+    "atk": 170,
+    "attackEvery": 3,
+    "kind": "normal"
+  },
+  {
+    "id": "water_n2",
+    "element": 0,
+    "hp": 1600,
+    "atk": 130,
+    "attackEvery": 2,
+    "kind": "normal"
+  },
+  {
+    "id": "water_e1",
+    "element": 0,
+    "hp": 4200,
+    "atk": 290,
+    "attackEvery": 3,
+    "kind": "elite"
+  },
+  {
+    "id": "fire_n1",
+    "element": 1,
+    "hp": 1700,
+    "atk": 180,
+    "attackEvery": 3,
+    "kind": "normal"
+  },
+  {
+    "id": "fire_n2",
+    "element": 1,
+    "hp": 1700,
+    "atk": 140,
+    "attackEvery": 2,
+    "kind": "normal"
+  },
+  {
+    "id": "fire_e1",
+    "element": 1,
+    "hp": 4300,
+    "atk": 300,
+    "attackEvery": 3,
+    "kind": "elite"
+  },
+  {
+    "id": "fire_b1",
+    "element": 1,
+    "hp": 9600,
+    "atk": 390,
+    "attackEvery": 3,
+    "kind": "boss"
+  },
+  {
+    "id": "wood_n1",
+    "element": 2,
+    "hp": 1800,
+    "atk": 190,
+    "attackEvery": 3,
+    "kind": "normal"
+  },
+  {
+    "id": "wood_n2",
+    "element": 2,
+    "hp": 1800,
+    "atk": 150,
+    "attackEvery": 2,
+    "kind": "normal"
+  },
+  {
+    "id": "wood_e1",
+    "element": 2,
+    "hp": 4400,
+    "atk": 310,
+    "attackEvery": 3,
+    "kind": "elite"
+  },
+  {
+    "id": "light_n1",
+    "element": 3,
+    "hp": 1900,
+    "atk": 200,
+    "attackEvery": 3,
+    "kind": "normal"
+  },
+  {
+    "id": "light_n2",
+    "element": 3,
+    "hp": 1900,
+    "atk": 160,
+    "attackEvery": 2,
+    "kind": "normal"
+  },
+  {
+    "id": "light_e1",
+    "element": 3,
+    "hp": 4500,
+    "atk": 320,
+    "attackEvery": 3,
+    "kind": "elite"
+  },
+  {
+    "id": "light_b1",
+    "element": 3,
+    "hp": 9800,
+    "atk": 410,
+    "attackEvery": 3,
+    "kind": "boss"
+  },
+  {
+    "id": "dark_n1",
+    "element": 4,
+    "hp": 2000,
+    "atk": 210,
+    "attackEvery": 3,
+    "kind": "normal"
+  },
+  {
+    "id": "dark_n2",
+    "element": 4,
+    "hp": 2000,
+    "atk": 170,
+    "attackEvery": 2,
+    "kind": "normal"
+  },
+  {
+    "id": "dark_e1",
+    "element": 4,
+    "hp": 4600,
+    "atk": 330,
+    "attackEvery": 3,
+    "kind": "elite"
+  },
+  {
+    "id": "heart_n1",
+    "element": 2,
+    "hp": 2100,
+    "atk": 220,
+    "attackEvery": 3,
+    "kind": "normal"
+  },
+  {
+    "id": "heart_n2",
+    "element": 2,
+    "hp": 2100,
+    "atk": 180,
+    "attackEvery": 2,
+    "kind": "normal"
+  },
+  {
+    "id": "heart_e1",
+    "element": 2,
+    "hp": 4700,
+    "atk": 340,
+    "attackEvery": 3,
+    "kind": "elite"
+  },
+  {
+    "id": "heart_b1",
+    "element": 2,
+    "hp": 10000,
+    "atk": 430,
+    "attackEvery": 3,
+    "kind": "boss"
+  }
 ]

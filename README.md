@@ -26,3 +26,11 @@ Chơi được một trận: đội 5 nhân vật mẫu đấu 3 quái. Kéo ng�
 - Nhóm ≥ 5 ngọc để lại một ngọc cường hóa
 
 Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự án.
+
+## M2: tháp, khu vực, ải, loot, lưu game
+- Cupola (hub) → chọn khu → chuyến 3–5 ải (2 cửa/ải, ải cuối Elite/Boss) → loot → lưu tự động.
+- Lõi: `core/run.js` (máy trạng thái chuyến, replay bằng `playRun`), `core/loot.js`, `core/progress.js`; lưu: `save/` (checksum, bản dự phòng, migrate, xuất/nhập).
+- Dữ liệu: `data/zones.json`, `events.json`, `config.json` (run, loot).
+- Mô phỏng loot: `node tools/loot-sim.js [N]`.
+- Gỡ lỗi: mở `?debug` để dùng `window.__debugWin()`; ô Seed trong "Tùy chọn gỡ lỗi".
+- Tạm thời: Khiên là cơ chế riêng cho vật phẩm (M3 thay bằng hiệu ứng Khiên); đội và quái là bản demo; chuyến chưa lưu giữa chừng.

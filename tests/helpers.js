@@ -1,18 +1,21 @@
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { indexById } from '../www/js/core/battle.js';
+import { indexById, buildCtx } from '../www/js/core/ctx.js';
 
 const dataDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'www', 'js', 'data');
 export const readJson = (f) => JSON.parse(fs.readFileSync(path.join(dataDir, f), 'utf8'));
 
 export function loadCtx() {
-  return {
+  return buildCtx({
     config: readJson('config.json'),
-    characters: indexById(readJson('characters.json')),
-    monsters: indexById(readJson('monsters.json')),
-  };
+    characters: readJson('characters.json'),
+    monsters: readJson('monsters.json'),
+    zones: readJson('zones.json'),
+    events: readJson('events.json'),
+  });
 }
+export { indexById };
 
 export const TEAM = ['demo_thuy', 'demo_hoa', 'demo_moc', 'demo_quang', 'demo_tim'];
 export const FOES = ['m_ember', 'm_tide', 'm_shade'];
