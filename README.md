@@ -53,7 +53,7 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 - E2E: `NODE_PATH=$(npm root -g) node tests/e2e/m4-newplayer.cjs` (cần `npm run serve`).
 
 ## M5 — Art, âm thanh, cân bằng, polish
-- **Asset**: `www/assets/{characters,orbs,bg,ui}`; thả file theo tên trong `docs/ART_PROMPTS.md` rồi chạy `node tools/check-assets.js --write` (cập nhật manifest, in danh sách thiếu/thừa, cảnh báo file nặng). Thiếu file thì game tự vẽ hình khối; manifest chỉ chứa file có thật nên không bắn 404.
+- **Asset** (art tạm sinh bởi `tools/gen-art.py`, thay bằng cách ghi đè file): `www/assets/{characters,orbs,bg,ui}`; thả file theo tên trong `docs/ART_PROMPTS.md` rồi chạy `node tools/check-assets.js --write` (cập nhật manifest, in danh sách thiếu/thừa, cảnh báo file nặng). Thiếu file thì game tự vẽ hình khối; manifest chỉ chứa file có thật nên không bắn 404.
 - **Âm thanh**: `ui/audio.js` tổng hợp bằng WebAudio, dữ liệu trong `data/audio.json` (3 bài nhạc hub/battle/boss, 16 SFX). Cài đặt: âm lượng, nhạc, SFX, rung. Tự dừng khi app ẩn. Nguồn: `docs/CREDITS.md`.
 - **Cân bằng**: `node tools/balance-sim.js --targets [đội] [lượt] [đường thử] [seed]` so tỉ lệ thắng và thời gian chuyến với `config.balance`; nhật ký ở `docs/BALANCE_LOG.md`.
 - **Polish**: particle khi xóa ngọc, rung khi bị đánh, nút Back (trong chuyến bị bỏ qua, màn khác về Hub), safe area, khóa dọc, vùng chạm ≥ 44 px.

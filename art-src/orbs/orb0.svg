@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><defs>
+<radialGradient id="g" cx="38%" cy="32%" r="80%"><stop offset="0" stop-color="#a9d8ff"/><stop offset=".45" stop-color="#3b9cff"/><stop offset="1" stop-color="#0d2a5c"/></radialGradient></defs>
+<path d="M128 22 C170 80 214 112 214 160 A86 86 0 0 1 42 160 C42 112 86 80 128 22Z" fill="url(#g)" stroke="#ffffff" stroke-width="7" stroke-linejoin="round"/>
+<path d="M128 70 C146 100 168 118 168 146 A40 40 0 0 1 88 146 C88 118 110 100 128 70Z" fill="#a9d8ff" opacity=".35"/>
+<ellipse cx="96" cy="84" rx="26" ry="14" fill="#fff" opacity=".55" transform="rotate(-30 96 84)"/></svg>
