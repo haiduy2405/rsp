@@ -31,3 +31,13 @@ test('độ khó tăng theo khu: quái khu sau mạnh hơn ở cùng ải', () =
   const z = ctx.config.run.zoneScale;
   for (let i = 1; i < 6; i++) assert.ok(z.hp[i] >= z.hp[i - 1] && z.atk[i] >= z.atk[i - 1]);
 });
+
+test('config.balance.targets phủ đủ 6 khu với dải thắng hợp lệ', () => {
+  const tg = ctx.config.balance.targets;
+  for (const z of ctx.zoneList) {
+    const b = tg[z.id];
+    assert.ok(b, z.id);
+    assert.ok(b.win[0] < b.win[1] && b.win[0] >= 0 && b.win[1] <= 1);
+    assert.ok(b.level >= 1 && b.level <= ctx.config.progression.levelMax);
+  }
+});

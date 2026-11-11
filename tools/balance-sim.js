@@ -116,7 +116,36 @@ export function playFullRun(seed, zoneId, team, K) {
 import { debugFinishBattle } from '../www/js/core/run.js';
 const finishBattle = (run, b) => debugFinishBattle(ctx, run, b);
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+// Chế độ --targets: mỗi khu chạy ở Level/Thức tỉnh dự kiến và so với dải thắng trong config.balance.targets.
+export function runTargets(teams = 60, runsPer = 2, K = 10, seed0 = 1) {
+  const bal = ctx.config.balance;
+  const pr = mulberry32(seed0 * 7919);
+  const chars = ctx.characterList;
+  const shuffle = (a) => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = pr.int(i + 1); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+  const ids = Array.from({ length: teams }, () => shuffle(chars).slice(0, 5).map((c) => c.id));
+  const out = [];
+  for (const z of ctx.zoneList) {
+    const tg = bal.targets[z.id];
+    let won = 0, runs = 0, turns = 0;
+    ids.forEach((team, ti) => {
+      for (let r = 0; r < runsPer; r++) {
+        const res = playFullRun(seed0 * 1000 + ti * 10 + r, z.id, team.map((id) => ({ id, level: tg.level, awaken: tg.awaken })), K);
+        runs++; won += res.won ? 1 : 0; turns += res.turns;
+      }
+    });
+    const win = won / runs;
+    const minutes = (turns / runs) * bal.secondsPerTurn / 60;
+    out.push({ zone: z.id, level: tg.level, awaken: tg.awaken, win, band: tg.win, minutes, okWin: win >= tg.win[0] && win <= tg.win[1], okTime: minutes >= bal.runMinutes[0] * 0.8 && minutes <= bal.runMinutes[1] });
+  }
+  return out;
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv[2] === '--targets') {
+  const [teams = 60, runsPer = 2, K = 10, seed0 = 1] = process.argv.slice(3).map(Number);
+  for (const r of runTargets(teams, runsPer, K, seed0)) {
+    console.log(`${r.zone.padEnd(11)} Lv${String(r.level).padEnd(2)} A${r.awaken} thắng ${(100 * r.win).toFixed(0)}% (dải ${r.band.map((x) => x * 100).join('-')}%) ${r.okWin ? 'OK ' : 'LỆCH'} | ~${r.minutes.toFixed(1)} phút ${r.okTime ? 'OK' : 'LỆCH'}`);
+  }
+} else if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [teams = 40, runsPer = 2, level = 10, awaken = 2, K = 10, seed0 = 1] = process.argv.slice(2).map(Number);
   const chars = ctx.characterList;
   const pr = mulberry32(seed0 * 7919);
