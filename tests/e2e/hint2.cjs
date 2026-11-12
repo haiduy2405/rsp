@@ -16,7 +16,7 @@ const { chromium, devices } = require('playwright');
   const has = () => p.evaluate(() => !!window.__game.getHint?.());
   console.log('hint before move:', await has());
   // thực hiện đúng đường gợi ý bằng chuột
-  for (let m = 1; m <= 3; m++) {
+  for (let m = 1; m <= 2; m++) {
     const path = await p.evaluate(() => window.__game.getHint?.());
     if (!path) { console.log('no hint at move', m); break; }
     const box = await p.locator('canvas').first().boundingBox();

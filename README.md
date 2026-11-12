@@ -285,3 +285,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Sau màn tải là màn chọn ván lưu: 3 ô, mỗi ô một tiến trình riêng (chơi, ván mới, đổi tên, xóa có xác nhận). Ô 1 dùng khóa cũ `rsp.save` nên save cũ thành ván 1; ô 2, 3 dùng `rsp.save.s2/.s3`; tên đặt riêng + lần chơi cuối ở `rsp.slots`.
 - Cài đặt có nút "Đổi ván lưu". Chế độ `?debug` tự vào ván gần nhất (thêm `&slots` để xem màn chọn ván).
 - Export/Import/Xóa dữ liệu trong Cài đặt áp dụng cho ván đang chơi.
+
+## v0.40.1
+- Gợi ý đường kéo: chỉ cho nước đi ĐẦU TIÊN của mỗi trận (mọi trận, mọi ải), không còn gợi ý các nước sau. Kéo hụt/không hợp lệ thì gợi ý hiện lại cho tới khi có nước đi hợp lệ đầu tiên.

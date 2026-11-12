@@ -427,10 +427,6 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.combo = 0;
     busy = false;
     view.canAct = state.status === 'playing';
-    if (hint && state.status === 'playing') {
-      const hp = findHint(ctx, state);
-      view.hint = hp ? { path: hp.path, text: t('tut.hint', { n: hp.combos }) } : null;
-    }
     if (state.status !== 'playing' && alive) onEnd(state);
   }
 
