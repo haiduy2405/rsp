@@ -250,3 +250,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.34.3
 - Trong trận: nhấn giữ icon buff của đội (trên thanh máu) hiện chi tiết từng hiệu ứng.
+
+## v0.35.0 — Màn chọn cửa
+- Tiêu đề có huy hiệu vùng, nhãn độ khó, chấm tầng (boss viền đỏ), thanh máu có tim.
+- Bản đồ: trụ đá có lửa theo hệ của vùng, vòng viền vàng quanh cửa, mép mờ dần.
+- Danh sách cửa: số hiệu, icon loại cửa, ảnh quái xem trước; vật phẩm mỗi loại một màu; nút thoát dạng viền.

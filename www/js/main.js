@@ -702,7 +702,7 @@ function runMapSVG() {
       const skipped = row.past && row.pick !== i;
       const cls = 'nd' + (row.cur ? ' cur' : '') + (taken ? ' taken' : '') + (skipped ? ' skipped' : '') + (big ? ' big' : '');
       const attr = row.cur ? ` data-door="${i}" role="button" tabindex="0" aria-label="${t(`door.${k}`)}"` : '';
-      nodes += `<g class="${cls}"${attr} style="--c:${d.col}">${row.cur ? `<circle class="pulse" cx="${x}" cy="${y}" r="${rad + 8}" fill="${d.col}"/>` : ''}<circle cx="${x}" cy="${y}" r="${rad}" fill="#14151a" stroke="${taken || row.cur ? d.ring : d.col}" stroke-width="${row.cur ? 3 : 2}"/><circle cx="${x}" cy="${y}" r="${rad - 5}" fill="${d.col}" opacity="${skipped ? 0.1 : taken ? 0.55 : 0.3}"/><g transform="translate(${x - 12 * (rad / 23)} ${y - 12 * (rad / 23)}) scale(${rad / 23})" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="${skipped ? 0.35 : 1}">${d.icon}</g>${row.cur || big ? label(x, y + rad + 17, k, row.cur) : ''}</g>`;
+      nodes += `<g class="${cls}"${attr} style="--c:${d.col}">${row.cur ? `<circle class="pulse" cx="${x}" cy="${y}" r="${rad + 8}" fill="${d.col}"/>` : ''}<circle cx="${x}" cy="${y}" r="${rad + 3}" fill="none" stroke="#d39a5e" stroke-opacity="${row.cur || taken ? 0.85 : 0.35}" stroke-width="1.4"/><circle cx="${x}" cy="${y}" r="${rad}" fill="#1d120b" stroke="${taken || row.cur ? d.ring : d.col}" stroke-width="${row.cur ? 3 : 2}"/><circle cx="${x}" cy="${y}" r="${rad - 5}" fill="${d.col}" opacity="${skipped ? 0.1 : taken ? 0.55 : 0.3}"/><g transform="translate(${x - 12 * (rad / 23)} ${y - 12 * (rad / 23)}) scale(${rad / 23})" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="${skipped ? 0.35 : 1}">${d.icon}</g>${row.cur || big ? label(x, y + rad + 17, k, row.cur) : ''}</g>`;
     });
   }
   if (curRow || true) {
@@ -712,11 +712,15 @@ function runMapSVG() {
   let stars = '';
   for (let i = 0; i < 40; i++) stars += `<circle cx="${(i * 97.3) % 400}" cy="${(i * 53.7) % 600}" r="${0.6 + (i % 3) * 0.4}" fill="#fff" opacity="${0.15 + (i % 4) * 0.1}"/>`;
   let cols = '';
-  for (const x of [26, 374]) cols += `<g opacity=".5"><rect x="${x - 14}" y="40" width="28" height="560" fill="url(#col)"/>${[110, 230, 350, 470].map((y) => `<rect x="${x - 18}" y="${y}" width="36" height="8" fill="#444853" stroke="#e2b75a" stroke-opacity=".5"/>`).join('')}</g>`;
+  for (const x of [26, 374]) {
+    cols += `<g class="pillar"><rect x="${x - 13}" y="62" width="26" height="520" fill="url(#col)" stroke="#6a4529" stroke-opacity=".7"/><rect x="${x - 19}" y="52" width="38" height="12" rx="2" fill="#4a2f1c" stroke="#d39a5e" stroke-opacity=".6"/><rect x="${x - 19}" y="578" width="38" height="12" rx="2" fill="#4a2f1c" stroke="#d39a5e" stroke-opacity=".6"/>`;
+    for (const y of [150, 270, 390, 500]) cols += `<path d="M${x} ${y - 9}l7 9-7 9-7-9z" fill="none" stroke="var(--zc,#ffb25a)" stroke-width="1.4" opacity=".55" class="rune"/>`;
+    cols += `<path d="M${x - 15} 52h30l-4 -9h-22z" fill="#2a1810" stroke="#d39a5e" stroke-opacity=".6"/><g transform="translate(${x} 43) scale(1.7) translate(${-x} -43)"><g class="flame" style="transform-origin:${x}px 43px"><path d="M${x} 14c5 7 8 11 8 17a8 8 0 0 1-16 0c0-4 2-6 4-9 0 3 1 4 2 4-1-4-1-8 2-12z" fill="var(--zc,#ffb25a)"/><path d="M${x} 24c3 4 4 6 4 9a4 4 0 0 1-8 0c0-2 1-3 2-5 0 2 1 2 2 2z" fill="#fff2c4"/></g></g><circle cx="${x}" cy="30" r="34" fill="url(#zg)" class="torchglow"/></g>`;
+  }
   return `<svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" aria-hidden="false">
 <defs><linearGradient id="col" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#111216"/><stop offset=".5" stop-color="#424753"/><stop offset="1" stop-color="#111216"/></linearGradient>
-<radialGradient id="rg" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#626878" stop-opacity=".55"/><stop offset="1" stop-color="#626878" stop-opacity="0"/></radialGradient></defs>
-<rect width="400" height="600" fill="url(#rg)"/>${stars}${cols}${faint}${gold}${nodes}</svg>`;
+<radialGradient id="zg"><stop offset="0" stop-color="var(--zc,#ffb25a)" stop-opacity=".45"/><stop offset="1" stop-color="var(--zc,#ffb25a)" stop-opacity="0"/></radialGradient><radialGradient id="tg" cx=".5" cy=".12" r=".7"><stop offset="0" stop-color="var(--zc,#ffb25a)" stop-opacity=".22"/><stop offset="1" stop-color="var(--zc,#ffb25a)" stop-opacity="0"/></radialGradient><radialGradient id="rg" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#626878" stop-opacity=".55"/><stop offset="1" stop-color="#626878" stop-opacity="0"/></radialGradient></defs>
+<rect width="400" height="600" fill="url(#rg)"/><rect width="400" height="600" fill="url(#tg)"/>${stars}${cols}${faint}${gold}${nodes}</svg>`;
 }
 
 // ---- Di Vật
@@ -753,12 +757,29 @@ function showRelicPick() {
     relicStrip(),
   );
 }
+// Tiêu đề bản đồ: huy hiệu vùng, tên ải, chấm tầng, thanh máu có tim.
+function mapHeader() {
+  const zc = COLORS[ctx.zones[run.zoneId].element] || '#ffb25a';
+  const pips = Array.from({ length: run.floors }, (_, i) => h('i', { class: 'pip' + (i < run.floor ? ' done' : i === run.floor ? ' cur' : '') + (i === run.floors - 1 ? ' boss' : '') }));
+  const pct = Math.max(0, (run.hp / run.maxHp) * 100);
+  const heart = h('span', { class: 'heart' });
+  heart.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21C5 15.500 2.500 11.800 2.500 8.300A4.800 4.800 0 0 1 7.300 3.500c2 0 3.700 1 4.700 2.700 1-1.700 2.700-2.700 4.700-2.700a4.800 4.800 0 0 1 4.800 4.800C21.500 11.800 19 15.500 12 21z"/></svg>';
+  return h('div', { class: 'mapnav', style: `--zc:${zc}` },
+    h('div', { class: 'mn-top' },
+      h('img', { class: 'mn-zone', src: `assets/ui/zones/${run.zoneId}.webp`, alt: '' }),
+      h('div', { class: 'mn-title' }, h('h2', {}, t(`zone.${run.zoneId}`)), h('div', { class: 'mn-sub' }, h('span', { class: `tag d-${run.diff}` }, t(`diff.${run.diff}`)), h('span', {}, t('stage.num', { n: run.stage ?? 1 })))),
+      h('div', { class: 'mn-floor' }, h('div', { class: 'pips' }, pips), h('small', {}, t('run.floor', { n: run.floor + 1, total: run.floors })))),
+    h('div', { class: 'mn-hp' }, heart, h('div', { class: 'hpbar' }, h('i', { style: `width:${pct}%` }), h('span', {}, `${Math.round(run.hp)} / ${run.maxHp}`))));
+}
 // Quái xem trước của từng cửa chiến đấu.
 function doorList() {
   return h('div', { class: 'doorlist' }, run.doors.map((k, i) => {
     const foes = run.preview?.[i];
-    const label = (m) => t(`monster.${m}`);
-    return h('div', { class: 'dl', 'data-dl': i }, h('b', {}, `${i + 1}. ${t(`door.${k}`)}`), ' ', foes ? h('small', { class: 'muted' }, foes.map(label).join(', ')) : h('small', { class: 'muted' }, t(`door.desc.${k}`)));
+    const d = NODE[k] || NODE.normal;
+    const ico = h('span', { class: 'dl-ico', style: `--c:${d.col}` });
+    ico.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d.icon}</svg>`;
+    const thumbs = foes ? h('span', { class: 'dl-foes' }, foes.map((m) => { const im = getImg(`monster:${m}`); return h('span', { class: 'dl-foe', title: t(`monster.${m}`) }, im ? h('img', { src: im.src, alt: t(`monster.${m}`) }) : null, h('small', {}, t(`monster.${m}`))); })) : h('small', { class: 'muted' }, t(`door.desc.${k}`));
+    return h('div', { class: 'dl', 'data-dl': i, style: `--c:${d.col}` }, h('span', { class: 'dl-n' }, String(i + 1)), ico, h('div', { class: 'dl-body' }, h('b', {}, t(`door.${k}`)), thumbs));
   }));
 }
 
@@ -785,15 +806,16 @@ function showDoors() {
     nd.addEventListener('keydown', (e) => e.key === 'Enter' && go());
   });
   screen(
-    h('div', { class: 'mapnav' }, floorTitle(), h('div', { class: 'muted' }, `${t('run.hp')}: ${Math.round(run.hp)} / ${run.maxHp}`), h('div', { class: 'hpbar' }, h('i', { style: `width:${Math.max(0, (run.hp / run.maxHp) * 100)}%` }))),
+    mapHeader(),
     map,
     h('p', { class: 'sub mapcap' }, run.doors.length > 1 ? t('run.chooseDoor') : t('run.finalDoor')),
     doorList(),
     relicStrip(),
     items,
-    btn(t('run.leave'), leaveRun, '', { id: 'leave-run' }),
+    btn(t('run.leave'), leaveRun, 'ghost', { id: 'leave-run' }),
   );
   $('screen').classList.add('mapscreen');
+  $('screen').style.setProperty('--zc', COLORS[ctx.zones[run.zoneId].element] || '#ffb25a');
 }
 
 function battleIntro() {

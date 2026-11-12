@@ -633,3 +633,61 @@ button:active:not(:disabled) { transform: scale(.95); filter: brightness(.92); }
 .sumcard.back { animation: backGlow 2s ease-in-out infinite; }
 .sumcard.back:nth-child(odd) { animation-delay: .5s; }
 @media (prefers-reduced-motion: reduce) { .shop-offer, .sumcard.back { animation: none !important; } }
+
+/* ===== Màn chọn cửa (v0.35.0): huy hiệu vùng, chấm tầng, trụ đá có lửa, danh sách cửa có ảnh quái ===== */
+#screen.mapscreen { gap: 6px; }
+.mapnav { text-align: left; padding: 8px 10px 10px; border: 1px solid var(--line); border-radius: 10px; background: linear-gradient(180deg, color-mix(in srgb, var(--zc, #ffb25a) 22%, #2a1810), rgba(27, 15, 8, .92)); box-shadow: inset 0 1px 0 rgba(246, 237, 214, .12), 0 3px 12px rgba(0, 0, 0, .35); position: relative; }
+.mapnav::before { content: ''; position: absolute; left: 12px; right: 12px; top: -1px; height: 2px; background: linear-gradient(90deg, transparent, var(--zc, #ffb25a), transparent); }
+.mn-top { display: flex; align-items: center; gap: 10px; }
+.mn-zone { width: 54px; height: 54px; flex: none; object-fit: contain; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .6)); animation: bob 4s ease-in-out infinite; }
+.mn-title { flex: 1; min-width: 0; }
+.mn-title h2 { margin: 0; font-size: 24px; line-height: 1.05; }
+.mn-sub { display: flex; align-items: center; gap: 8px; margin-top: 3px; font-size: 13px; color: var(--bone); font-weight: 600; }
+.tag { padding: 1px 8px; border-radius: 99px; font-size: 11.5px; font-weight: 800; letter-spacing: .02em; border: 1px solid currentColor; }
+.tag.d-easy { color: #8be3a3; background: rgba(76, 196, 106, .15); } .tag.d-normal { color: #ffd37a; background: rgba(240, 185, 74, .15); } .tag.d-hard { color: #ff8b7a; background: rgba(255, 90, 60, .16); }
+.mn-floor { text-align: right; flex: none; }
+.mn-floor small { display: block; margin-top: 3px; color: var(--mute); font-size: 11px; }
+.pips { display: flex; gap: 5px; justify-content: flex-end; }
+.pip { width: 11px; height: 11px; transform: rotate(45deg); border: 1.5px solid var(--line-hi); background: rgba(0, 0, 0, .35); }
+.pip.done { background: var(--line-hi); }
+.pip.cur { background: #ffe9ad; border-color: #fff6cf; box-shadow: 0 0 8px #ffd77a; animation: pipGlow 1.6s ease-in-out infinite; }
+@keyframes pipGlow { 50% { transform: rotate(45deg) scale(1.3); } }
+.pip.boss { border-color: #ff6b5c; } .pip.boss.cur { background: #ff8a7a; box-shadow: 0 0 8px #ff5a4a; }
+.mn-hp { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.mn-hp .heart { width: 24px; height: 24px; flex: none; }
+.mn-hp .heart svg { width: 100%; height: 100%; fill: #ff6f86; stroke: #ffd0d8; stroke-width: 1.2; filter: drop-shadow(0 0 4px rgba(255, 90, 120, .7)); animation: bump 1.6s ease-in-out infinite; }
+.mn-hp .hpbar { position: relative; height: 18px; margin: 0; border-radius: 9px; flex: 1; }
+.mn-hp .hpbar > i { border-radius: 8px; }
+.mn-hp .hpbar > span { position: absolute; inset: 0; display: grid; place-items: center; font: 700 12px 'Be Vietnam Pro', sans-serif; color: #fff; text-shadow: 0 1px 2px #000, 0 0 3px #000; }
+.runmap .flame { animation: flicker .9s ease-in-out infinite alternate; }
+.runmap .torchglow { animation: halo 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.runmap .rune { animation: runeGlow 3s ease-in-out infinite; }
+@keyframes runeGlow { 50% { opacity: .95; } }
+@keyframes flicker { from { transform: scale(1, .94) skewX(-2deg); } to { transform: scale(1.06, 1.06) skewX(2deg); } }
+.mapcap { font-family: 'Cormorant', serif; font-size: 20px; color: var(--gold-hi, #f0b94a); position: relative; display: flex; align-items: center; gap: 10px; width: 100%; justify-content: center; }
+.mapcap::before, .mapcap::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--line-hi)); }
+.mapcap::after { transform: scaleX(-1); }
+.doorlist { gap: 5px; }
+.doorlist .dl { display: flex; align-items: center; gap: 8px; padding: 6px 10px 6px 6px; border: 1px solid var(--line); border-left: 3px solid var(--c, #5c616c); border-radius: 8px; background: linear-gradient(90deg, color-mix(in srgb, var(--c) 18%, #2a1810), rgba(42, 24, 16, .75)); animation: listIn .35s both; }
+.doorlist .dl:nth-child(2) { animation-delay: .06s; } .doorlist .dl:nth-child(3) { animation-delay: .12s; }
+.dl-n { position: relative; width: 22px; height: 22px; flex: none; display: grid; place-items: center; font: 800 12px 'Be Vietnam Pro', sans-serif; color: #2a1600; z-index: 0; }
+.dl-n::before { content: ''; position: absolute; inset: 2px; z-index: -1; background: linear-gradient(180deg, #ffd98a, #d39a5e); transform: rotate(45deg); border-radius: 3px; box-shadow: 0 0 6px rgba(240, 185, 74, .5); }
+.dl-ico { width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c) 80%, #fff), var(--c) 60%, #14151a); border: 2px solid color-mix(in srgb, var(--c) 60%, #fff); box-shadow: 0 0 8px color-mix(in srgb, var(--c) 60%, transparent); }
+.dl-ico svg { width: 20px; height: 20px; }
+.dl-body { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.dl-body > b { font-size: 14px; white-space: nowrap; }
+.dl-foes { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
+.dl-foe { display: flex; flex-direction: column; align-items: center; width: 52px; }
+.dl-foe img { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .6)); }
+.dl-foe small { font-size: 9px; line-height: 1.1; color: var(--mute); text-align: center; max-width: 52px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Vật phẩm: mỗi loại một màu */
+.itm[data-item="potion"] { --ic: #6be39a; } .itm[data-item="shield"] { --ic: #6bb7ff; } .itm[data-item="time"] { --ic: #c58bff; }
+.itm svg { stroke: var(--ic, var(--gold-hi)); filter: drop-shadow(0 0 5px var(--ic)); width: 30px; height: 30px; }
+.itm { border-color: color-mix(in srgb, var(--ic) 45%, var(--line)); background: linear-gradient(180deg, color-mix(in srgb, var(--ic) 14%, #54341e), rgba(42, 24, 16, .94)); }
+.itm:not([disabled]):active { transform: scale(.96); }
+button.ghost#leave-run { min-height: 0; padding: 9px 22px; font-size: 14px; width: auto; align-self: center; background: transparent; border: 1px solid var(--line-hi); color: var(--bone); box-shadow: none; }
+@media (prefers-reduced-motion: reduce) { .mn-zone, .pip.cur, .mn-hp .heart svg, .runmap .flame, .runmap .torchglow, .runmap .rune, .doorlist .dl { animation: none !important; } }
+
+.runmap svg { -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 7%, #000 93%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 7%, #000 93%, transparent 100%); }
+.dl-foe { width: 46px; } .dl-foe img { width: 32px; height: 32px; } .dl-foe small { max-width: 46px; }
+.dl-foe { width: 56px; } .dl-foe small { max-width: 56px; white-space: normal; text-align: center; }
