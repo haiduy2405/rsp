@@ -11,17 +11,19 @@ export function createHeroUI({ h, T, ctx }) {
   const el = (n) => T(`element.${n}`);
   const stars = (id) => '★'.repeat(ctx.characters[id].rarity);
 
-  function unitText(u) {
+  function unitText(u, elem) {
     if (u.type === 'damage') {
       const target = T(`target.${u.target}`);
       return u.element != null ? T('unit.damage.el', { mult: u.mult, target, element: el(u.element) }) : T('unit.damage', { mult: u.mult, target });
     }
     if (u.type === 'heal') return T('unit.heal', { pct: pct(u.pctMax) });
     if (u.type === 'convert') return T('unit.convert', { count: u.count, element: el(u.to) });
+    if (u.type === 'enhance') return T('unit.enhance', { count: u.count, element: el(elem ?? 0) });
+    if (u.type === 'timeFreeze') return T('unit.timeFreeze', { turns: u.turns });
     const val = u.value ? `, ${pct(u.value)}%` : '';
     return T('unit.apply', { effect: T(`effect.${u.key}.name`), target: T(`target.${u.target}`), turns: u.turns, value: val });
   }
-  const leaderText = (l) => T(`leader.${l.template}`, { pct: pct(l.pct || 0), element: l.element != null ? el(l.element) : '', n: l.n });
+  const leaderText = (l) => T(`leader.${l.template}`, { pct: pct(l.pct || 0), element: l.element != null ? el(l.element) : '', sec: ((l.ms || 0) / 1000).toFixed(1).replace(/\.0$/, ''), mult: l.mult ?? '' });
   const keysOf = (units) => [...new Set(units.filter((u) => u.type === 'applyEffect').map((u) => u.key))];
   const keywordBlock = (keys) => keys.map((k) => h('div', { class: 'muted fxrow' }, h('img', { class: 'fxico', src: `assets/ui/fx/${k}.webp`, alt: '' }), h('div', { style: 'flex:1;min-width:0' }, h('b', {}, T(`effect.${k}.name`)), ': ', T(`effect.${k}.desc`))));
 
@@ -88,7 +90,7 @@ export function createHeroUI({ h, T, ctx }) {
   const lvTag = (id, lv) => (lv ? h('small', { class: 'muted' }, T('skill.lv', { n: lv, max: maxSkillLevel(ctx, id) })) : null);
   function activeBox(id, { cooldown, status, skillLv, awaken = 0 } = {}) {
     const kit = resolveKit(ctx, id, skillLv || newSkillLevels(), formOf(awaken));
-    return skillBox('active', T(`skill.${id}`), lvTag(id, skillLv?.active), h('div', { class: 'muted' }, [status, T('char.cooldown', { n: cooldown ?? kit.skill.cooldown })].filter(Boolean).join(' · ')), kit.skill.units.map((u) => h('div', {}, unitText(u))));
+    return skillBox('active', T(`skill.${id}`), lvTag(id, skillLv?.active), h('div', { class: 'muted' }, [status, T('char.cooldown', { n: cooldown ?? kit.skill.cooldown })].filter(Boolean).join(' · ')), kit.skill.units.map((u) => h('div', {}, unitText(u, ctx.characters[id].element))));
   }
   const leaderBox = (id, skillLv, awaken = 0) => skillBox('leader', null, lvTag(id, skillLv?.leader), h('div', {}, leaderText(resolveKit(ctx, id, skillLv || newSkillLevels(), formOf(awaken)).leader)));
   function passiveText(p) {

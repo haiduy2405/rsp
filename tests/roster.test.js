@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validate, characterSchema, duoSchema } from '../www/js/core/schema.js';
 import { statsFor, skillCooldown } from '../www/js/core/stats.js';
+import { resolveKit } from '../www/js/core/kit.js';
 import { createBattle, step } from '../www/js/core/battle.js';
 import { buildCtx, DATA_FILES } from '../www/js/core/ctx.js';
 import { DEFAULT_TEAM } from '../www/js/core/progress.js';
@@ -59,12 +60,16 @@ test('ngân sách chỉ số: không ai vượt trần của độ hiếm tại 
   }
 });
 
-test('kỹ năng: chỉ ghép từ đơn vị hợp lệ và 12 từ khóa; leader chỉ dùng 4 khuôn mẫu', () => {
-  const templates = new Set(['atk_element', 'hp_element', 'heal_boost', 'start_cd']);
+test('kỹ năng: chỉ ghép từ đơn vị hợp lệ và 12 từ khóa; leader chỉ dùng các mẫu đã định', () => {
+  const templates = new Set(['atk_element', 'hp_element', 'heal_boost', 'atk_all', 'hp_all', 'drag_time', 'combo_mult', 'rainbow']);
   for (const c of chars) {
-    assert.ok(templates.has(c.leader.template), c.id);
+    if (c.leader) assert.ok(templates.has(c.leader.template), c.id);
+    assert.equal(c.skill.units.length, 1, c.id);
+    assert.equal(c.passive, undefined, c.id);
+    assert.equal(c.form2, undefined, c.id);
     for (const u of c.skill.units) {
-      if (u.type === 'applyEffect') assert.ok(u.key && u.turns >= 1 && u.target, c.id);
+      assert.ok(['damage', 'heal', 'convert', 'applyEffect', 'enhance', 'timeFreeze'].includes(u.type), c.id);
+      if (u.type === 'applyEffect') assert.ok(u.key && KEYS.includes(u.key) && u.turns >= 1 && u.target, c.id);
       if (u.type === 'damage') assert.ok(u.mult > 0, c.id);
     }
   }
@@ -108,35 +113,32 @@ test('leader: khuôn mẫu tác động đúng cho ô 1 và không cho ô khác'
   const lead = createBattle(ctx, { seed: 1, team: ['thuy_tinh', 'bennu', 'eir'], enemies: ['water_n1'] });
   const base = statsFor(ctx, 'thuy_tinh', 1, 0);
   assert.equal(lead.members[0].atk, Math.round(base.atk * 1.25));
-  assert.equal(ref.members[1].atk, base.atk); // thuy_tinh không phải leader thì không có thưởng
+  assert.equal(ref.members[1].atk, base.atk); // không phải leader thì không có thưởng
   const hpEl = createBattle(ctx, { seed: 1, team: ['thetis', 'thuy_tinh'], enemies: ['water_n1'] });
   assert.equal(hpEl.members[1].hp, Math.round(statsFor(ctx, 'thuy_tinh').hp * 1.15));
-  const cd = createBattle(ctx, { seed: 1, team: ['atalanta', 'bennu'], enemies: ['water_n1'] });
-  assert.equal(cd.members[0].skillCd, ctx.characters.atalanta.skill.startCooldown - 1);
-  assert.equal(cd.members[1].skillCd, ctx.characters.bennu.skill.startCooldown - 1);
+  // atk_all / hp_all: mọi ô
+  const all = createBattle(ctx, { seed: 1, team: ['thanh_giong', 'bennu', 'eir'], enemies: ['water_n1'] });
+  assert.equal(all.members[1].atk, Math.round(statsFor(ctx, 'bennu').atk * 1.18));
+  const hall = createBattle(ctx, { seed: 1, team: ['son_tinh', 'bennu'], enemies: ['water_n1'] });
+  assert.equal(hall.members[1].hp, Math.round(statsFor(ctx, 'bennu').hp * 1.18));
+  // drag_time: cộng thời gian kéo; combo_mult: cộng bước nhân combo
+  const dt = createBattle(ctx, { seed: 1, team: ['ra', 'bennu'], enemies: ['water_n1'] });
+  assert.equal(dt.dragBonusMs, 1500);
+  assert.equal(createBattle(ctx, { seed: 1, team: ['bennu', 'ra'], enemies: ['water_n1'] }).dragBonusMs, 0);
+  assert.equal(createBattle(ctx, { seed: 1, team: ['hel', 'bennu'], enemies: ['water_n1'] }).mods.comboStep, 0.2);
 });
 
-test('Form 2: tăng chỉ số, kỹ năng thay thế có sàn hồi chiêu; Level tăng chỉ số', () => {
+test('leader Cầu Vồng: chỉ khi cả đội khác hệ hoàn toàn', () => {
+  const diff = createBattle(ctx, { seed: 1, team: ['apollo', 'thetis', 'bennu', 'atalanta', 'nyx'], enemies: ['water_n1'] });
+  assert.equal(diff.members[1].atk, Math.round(statsFor(ctx, 'thetis').atk * 1.6));
+  const dup = createBattle(ctx, { seed: 1, team: ['apollo', 'thetis', 'bennu', 'atalanta', 'eos'], enemies: ['water_n1'] }); // eos trùng hệ Quang với apollo
+  assert.equal(dup.members[1].atk, statsFor(ctx, 'thetis').atk);
+});
+
+test('Thức tỉnh chỉ tăng chỉ số, không đổi kỹ năng (bị động sẽ thêm sau)', () => {
   assert.ok(statsFor(ctx, 'thetis', 30, 0).atk > statsFor(ctx, 'thetis', 1, 0).atk);
   assert.ok(statsFor(ctx, 'thetis', 1, 1).hp > statsFor(ctx, 'thetis', 1, 0).hp);
-  for (const c of chars) {
-    assert.ok(c.form2?.skill, `${c.id} thiếu Form 2`);
-    assert.ok(skillCooldown(ctx, c.id, 1) >= config.progression.minCooldown, c.id);
-    assert.ok(skillCooldown(ctx, c.id, 1) <= skillCooldown(ctx, c.id, 0), `${c.id}: Form 2 không chậm hơn`);
-  }
-});
-
-test('Form 2: kỹ năng chỉ dùng đơn vị và từ khóa hợp lệ, mạnh hơn Form 1', () => {
-  for (const c of chars) {
-    const f = c.form2;
-    assert.ok(f.skill.units.length >= c.skill.units.length, c.id);
-    for (const u of f.skill.units) {
-      assert.ok(['damage', 'heal', 'convert', 'applyEffect'].includes(u.type), c.id);
-      if (u.type === 'applyEffect') assert.ok(KEYS.includes(u.key), `${c.id} ${u.key}`);
-    }
-    const power = (units) => units.reduce((a, u) => a + (u.mult || 0) + (u.pctMax || 0) * 5, 0);
-    assert.ok(power(f.skill.units) >= power(c.skill.units), `${c.id}: Form 2 không yếu hơn`);
-  }
+  for (const c of chars) assert.deepEqual(resolveKit(ctx, c.id, undefined, 1).skill, resolveKit(ctx, c.id, undefined, 2).skill, c.id);
 });
 
 test('đội khởi đầu là 5 nhân vật 3★ đủ 5 hệ khác nhau', () => {

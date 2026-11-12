@@ -19,24 +19,28 @@ test('kit: cấp kỹ năng tối đa theo độ hiếm 3/4/5', () => {
 });
 
 test('kit: cấp cao mạnh hơn cấp thấp; cấp tối đa giảm 1 hồi chiêu', () => {
-  const base = resolveKit(ctx, 'thuy_tinh', lv(1));
-  const mid = resolveKit(ctx, 'thuy_tinh', lv(3));
-  const top = resolveKit(ctx, 'thuy_tinh', lv(5));
+  const base = resolveKit(ctx, 'hel', lv(1));
+  const mid = resolveKit(ctx, 'hel', lv(3));
+  const top = resolveKit(ctx, 'hel', lv(5));
   assert.ok(base.skill.units[0].mult < mid.skill.units[0].mult && mid.skill.units[0].mult < top.skill.units[0].mult);
-  assert.equal(base.skill.cooldown, ctx.characters.thuy_tinh.skill.cooldown);
-  assert.equal(top.skill.cooldown, ctx.characters.thuy_tinh.skill.cooldown - 1);
+  assert.equal(base.skill.cooldown, ctx.characters.hel.skill.cooldown);
+  assert.equal(top.skill.cooldown, ctx.characters.hel.skill.cooldown - 1);
   assert.ok(base.leader.pct < top.leader.pct);
-  // dữ liệu gốc không bị sửa
-  assert.equal(ctx.characters.thuy_tinh.skill.units[0].mult, 2.5);
+  assert.equal(ctx.characters.hel.skill.units[0].mult, 3.5, 'dữ liệu gốc không bị sửa');
 });
 
-test('kit: mọi tướng có đủ kỹ năng chủ động, đội trưởng, bị động hợp lệ', () => {
-  for (const c of ctx.characterList.filter((x) => !x.id.startsWith('demo_'))) {
+test('kit: mọi tướng có đúng 1 kỹ năng chủ động (1 đơn vị); đội trưởng 12/24; chưa có bị động', () => {
+  const list = ctx.characterList.filter((x) => !x.id.startsWith('demo_'));
+  let leaders = 0;
+  for (const c of list) {
     const k = resolveKit(ctx, c.id, newSkillLevels());
-    assert.ok(k.skill && k.leader && k.passive, c.id);
-    if (k.passive.kind === 'stat') assert.ok(['hp', 'atk', 'heal'].includes(k.passive.stat) && k.passive.pct > 0, c.id);
-    else assert.ok(['start', 'turn'].includes(k.passive.trigger) && (k.passive.trigger === 'start' || k.passive.every >= 1), c.id);
+    assert.ok(k.skill && k.skill.units.length === 1, c.id);
+    assert.equal(k.passive, null, c.id);
+    if (k.leader) leaders++;
   }
+  assert.equal(leaders, 12);
+  const by = (r) => list.filter((c) => c.rarity === r && c.leader).length;
+  assert.deepEqual([by(5), by(4), by(3)], [6, 4, 2]);
 });
 
 test('skillUp: tốn Lễ Vật đúng tộc và Vàng, dừng ở cấp tối đa', () => {
@@ -59,12 +63,11 @@ test('skillUp: tốn Lễ Vật đúng tộc và Vàng, dừng ở cấp tối �
   assert.ok(isValidProgress(p));
 });
 
-test('bị động dạng chỉ số tăng chỉ số trong trận', () => {
+test('bị động dạng chỉ số vẫn hoạt động khi dữ liệu có (dành cho sau này)', () => {
   const team = ['thanh_giong', 'thetis', 'bennu', 'eos', 'eir'];
-  const withP = buildMembers(ctx, team).members[0];
-  const noP = structuredClone(ctx);
-  noP.characters.thanh_giong = { ...ctx.characters.thanh_giong, passive: { kind: 'stat', stat: 'atk', scope: 'self', pct: 0 } };
-  assert.ok(withP.atk > buildMembers(noP, team).members[0].atk);
+  const c2 = structuredClone(ctx);
+  c2.characters.thetis = { ...c2.characters.thetis, passive: { kind: 'stat', stat: 'atk', scope: 'all', pct: 0.5 } };
+  assert.ok(buildMembers(c2, team).members[1].atk > buildMembers(ctx, team).members[1].atk);
 });
 
 test('bị động kích hoạt: "start" áp hiệu ứng đầu trận, "turn" nổ đúng chu kỳ', () => {

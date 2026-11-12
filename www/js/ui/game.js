@@ -71,6 +71,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.locked = state.locked.slice();
     view.teamFx = state.team.effects.map((e) => ({ ...e }));
     view.duos = state.duos.map((d) => ({ ...d }));
+    view.freezeTurns = state.freeze || 0;
     view.focus = Number.isInteger(state.focus) && state.enemies[state.focus]?.hp > 0 ? state.focus : -1;
   }
   sync();
@@ -425,7 +426,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     }
     view.tally = { shown: 0, target: 0, pulse: 0 };
     const hadStep = r.events.some((e) => e.type === 'step');
-    if (action.type === 'move' && !hadStep) floater(t('battle.noCombo'), W / 2, 700, '#c8ccff', 30);
+    if (action.type === 'move' && !hadStep && !(state.freeze > 0)) floater(t('battle.noCombo'), W / 2, 700, '#c8ccff', 30);
     celebrated = false;
     await animate(r.events, r.state.status === 'won');
     if (r.state.status === 'won' && !celebrated && alive) {
@@ -506,6 +507,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       return;
     }
     const p = p0;
+    if (view.freezeTurns > 0 && p.x >= 408 && p.x <= 528 && p.y >= 344 && p.y <= 380) { fx.sfx?.('confirm'); run({ type: 'clear' }); return; }
     if (onTeamFx(p)) { startPress('team', 0, p, ev); return; }
     for (const d of state.duos) {
       const cx = 12 + (d.slot + 1) * 104 - 3;
@@ -668,7 +670,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     last = now;
     let dt = real;
     if (view.freeze > 0) { view.freeze -= real; dt = 0; } else dt = real * (view.slow ?? 1);
-    if (drag && drag.t0) {
+    if (drag && drag.t0 && !(state.freeze > 0)) {
       const k = 1 - (now - drag.t0) / dragMs;
       view.timer = Math.max(0, k);
       if (k <= 0) release();
@@ -746,7 +748,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     // Tính và hiện gợi ý đơn giản cho nước kế tiếp (dùng trong màn hướng dẫn). opts: { maxSteps, maxCombos }.
     requestHint(opts = hintOpts) {
       const s0 = state;
-      findHintAsync(ctx, s0, undefined, 4, opts).then((hp) => { if (hp && alive && state === s0 && !busy) view.hint = { path: hp.path, text: t('tut.hint', { n: hp.combos }) }; });
+      findHintAsync(ctx, s0, undefined, 4, opts).then((hp) => { if (hp && alive && state === s0 && !busy && !(s0.freeze > 0)) view.hint = { path: hp.path, text: t('tut.hint', { n: hp.combos }) }; });
     },
     hideHint() { view.hint = null; view.hintKeep = null; },
     getHint: () => (view.hint ? view.hint.path.slice() : null),

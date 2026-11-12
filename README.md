@@ -314,3 +314,9 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Tutorial dùng xác nhận kỹ năng như trận thật. Bong bóng hướng dẫn nhỏ, mờ, đặt sát dưới thanh đầu trận để không che quái.
 - Thanh đầu trận mới: bảng "LƯỢT" số lớn và bảng "TẦNG" kèm chấm tiến độ.
 - SFX Kenney CC0 bổ sung: tick, open, confirm, error, toggle, sting (xem docs/CREDITS.md).
+
+## v0.43.0 — Thiết kế lại kỹ năng 24 tướng
+- Mỗi tướng đúng 1 kỹ năng chủ động: sát thương, hồi máu, đổi ngọc sang hệ mình, buff/debuff, Ngọc Nâng Cấp, Dừng Thời Gian (nút "Tiêu").
+- 12/24 tướng có kỹ năng đội trưởng (5★ 6/6, 4★ 4/8, 3★ 2/10): thêm thời gian kéo, hệ số combo, Cầu Vồng (cả đội khác hệ), sát thương/HP theo hệ hoặc cả đội, hồi máu.
+- Bỏ bị động và Form 2 trong dữ liệu; Thức tỉnh chỉ tăng chỉ số. Bị động sẽ thêm sau.
+- Chi tiết: docs/SKILLS_V2.md. Test e2e: tests/e2e/freeze.cjs.

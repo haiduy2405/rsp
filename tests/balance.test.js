@@ -21,7 +21,7 @@ test('i18n: đủ tên, viết tắt, mô tả cho 12 từ khóa; khuôn mẫu �
   for (const l of ['vi', 'en']) {
     const d = dict(l);
     for (const k of KEYS) for (const f of ['name', 'short', 'desc']) assert.ok(d[`effect.${k}.${f}`], `${l} effect.${k}.${f}`);
-    for (const k of ['atk_element', 'hp_element', 'heal_boost', 'start_cd']) assert.ok(d[`leader.${k}`], k);
+    for (const k of ['atk_element', 'hp_element', 'heal_boost', 'atk_all', 'hp_all', 'drag_time', 'combo_mult', 'rainbow']) assert.ok(d[`leader.${k}`], k);
     for (const k of ['one', 'all', 'team']) assert.ok(d[`target.${k}`], k);
   }
   assert.ok(ctx.characterList.length === 24);

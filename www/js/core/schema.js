@@ -31,7 +31,7 @@ export const skillUnit = {
   type: 'object',
   required: ['type'],
   properties: {
-    type: { type: 'string', enum: ['damage', 'heal', 'convert', 'applyEffect'] },
+    type: { type: 'string', enum: ['damage', 'heal', 'convert', 'applyEffect', 'enhance', 'timeFreeze'] },
     key: { type: 'string', enum: EFFECT_KEYS },
     target: { type: 'string', enum: ['one', 'all', 'team'] },
     turns: { type: 'integer', min: 1 },

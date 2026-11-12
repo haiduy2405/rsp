@@ -17,7 +17,7 @@ function scaleUnit(u, k) {
   const o = { ...u };
   if (o.type === 'damage') o.mult = r2(o.mult * k);
   else if (o.type === 'heal') o.pctMax = r3(o.pctMax * k);
-  else if (o.type === 'convert') o.count = Math.max(o.count, Math.round(o.count * k));
+  else if (o.type === 'convert' || o.type === 'enhance') o.count = Math.max(o.count, Math.round(o.count * k));
   else if (o.type === 'applyEffect' && typeof o.value === 'number') o.value = r3(o.value * k);
   return o;
 }
@@ -49,7 +49,8 @@ export function resolveKit(ctx, id, skillLv = newSkillLevels(), form = 1) {
     const k = lvK(ctx, lv);
     const l = { ...src.leader };
     if (typeof l.pct === 'number') l.pct = r3(l.pct * k);
-    if (typeof l.n === 'number') l.n += lv >= max ? 1 : 0;
+    if (typeof l.ms === 'number') l.ms = Math.round(l.ms * k);
+    if (typeof l.mult === 'number') l.mult = r2(1 + (l.mult - 1) * k);
     kit.leader = l;
   }
   if (src.passive) {

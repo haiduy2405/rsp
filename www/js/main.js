@@ -1075,7 +1075,7 @@ function showSkillAsk(idx, confirm) {
   const close = () => $('info')?.remove();
   const body = [
     h('div', { class: 'charrow' }, portrait(m.id, 72), h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`skill.${m.id}`)), h('div', { class: 'muted' }, t(`char.${m.id}`), ' · ', t('char.cooldown', { n: m.skillMax })))),
-    h('div', { class: 'card' }, kit.skill.units.map((u) => h('div', {}, unitText(u)))),
+    h('div', { class: 'card' }, kit.skill.units.map((u) => h('div', {}, unitText(u, m.element)))),
     keys.length ? h('div', { class: 'card' }, keywordBlock(keys)) : null,
     h('div', { class: 'row' }, btn(t('skill.ok'), () => { close(); confirm(); }, 'primary', { id: 'skill-ok' }), btn(t('skill.cancel'), close, '', { id: 'skill-cancel' })),
   ];

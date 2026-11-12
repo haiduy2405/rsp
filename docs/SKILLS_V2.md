@@ -1,4 +1,4 @@
-# Thiết kế lại kỹ năng 24 tướng (bản đề xuất, chờ Duy duyệt)
+# Thiết kế lại kỹ năng 24 tướng (đã duyệt, đã triển khai v0.43.0)
 
 ## Nguyên tắc
 - Mỗi tướng **đúng 1 kỹ năng chủ động**, đúng 1 dạng, 1 hiệu ứng (đọc một dòng là hiểu).
@@ -64,5 +64,7 @@ Phân bố: convert 3, buff 4, debuff 3, damage 5, heal 4, enhance 3, timeFreeze
 1. **Ngọc Nâng Cấp**: tiêu trong một cụm thì cụm đó +50% sát thương/hồi (Tim nâng cấp hồi +50%). Giữ nguyên tới khi tiêu.
 2. **Dừng Thời Gian**: kéo không giới hạn giờ; thả tay ngọc ở yên; nút **Tiêu** để tính cụm. Có thể kéo nhiều lần trước khi bấm Tiêu. Hết N lượt trở về bình thường.
 3. **combo_mult**: mỗi combo cộng thêm vào hệ số nhân (ví dụ +0.10 mỗi combo, 6 combo thành +0.60).
-4. **Thức tỉnh** (khi chỉ còn 1 chủ động): chủ động mạnh thêm 25% và hồi chiêu −1; đội trưởng (nếu có) mạnh thêm 20%.
+4. **Thức tỉnh**: chỉ tăng chỉ số, KHÔNG đổi kỹ năng (bị động sẽ thêm sau).
+
+**Triển khai thực tế**: Ngọc Nâng Cấp dùng sẵn thưởng +25% mỗi ngọc nâng cấp trong cụm (config.group.enhancedBonus); Dừng Thời Gian: kéo không giới hạn giờ, thả chỉ hoán đổi, nút "Tiêu" mới xử lý cụm và tốn 1 lượt; leader combo_mult cộng vào bước nhân combo (mods.comboStep).
 5. Hiệu ứng kỹ năng nằm trong `characters.json`; chữ mô tả sinh từ i18n, hai ngôn ngữ cùng bộ key.

@@ -107,11 +107,9 @@ test('Thức tỉnh: thiếu từng loại nguyên liệu đều bị từ chố
   }
 });
 
-test('Form 2 tăng chỉ số và đổi kỹ năng', () => {
+test('Thức tỉnh tăng chỉ số, giữ nguyên kỹ năng', () => {
   assert.ok(statsFor(ctx, 'thetis', 1, 1).hp > statsFor(ctx, 'thetis', 1, 0).hp);
-  const k1 = resolveKit(ctx, 'thetis', undefined, 1).skill;
-  const k2 = resolveKit(ctx, 'thetis', undefined, formOf(1)).skill;
-  assert.notDeepEqual(k1.units, k2.units);
+  assert.deepEqual(resolveKit(ctx, 'thetis', undefined, 1).skill, resolveKit(ctx, 'thetis', undefined, formOf(1)).skill);
 });
 
 test('nhân vật trùng tự đổi thành mảnh chung theo độ hiếm; nhân vật mới được thêm', () => {

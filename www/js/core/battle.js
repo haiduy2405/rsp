@@ -53,8 +53,11 @@ export function buildMembers(ctx, team, mods = relicMods(ctx, [])) {
       if (lead.template === 'atk_element' && m.element === lead.element) m.atk = Math.round(m.atk * (1 + lead.pct));
       else if (lead.template === 'hp_element' && m.element === lead.element) m.hp = Math.round(m.hp * (1 + lead.pct));
       else if (lead.template === 'heal_boost') m.heal = Math.round(m.heal * (1 + lead.pct));
-      else if (lead.template === 'start_cd') m.skillCd = Math.max(0, m.skillCd - lead.n);
+      else if (lead.template === 'atk_all') m.atk = Math.round(m.atk * (1 + lead.pct));
+      else if (lead.template === 'hp_all') m.hp = Math.round(m.hp * (1 + lead.pct));
     }
+    // Cầu Vồng: cả đội 5 hệ khác nhau thì tăng ATK toàn đội.
+    if (lead.template === 'rainbow' && new Set(members.map((m) => m.element)).size === members.length) for (const m of members) m.atk = Math.round(m.atk * lead.mult);
   }
   // Bị động dạng chỉ số: có hiệu lực khi tướng có mặt trong đội (không cần là đội trưởng).
   members.forEach((src, i) => {
@@ -127,8 +130,9 @@ export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects
     locked: [],
     hp: Math.min(maxHp, hp ?? maxHp),
     maxHp,
-    dragBonusMs: (dragBonusMs ?? 0) + mods.dragMs,
-    mods: { aoeCut: mods.aoeCut, comboStep: mods.comboStep, heartPct: mods.heartPct, bossDmg: mods.bossDmg, leech: mods.leech, turnHeal: mods.turnHeal, revive: mods.revive, firstTurn: mods.firstTurn, skillDmg: mods.skillDmg },
+    dragBonusMs: (dragBonusMs ?? 0) + mods.dragMs + (lead?.template === 'drag_time' ? lead.ms : 0),
+    freeze: 0, // Dừng Thời Gian: số lượt còn lại
+    mods: { aoeCut: mods.aoeCut, comboStep: mods.comboStep + (lead?.template === 'combo_mult' ? lead.pct : 0), heartPct: mods.heartPct, bossDmg: mods.bossDmg, leech: mods.leech, turnHeal: mods.turnHeal, revive: mods.revive, firstTurn: mods.firstTurn, skillDmg: mods.skillDmg },
     big,
     reviveUsed,
     enemies: foes,
@@ -215,6 +219,28 @@ function runUnits(ctx, s, rng, units, caster) {
           left--;
         }
       }
+    } else if (u.type === 'enhance') {
+      // Nâng cấp ngọc màu của tướng: ưu tiên ngọc cùng màu chưa nâng cấp; thiếu thì đổi thêm ngọc khác sang màu đó.
+      const own = [];
+      const other = [];
+      for (let i = 0; i < N; i++) {
+        if (s.board.cells[i] === caster.element && !s.board.enh[i]) own.push(i);
+        else if (s.board.cells[i] !== caster.element) other.push(i);
+      }
+      let left = u.count;
+      while (left > 0 && own.length) {
+        const i = own.splice(rng.int(own.length), 1)[0];
+        s.board.enh[i] = 1;
+        left--;
+      }
+      while (left > 0 && other.length) {
+        const i = other.splice(rng.int(other.length), 1)[0];
+        s.board.cells[i] = caster.element;
+        s.board.enh[i] = 1;
+        left--;
+      }
+    } else if (u.type === 'timeFreeze') {
+      s.freeze = Math.max(s.freeze || 0, u.turns);
     } else if (u.type === 'applyEffect') {
       if (u.target === 'team') applyToTeam(s, rng, u);
       else {
@@ -335,11 +361,19 @@ export function step(ctx, state, action) {
     return done(s, events);
   }
 
-  if (action.type !== 'move') return invalid('unknown_action');
-  const err = validatePath(action.path, ctx.config.board.allowDiagonal, s.locked);
-  if (err) return invalid(err);
-
-  s.board = applyPath(s.board, action.path);
+  if (action.type === 'clear') {
+    // Dừng Thời Gian: bấm Tiêu để tính các cụm trên bàn hiện tại và tốn một lượt.
+    if (!(s.freeze > 0)) return invalid('not_frozen');
+  } else if (action.type !== 'move') return invalid('unknown_action');
+  else {
+    const err = validatePath(action.path, ctx.config.board.allowDiagonal, s.locked);
+    if (err) return invalid(err);
+    s.board = applyPath(s.board, action.path);
+    if (s.freeze > 0) {
+      // Đang dừng thời gian: chỉ hoán đổi, ngọc chưa tiêu, chưa tốn lượt.
+      return { state: s, events: [{ type: 'swap', board: structuredClone(s.board) }] };
+    }
+  }
   const { board, steps } = resolve(s.board, rng);
   s.board = board;
 
@@ -376,6 +410,7 @@ export function step(ctx, state, action) {
   }
   s.combo = comboN;
 
+  if (s.freeze > 0) s.freeze -= 1;
   for (const m of s.members) m.skillCd = Math.max(0, m.skillCd - 1);
   for (const d of s.duos) d.cd = Math.max(0, d.cd - 1);
   checkEnd(s);

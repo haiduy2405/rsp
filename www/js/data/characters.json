@@ -8,21 +8,17 @@
     "hp": 743,
     "atk": 184,
     "heal": 38,
+    "culture": "viet",
     "skill": {
-      "cooldown": 6,
-      "startCooldown": 6,
+      "cooldown": 7,
+      "startCooldown": 7,
       "units": [
-        {
-          "type": "damage",
-          "target": "all",
-          "mult": 2.5
-        },
         {
           "type": "applyEffect",
           "target": "all",
           "key": "atkDown",
-          "turns": 2,
-          "value": 0.3
+          "turns": 3,
+          "value": 0.4
         }
       ]
     },
@@ -30,51 +26,6 @@
       "template": "atk_element",
       "element": 0,
       "pct": 0.25
-    },
-    "culture": "viet",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "turn",
-      "units": [
-        {
-          "type": "damage",
-          "target": "all",
-          "mult": 0.8
-        }
-      ],
-      "every": 4
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "damage",
-            "target": "all",
-            "mult": 3.2
-          },
-          {
-            "type": "applyEffect",
-            "target": "all",
-            "key": "atkDown",
-            "turns": 3,
-            "value": 0.35
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "shield",
-            "turns": 3,
-            "value": 0.1
-          }
-        ]
-      },
-      "leader": {
-        "template": "atk_element",
-        "element": 0,
-        "pct": 0.3
-      }
     }
   },
   {
@@ -86,68 +37,17 @@
     "hp": 840,
     "atk": 96,
     "heal": 60,
+    "culture": "bacau",
     "skill": {
       "cooldown": 6,
       "startCooldown": 6,
       "units": [
         {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "shield",
-          "turns": 3,
-          "value": 0.2
-        },
-        {
           "type": "convert",
           "to": 0,
-          "count": 5
+          "count": 7
         }
       ]
-    },
-    "leader": {
-      "template": "hp_element",
-      "element": 0,
-      "pct": 0.2
-    },
-    "culture": "bacau",
-    "passive": {
-      "kind": "stat",
-      "stat": "hp",
-      "scope": "element",
-      "pct": 0.08,
-      "element": 0
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "shield",
-            "turns": 3,
-            "value": 0.3
-          },
-          {
-            "type": "convert",
-            "to": 0,
-            "count": 7
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "regen",
-            "turns": 3,
-            "value": 0.03
-          }
-        ]
-      },
-      "leader": {
-        "template": "hp_element",
-        "element": 0,
-        "pct": 0.24
-      }
     }
   },
   {
@@ -159,6 +59,7 @@
     "hp": 981,
     "atk": 56,
     "heal": 33,
+    "culture": "hylap",
     "skill": {
       "cooldown": 5,
       "startCooldown": 5,
@@ -176,48 +77,6 @@
       "template": "hp_element",
       "element": 0,
       "pct": 0.15
-    },
-    "culture": "hylap",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "turn",
-      "units": [
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "shield",
-          "turns": 2,
-          "value": 0.1
-        }
-      ],
-      "every": 4
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 4,
-        "startCooldown": 4,
-        "units": [
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "shield",
-            "turns": 3,
-            "value": 0.3
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "reflect",
-            "turns": 2,
-            "value": 0.3
-          }
-        ]
-      },
-      "leader": {
-        "template": "hp_element",
-        "element": 0,
-        "pct": 0.18
-      }
     }
   },
   {
@@ -229,6 +88,7 @@
     "hp": 471,
     "atk": 117,
     "heal": 24,
+    "culture": "viet",
     "skill": {
       "cooldown": 5,
       "startCooldown": 5,
@@ -236,60 +96,9 @@
         {
           "type": "damage",
           "target": "one",
-          "mult": 3.5
-        },
-        {
-          "type": "applyEffect",
-          "target": "one",
-          "key": "stun",
-          "turns": 1,
-          "value": 0
+          "mult": 4.0
         }
       ]
-    },
-    "leader": {
-      "template": "start_cd",
-      "n": 1
-    },
-    "culture": "viet",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "turn",
-      "units": [
-        {
-          "type": "damage",
-          "target": "one",
-          "mult": 1.0
-        }
-      ],
-      "every": 4
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 4,
-        "startCooldown": 4,
-        "units": [
-          {
-            "type": "damage",
-            "target": "one",
-            "mult": 4.5
-          },
-          {
-            "type": "applyEffect",
-            "target": "one",
-            "key": "stun",
-            "turns": 1,
-            "value": 0
-          },
-          {
-            "type": "applyEffect",
-            "target": "one",
-            "key": "atkDown",
-            "turns": 2,
-            "value": 0.3
-          }
-        ]
-      }
     }
   },
   {
@@ -301,67 +110,23 @@
     "hp": 743,
     "atk": 184,
     "heal": 38,
+    "culture": "viet",
     "skill": {
-      "cooldown": 6,
-      "startCooldown": 6,
+      "cooldown": 7,
+      "startCooldown": 7,
       "units": [
         {
           "type": "applyEffect",
           "target": "team",
           "key": "atkUp",
           "turns": 3,
-          "value": 0.3
-        },
-        {
-          "type": "damage",
-          "target": "one",
-          "mult": 4
+          "value": 0.4
         }
       ]
     },
     "leader": {
-      "template": "atk_element",
-      "element": 1,
-      "pct": 0.25
-    },
-    "culture": "viet",
-    "passive": {
-      "kind": "stat",
-      "stat": "atk",
-      "scope": "self",
-      "pct": 0.2
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "atkUp",
-            "turns": 3,
-            "value": 0.4
-          },
-          {
-            "type": "damage",
-            "target": "one",
-            "mult": 5.2
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "pierce",
-            "turns": 2,
-            "value": 0
-          }
-        ]
-      },
-      "leader": {
-        "template": "atk_element",
-        "element": 1,
-        "pct": 0.3
-      }
+      "template": "atk_all",
+      "pct": 0.18
     }
   },
   {
@@ -373,71 +138,16 @@
     "hp": 1249,
     "atk": 72,
     "heal": 43,
+    "culture": "hylap",
     "skill": {
       "cooldown": 6,
       "startCooldown": 6,
       "units": [
         {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "reflect",
-          "turns": 3,
-          "value": 0.5
-        },
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "shield",
-          "turns": 3,
-          "value": 0.15
+          "type": "enhance",
+          "count": 6
         }
       ]
-    },
-    "leader": {
-      "template": "hp_element",
-      "element": 1,
-      "pct": 0.2
-    },
-    "culture": "hylap",
-    "passive": {
-      "kind": "stat",
-      "stat": "hp",
-      "scope": "all",
-      "pct": 0.05
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "reflect",
-            "turns": 3,
-            "value": 0.6
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "shield",
-            "turns": 3,
-            "value": 0.25
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "atkUp",
-            "turns": 3,
-            "value": 0.15
-          }
-        ]
-      },
-      "leader": {
-        "template": "hp_element",
-        "element": 1,
-        "pct": 0.24
-      }
     }
   },
   {
@@ -449,6 +159,7 @@
     "hp": 600,
     "atk": 148,
     "heal": 31,
+    "culture": "bacau",
     "skill": {
       "cooldown": 6,
       "startCooldown": 6,
@@ -456,14 +167,7 @@
         {
           "type": "damage",
           "target": "all",
-          "mult": 2
-        },
-        {
-          "type": "applyEffect",
-          "target": "all",
-          "key": "burn",
-          "turns": 3,
-          "value": 0.05
+          "mult": 2.5
         }
       ]
     },
@@ -471,46 +175,6 @@
       "template": "atk_element",
       "element": 1,
       "pct": 0.2
-    },
-    "culture": "bacau",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "turn",
-      "units": [
-        {
-          "type": "applyEffect",
-          "target": "all",
-          "key": "burn",
-          "turns": 2,
-          "value": 0.03
-        }
-      ],
-      "every": 3
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "damage",
-            "target": "all",
-            "mult": 2.7
-          },
-          {
-            "type": "applyEffect",
-            "target": "all",
-            "key": "burn",
-            "turns": 4,
-            "value": 0.07
-          }
-        ]
-      },
-      "leader": {
-        "template": "atk_element",
-        "element": 1,
-        "pct": 0.24
-      }
     }
   },
   {
@@ -522,68 +186,16 @@
     "hp": 660,
     "atk": 32,
     "heal": 90,
+    "culture": "aicap",
     "skill": {
       "cooldown": 5,
       "startCooldown": 5,
       "units": [
         {
           "type": "heal",
-          "pctMax": 0.25
-        },
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "regen",
-          "turns": 3,
-          "value": 0.04
+          "pctMax": 0.3
         }
       ]
-    },
-    "leader": {
-      "template": "heal_boost",
-      "pct": 0.2
-    },
-    "culture": "aicap",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "turn",
-      "units": [
-        {
-          "type": "heal",
-          "pctMax": 0.03
-        }
-      ],
-      "every": 3
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 4,
-        "startCooldown": 4,
-        "units": [
-          {
-            "type": "heal",
-            "pctMax": 0.35
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "regen",
-            "turns": 4,
-            "value": 0.05
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "immune",
-            "turns": 1,
-            "value": 0
-          }
-        ]
-      },
-      "leader": {
-        "template": "heal_boost",
-        "pct": 0.24
-      }
     }
   },
   {
@@ -595,67 +207,20 @@
     "hp": 1546,
     "atk": 89,
     "heal": 53,
+    "culture": "viet",
     "skill": {
-      "cooldown": 6,
-      "startCooldown": 6,
+      "cooldown": 7,
+      "startCooldown": 7,
       "units": [
         {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "shield",
-          "turns": 4,
-          "value": 0.3
-        },
-        {
-          "type": "damage",
-          "target": "all",
-          "mult": 1.5
+          "type": "timeFreeze",
+          "turns": 1
         }
       ]
     },
     "leader": {
-      "template": "hp_element",
-      "element": 2,
-      "pct": 0.25
-    },
-    "culture": "viet",
-    "passive": {
-      "kind": "stat",
-      "stat": "hp",
-      "scope": "all",
-      "pct": 0.08
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "shield",
-            "turns": 4,
-            "value": 0.4
-          },
-          {
-            "type": "damage",
-            "target": "all",
-            "mult": 2.0
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "regen",
-            "turns": 3,
-            "value": 0.03
-          }
-        ]
-      },
-      "leader": {
-        "template": "hp_element",
-        "element": 2,
-        "pct": 0.3
-      }
+      "template": "hp_all",
+      "pct": 0.18
     }
   },
   {
@@ -667,59 +232,17 @@
     "hp": 840,
     "atk": 40,
     "heal": 115,
+    "culture": "viet",
     "skill": {
       "cooldown": 6,
       "startCooldown": 6,
       "units": [
         {
-          "type": "heal",
-          "pctMax": 0.3
-        },
-        {
           "type": "convert",
-          "to": 5,
-          "count": 4
+          "to": 2,
+          "count": 7
         }
       ]
-    },
-    "leader": {
-      "template": "heal_boost",
-      "pct": 0.25
-    },
-    "culture": "viet",
-    "passive": {
-      "kind": "stat",
-      "stat": "heal",
-      "scope": "all",
-      "pct": 0.08
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "heal",
-            "pctMax": 0.4
-          },
-          {
-            "type": "convert",
-            "to": 5,
-            "count": 6
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "shield",
-            "turns": 3,
-            "value": 0.1
-          }
-        ]
-      },
-      "leader": {
-        "template": "heal_boost",
-        "pct": 0.3
-      }
     }
   },
   {
@@ -731,6 +254,7 @@
     "hp": 600,
     "atk": 148,
     "heal": 31,
+    "culture": "hylap",
     "skill": {
       "cooldown": 6,
       "startCooldown": 6,
@@ -738,60 +262,13 @@
         {
           "type": "damage",
           "target": "one",
-          "mult": 4.5
-        },
-        {
-          "type": "applyEffect",
-          "target": "one",
-          "key": "poison",
-          "turns": 4,
-          "value": 0.03
+          "mult": 5.0
         }
       ]
     },
     "leader": {
-      "template": "atk_element",
-      "element": 2,
-      "pct": 0.2
-    },
-    "culture": "hylap",
-    "passive": {
-      "kind": "stat",
-      "stat": "atk",
-      "scope": "self",
-      "pct": 0.15
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "damage",
-            "target": "one",
-            "mult": 6.0
-          },
-          {
-            "type": "applyEffect",
-            "target": "one",
-            "key": "poison",
-            "turns": 4,
-            "value": 0.045
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "pierce",
-            "turns": 2,
-            "value": 0
-          }
-        ]
-      },
-      "leader": {
-        "template": "atk_element",
-        "element": 2,
-        "pct": 0.24
-      }
+      "template": "combo_mult",
+      "pct": 0.1
     }
   },
   {
@@ -803,68 +280,16 @@
     "hp": 471,
     "atk": 117,
     "heal": 24,
+    "culture": "hylap",
     "skill": {
       "cooldown": 5,
       "startCooldown": 5,
       "units": [
         {
-          "type": "damage",
-          "target": "one",
-          "mult": 3
-        },
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "atkUp",
-          "turns": 2,
-          "value": 0.2
+          "type": "enhance",
+          "count": 4
         }
       ]
-    },
-    "leader": {
-      "template": "start_cd",
-      "n": 1
-    },
-    "culture": "hylap",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "start",
-      "units": [
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "atkUp",
-          "turns": 3,
-          "value": 0.15
-        }
-      ]
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 4,
-        "startCooldown": 4,
-        "units": [
-          {
-            "type": "damage",
-            "target": "one",
-            "mult": 4.0
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "atkUp",
-            "turns": 3,
-            "value": 0.3
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "pierce",
-            "turns": 2,
-            "value": 0
-          }
-        ]
-      }
     }
   },
   {
@@ -876,76 +301,20 @@
     "hp": 1041,
     "atk": 118,
     "heal": 74,
+    "culture": "hylap",
     "skill": {
-      "cooldown": 7,
-      "startCooldown": 7,
+      "cooldown": 9,
+      "startCooldown": 9,
       "units": [
         {
-          "type": "heal",
-          "pctMax": 0.25
-        },
-        {
-          "type": "damage",
-          "target": "all",
-          "mult": 2
-        },
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "atkUp",
-          "turns": 3,
-          "value": 0.25
+          "type": "timeFreeze",
+          "turns": 2
         }
       ]
     },
     "leader": {
-      "template": "atk_element",
-      "element": 3,
-      "pct": 0.25
-    },
-    "culture": "hylap",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "turn",
-      "units": [
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "atkUp",
-          "turns": 2,
-          "value": 0.1
-        }
-      ],
-      "every": 4
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 6,
-        "startCooldown": 6,
-        "units": [
-          {
-            "type": "heal",
-            "pctMax": 0.33
-          },
-          {
-            "type": "damage",
-            "target": "all",
-            "mult": 2.6
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "atkUp",
-            "turns": 3,
-            "value": 0.33
-          }
-        ]
-      },
-      "leader": {
-        "template": "atk_element",
-        "element": 3,
-        "pct": 0.3
-      }
+      "template": "rainbow",
+      "mult": 1.6
     }
   },
   {
@@ -957,15 +326,11 @@
     "hp": 600,
     "atk": 148,
     "heal": 31,
+    "culture": "aicap",
     "skill": {
       "cooldown": 6,
       "startCooldown": 6,
       "units": [
-        {
-          "type": "damage",
-          "target": "all",
-          "mult": 2
-        },
         {
           "type": "applyEffect",
           "target": "team",
@@ -976,49 +341,8 @@
       ]
     },
     "leader": {
-      "template": "atk_element",
-      "element": 3,
-      "pct": 0.2
-    },
-    "culture": "aicap",
-    "passive": {
-      "kind": "stat",
-      "stat": "atk",
-      "scope": "element",
-      "pct": 0.1,
-      "element": 3
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "damage",
-            "target": "all",
-            "mult": 2.7
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "pierce",
-            "turns": 4,
-            "value": 0
-          },
-          {
-            "type": "applyEffect",
-            "target": "all",
-            "key": "burn",
-            "turns": 3,
-            "value": 0.04
-          }
-        ]
-      },
-      "leader": {
-        "template": "atk_element",
-        "element": 3,
-        "pct": 0.24
-      }
+      "template": "drag_time",
+      "ms": 1500
     }
   },
   {
@@ -1030,6 +354,7 @@
     "hp": 660,
     "atk": 75,
     "heal": 47,
+    "culture": "hylap",
     "skill": {
       "cooldown": 5,
       "startCooldown": 5,
@@ -1038,59 +363,12 @@
           "type": "convert",
           "to": 3,
           "count": 6
-        },
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "immune",
-          "turns": 2,
-          "value": 0
         }
       ]
     },
     "leader": {
-      "template": "start_cd",
-      "n": 1
-    },
-    "culture": "hylap",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "turn",
-      "units": [
-        {
-          "type": "convert",
-          "to": 3,
-          "count": 2
-        }
-      ],
-      "every": 5
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 4,
-        "startCooldown": 4,
-        "units": [
-          {
-            "type": "convert",
-            "to": 3,
-            "count": 8
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "immune",
-            "turns": 3,
-            "value": 0
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "shield",
-            "turns": 3,
-            "value": 0.1
-          }
-        ]
-      }
+      "template": "drag_time",
+      "ms": 1000
     }
   },
   {
@@ -1102,35 +380,10 @@
     "hp": 981,
     "atk": 56,
     "heal": 33,
-    "skill": {
-      "cooldown": 5,
-      "startCooldown": 5,
-      "units": [
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "immune",
-          "turns": 3,
-          "value": 0
-        },
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "shield",
-          "turns": 3,
-          "value": 0.1
-        }
-      ]
-    },
-    "leader": {
-      "template": "hp_element",
-      "element": 3,
-      "pct": 0.15
-    },
     "culture": "bacau",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "start",
+    "skill": {
+      "cooldown": 6,
+      "startCooldown": 6,
       "units": [
         {
           "type": "applyEffect",
@@ -1140,40 +393,6 @@
           "value": 0
         }
       ]
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 4,
-        "startCooldown": 4,
-        "units": [
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "immune",
-            "turns": 4,
-            "value": 0
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "shield",
-            "turns": 4,
-            "value": 0.15
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "reflect",
-            "turns": 3,
-            "value": 0.3
-          }
-        ]
-      },
-      "leader": {
-        "template": "hp_element",
-        "element": 3,
-        "pct": 0.18
-      }
     }
   },
   {
@@ -1185,75 +404,21 @@
     "hp": 743,
     "atk": 184,
     "heal": 38,
+    "culture": "bacau",
     "skill": {
-      "cooldown": 6,
-      "startCooldown": 6,
+      "cooldown": 8,
+      "startCooldown": 8,
       "units": [
         {
           "type": "damage",
           "target": "all",
-          "mult": 2.5
-        },
-        {
-          "type": "applyEffect",
-          "target": "all",
-          "key": "atkDown",
-          "turns": 3,
-          "value": 0.35
+          "mult": 3.5
         }
       ]
     },
     "leader": {
-      "template": "atk_element",
-      "element": 4,
-      "pct": 0.25
-    },
-    "culture": "bacau",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "turn",
-      "units": [
-        {
-          "type": "applyEffect",
-          "target": "all",
-          "key": "atkDown",
-          "turns": 2,
-          "value": 0.15
-        }
-      ],
-      "every": 4
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "damage",
-            "target": "all",
-            "mult": 3.3
-          },
-          {
-            "type": "applyEffect",
-            "target": "all",
-            "key": "atkDown",
-            "turns": 3,
-            "value": 0.45
-          },
-          {
-            "type": "applyEffect",
-            "target": "all",
-            "key": "poison",
-            "turns": 3,
-            "value": 0.03
-          }
-        ]
-      },
-      "leader": {
-        "template": "atk_element",
-        "element": 4,
-        "pct": 0.3
-      }
+      "template": "combo_mult",
+      "pct": 0.2
     }
   },
   {
@@ -1265,6 +430,7 @@
     "hp": 840,
     "atk": 96,
     "heal": 60,
+    "culture": "bacau",
     "skill": {
       "cooldown": 6,
       "startCooldown": 6,
@@ -1275,59 +441,8 @@
           "key": "freeze",
           "turns": 2,
           "value": 0
-        },
-        {
-          "type": "damage",
-          "target": "one",
-          "mult": 3
         }
       ]
-    },
-    "leader": {
-      "template": "start_cd",
-      "n": 2
-    },
-    "culture": "bacau",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "turn",
-      "units": [
-        {
-          "type": "applyEffect",
-          "target": "one",
-          "key": "freeze",
-          "turns": 1,
-          "value": 0
-        }
-      ],
-      "every": 5
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "applyEffect",
-            "target": "one",
-            "key": "freeze",
-            "turns": 2,
-            "value": 0
-          },
-          {
-            "type": "damage",
-            "target": "one",
-            "mult": 4.0
-          },
-          {
-            "type": "applyEffect",
-            "target": "all",
-            "key": "atkDown",
-            "turns": 2,
-            "value": 0.25
-          }
-        ]
-      }
     }
   },
   {
@@ -1339,6 +454,7 @@
     "hp": 660,
     "atk": 75,
     "heal": 47,
+    "culture": "hylap",
     "skill": {
       "cooldown": 6,
       "startCooldown": 6,
@@ -1351,58 +467,6 @@
           "value": 0
         }
       ]
-    },
-    "leader": {
-      "template": "hp_element",
-      "element": 4,
-      "pct": 0.15
-    },
-    "culture": "hylap",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "turn",
-      "units": [
-        {
-          "type": "applyEffect",
-          "target": "all",
-          "key": "stun",
-          "turns": 1,
-          "value": 0
-        }
-      ],
-      "every": 6
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "applyEffect",
-            "target": "all",
-            "key": "stun",
-            "turns": 1,
-            "value": 0
-          },
-          {
-            "type": "applyEffect",
-            "target": "all",
-            "key": "atkDown",
-            "turns": 3,
-            "value": 0.3
-          },
-          {
-            "type": "damage",
-            "target": "all",
-            "mult": 1.0
-          }
-        ]
-      },
-      "leader": {
-        "template": "hp_element",
-        "element": 4,
-        "pct": 0.18
-      }
     }
   },
   {
@@ -1414,6 +478,7 @@
     "hp": 471,
     "atk": 117,
     "heal": 24,
+    "culture": "bacau",
     "skill": {
       "cooldown": 5,
       "startCooldown": 5,
@@ -1421,60 +486,9 @@
         {
           "type": "damage",
           "target": "one",
-          "mult": 4
-        },
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "atkUp",
-          "turns": 2,
-          "value": 0.15
+          "mult": 4.0
         }
       ]
-    },
-    "leader": {
-      "template": "atk_element",
-      "element": 4,
-      "pct": 0.15
-    },
-    "culture": "bacau",
-    "passive": {
-      "kind": "stat",
-      "stat": "atk",
-      "scope": "self",
-      "pct": 0.2
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 4,
-        "startCooldown": 4,
-        "units": [
-          {
-            "type": "damage",
-            "target": "one",
-            "mult": 5.2
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "atkUp",
-            "turns": 3,
-            "value": 0.2
-          },
-          {
-            "type": "applyEffect",
-            "target": "one",
-            "key": "poison",
-            "turns": 3,
-            "value": 0.03
-          }
-        ]
-      },
-      "leader": {
-        "template": "atk_element",
-        "element": 4,
-        "pct": 0.18
-      }
     }
   },
   {
@@ -1486,70 +500,20 @@
     "hp": 1041,
     "atk": 50,
     "heal": 142,
+    "culture": "viet",
     "skill": {
-      "cooldown": 7,
-      "startCooldown": 7,
+      "cooldown": 8,
+      "startCooldown": 8,
       "units": [
         {
           "type": "heal",
-          "pctMax": 0.4
-        },
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "regen",
-          "turns": 4,
-          "value": 0.05
-        },
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "immune",
-          "turns": 1,
-          "value": 0
+          "pctMax": 0.5
         }
       ]
     },
     "leader": {
       "template": "heal_boost",
       "pct": 0.3
-    },
-    "culture": "viet",
-    "passive": {
-      "kind": "stat",
-      "stat": "heal",
-      "scope": "all",
-      "pct": 0.1
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 6,
-        "startCooldown": 6,
-        "units": [
-          {
-            "type": "heal",
-            "pctMax": 0.5
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "regen",
-            "turns": 4,
-            "value": 0.06
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "immune",
-            "turns": 2,
-            "value": 0
-          }
-        ]
-      },
-      "leader": {
-        "template": "heal_boost",
-        "pct": 0.36
-      }
     }
   },
   {
@@ -1561,17 +525,13 @@
     "hp": 840,
     "atk": 40,
     "heal": 115,
+    "culture": "bacau",
     "skill": {
       "cooldown": 6,
       "startCooldown": 6,
       "units": [
         {
-          "type": "heal",
-          "pctMax": 0.25
-        },
-        {
-          "type": "convert",
-          "to": 5,
+          "type": "enhance",
           "count": 6
         }
       ]
@@ -1579,41 +539,6 @@
     "leader": {
       "template": "heal_boost",
       "pct": 0.25
-    },
-    "culture": "bacau",
-    "passive": {
-      "kind": "stat",
-      "stat": "heal",
-      "scope": "all",
-      "pct": 0.08
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "heal",
-            "pctMax": 0.33
-          },
-          {
-            "type": "convert",
-            "to": 5,
-            "count": 8
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "regen",
-            "turns": 3,
-            "value": 0.03
-          }
-        ]
-      },
-      "leader": {
-        "template": "heal_boost",
-        "pct": 0.3
-      }
     }
   },
   {
@@ -1625,6 +550,7 @@
     "hp": 660,
     "atk": 32,
     "heal": 90,
+    "culture": "bacau",
     "skill": {
       "cooldown": 5,
       "startCooldown": 5,
@@ -1634,50 +560,6 @@
           "pctMax": 0.3
         }
       ]
-    },
-    "leader": {
-      "template": "hp_element",
-      "element": 5,
-      "pct": 0.15
-    },
-    "culture": "bacau",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "turn",
-      "units": [
-        {
-          "type": "applyEffect",
-          "target": "team",
-          "key": "regen",
-          "turns": 2,
-          "value": 0.03
-        }
-      ],
-      "every": 3
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 4,
-        "startCooldown": 4,
-        "units": [
-          {
-            "type": "heal",
-            "pctMax": 0.4
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "regen",
-            "turns": 3,
-            "value": 0.04
-          }
-        ]
-      },
-      "leader": {
-        "template": "hp_element",
-        "element": 5,
-        "pct": 0.18
-      }
     }
   },
   {
@@ -1689,68 +571,16 @@
     "hp": 660,
     "atk": 75,
     "heal": 47,
+    "culture": "hylap",
     "skill": {
-      "cooldown": 6,
-      "startCooldown": 6,
+      "cooldown": 5,
+      "startCooldown": 5,
       "units": [
         {
-          "type": "applyEffect",
-          "target": "all",
-          "key": "stun",
-          "turns": 1,
-          "value": 0
-        },
-        {
           "type": "heal",
-          "pctMax": 0.1
+          "pctMax": 0.25
         }
       ]
-    },
-    "leader": {
-      "template": "heal_boost",
-      "pct": 0.2
-    },
-    "culture": "hylap",
-    "passive": {
-      "kind": "trigger",
-      "trigger": "turn",
-      "units": [
-        {
-          "type": "heal",
-          "pctMax": 0.04
-        }
-      ],
-      "every": 4
-    },
-    "form2": {
-      "skill": {
-        "cooldown": 5,
-        "startCooldown": 5,
-        "units": [
-          {
-            "type": "applyEffect",
-            "target": "all",
-            "key": "stun",
-            "turns": 1,
-            "value": 0
-          },
-          {
-            "type": "heal",
-            "pctMax": 0.15
-          },
-          {
-            "type": "applyEffect",
-            "target": "team",
-            "key": "atkUp",
-            "turns": 3,
-            "value": 0.2
-          }
-        ]
-      },
-      "leader": {
-        "template": "heal_boost",
-        "pct": 0.24
-      }
     }
   }
 ]

@@ -635,6 +635,21 @@ export function draw(g, view, t) {
     g.shadowBlur = 0;
   }
 
+  // Dừng thời gian: chữ báo còn mấy lượt + nút Tiêu
+  if (view.freezeTurns > 0) {
+    text(g, view.t('battle.frozen', { n: view.freezeTurns }), W / 2, 473, 11, '#9fe3ff', 'center', '800');
+    if (view.canAct) {
+      g.fillStyle = 'rgba(20,70,96,0.95)';
+      g.strokeStyle = '#9fe3ff';
+      g.lineWidth = 2;
+      g.beginPath();
+      g.roundRect(412, 346, 112, 32, 8);
+      g.fill();
+      g.stroke();
+      text(g, view.t('battle.clear'), 468, 362, 16, '#e8f8ff', 'center', '800');
+    }
+  }
+
   // bàn: khung kính, mỗi ô là một hốc bo nhẹ
   g.fillStyle = 'rgba(28,16,9, 0.92)';
   g.fillRect(0, BOARD_Y, W, ROWS * CELL);
