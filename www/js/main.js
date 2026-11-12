@@ -1101,7 +1101,7 @@ function startTutorial(retry = false) {
     coach(L.coach);
   };
   const done = () => { clearTimeout(dimTimer); bubble.remove(); $('pause-btn')?.remove(); $('hint-btn')?.remove(); };
-  audio.playMusic('battle');
+  audio.playMusic('tutorial');
   $('screen').classList.remove('show');
   game?.destroy();
   game = startGame({

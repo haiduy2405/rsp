@@ -191,10 +191,22 @@ def hub():
                 form=["pa", "palb", "palb", "palbh", "palb", "palbh", "palbh", "palb"])
 
 
+def tutorial():
+    """Bài cho màn hướng dẫn: sáng, đơn giản, nhịp vừa, không dồn dập để người mới tập trung kéo ngọc."""
+    z = dict(chords=[0, 4, 5, 3, 0, 4, 3, 0], root=55, lo=4, hi=12)
+    bars = make_lead(z, "bright", 91, 4, 12)
+    return dict(bpm=104, root=55, scale=SCALES["ionian"], swing=0.0, chords=z["chords"], padWave="triangle", padGain=0.09, padCut=1500, padAttack=0.5, reverb=0.4,
+                arp=dict(wave="triangle", gain=0.13, cut=3000, pattern="0.1.2.1.3.2.1.2.", len=1.6, sustain=0.3),
+                lead=dict(wave="triangle", gain=0.32, octave=12, cut=3200, vib=8, sustain=0.45, maxLen=3, bars=bars), harm=dict(wave="sine", gain=0.09),
+                bass=dict(wave="triangle", gain=0.36, pattern="0.......0.....5."),
+                drums=dict(kick="x.......x.......", snare="", hat="..x...x...x...x.", shaker="x.x.x.x.x.x.x.x."),
+                form=["palb", "palbd", "palbdh", "palbdh"])
+
+
 def main():
     cfg = json.loads(FILE.read_text(encoding="utf-8"))
     tracks = {k: v for k, v in cfg["tracks"].items() if k in ("battle", "boss")}  # giữ bản cũ làm dự phòng
-    tracks = {"hub": hub(), **tracks}
+    tracks = {"hub": hub(), "tutorial": tutorial(), **tracks}
     for zone in ZONES:
         tracks[f"map_{zone}"] = build(zone, "map")
         tracks[f"battle_{zone}"] = build(zone, "battle")

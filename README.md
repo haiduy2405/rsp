@@ -427,3 +427,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - **Nhạc nền theo vùng:** màn chính 1 bài; mỗi vùng Thủy/Hỏa/Mộc/Quang/Ám/Tâm có 3 bài riêng: `map_*` (danh sách ải + bản đồ cửa, êm), `battle_*`, `boss_*` (nhanh, nặng hơn). Mỗi vùng một thang âm + âm sắc + tiết tấu (Thủy Dorian mượt, Hỏa Phrygian dominant dồn dập, Mộc Mixolydian dân gian, Quang Lydian sáng, Ám hòa âm thứ, Tâm trưởng ấm). Chưa có bài riêng thì rơi về `battle`/`boss` cũ.
 - Engine (`ui/audio.js`) nâng cấp: vòng 8 ô nhịp, `form` bật/tắt lớp theo ô nhịp (dạo → cao trào), bè hòa, rung nốt (vibrato), âm có họa âm (chuông), dồn trống cuối vòng, chuyển bài mờ dần 0.5s thay vì cắt cụt.
 - Nhạc vẫn sinh bằng WebAudio, không file, không giấy phép. Dữ liệu sinh bởi `python3 tools/gen-music.py` (hạt giống cố định) vào `data/audio.json`; có thể sửa tay từng bài.
+
+### v0.58.1
+- Màn hướng dẫn có bài riêng `tutorial` (sáng, nhịp vừa, ít trống) thay vì dùng chung bài đánh thường. Trận trong tháp đã dùng `battle_*`/`boss_*` theo vùng từ v0.58.0.
