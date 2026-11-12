@@ -124,4 +124,4 @@ Sau khi xoay ngọc: mỗi tướng nảy số sát thương của mình ngay tr
 ## Form 2 (v0.17)
 - Thức tỉnh một bậc: lên **Form 2** (chỉ số +20%, kỹ năng chủ động viết lại cho từng tướng trong `characters.json` > `form2`, đội trưởng mạnh hơn). Form 1 tối đa Level 30, Form 2 lên 50. `awaken` trong save là 0/1 (save v8, migrate từ bản cũ).
 - Art Form 2 hiện dùng chung art Form 1 (asset tạm); Duy cấp art sau.
-
+- Nhịp tiến triển ba giai đoạn (tân thủ/trung kỳ/hậu kỳ): `docs/PROGRESSION.md`; `tools/loot-sim.js` đo số chuyến để đủ Form 2 so với `config.balance.pacing`.

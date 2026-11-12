@@ -419,10 +419,6 @@
       }
     }
   },
-  "sim": {
-    "awakenNormalStones": 6,
-    "awakenRareStones": 2
-  },
   "progression": {
     "levelMax": 50,
     "levelGrowth": 0.00875,
@@ -496,6 +492,9 @@
   },
   "balance": {
     "secondsPerTurn": 8,
+    "pacing": {
+      "form2Runs": { "3": [3, 10], "5": [8, 24] }
+    },
     "runMinutes": [
       8,
       15
