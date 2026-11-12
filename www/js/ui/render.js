@@ -489,9 +489,30 @@ export function draw(g, view, t) {
       g.moveTo(cx0 - 7, cy0 + 4); g.lineTo(cx0 - 8, cy0 - 5); g.lineTo(cx0 - 3, cy0); g.lineTo(cx0, cy0 - 7); g.lineTo(cx0 + 3, cy0); g.lineTo(cx0 + 8, cy0 - 5); g.lineTo(cx0 + 7, cy0 + 4);
       g.closePath();
       g.fill();
-      text(g, view.t('team.leader'), x + 58, y + 14, 10, '#f6edd6', 'center', '800');
+      text(g, view.t('team.leader'), x + 52, y + 14, 10, '#f6edd6', 'center', '800');
     }
-    drawOrb(g, m.element, x + 49, y + 26 + oy / 2 + (lead ? 4 : 0), 18);
+    const icy = lead ? y + 38 : y + 24;
+    const ic = getImg(`icon:${m.id}`);
+    if (ic) {
+      const S = 32;
+      g.save();
+      g.beginPath();
+      g.roundRect(x + 49 - S / 2, icy - S / 2, S, S, 8);
+      g.clip();
+      g.drawImage(ic, x + 49 - S / 2, icy - S / 2, S, S);
+      g.restore();
+      g.strokeStyle = COLORS[m.element];
+      g.lineWidth = 2;
+      g.beginPath();
+      g.roundRect(x + 49 - S / 2, icy - S / 2, S, S, 8);
+      g.stroke();
+      // icon hệ nhỏ ở góc ô
+      g.fillStyle = 'rgba(20,12,6,0.85)';
+      g.beginPath();
+      g.arc(x + 87, y + 13, 10, 0, Math.PI * 2);
+      g.fill();
+      drawOrb(g, m.element, x + 87, y + 13, 8);
+    } else drawOrb(g, m.element, x + 49, icy, 18);
     text(g, view.t(`char.${m.id}`), x + 49, y + 50 + oy, 11, lead ? '#fff4c9' : '#e7eaff', 'center', lead ? '800' : '600');
     if (ready) text(g, view.t('battle.skillReady'), x + 49, y + 63 + oy, 11, '#7dffa0', 'center', '700');
     else {

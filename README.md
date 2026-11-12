@@ -269,3 +269,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 ## v0.37.0 — Gợi ý nhiều bước
 - Gợi ý trong trận giờ là một đường kéo nhiều bước (tối đa 8) tạo nhiều combo nhất, dò bằng mô phỏng thật của lõi (beam search, ~30ms); hiện "tạo N combo", viên dẫn đường chạy hết đường; tự tính lại sau mỗi lượt khi gợi ý còn bật.
 - Màn chọn cửa: dòng nhắc "Nhấn giữ một cửa để xem chi tiết".
+
+## v0.37.1
+- Ô đội hình trong trận: hiện icon tướng (viền theo hệ), icon hệ nhỏ ở góc ô; chưa có icon thì quay về viên ngọc hệ.
