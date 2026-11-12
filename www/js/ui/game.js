@@ -466,6 +466,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
 
   // Nhấn giữ tướng/quái: xem chi tiết. Chạm nhanh vào tướng: dùng kỹ năng.
   let press = null;
+  const onTeamFx = (p) => !!state.team?.effects?.length && p.y >= 318 && p.y <= 358 && p.x >= 8 && p.x <= 20 + state.team.effects.length * 30;
   function startPress(kind, idx, p, ev) {
     clearTimeout(press?.timer);
     press = { kind, idx, x: p.x, y: p.y, fired: false, id: ev.pointerId };
@@ -478,6 +479,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     clearTimeout(pr.timer);
     if (cancel || pr.fired) return;
     if (busy || state.status !== 'playing') return;
+    if (pr.kind === 'team') return;
     if (pr.kind === 'enemy') {
       if (state.enemies[pr.idx]?.hp > 0) {
         const r = stepper(state, { type: 'target', index: pr.idx });
@@ -504,11 +506,13 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     }
     if (state.status !== 'playing' || busy) {
       // đang bận: chỉ cho xem chi tiết
+      if (onTeamFx(p0)) { startPress('team', 0, p0, ev); return; }
       if (p0.y >= 384 && p0.y <= 466) { const i = Math.floor((p0.x - 12) / 104); if (i >= 0 && i < state.members.length) startPress('member', i, p0, ev); }
       else if (p0.y >= 80 && p0.y <= 330 && state.enemies.length) startPress('enemy', Math.min(state.enemies.length - 1, Math.floor(p0.x / (W / state.enemies.length))), p0, ev);
       return;
     }
     const p = p0;
+    if (onTeamFx(p)) { startPress('team', 0, p, ev); return; }
     for (const d of state.duos) {
       const cx = 12 + (d.slot + 1) * 104 - 3;
       if (Math.abs(p.x - cx) <= 30 && p.y >= 380 && p.y <= 406) {

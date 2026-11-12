@@ -247,3 +247,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.34.2
 - Hào quang ô tướng sẵn sàng kỹ năng đậm hơn, 4 hạt sáng bay lên (đã kiểm bằng ảnh chụp).
+
+## v0.34.3
+- Trong trận: nhấn giữ icon buff của đội (trên thanh máu) hiện chi tiết từng hiệu ứng.

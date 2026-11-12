@@ -927,7 +927,9 @@ function showInspect(kind, idx) {
   const st = game?.getState?.();
   if (!st || $('info')) return;
   let body;
-  if (kind === 'member') {
+  if (kind === 'team') {
+    body = [h('h3', {}, t('info.teamEffects')), h('div', { class: 'card' }, effectRows(st.team.effects))];
+  } else if (kind === 'member') {
     const m = st.members[idx];
     if (!m) return;
     const c = ctx.characters[m.id];
