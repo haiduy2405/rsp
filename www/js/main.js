@@ -11,6 +11,8 @@ import { newProgress } from './core/progress.js';
 import { createT, detectLang } from './i18n/index.js';
 import { startGame } from './ui/game.js';
 import { preloadAssets, getImg } from './ui/assets.js';
+import { createLoading } from './ui/loading.js';
+import * as offline from './ui/offline.js';
 import { VERSION, BUILD, BUILD_DATE } from './version.js';
 import { createFxLayer } from './ui/fxlayer.js';
 import { createAudio } from './ui/audio.js';
@@ -710,6 +712,52 @@ function showStory() {
   );
 }
 
+// Khối "Dữ liệu offline" trong Cài đặt: trạng thái, tải/cập nhật, xóa.
+function offlineSection() {
+  const box = h('div', { class: 'card offline', id: 'offline' }, h('b', {}, t('offline.title')));
+  if (!offline.offlineSupported()) {
+    box.append(h('p', { class: 'muted' }, t('offline.unsupported')));
+    return box;
+  }
+  const status = h('p', { class: 'muted', id: 'off-status' }, '…');
+  const bar = h('i', { id: 'off-bar', style: 'width:0%' });
+  const track = h('div', { class: 'hpbar', hidden: '' }, bar);
+  const go = btn(t('offline.download'), async () => {
+    go.disabled = true;
+    track.hidden = false;
+    try {
+      await offline.downloadOffline((d, n) => {
+        bar.style.width = `${(d / n) * 100}%`;
+        status.textContent = t('offline.progress', { done: d, total: n });
+      });
+      refresh(t('offline.done'));
+    } catch {
+      refresh(t('offline.fail'));
+    }
+    track.hidden = true;
+    go.disabled = false;
+  }, '', { id: 'off-go' });
+  const clear = btn(t('offline.clear'), async () => {
+    await offline.clearOffline();
+    refresh(t('offline.cleared'));
+  }, '', { id: 'off-clear' });
+  async function refresh(msg) {
+    try {
+      const st = await offline.offlineStatus();
+      const size = offline.formatMB(st.bytes);
+      const full = st.have === st.total;
+      status.textContent = msg ?? (full ? t('offline.full', { size }) : st.have ? t('offline.status', { have: st.have, total: st.total, size }) : t('offline.none'));
+      go.textContent = t(st.have ? 'offline.update' : 'offline.download');
+      clear.hidden = !st.have;
+    } catch {
+      status.textContent = t('offline.fail');
+    }
+  }
+  box.append(h('p', { class: 'muted' }, t('offline.note')), status, track, go, clear);
+  refresh();
+  return box;
+}
+
 function showSettings(msg = null, confirmDelete = false) {
   const exportBox = h('textarea', { readonly: '', id: 'export-box' });
   const importBox = h('textarea', { placeholder: '…', id: 'import-box' });
@@ -731,6 +779,7 @@ function showSettings(msg = null, confirmDelete = false) {
         if (k === 'haptic' && e.target.checked) audio.vibrate(30);
       } }), t(label))),
     h('p', { class: 'muted' }, t('set.volumeNote')),
+    offlineSection(),
     btn(t('hub.export'), () => (exportBox.value = storage.exportText(progress)), '', { id: 'export' }),
     exportBox,
     importBox,
@@ -1392,10 +1441,11 @@ try {
 }
 document.title = t('game.title');
 document.documentElement.lang = lang;
-screen(h('h1', {}, t('game.title')), h('div', { class: 'hpbar', style: 'max-width:260px' }, h('i', { id: 'load-bar', style: 'width:0%;background:#6b79ff' })), h('p', { class: 'sub' }, t('load.text')));
-await preloadAssets((d, n) => {
-  const b = $('load-bar');
-  if (b && n) b.style.width = `${(d / n) * 100}%`;
-});
+const loading = createLoading({ t, title: t('game.title'), subtitle: 'Rift Spire: Pantheon', auto: DEBUG });
+screen(loading.el);
+const bootStart = performance.now();
+await preloadAssets((d, n) => loading.setProgress(n ? (d / n) * 0.95 : 0));
+if (!DEBUG) await new Promise((r) => setTimeout(r, Math.max(0, 1400 - (performance.now() - bootStart)))); // đủ lâu để đọc 1 mẹo
+await loading.ready();
 if (progress.onboarding.done) showHub();
 else showOnboarding();

@@ -1,4 +1,5 @@
-// Service worker: chơi offline sau lần tải đầu. Mã/JSON ưu tiên mạng (luôn mới), ảnh/âm thanh ưu tiên cache.
+// Service worker: chơi offline. Mã/JSON ưu tiên mạng (luôn mới); ảnh/âm thanh/font lấy từ cache và làm mới ngầm.
+// Tên bộ nhớ đệm phải khớp CACHE_NAME trong js/ui/offline.js (nút "Tải dữ liệu offline" ghi vào cùng chỗ).
 const CACHE = 'rsp-v1';
 self.addEventListener('install', (e) => { self.skipWaiting(); });
 self.addEventListener('activate', (e) => {
@@ -10,7 +11,10 @@ self.addEventListener('fetch', (e) => {
   const heavy = /\.(webp|png|jpg|mp3|ogg|wav|woff2?)$/i.test(new URL(req.url).pathname);
   e.respondWith(
     heavy
-      ? caches.match(req).then((hit) => hit || fetch(req).then((res) => { const c = res.clone(); caches.open(CACHE).then((x) => x.put(req, c)); return res; }))
+      ? caches.match(req).then((hit) => {
+          const net = fetch(req).then((res) => { const c = res.clone(); caches.open(CACHE).then((x) => x.put(req, c)); return res; });
+          return hit || net;
+        })
       : fetch(req).then((res) => { const c = res.clone(); caches.open(CACHE).then((x) => x.put(req, c)); return res; }).catch(() => caches.match(req).then((hit) => hit || caches.match('./index.html'))),
   );
 });

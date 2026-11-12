@@ -80,3 +80,8 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 - UI/UX mới: design system (kính + khung vàng), font tự host, app-like (chặn bôi chọn/menu giữ), PWA (nút cài, fullscreen), góc tiền tệ trên phải, màn Kho đồ, credit "made by duyluma" + version (`npm run stamp`).
 - Đội hình: 3 đội lưu sẵn, đổi đội trưởng, màn chuẩn bị trước trận (chọn khu → chọn đội → Vào trận). Đội trưởng nổi bật trong trận (ô cao hơn, viền vàng, vương miện).
 - Âm thanh: mẫu CC0 (`tools/build-audio.py`), cao độ combo tăng dần; synth dự phòng.
+
+## Màn hình tải và dữ liệu offline (v0.10)
+- `www/js/ui/loading.js`: màn hình tải (tháp sáng dần theo tiến độ, mẹo xoay vòng `load.tip.*`, "Chạm để vào" cũng mở khóa âm thanh). Thêm mẹo mới: thêm key `load.tip.N` ở cả hai file i18n và tăng `TIP_COUNT`.
+- `www/js/ui/offline.js` + Cài đặt → "Dữ liệu offline": tải toàn bộ tệp liệt kê trong `www/precache.json` vào Cache Storage `rsp-v1` (cùng kho với `sw.js`). `precache.json` do `tools/gen-precache.js` sinh, tự chạy trong `npm run stamp`.
+- Khi game nặng hơn (art/nhạc thật): không cần sửa code, chỉ stamp lại là nút tải tính đúng dung lượng.
