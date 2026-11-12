@@ -166,6 +166,9 @@ const bounceOut = (x) => {
 };
 const SANS = '"Be Vietnam Pro", system-ui, sans-serif';
 const SERIF = 'Cormorant, "Times New Roman", serif';
+const TALLY_AT = { x: W / 2 + 90, y: 340 }; // ô tổng sát thương (khớp game.js)
+const POP_LIGHT = ['#b8e0ff', '#ffc0ac', '#b8f5c4', '#fff4b0', '#dcc4ff', '#ffd0e4']; // màu sáng theo hệ cho số của tướng
+const easeOut = (k) => 1 - (1 - k) ** 3;
 const NUM = 'Oswald, "Be Vietnam Pro", system-ui, sans-serif'; // số: chữ cao hẹp, dễ đọc khi to
 function text(g, s, x, y, size, color = '#e8ebff', align = 'center', weight = '600', family = SANS) {
   g.fillStyle = color;
@@ -621,6 +624,33 @@ export function draw(g, view, t) {
     g.scale(sc, sc);
     if (f.kind === 'dmg') outlined(g, f.s, 0, 0, f.size || 40, '#ffffff', f.color, NUM, Math.max(4, (f.size || 40) * 0.13));
     else outlined(g, f.s, 0, 0, f.size || 24, f.color, f.color, SANS, 4, '800');
+    g.restore();
+  }
+  // số sát thương từng tướng: nảy ở ô tướng, rồi bay gộp vào ô tổng
+  for (const q of view.pops || []) {
+    if (q.age < q.delay) continue;
+    const t = q.age - q.delay;
+    const pop = Math.min(1, t / 200);
+    const back = 1 + 2.4 * Math.pow(pop - 1, 3) + 1.4 * Math.pow(pop - 1, 2);
+    let x = q.x, y = q.y - 14 * easeOut(Math.min(1, t / 400)), sc = 0.3 + 0.7 * back, a = 1;
+    if (q.flyAge >= 0) {
+      const f = Math.max(0, q.flyAge - q.flyDelay) / 300, e = Math.min(1, f) ** 2.2;
+      x += (TALLY_AT.x - x) * e;
+      y += (TALLY_AT.y - y) * e;
+      sc *= 1 - 0.5 * e;
+      a = 1 - 0.7 * e * e;
+    }
+    const col = COLORS[q.el] || '#ffd84a';
+    g.save();
+    g.globalAlpha = a;
+    g.translate(x, y);
+    g.scale(sc, sc);
+    const halo = g.createRadialGradient(0, 0, 4, 0, 0, q.size * 1.1);
+    halo.addColorStop(0, `${col}66`);
+    halo.addColorStop(1, `${col}00`);
+    g.fillStyle = halo;
+    g.fillRect(-q.size * 1.4, -q.size * 1.1, q.size * 2.8, q.size * 2.2);
+    outlined(g, q.s, 0, 0, q.size, POP_LIGHT[q.el] || '#fff0a0', col, NUM, Math.max(5, q.size * 0.16), '700');
     g.restore();
   }
   g.restore(); // hết máy quay

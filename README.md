@@ -100,3 +100,6 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 - **Thẻ tướng** kiểu ToS (`ui/hero-ui.js`): HP, ATK, Hồi, Tộc, hệ; dùng ở Bộ sưu tập và bảng thông tin trong trận.
 - **Tạm dừng** trong trận: chỉnh âm thanh hoặc thoát. Thoát bỏ trận dở, giữ tiến trình các cửa đã xong (chơi lại từ lúc chọn cửa). Test: `tests/e2e/pause.cjs`.
 - Lưu ý: save đã reset theo v6; thức tỉnh cũ vẫn tạm giữ cho tới v0.14 (Form 2).
+
+## Đòn đánh theo từng tướng (v0.13)
+Sau khi xoay ngọc: mỗi tướng nảy số sát thương của mình ngay trên ô tướng (màu theo hệ), giữ một nhịp, rồi lần lượt bay gộp vào ô tổng, tổng nổ to, rồi mới bắn từ tướng vào quái. Nhịp chỉnh ở `ANIM` (game.js), vẽ ở `render.js` (`view.pops`). Test thủ công: `tests/e2e/pause.cjs` cho tạm dừng; xem hiệu ứng bằng `?debug`.
