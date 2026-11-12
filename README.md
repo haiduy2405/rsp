@@ -291,3 +291,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.40.2
 - Slow-motion kết thúc trận chỉ bắt đầu từ đúng đòn làm quái CUỐI CÙNG chết; các đòn trước (kể cả giết quái khác trong cùng lượt) chạy tốc độ thường.
+
+## v0.40.3
+- Gợi ý nước đầu mỗi trận giới hạn tối đa 6 combo (`config.hint.maxCombos`, `maxSteps`), thực tế ra 4–6 combo; chọn đường nhiều combo nhất không vượt trần.

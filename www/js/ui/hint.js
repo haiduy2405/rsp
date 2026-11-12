@@ -1,10 +1,10 @@
 import { areAdjacent } from '../core/board.js';
 import { step as coreStep } from '../core/battle.js';
 
-// Gợi ý: tìm MỘT ĐƯỜNG KÉO (nhiều bước) tạo được nhiều combo nhất (rồi tới số ngọc tan, rồi sát thương).
+// Gợi ý: tìm MỘT ĐƯỜNG KÉO (nhiều bước) tạo nhiều combo nhất nhưng KHÔNG QUÁ config.hint.maxCombos (người mới đừng thấy 10+ combo
+// rồi nản), rồi tới số ngọc tan, rồi sát thương, rồi đường ngắn hơn.
 // Tìm chùm (beam search) trên mô phỏng thật của lõi nên luôn khớp kết quả thực tế.
 const BEAM = 14;
-const MAX_STEPS = 8;
 
 function score(r) {
   const steps = r.events.filter((e) => e.type === 'step');
@@ -18,11 +18,13 @@ const better = (a, b) => !b || a.combos !== b.combos ? !b || a.combos > b.combos
 
 export function findHint(ctx, state, step = coreStep) {
   const diag = ctx.config.board.allowDiagonal;
+  const cap = ctx.config.hint?.maxCombos ?? 6;
+  const maxSteps = ctx.config.hint?.maxSteps ?? 8;
   const N = state.board.cells.length;
   let best = null;
   let beam = [];
   for (let a = 0; a < N; a++) if (!state.locked.includes(a)) beam.push({ path: [a], sc: null });
-  for (let depth = 1; depth <= MAX_STEPS && beam.length; depth++) {
+  for (let depth = 1; depth <= maxSteps && beam.length; depth++) {
     const next = [];
     for (const node of beam) {
       const last = node.path[node.path.length - 1];
@@ -31,9 +33,10 @@ export function findHint(ctx, state, step = coreStep) {
         if (b === prev || b === last || state.locked.includes(b) || !areAdjacent(last, b, diag)) continue;
         const path = [...node.path, b];
         const sc = score(step(ctx, state, { type: 'move', path }));
+        if (sc && sc.combos > cap) continue; // quá nhiều combo: bỏ
         const entry = { path, sc: sc || { combos: 0, cleared: 0, dmg: 0 } };
         next.push(entry);
-        if (sc && better(sc, best?.sc)) best = entry;
+        if (sc && better(sc, best?.sc)) best = entry; // bằng điểm thì giữ đường ngắn đã tìm trước
       }
     }
     // giữ các đường triển vọng nhất; ưu tiên đường ngắn khi điểm bằng nhau

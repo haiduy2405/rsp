@@ -3,6 +3,7 @@
     "allowDiagonal": true
   },
   "dragTimeMs": 5000,
+  "hint": { "maxCombos": 6, "maxSteps": 8 },
   "elements": [
     "water",
     "fire",

@@ -23,10 +23,12 @@ test('hint: đường gợi ý là nước hợp lệ, cho đúng số combo đ�
       const q = step(ctx, s, { type: 'move', path: [a, b] }).events.filter((e) => e.type === 'step');
       if (q.length) two = Math.max(two, q[q.length - 1].combos);
     }
-    assert.ok(h.combos >= two, `seed ${seed}: ${h.combos} >= ${two}`);
+    const cap = ctx.config.hint.maxCombos;
+    assert.ok(h.combos <= cap, `seed ${seed}: ${h.combos} <= ${cap}`);
+    assert.ok(h.combos >= Math.min(two, cap), `seed ${seed}: ${h.combos} >= min(${two}, ${cap})`);
     if (h.combos > two) better++;
   }
-  assert.ok(better >= 6, `đa số trường hợp nhiều combo hơn nước 1 ô (${better}/12)`);
+  assert.ok(better >= 4, `nhiều trường hợp nhiều combo hơn nước 1 ô (${better}/12)`);
 });
 
 test('hint: tìm nhanh (dưới 1 giây mỗi lần)', () => {
