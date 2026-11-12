@@ -946,7 +946,7 @@
   "battle.clear": "Clear",
   "battle.frozen": "Time frozen: {n} turn(s) left",
   "battle.freezeHint": "Drag freely, then press Clear",
-  "tut.lesson": "Lesson {n} of {total}",
+  "tut.lesson": "{n}/{total}",
   "tut.guide": "Press the first orb, release on the last",
   "tut.l1": "Lesson 1: drag sideways. Press the glowing orb, drag it one cell left and let go. 3 orbs of one color in a row clear.",
   "tut.l2": "Lesson 2: drag up and down. Press the glowing orb, drag it up one cell and let go. Vertical lines clear too.",

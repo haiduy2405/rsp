@@ -946,7 +946,7 @@
   "battle.clear": "Tiêu",
   "battle.frozen": "Dừng thời gian: còn {n} lượt",
   "battle.freezeHint": "Xoay thoải mái, xong bấm Tiêu",
-  "tut.lesson": "Bài {n}/{total}",
+  "tut.lesson": "{n}/{total}",
   "tut.guide": "Nhấn ở viên đầu, nhả ở viên cuối",
   "tut.l1": "Bài 1: kéo ngang. Nhấn vào viên ngọc sáng rồi kéo sang trái 1 ô, thả tay. 3 ngọc cùng màu nối nhau sẽ tiêu.",
   "tut.l2": "Bài 2: kéo dọc. Nhấn vào viên ngọc sáng, kéo lên 1 ô rồi thả. Hàng dọc cũng tiêu được.",

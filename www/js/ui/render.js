@@ -229,8 +229,12 @@ function hud(g, view) {
     const tot = +m[2];
     const w = Math.max(132, 44 + tot * 16);
     plaque(g, 122, 8, w, 40);
-    text(g, view.t('battle.floorWord'), 134, 22, 11, '#c9a678', 'left', '700');
-    text(g, `${n}/${tot}`, 134 + 52, 22, 13, '#f6edd6', 'left', '700');
+    if (/^[\d\s/]+$/.test(view.titleText)) {
+      text(g, `${n}/${tot}`, 134, 22, 15, '#f6edd6', 'left', '800'); // bài hướng dẫn: chỉ "n/tổng", không chữ "Tầng"
+    } else {
+      text(g, view.t('battle.floorWord'), 134, 22, 11, '#c9a678', 'left', '700');
+      text(g, `${n}/${tot}`, 134 + 52, 22, 13, '#f6edd6', 'left', '700');
+    }
     for (let i = 0; i < tot; i++) {
       const px = 134 + i * 16 + 6;
       g.beginPath();
@@ -668,6 +672,7 @@ export function draw(g, view, t) {
   g.beginPath();
   g.rect(0, BOARD_Y, W, ROWS * CELL + 30);
   g.clip(); // ngọc rơi từ trên xuống không được đè lên hàng tướng
+  if (view.boardIn !== undefined && view.boardIn < 1) g.globalAlpha = view.boardIn; // đổi bàn ở bài hướng dẫn: hiện dần, không chớp
   // viên đang cầm luồn bên dưới
   if (held >= 0) drawOrb(g, view.board.cells[held], view.drag.x, view.drag.y, 40, !!view.board.enh[held], 0.92);
   const lifted = [];

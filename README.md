@@ -340,3 +340,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.46.0 — Quái phản diện thần thoại
 - 27 quái đổi sang phản diện thần thoại/truyền thuyết (Kappa, Kraken, Leviathan, Typhon, Hydra, Sphinx, Cerberus, Cửu Vĩ Hồ...), art mới, tộc khớp lại. Chi tiết: docs/MONSTERS_V2.md.
+
+## v0.46.1
+- Tutorial: bàn bài 1 có sẵn từ khung hình đầu (hết giật do đổi bàn), các lần đổi bàn sau hiện dần. Ô tiêu đề chỉ ghi 1/6 đến 6/6, không chữ "Tầng".

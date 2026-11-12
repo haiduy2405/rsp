@@ -914,6 +914,7 @@ function startTutorial(retry = false) {
   // Đội, quái, bàn và đường kéo đều cố định trong config: mọi tài khoản học cùng một bài.
   const st0 = createBattle(ctx, { seed: tc.seed, team: tc.team, enemies: tc.enemies, scale: tc.scale });
   st0.members[0].skillCd = 0; // tướng đầu sẵn kỹ năng để dạy
+  if (tc.lessons[0]?.board) st0.board = { cells: tc.lessons[0].board.slice(), enh: new Array(tc.lessons[0].board.length).fill(0) }; // bàn bài 1 có ngay từ khung hình đầu, không đổi bàn sau đó
   const lessons = tc.lessons;
   let li = 0;
   $('coach')?.remove();

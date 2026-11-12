@@ -677,6 +677,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     const real = now - last;
     last = now;
     let dt = real;
+    if (view.boardIn !== undefined && view.boardIn < 1) view.boardIn = Math.min(1, view.boardIn + real / 240);
     if (view.freeze > 0) { view.freeze -= real; dt = 0; } else dt = real * (view.slow ?? 1);
     if (drag && drag.t0 && !(state.freeze > 0)) {
       const k = 1 - (now - drag.t0) / dragMs;
@@ -762,7 +763,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     // Bài hướng dẫn: đặt bàn cố định, đường chỉ định và bộ lọc nước đi.
     setGuide({ board = null, path = null, text = '', allow = null, title = null }) {
       if (title !== null) view.titleText = title;
-      if (board) { state.board = { cells: board.slice(), enh: new Array(board.length).fill(0) }; sync(); }
+      if (board) { const same = state.board.cells.every((c, i) => c === board[i]); state.board = { cells: board.slice(), enh: new Array(board.length).fill(0) }; sync(); if (!same) view.boardIn = 0; }
       moveGuard = allow;
       view.hint = path ? { path: path.slice(), text } : null;
       view.hintKeep = view.hint;
