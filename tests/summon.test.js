@@ -2,14 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mulberry32 } from '../www/js/core/rng.js';
 import { newProgress, isValidProgress } from '../www/js/core/progress.js';
-import { newSummonState, rollPull, summon, buyTickets, redeemCharacter, effectiveRates } from '../www/js/core/summon.js';
+import { newSummonState, rollPull, summon, starterSummon, buyTickets, redeemCharacter, effectiveRates } from '../www/js/core/summon.js';
 import { finishOnboarding, completeTutorial, storyUnlocked } from '../www/js/core/onboarding.js';
 import { migrate } from '../www/js/save/migrate.js';
 import { loadCtx } from './helpers.js';
 
 const ctx = loadCtx();
 const cfg = ctx.config.summon;
-const input = (o = {}) => ({ name: 'An', callsign: 'Kite', hometown: 'Mạo Khê', avatar: 2, culture: 'viet', ...o });
+const input = (o = {}) => ({ name: 'An', hometown: 'Mạo Khê', avatar: 2, ...o });
 const onboarded = (o) => finishOnboarding(ctx, newProgress(ctx), input(o)).progress;
 const rich = (o) => {
   const p = onboarded(o);
@@ -80,26 +80,29 @@ test('xác định theo seed; seed khác cho kết quả khác; x10 luôn có í
   const c = summon(ctx, p, { bannerId: 'standard', count: 10, dayKey: 1, seed: 6 });
   assert.notDeepEqual(a.results, c.results);
   for (let seed = 1; seed <= 300; seed++) {
-    const r = summon(ctx, { ...p, summon: { ...p.summon, firstDone: true } }, { bannerId: 'standard', count: 10, dayKey: 1, seed });
+    const r = summon(ctx, { ...p, summon: { ...p.summon } }, { bannerId: 'standard', count: 10, dayKey: 1, seed });
     assert.ok(r.results.some((x) => x.rarity >= 4), `seed ${seed}`);
   }
 });
 
-test('Tín Vật: lượt đầu tiên chắc chắn 4★ của nền văn hóa đã chọn và không tính vào pity', () => {
-  for (const culture of ctx.config.summon.cultures) {
-    for (let seed = 1; seed <= 20; seed++) {
-      const p = rich({ culture });
-      const r = summon(ctx, p, { bannerId: 'standard', count: 1, dayKey: 1, seed });
-      const res = r.results[0];
-      assert.equal(res.rarity, 4);
-      assert.equal(ctx.characters[res.id].culture, culture);
-      assert.equal(res.forced, true);
-      assert.deepEqual([r.progress.summon.pity5, r.progress.summon.pity4], [0, 0]);
-      assert.equal(r.progress.summon.firstDone, true);
-      const r2 = summon(ctx, r.progress, { bannerId: 'standard', count: 1, dayKey: 1, seed });
-      assert.equal(r2.results[0].forced, false);
-    }
+test('quà tân thủ: đúng 1 tướng 4★ + 9 tướng 3★, không 5★, không động pity, chỉ nhận một lần', () => {
+  const base = finishOnboarding(ctx, newProgress(ctx), input()).progress;
+  for (let seed = 1; seed <= 200; seed++) {
+    const r = starterSummon(ctx, base, seed);
+    assert.ok(r.ok);
+    assert.equal(r.results.length, 10);
+    assert.equal(r.results.filter((x) => x.rarity === 4).length, 1, `seed ${seed}`);
+    assert.equal(r.results.filter((x) => x.rarity === 3).length, 9);
+    for (const x of r.results) assert.equal(ctx.characters[x.id].rarity, x.rarity);
+    assert.deepEqual([r.progress.summon.pity5, r.progress.summon.pity4], [0, 0]);
+    assert.equal(r.progress.onboarding.starterDone, true);
+    assert.ok(isValidProgress(r.progress));
+    assert.equal(starterSummon(ctx, r.progress, seed).reason, 'already_done');
   }
+  assert.equal(starterSummon(ctx, newProgress(ctx), 1).reason, 'not_ready');
+  const pos = new Set();
+  for (let seed = 1; seed <= 200; seed++) pos.add(starterSummon(ctx, base, seed).results.findIndex((x) => x.rarity === 4));
+  assert.ok(pos.size >= 6, 'vị trí 4★ ngẫu nhiên');
 });
 
 test('chi phí: 1 Vé mỗi lượt, x10 = 10 Vé, thiếu thì từ chối và không đổi gì', () => {
@@ -192,14 +195,14 @@ test('lịch sử triệu hồi giữ tối đa historyMax bản ghi mới nhấ
   assert.equal(p.summon.history.at(-1).n, p.summon.pulls);
 });
 
-test('onboarding: kiểm tra dữ liệu, tặng Vé chào mừng, chỉ làm một lần', () => {
+test('onboarding: kiểm tra dữ liệu, chỉ làm một lần', () => {
   const p0 = newProgress(ctx);
   assert.equal(p0.onboarding.done, false);
-  for (const bad of [{ name: '' }, { name: 'x'.repeat(40) }, { callsign: '' }, { avatar: 99 }, { avatar: 1.5 }, { culture: 'la_ma' }, { hometown: 'y'.repeat(60) }])
+  for (const bad of [{ name: '' }, { name: 'x'.repeat(40) }, { avatar: 99 }, { avatar: 1.5 }, { hometown: 'y'.repeat(60) }])
     assert.equal(finishOnboarding(ctx, p0, input(bad)).ok, false, JSON.stringify(bad));
   const r = finishOnboarding(ctx, p0, input({ name: '  An   Nguyễn ' }));
   assert.equal(r.progress.player.name, 'An Nguyễn');
-  assert.equal(r.progress.inventory.tickets, cfg.welcomeTickets);
+  assert.equal(r.progress.inventory.tickets, 0);
   assert.equal(r.progress.onboarding.done, true);
   assert.equal(finishOnboarding(ctx, r.progress, input()).reason, 'already_done');
   assert.ok(isValidProgress(r.progress));
@@ -243,3 +246,14 @@ test('avatar: ảnh người chơi phải là JPEG data URL nhỏ, mẫu avatar 
   assert.equal(finishOnboarding(ctx, p0, input({ avatar: 12 })).reason, 'bad_avatar');
 });
 const cfg_photoMax = () => ctx.config.onboarding.photoMax;
+
+test('migrate v11 → v12: bỏ callsign/Tín Vật, người cũ coi như đã nhận quà tân thủ', async () => {
+  const { migrate } = await import('../www/js/save/migrate.js');
+  const old = { version: 11, player: { name: 'A', callsign: 'K', hometown: '', avatar: 0, photo: null, culture: 'viet' }, summon: { pity5: 1, pity4: 2, pulls: 3, firstDone: true, freeDay: -1, history: [] }, onboarding: { done: true, tutorialDone: true } };
+  const m = migrate(old, 11, ctx);
+  assert.equal(m.version, 12);
+  assert.equal('callsign' in m.player, false);
+  assert.equal('culture' in m.player, false);
+  assert.equal('firstDone' in m.summon, false);
+  assert.equal(m.onboarding.starterDone, true);
+});

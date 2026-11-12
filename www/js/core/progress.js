@@ -6,7 +6,7 @@ import { grantExp } from './upgrade.js';
 import { newShopState } from './shop.js';
 import { addFragments } from './fragments.js';
 // Tiến trình người chơi (dữ liệu được lưu). Hàm thuần: nhận progress, trả progress mới.
-export const SAVE_VERSION = 11;
+export const SAVE_VERSION = 12;
 
 // Linh Thạch thưởng lần clear đầu tiên của một độ khó trong khu (cả 7 ải): gốc theo độ khó, tăng theo khu (config.firstClear).
 export function firstClearSpirit(ctx, zoneId, diff) {
@@ -35,7 +35,7 @@ export function newProgress(ctx) {
     characters: Object.fromEntries(DEFAULT_TEAM.map((id) => [id, newCharacter()])),
     team: DEFAULT_TEAM.slice(),
     player: newPlayer(),
-    onboarding: { done: false, tutorialDone: false },
+    onboarding: { done: false, tutorialDone: false, starterDone: false },
     summon: newSummonState(),
     shop: newShopState(),
     settings: { volume: 80 },

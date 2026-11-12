@@ -2,7 +2,6 @@
 import { $, h, btn } from './dom.js';
 import { zoneClears } from '../core/stage.js';
 import { avatarNode, photoFromFile } from '../ui/avatar.js';
-import { summon } from '../core/summon.js';
 import { finishOnboarding, storyUnlocked, updateProfile } from '../core/onboarding.js';
 import { newProgress } from '../core/progress.js';
 import * as offline from '../ui/offline.js';
@@ -24,7 +23,7 @@ export function install(app) {
     const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (d.avatar === i && !d.photo ? ' sel' : ''), 'data-avatar': i, onclick: () => { d.avatar = i; d.photo = null; showProfile(); } }, avatarNode({ avatar: i })));
     const save1 = () => {
       const r = updateProfile(ctx, app.progress, d);
-      if (!r.ok) return showProfile(t(`ob.bad.${r.reason}`, { max: r.reason === 'bad_callsign' ? o.callsignMax : o.nameMax }) );
+      if (!r.ok) return showProfile(t(`ob.bad.${r.reason}`, { max: o.nameMax }));
       app.progress = r.progress;
       save();
       profDraft = null;
@@ -32,7 +31,7 @@ export function install(app) {
       showProfile(t('profile.saved'));
     };
     const keep = (e, k) => { d[k] = e.target.value; };
-    const dirty = d.name !== app.progress.player.name || d.callsign !== app.progress.player.callsign || (d.hometown || '') !== (app.progress.player.hometown || '') || d.avatar !== app.progress.player.avatar || (d.photo || null) !== (app.progress.player.photo || null);
+    const dirty = d.name !== app.progress.player.name || (d.hometown || '') !== (app.progress.player.hometown || '') || d.avatar !== app.progress.player.avatar || (d.photo || null) !== (app.progress.player.photo || null);
     screen(
       h('h2', {}, t('profile.title')),
       h('div', { class: 'prof-head' }, h('div', { class: 'avatar big' }, avatarNode(d))),
@@ -40,9 +39,7 @@ export function install(app) {
       h('div', { class: 'row' }, av),
       photoPicker(d, () => showProfile(), 'pf'),
       h('label', {}, t('ob.name'), h('input', { id: 'pf-name', maxlength: String(o.nameMax), value: d.name, oninput: (e) => keep(e, 'name') })),
-      h('label', {}, t('ob.callsign'), h('input', { id: 'pf-callsign', maxlength: String(o.callsignMax), value: d.callsign, oninput: (e) => keep(e, 'callsign') })),
       h('label', {}, t('ob.hometown')), flagPicker(ctx, t, d.hometown || '', (c) => keep({ target: { value: c } }, 'hometown'), 'pf'),
-      d.culture ? h('div', { class: 'muted' }, `${t('profile.token')}: ${t(`ob.token.${d.culture}`)}`) : null,
       btn(t('profile.save'), save1, 'primary', { id: 'pf-save' }),
       h('h3', {}, t('profile.stats')),
       stat(t('profile.runs'), st.runs),
@@ -184,52 +181,46 @@ export function install(app) {
     $('lang').value = app.lang;
   }
 
-  // Onboarding: mở đầu -> quê hương -> Tín Vật -> ngoại hình -> tên -> lượt triệu hồi đầu.
-  const ob = { hometown: '', culture: null, avatar: 0, photo: null, name: '', callsign: '' };
+  // Mở đầu: cốt truyện -> AIDA hỏi tên, ngoại hình, quê hương -> màn hướng dẫn (trận thật) -> quà 10 vé.
+  const ob = { hometown: '', avatar: 0, photo: null, name: '' };
+  const TOWER = '<svg viewBox="0 0 120 220" aria-hidden="true"><defs><linearGradient id="tw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2c27a"/><stop offset="1" stop-color="#3a2013"/></linearGradient></defs><path d="M60 8 L72 40 L68 40 L80 90 L74 90 L90 150 L84 150 L104 210 L16 210 L36 150 L30 150 L46 90 L40 90 L52 40 L48 40 Z" fill="url(#tw)" stroke="#d39a5e" stroke-width="1.5" stroke-linejoin="round"/><circle cx="60" cy="14" r="5" fill="#fff3c9" class="tw-eye"/></svg>';
 
   function showOnboarding(step = 1, err = null) {
-    if (step === 1) Object.assign(ob, { hometown: '', culture: null, avatar: 0, photo: null, name: '', callsign: '' });
+    if (step === 1) Object.assign(ob, { hometown: '', avatar: 0, photo: null, name: '' });
     app.obTimers.forEach(clearTimeout);
     app.obTimers = [];
     const o = ctx.config.onboarding;
-    const next = (n) => () => showOnboarding(n);
     if (step === 1) {
-      const lines = ['ob.alarm1', 'ob.alarm2', 'ob.alarm3'].map((k) => h('p', { class: 'ob-line', style: 'opacity:0;transition:opacity 1s' }, t(k)));
-      screen(h('h1', {}, t('game.title')), lines, btn(t('ob.next'), next(2), 'primary', { id: 'ob-next' }), btn(t('ob.skip'), next(2), '', { id: 'ob-skip' }));
-      lines.forEach((l, i) => app.obTimers.push(setTimeout(() => (l.style.opacity = '1'), 300 + i * 2500)));
-    } else if (step === 2) {
+      const lines = ['ob.alarm1', 'ob.alarm2', 'ob.alarm3'].map((k) => h('p', { class: 'ob-line' }, t(k)));
+      const tower = h('div', { class: 'ob-tower' });
+      tower.innerHTML = TOWER;
       screen(
-        h('div', { class: 'card' }, h('p', {}, t('ob.aida'))),
-        h('label', {}, t('ob.hometown')), flagPicker(ctx, t, ob.hometown, (c) => (ob.hometown = c), 'ob'),
-        h('p', { class: 'muted' }, t('ob.hometownHint')),
-        btn(t('ob.next'), next(3), 'primary', { id: 'ob-next' }),
+        h('div', { class: 'ob-story' }, tower, h('h1', {}, t('game.title')), h('div', { class: 'ob-lines' }, lines),
+          h('div', { class: 'ob-actions' }, btn(t('ob.next'), () => showOnboarding(2), 'primary', { id: 'ob-next' }), btn(t('ob.skip'), () => showOnboarding(2), 'ghost', { id: 'ob-skip' }))),
       );
-    } else if (step === 3) {
+      lines.forEach((l, i) => app.obTimers.push(setTimeout(() => l.classList.add('on'), 500 + i * 2200)));
+    } else {
+      const preview = h('div', { class: 'avatar big ob-me' }, avatarNode(ob));
+      const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (ob.avatar === i && !ob.photo ? ' sel' : ''), 'data-avatar': i, onclick: () => { ob.avatar = i; ob.photo = null; showOnboarding(2, err); } }, avatarNode({ avatar: i })));
       screen(
-        h('div', { class: 'card' }, h('p', {}, t('ob.token'))),
-        o && ctx.config.summon.cultures.map((c) => h('div', { class: 'card btn' + (ob.culture === c ? ' sel' : ''), 'data-culture': c, onclick: () => { ob.culture = c; showOnboarding(3); } }, h('b', {}, t(`ob.token.${c}`)))),
-        btn(t('ob.next'), next(4), 'primary', { id: 'ob-next', ...(ob.culture ? {} : { disabled: '' }) }),
-      );
-    } else if (step === 4) {
-      const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (ob.avatar === i && !ob.photo ? ' sel' : ''), 'data-avatar': i, onclick: () => { ob.avatar = i; ob.photo = null; showOnboarding(4); } }, avatarNode({ avatar: i })));
-      screen(h('div', { class: 'card' }, h('p', {}, t('ob.avatar'))), h('div', { class: 'row' }, av), photoPicker(ob, () => showOnboarding(4), 'ob'), btn(t('ob.next'), next(5), 'primary', { id: 'ob-next' }));
-    } else if (step === 5) {
-      screen(
-        err ? h('div', { class: 'notice' }, err) : null,
-        h('label', {}, t('ob.name'), h('input', { id: 'ob-name', maxlength: String(o.nameMax), value: ob.name, oninput: (e) => (ob.name = e.target.value) })),
-        h('label', {}, t('ob.callsign'), h('input', { id: 'ob-callsign', maxlength: String(o.callsignMax), value: ob.callsign, oninput: (e) => (ob.callsign = e.target.value) })),
-        btn(t('ob.start'), () => {
-          const r = finishOnboarding(ctx, app.progress, { name: ob.name, callsign: ob.callsign, hometown: ob.hometown, avatar: ob.avatar, photo: ob.photo, culture: ob.culture });
-          if (!r.ok) {
-            const key = `ob.bad.${r.reason}`;
-            return showOnboarding(5, dicts[app.lang][key] ? t(key, { max: r.reason === 'bad_name' ? o.nameMax : o.callsignMax }) : t('ob.bad.other'));
-          }
-          app.progress = r.progress;
-          const s = summon(ctx, app.progress, { bannerId: 'standard', count: 1, free: true, dayKey: app.dayKey(), seed: (Math.random() * 4294967296) >>> 0 });
-          app.progress = s.progress;
-          save();
-          app.showFirstSummon(s.results[0]);
-        }, 'primary', { id: 'ob-start' }),
+        h('div', { class: 'ob-id' },
+          h('div', { class: 'ob-aida' }, h('b', {}, 'AIDA'), h('p', {}, t('ob.aida'))),
+          err ? h('div', { class: 'notice' }, err) : null,
+          h('div', { class: 'ob-me-row' }, preview, h('label', { class: 'ob-name' }, t('ob.name'), h('input', { id: 'ob-name', maxlength: String(o.nameMax), value: ob.name, autocomplete: 'off', oninput: (e) => (ob.name = e.target.value) }))),
+          h('div', { class: 'ob-avs' }, av),
+          photoPicker(ob, () => showOnboarding(2, err), 'ob'),
+          h('details', { class: 'ob-flag' }, h('summary', {}, t('ob.hometown')), flagPicker(ctx, t, ob.hometown, (c) => (ob.hometown = c), 'ob'), h('p', { class: 'muted' }, t('ob.hometownHint'))),
+          btn(t('ob.start'), () => {
+            const r = finishOnboarding(ctx, app.progress, { name: ob.name, hometown: ob.hometown, avatar: ob.avatar, photo: ob.photo });
+            if (!r.ok) {
+              const key = `ob.bad.${r.reason}`;
+              return showOnboarding(2, dicts[app.lang][key] ? t(key, { max: o.nameMax }) : t('ob.bad.other'));
+            }
+            app.progress = r.progress;
+            save();
+            app.startTutorial();
+          }, 'primary', { id: 'ob-start' }),
+        ),
       );
     }
   }

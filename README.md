@@ -294,3 +294,10 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.40.3
 - Gợi ý nước đầu mỗi trận giới hạn tối đa 6 combo (`config.hint.maxCombos`, `maxSteps`), thực tế ra 4–6 combo; chọn đường nhiều combo nhất không vượt trần.
+
+## v0.41.0 — Mở đầu mới
+- Bỏ callsign và Tín Vật. Người chơi chỉ đặt tên, chọn ngoại hình, quốc kỳ (sửa lệch highlight).
+- Cốt truyện: AIDA -> màn tutorial thật (đội mượn sẵn, 3 quái yếu, bong bóng chỉ dẫn từng nước, chơi lại nếu thua, `config.tutorial`).
+- Quà tân thủ: 10 lượt triệu hồi miễn phí, chắc chắn 1×4★ + 9×3★, không 5★, không động pity (`starterSummon`, `config.summon.starter`). Muốn reroll tướng 4★: tạo slot lưu mới.
+- Cutscene dùng chung một khuôn cho mọi tướng 4★ (thay chân dung/tên), rồi hiệu ứng vào màn chính. Hiệu ứng chỉ dùng transform/opacity cho mượt 60 fps.
+- Save v12 (bỏ callsign/culture/firstDone, thêm `onboarding.starterDone`; save cũ coi như đã nhận).

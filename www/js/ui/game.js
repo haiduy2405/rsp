@@ -23,7 +23,7 @@ const DIAG_ASSIST = 0.38; // tỉ lệ ô: lệch ngang và dọc đều vượt
 const NOFX = { sfx() {}, vibrate() {} };
 
 
-export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null, onSkillAsk = null }) {
+export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null, onSkillAsk = null, onSettled = null }) {
   const g = canvas.getContext('2d');
   let state = initial;
   let busy = false;
@@ -440,6 +440,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     busy = false;
     view.canAct = state.status === 'playing';
     if (state.status !== 'playing' && alive) onEnd(state);
+    else if (alive) onSettled?.(state, action);
   }
 
   function pos(ev) {

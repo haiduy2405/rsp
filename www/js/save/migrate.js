@@ -90,6 +90,12 @@ const steps = {
     for (const [zone, byDiff] of Object.entries(data.clears || {})) stages[zone] = Object.fromEntries(Object.entries(byDiff).filter(([, c]) => c > 0).map(([d]) => [d, n]));
     return { ...data, version: 11, stages };
   },
+  11(data) {
+    // v12: bỏ callsign và Tín Vật (culture), thêm quà tân thủ. Người đã chơi coi như đã nhận.
+    const { callsign, culture, ...player } = data.player || {};
+    const { firstDone, ...summon } = data.summon || {};
+    return { ...data, version: 12, player, summon, onboarding: { ...data.onboarding, starterDone: true } };
+  },
 };
 
 export function migrate(data, fromVersion, ctx) {

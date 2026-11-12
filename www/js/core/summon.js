@@ -1,11 +1,11 @@
 import { newCharacter } from './kit.js';
 // Nghi Thức Triệu Hồi. Thuần, xác định theo seed. Số liệu ở config.summon và banners.json.
-// Trạng thái summon: { pity5, pity4, pulls, firstDone, freeDay, history[] }
+// Trạng thái summon: { pity5, pity4, pulls, freeDay, history[] }
 //   pity5 = số lượt liên tiếp chưa ra 5★; pity4 = số lượt liên tiếp chưa ra từ 4★ trở lên.
 import { mulberry32 } from './rng.js';
 import { grantCharacter } from './upgrade.js';
 
-export const newSummonState = () => ({ pity5: 0, pity4: 0, pulls: 0, firstDone: false, freeDay: -1, history: [] });
+export const newSummonState = () => ({ pity5: 0, pity4: 0, pulls: 0, freeDay: -1, history: [] });
 
 const pickFrom = (rng, list) => list[rng.int(list.length)];
 
@@ -31,15 +31,9 @@ function pickCharacter(ctx, banner, rarity, rng) {
   return pickFrom(rng, all).id;
 }
 
-// Một lượt, sửa trực tiếp st (dùng cho mô phỏng và cho summon()). Trả về { id, rarity, forced }.
-export function rollPull(ctx, st, banner, rng, culture) {
+// Một lượt, sửa trực tiếp st (dùng cho mô phỏng và cho summon()). Trả về { id, rarity }.
+export function rollPull(ctx, st, banner, rng) {
   st.pulls += 1;
-  // Tín Vật: lượt đầu tiên chắc chắn 4★ của nền văn hóa đã chọn, tách biệt với pity.
-  if (!st.firstDone && culture) {
-    st.firstDone = true;
-    const pool = ctx.characterList.filter((c) => c.rarity === 4 && c.culture === culture && !c.reserve);
-    if (pool.length) return { id: pickFrom(rng, pool).id, rarity: 4, forced: true };
-  }
   const rarity = rollRarity(ctx.config, st, rng);
   if (rarity === 5) {
     st.pity5 = 0;
@@ -51,7 +45,7 @@ export function rollPull(ctx, st, banner, rng, culture) {
     st.pity5 += 1;
     st.pity4 += 1;
   }
-  return { id: pickCharacter(ctx, banner, rarity, rng), rarity, forced: false };
+  return { id: pickCharacter(ctx, banner, rarity, rng), rarity };
 }
 
 const fail = (reason) => ({ ok: false, reason });
@@ -77,11 +71,11 @@ export function summon(ctx, progress, { bannerId, count, free = false, dayKey, s
   const rng = mulberry32(seed);
   const results = [];
   for (let i = 0; i < count; i++) {
-    const pull = rollPull(ctx, st, banner, rng, p.player.culture);
+    const pull = rollPull(ctx, st, banner, rng);
     const g = grantCharacter(ctx, p, pull.id);
     p = g.progress;
     p.summon = st; // grantCharacter clone giữ nguyên state đã sửa
-    results.push({ id: pull.id, rarity: pull.rarity, isNew: !g.duplicate, generic: g.generic, forced: pull.forced });
+    results.push({ id: pull.id, rarity: pull.rarity, isNew: !g.duplicate, generic: g.generic });
     st.history.push({ n: st.pulls, id: pull.id, rarity: pull.rarity, banner: bannerId, day: dayKey });
   }
   if (st.history.length > cfg.historyMax) st.history.splice(0, st.history.length - cfg.historyMax);
@@ -155,4 +149,36 @@ export function effectiveRates(cfg) {
     out[3] = got[3];
   }
   return out;
+}
+
+// Tân thủ: 10 lượt miễn phí sau màn hướng dẫn. Chắc chắn đúng 1 tướng 4★ và còn lại 3★, không 5★, không động tới pity.
+// Ưu tiên tướng 3★ chưa sở hữu để quà không toàn bản trùng. Vị trí của 4★ trong chuỗi ngẫu nhiên.
+export function starterSummon(ctx, progress, seed) {
+  const cfg = ctx.config.summon.starter;
+  if (!progress.onboarding.done) return fail('not_ready');
+  if (progress.onboarding.starterDone) return fail('already_done');
+  const rng = mulberry32(seed);
+  const pool = (r) => ctx.characterList.filter((c) => c.rarity === r && !c.reserve);
+  const fours = pool(4);
+  const threes = pool(3);
+  const fresh = threes.filter((c) => !progress.characters[c.id]);
+  const order = [];
+  const bag = fresh.slice();
+  for (let i = 0; i < cfg.three; i++) {
+    if (bag.length) order.push(bag.splice(rng.int(bag.length), 1)[0].id);
+    else order.push(pickFrom(rng, threes).id);
+  }
+  const seq = order.map((id) => ({ id, rarity: 3 }));
+  for (let i = 0; i < cfg.four; i++) seq.splice(rng.int(seq.length + 1), 0, { id: pickFrom(rng, fours).id, rarity: 4 });
+  let p = structuredClone(progress);
+  const results = [];
+  for (const pull of seq) {
+    const g = grantCharacter(ctx, p, pull.id);
+    p = g.progress;
+    results.push({ id: pull.id, rarity: pull.rarity, isNew: !g.duplicate, generic: g.generic });
+    p.summon.pulls += 1;
+    p.summon.history.push({ n: p.summon.pulls, id: pull.id, rarity: pull.rarity, banner: 'starter', day: -1 });
+  }
+  p.onboarding.starterDone = true;
+  return { ok: true, progress: p, results };
 }

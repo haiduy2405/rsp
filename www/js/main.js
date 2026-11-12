@@ -10,8 +10,9 @@ import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useElixir, fe
 import { statsFor, skillCooldown } from './core/stats.js';
 import { KEYS } from './core/effects.js';
 import { avatarNode, photoFromFile } from './ui/avatar.js';
-import { summon, buyTickets, redeemCharacter, effectiveRates } from './core/summon.js';
-import { finishOnboarding, completeTutorial, storyUnlocked, updateProfile } from './core/onboarding.js';
+import { completeTutorial, storyUnlocked } from './core/onboarding.js';
+import { createBattle, step as battleStep } from './core/battle.js';
+import { install as installIntro } from './ui/screen-intro.js';
 import { newProgress } from './core/progress.js';
 import { createT, detectLang } from './i18n/index.js';
 import { startGame } from './ui/game.js';
@@ -120,8 +121,9 @@ function enterSlot(n) {
   record = null;
   runPath = [];
   ui.resetDrafts?.();
-  if (progress.onboarding.done) showHub();
-  else ui.showOnboarding();
+  if (!progress.onboarding.done) ui.showOnboarding();
+  else if (!progress.onboarding.starterDone) startTutorial();
+  else showHub();
 }
 const fodderName = (key) => `${t('fodder.' + key.replace('_', '.'))} ${'★'.repeat(ctx.fodder[key].star)}`;
 const offeringName = (key) => `${t('offering.' + key.replace('_', '.'))} ${'★'.repeat(Number(key.split('_')[1]))}`;
@@ -212,7 +214,7 @@ function showHub() {
       'div',
       { class: 'hub-top' },
       h('div', { class: 'avatar', id: 'b-profile', role: 'button', tabindex: '0', 'aria-label': t('profile.title'), style: 'cursor:pointer', onclick: () => ui.showProfile() }, avatarNode(progress.player)),
-      h('div', { class: 'who', id: 'b-profile-name', style: 'cursor:pointer', onclick: () => ui.showProfile() }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, progress.player.callsign)),
+      h('div', { class: 'who', id: 'b-profile-name', style: 'cursor:pointer', onclick: () => ui.showProfile() }, h('b', {}, progress.player.name)),
       dockBtn('help', t('hub.help'), () => ui.showGlossary(), 'b-help', 'help-btn'),
       dockBtn('settings', t('hub.settings'), () => ui.showSettings(), 'b-set', 'help-btn'),
     ),
@@ -903,23 +905,69 @@ function battleIntro() {
 }
 
 function showBattle() {
-  if (!progress.onboarding.tutorialDone) return showTutorial(1);
   startBattleUI();
 }
 
-function showTutorial(n) {
-  const total = 3;
-  const finish = () => {
-    progress = completeTutorial(progress);
-    save();
-    startBattleUI();
+// Màn hướng dẫn: một trận ngắn với đội mượn sẵn, quái yếu. Bong bóng chỉ dẫn đổi theo từng nước đi; thua thì chơi lại.
+function startTutorial(retry = false) {
+  const tc = ctx.config.tutorial;
+  const st0 = createBattle(ctx, { seed: tc.seed, team: teamRoster(progress), enemies: tc.enemies, scale: tc.scale });
+  st0.members[0].skillCd = 0; // tướng đầu sẵn kỹ năng để dạy
+  let moves = 0;
+  let skillShown = false;
+  let skillUsed = false;
+  $('coach')?.remove();
+  const bubble = h('div', { id: 'coach' });
+  $('wrap').appendChild(bubble);
+  const coach = (key) => {
+    if (!key) { bubble.classList.remove('on'); return; }
+    bubble.classList.remove('on');
+    void bubble.offsetWidth;
+    bubble.textContent = t(key);
+    bubble.classList.add('on');
+    audio.sfx('tick');
   };
-  screen(
-    h('h2', {}, t('tut.title')),
-    h('div', { class: 'card' }, h('small', {}, t('tut.step', { n, total })), h('p', {}, t(`tut.${n}`))),
-    n < total ? btn(t('ob.next'), () => showTutorial(n + 1), 'primary', { id: 'tut-next' }) : btn(t('tut.go'), finish, 'primary', { id: 'tut-go' }),
-    n < total ? btn(t('ob.skip'), finish, '', { id: 'tut-skip' }) : null,
-  );
+  const done = () => { bubble.remove(); $('pause-btn')?.remove(); };
+  audio.playMusic('battle');
+  $('screen').classList.remove('show');
+  game?.destroy();
+  game = startGame({
+    canvas: $('cv'),
+    ctx,
+    t,
+    state: st0,
+    titleText: t('tut.title'),
+    intro: null,
+    stepper: (state, action) => battleStep(ctx, state, action),
+    fx: audio,
+    hint: true,
+    onInspect: showInspect,
+    onSkillAsk(idx, go) { skillUsed = true; coach(null); go(); },
+    celebrate,
+    onSettled(state, action) {
+      if (action.type === 'skill') { coach('tut.c5'); return; }
+      moves += 1;
+      if (moves === 1) coach('tut.c2');
+      else if (moves === 2 && !skillShown && state.members[0].skillCd === 0) { skillShown = true; coach('tut.c4'); }
+      else if (moves <= 3) coach('tut.c3');
+      else coach('tut.c5');
+    },
+    onEnd(state) {
+      done();
+      if (state.status === 'won') {
+        audio.sfx('win');
+        progress = completeTutorial(progress);
+        save();
+        ui.showStarterReward();
+      } else {
+        audio.sfx('lose');
+        screen(h('h2', {}, t('tut.lose.title')), h('div', { class: 'card' }, h('p', {}, t('tut.lose.body'))), btn(t('tut.lose.retry'), () => startTutorial(true), 'primary', { id: 'tut-retry' }));
+      }
+    },
+  });
+  window.__game = game;
+  void skillUsed;
+  setTimeout(() => coach(retry ? 'tut.c1b' : 'tut.c1'), 400);
 }
 
 function startBattleUI() {
@@ -1255,6 +1303,7 @@ function showInstallHelp() {
 // ---- Màn hình tách module: dùng chung trạng thái qua `app`, gọi chéo qua `app.*` / `ui.*`
 const ui = {};
 const app = {
+  startTutorial: () => startTutorial(), enterHub: showHub,
   ctx, audio, storage, slots, enterSlot, dicts, h, btn, $, el, chip, portrait, CUR_COL, fodderName, offeringName, pct, save, screen, setLang, showHub,
   t: (...a) => t(...a),
   get lang() { return lang; },
@@ -1268,6 +1317,7 @@ Object.assign(ui, installItems(app));
 Object.assign(ui, installSummon(app));
 Object.assign(ui, installProfile(app));
 Object.assign(ui, installSlots(app));
+Object.assign(ui, installIntro(app));
 Object.assign(app, ui);
 Object.assign(ui, installShop(app));
 Object.assign(app, ui);

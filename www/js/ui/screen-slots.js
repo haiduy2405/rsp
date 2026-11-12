@@ -24,7 +24,7 @@ export function install(app) {
           h('div', { class: 'sl-body' }, h('b', {}, t('slot.n', { n: s.n })), h('small', { class: 'muted' }, t('slot.new'))));
       }
       const p = s.progress.player;
-      const meta = [p.callsign, t('slot.cleared', { n: cleared(s.progress) }), when(s.at)].filter(Boolean).join(' · ');
+      const meta = [t('slot.cleared', { n: cleared(s.progress) }), when(s.at)].filter(Boolean).join(' · ');
       return h('div', { class: 'card slotcard' + (last === s.n ? ' last' : ''), 'data-slot': s.n },
         h('div', { class: 'sl-main', role: 'button', tabindex: '0', onclick: () => app.enterSlot(s.n) },
           h('span', { class: 'sl-av' }, avatarNode(p)),

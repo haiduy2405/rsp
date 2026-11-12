@@ -227,18 +227,17 @@ test('auto lập đội: chọn tướng mạnh, không trùng, đội trưởng
   assert.ok(q.ok);
 });
 
-test('sửa hồ sơ: hợp lệ, giữ Tín Vật, từ chối dữ liệu xấu', async () => {
+test('sửa hồ sơ: hợp lệ, từ chối dữ liệu xấu', async () => {
   const { updateProfile, finishOnboarding } = await import('../www/js/core/onboarding.js');
-  const p0 = finishOnboarding(ctx, newProgress(ctx), { name: 'A', callsign: 'B', hometown: '', avatar: 0, culture: 'viet' }).progress;
-  const r = updateProfile(ctx, p0, { name: '  Duy   Nguyễn ', callsign: 'Sao', hometown: 'Mạo Khê', avatar: 2 });
+  const p0 = finishOnboarding(ctx, newProgress(ctx), { name: 'A', hometown: '', avatar: 0 }).progress;
+  const r = updateProfile(ctx, p0, { name: '  Duy   Nguyễn ', hometown: 'Mạo Khê', avatar: 2 });
   assert.ok(r.ok);
   assert.equal(r.progress.player.name, 'Duy Nguyễn');
-  assert.equal(r.progress.player.culture, 'viet');
   assert.equal(r.progress.player.avatar, 2);
   assert.ok(isValidProgress(r.progress));
-  assert.equal(updateProfile(ctx, p0, { name: '', callsign: 'x', avatar: 0 }).ok, false);
-  assert.equal(updateProfile(ctx, p0, { name: 'x', callsign: 'x', avatar: 99 }).ok, false);
-  assert.equal(updateProfile(ctx, newProgress(ctx), { name: 'x', callsign: 'x', avatar: 0 }).ok, false);
+  assert.equal(updateProfile(ctx, p0, { name: '', avatar: 0 }).ok, false);
+  assert.equal(updateProfile(ctx, p0, { name: 'x', avatar: 99 }).ok, false);
+  assert.equal(updateProfile(ctx, newProgress(ctx), { name: 'x', avatar: 0 }).ok, false);
 });
 
 test('migrate v7 → v8: Thức tỉnh thành Form 2; vượt cấp 30 cũng lên Form 2', () => {

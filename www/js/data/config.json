@@ -427,20 +427,18 @@
     ],
     "multiCount": 10,
     "redeemShards": 200,
-    "welcomeTickets": 10,
     "historyMax": 100,
-    "cultures": [
-      "viet",
-      "hylap",
-      "bacau",
-      "aicap"
-    ]
+    "starter": { "four": 1, "three": 9 }
+  },
+  "tutorial": {
+    "seed": 20260101,
+    "enemies": ["m_ember", "m_tide", "m_shade"],
+    "scale": { "hp": 0.35, "atk": 0.35 }
   },
   "onboarding": {
     "avatars": 12,
     "photoMax": 24000,
     "nameMax": 20,
-    "callsignMax": 12,
     "hometownMax": 24
   },
   "balance": {

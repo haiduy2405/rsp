@@ -74,7 +74,6 @@ export function install(app) {
         h('div', {}, t('summon.baseRates', { r5: fmtPct(cfg.rates['5']), r4: fmtPct(cfg.rates['4']), r3: fmtPct(cfg.rates['3']) })),
         h('div', {}, t('summon.effRates', { r5: fmtPct(eff[5]), r4: fmtPct(eff[4]), r3: fmtPct(eff[3]) })),
         h('div', { class: 'muted' }, t('summon.pity4', { max: cfg.guarantee4Every, n: sm.pity4 })),
-        sm.firstDone ? null : h('div', { class: 'muted' }, t('summon.tokenNote')),
       ),
       h('div', { class: 'row' }, btn(t('summon.history'), showHistory, '', { id: 'b-history' }), btn(t('summon.redeem'), () => showRedeem(), '', { id: 'b-redeem' })),
       btn(t('back'), showHub, '', { id: 'back' }),
@@ -90,7 +89,7 @@ export function install(app) {
     );
   }
 
-  function showSummonResult(bannerId, results) {
+  function showSummonResult(bannerId, results, onDone = null) {
     const shown = new Set();
     const cards = results.map((r, i) =>
       h(
@@ -118,7 +117,6 @@ export function install(app) {
           portrait(r.id, 60),
           h('h3', {}, t(`char.${r.id}`), ' ', h('small', {}, '★'.repeat(r.rarity))),
           h('small', {}, r.isNew ? t('summon.new') : t('summon.dup', { n: r.generic, s: r.rarity })),
-          r.forced ? h('div', { class: 'muted' }, t('summon.forced')) : null,
         ].filter(Boolean),
       );
       el.style.display = 'flex';
@@ -132,7 +130,7 @@ export function install(app) {
     screen(
       h('h2', {}, t('summon.title')),
       h('div', { class: 'sumgrid' }, cards),
-      h('div', { class: 'row' }, btn(t('summon.reveal'), () => cards.forEach((el, i) => reveal(i, el)), '', { id: 'reveal-all' }), btn(t('summon.done'), () => showSummon(bannerId), 'primary', { id: 'sum-done' })),
+      h('div', { class: 'row' }, btn(t('summon.reveal'), () => cards.forEach((el, i) => reveal(i, el)), '', { id: 'reveal-all' }), btn(t('summon.done'), () => (onDone ? onDone() : showSummon(bannerId)), 'primary', { id: 'sum-done' })),
     );
   }
 
@@ -166,14 +164,5 @@ export function install(app) {
     );
   }
 
-  function showFirstSummon(r) {
-    screen(
-      h('div', { class: 'card' }, h('p', {}, t('ob.firstSummon'))),
-      h('div', { class: `card sumcard ${rarityCls(r.rarity)}`, 'data-first': r.id }, h('h3', {}, t(`char.${r.id}`), ' ', chip(r.id), ' ', h('small', {}, '★'.repeat(r.rarity))), h('small', {}, t('summon.forced'))),
-      h('p', { class: 'muted' }, t('ob.welcome', { n: ctx.config.summon.welcomeTickets })),
-      btn(t('ob.toHub'), showHub, 'primary', { id: 'ob-hub' }),
-    );
-  }
-
-  return { confirmBox, dayKey, showFirstSummon, showHistory, showRedeem, showSummon, showSummonResult };
+  return { confirmBox, dayKey, showHistory, showRedeem, showSummon, showSummonResult };
 }
