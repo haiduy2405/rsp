@@ -1022,5 +1022,20 @@
   "achv.awakened": "Tướng Thức tỉnh",
   "achv.tier": "Bậc {n}/{m}",
   "achv.max": "Hoàn thành",
-  "achv.next": "Mục tiêu {goal}"
+  "achv.next": "Mục tiêu {goal}",
+  "monster.slime_water": "Slime Thủy",
+  "monster.gnome_water": "Gnome Thủy",
+  "monster.slime_fire": "Slime Hỏa",
+  "monster.gnome_fire": "Gnome Hỏa",
+  "monster.slime_wood": "Slime Mộc",
+  "monster.gnome_wood": "Gnome Mộc",
+  "monster.slime_light": "Slime Quang",
+  "monster.gnome_light": "Gnome Quang",
+  "monster.slime_dark": "Slime Ám",
+  "monster.gnome_dark": "Gnome Ám",
+  "monster.slime_heart": "Slime Tim",
+  "monster.gnome_heart": "Gnome Tim",
+  "monster.tut_slime_fire": "Slime Hỏa",
+  "monster.tut_slime_water": "Slime Thủy",
+  "monster.tut_gnome_dark": "Gnome Ám"
 }

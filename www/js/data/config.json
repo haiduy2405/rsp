@@ -433,7 +433,7 @@
   "tutorial": {
     "seed": 20260101,
     "team": ["coc_kien_troi", "bennu", "fenrir", "heimdall", "eir"],
-    "enemies": ["m_ember", "m_tide", "m_shade"],
+    "enemies": ["tut_slime_fire", "tut_slime_water", "tut_gnome_dark"],
     "scale": { "hp": 0.3, "atk": 0.35 },
     "hint": { "maxCombos": 2, "maxSteps": 2 },
     "lessons": [

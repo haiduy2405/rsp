@@ -352,5 +352,221 @@
         "value": 0.25
       }
     ]
+  },
+  {
+    "id": "slime_water",
+    "element": 0,
+    "race": "linh",
+    "hp": 3080,
+    "atk": 220,
+    "attackEvery": 3,
+    "kind": "normal",
+    "onAttack": [
+      {
+        "key": "atkDown",
+        "turns": 2,
+        "value": 0.15
+      }
+    ]
+  },
+  {
+    "id": "gnome_water",
+    "element": 0,
+    "race": "nhan",
+    "hp": 2520,
+    "atk": 171,
+    "attackEvery": 2,
+    "kind": "normal",
+    "onAttack": [
+      {
+        "key": "lock",
+        "turns": 2,
+        "value": 2
+      }
+    ]
+  },
+  {
+    "id": "slime_fire",
+    "element": 1,
+    "race": "linh",
+    "hp": 2057,
+    "atk": 176,
+    "attackEvery": 3,
+    "kind": "normal",
+    "onAttack": [
+      {
+        "key": "burn",
+        "turns": 3,
+        "value": 0.02
+      }
+    ]
+  },
+  {
+    "id": "gnome_fire",
+    "element": 1,
+    "race": "nhan",
+    "hp": 1683,
+    "atk": 135,
+    "attackEvery": 2,
+    "kind": "normal",
+    "onAttack": [
+      {
+        "key": "burn",
+        "turns": 2,
+        "value": 0.015
+      }
+    ]
+  },
+  {
+    "id": "slime_wood",
+    "element": 2,
+    "race": "linh",
+    "hp": 1980,
+    "atk": 171,
+    "attackEvery": 3,
+    "kind": "normal",
+    "onAttack": [
+      {
+        "key": "poison",
+        "turns": 3,
+        "value": 0.012
+      }
+    ]
+  },
+  {
+    "id": "gnome_wood",
+    "element": 2,
+    "race": "nhan",
+    "hp": 1620,
+    "atk": 135,
+    "attackEvery": 2,
+    "kind": "normal",
+    "onAttack": [
+      {
+        "key": "atkDown",
+        "turns": 2,
+        "value": 0.15
+      }
+    ]
+  },
+  {
+    "id": "slime_light",
+    "element": 3,
+    "race": "linh",
+    "hp": 2090,
+    "atk": 180,
+    "attackEvery": 3,
+    "kind": "normal",
+    "onAttack": [
+      {
+        "key": "atkDown",
+        "turns": 2,
+        "value": 0.2
+      }
+    ]
+  },
+  {
+    "id": "gnome_light",
+    "element": 3,
+    "race": "nhan",
+    "hp": 1710,
+    "atk": 144,
+    "attackEvery": 2,
+    "kind": "normal",
+    "onAttack": [
+      {
+        "key": "stun",
+        "turns": 1,
+        "value": 0
+      }
+    ]
+  },
+  {
+    "id": "slime_dark",
+    "element": 4,
+    "race": "linh",
+    "hp": 1925,
+    "atk": 166,
+    "attackEvery": 3,
+    "kind": "normal",
+    "onAttack": [
+      {
+        "key": "lock",
+        "turns": 2,
+        "value": 2
+      }
+    ]
+  },
+  {
+    "id": "gnome_dark",
+    "element": 4,
+    "race": "nhan",
+    "hp": 1575,
+    "atk": 130,
+    "attackEvery": 2,
+    "kind": "normal",
+    "onAttack": [
+      {
+        "key": "atkDown",
+        "turns": 2,
+        "value": 0.2
+      }
+    ]
+  },
+  {
+    "id": "slime_heart",
+    "element": 5,
+    "race": "linh",
+    "hp": 1426,
+    "atk": 126,
+    "attackEvery": 3,
+    "kind": "normal",
+    "onAttack": [
+      {
+        "key": "poison",
+        "turns": 3,
+        "value": 0.012
+      }
+    ]
+  },
+  {
+    "id": "gnome_heart",
+    "element": 5,
+    "race": "nhan",
+    "hp": 1166,
+    "atk": 105,
+    "attackEvery": 2,
+    "kind": "normal",
+    "onAttack": [
+      {
+        "key": "lock",
+        "turns": 2,
+        "value": 2
+      }
+    ]
+  },
+  {
+    "id": "tut_slime_fire",
+    "element": 1,
+    "race": "linh",
+    "hp": 2200,
+    "atk": 220,
+    "attackEvery": 2
+  },
+  {
+    "id": "tut_slime_water",
+    "element": 0,
+    "race": "linh",
+    "hp": 3200,
+    "atk": 260,
+    "attackEvery": 3
+  },
+  {
+    "id": "tut_gnome_dark",
+    "element": 4,
+    "race": "nhan",
+    "hp": 4500,
+    "atk": 320,
+    "attackEvery": 3
   }
 ]

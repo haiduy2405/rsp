@@ -394,3 +394,9 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - **Thành tựu** nằm trong màn Nhiệm vụ (tab "Thành tựu"): 9 thành tựu, mỗi cái nhiều bậc, nhận Linh Thạch (bậc cuối có Vé Triệu Hồi). Đo từ tiến trình sẵn có: ải thắng, trận thắng (bộ đếm mới `stats.battles`), khu chinh phục Dễ/Khó, lần triệu hồi, số tướng, tướng 5★, cấp cao nhất, tướng Thức tỉnh.
 - Logic thuần ở `core/achievements.js`; số liệu ở `config.achievements`; trạng thái `progress.achv` (tùy chọn, không đổi SAVE_VERSION).
 - Chấm đỏ ở tab và nút Nhiệm vụ khi có thưởng chưa nhận.
+
+### v0.54.0
+- **Quái mới:** Slime (tộc Linh, trâu, đánh chậm) và Gnome (tộc Nhân, đánh nhanh) cho cả 6 hệ, 12 quái `slime_*`/`gnome_*`. Mỗi con áp một hiệu ứng nhẹ khi đánh (`onAttack`, chỉ dùng 12 từ khóa cũ). Quái thường của 6 khu giờ là slime/gnome cùng hệ; quái cũ `*_n1/_n2` vẫn nằm trong kho.
+- Tutorial dùng `tut_slime_fire`, `tut_slime_water`, `tut_gnome_dark` (chỉ số y hệt quái cũ, không hiệu ứng) nên bài học không đổi.
+- Schema cho phép quái hệ Tim (element 5). Chưa có art slime/gnome: hiện là hình khối màu.
+- Cân bằng (sim `--curve`): Dễ 15/18, Vừa 13/18, Hard 10/18 ô trong dải (trước: 16/12/10). Quái Tim giảm 10% chỉ số.

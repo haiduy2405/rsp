@@ -80,7 +80,7 @@ export const monsterSchema = {
   required: ['id', 'element', 'hp', 'atk', 'attackEvery'],
   properties: {
     id: { type: 'string' },
-    element: { type: 'integer', min: 0, max: 4 },
+    element: { type: 'integer', min: 0, max: 5 },
     hp: { type: 'integer', min: 1 },
     atk: { type: 'integer', min: 0 },
     attackEvery: { type: 'integer', min: 1 },

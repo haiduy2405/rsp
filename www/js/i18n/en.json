@@ -1022,5 +1022,20 @@
   "achv.awakened": "Awakened heroes",
   "achv.tier": "Tier {n}/{m}",
   "achv.max": "Completed",
-  "achv.next": "Goal {goal}"
+  "achv.next": "Goal {goal}",
+  "monster.slime_water": "Water Slime",
+  "monster.gnome_water": "Water Gnome",
+  "monster.slime_fire": "Fire Slime",
+  "monster.gnome_fire": "Fire Gnome",
+  "monster.slime_wood": "Wood Slime",
+  "monster.gnome_wood": "Wood Gnome",
+  "monster.slime_light": "Light Slime",
+  "monster.gnome_light": "Light Gnome",
+  "monster.slime_dark": "Dark Slime",
+  "monster.gnome_dark": "Dark Gnome",
+  "monster.slime_heart": "Heart Slime",
+  "monster.gnome_heart": "Heart Gnome",
+  "monster.tut_slime_fire": "Fire Slime",
+  "monster.tut_slime_water": "Water Slime",
+  "monster.tut_gnome_dark": "Dark Gnome"
 }

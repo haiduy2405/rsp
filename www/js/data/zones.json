@@ -5,8 +5,8 @@
     "element": 0,
     "monsters": {
       "normal": [
-        "water_n1",
-        "water_n2"
+        "slime_water",
+        "gnome_water"
       ],
       "elite": [
         "water_e1"
@@ -22,8 +22,8 @@
     "element": 1,
     "monsters": {
       "normal": [
-        "fire_n1",
-        "fire_n2"
+        "slime_fire",
+        "gnome_fire"
       ],
       "elite": [
         "fire_e1"
@@ -39,8 +39,8 @@
     "element": 2,
     "monsters": {
       "normal": [
-        "wood_n1",
-        "wood_n2"
+        "slime_wood",
+        "gnome_wood"
       ],
       "elite": [
         "wood_e1"
@@ -56,8 +56,8 @@
     "element": 3,
     "monsters": {
       "normal": [
-        "light_n1",
-        "light_n2"
+        "slime_light",
+        "gnome_light"
       ],
       "elite": [
         "light_e1"
@@ -73,8 +73,8 @@
     "element": 4,
     "monsters": {
       "normal": [
-        "dark_n1",
-        "dark_n2"
+        "slime_dark",
+        "gnome_dark"
       ],
       "elite": [
         "dark_e1"
@@ -90,8 +90,8 @@
     "element": 5,
     "monsters": {
       "normal": [
-        "heart_n1",
-        "heart_n2"
+        "slime_heart",
+        "gnome_heart"
       ],
       "elite": [
         "heart_e1"
