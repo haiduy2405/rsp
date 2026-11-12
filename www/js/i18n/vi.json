@@ -796,5 +796,21 @@
   "affix.warded.desc": "Miễn nhiễm hiệu ứng xấu",
   "affix.title": "Đặc tính quái",
   "char.form": "Form {n}",
-  "char.form2Preview": "Form 2: chỉ số +{pct}%, kỹ năng mạnh hơn, Level tối đa {cap}. Dưới đây là kỹ năng Form 2."
+  "char.form2Preview": "Form 2: chỉ số +{pct}%, kỹ năng mạnh hơn, Level tối đa {cap}. Dưới đây là kỹ năng Form 2.",
+  "battle.enhance": "Ngọc Nâng Cấp!",
+  "battle.four": "{n} ngọc! ×1.5",
+  "res.fodder": "Tiểu Linh",
+  "res.offering": "Lễ Vật",
+  "loot.src.normal": "Quái thường",
+  "loot.src.swarm": "Bầy quái",
+  "loot.src.elite": "Elite",
+  "loot.src.boss": "Boss",
+  "loot.src.chest": "Rương",
+  "loot.src.completion": "Thưởng hoàn thành ải",
+  "loot.tier": "Bậc {n}",
+  "stage.hold": "Giữ vào một độ khó để xem quái, đặc tính và bảng rớt",
+  "stage.info.enemy": "Quái",
+  "stage.info.floors": "Số tầng",
+  "stage.info.loot": "Vật phẩm có thể nhặt (tỉ lệ · số lượng)",
+  "stage.info.offering": "Lễ Vật rớt theo tộc quái"
 }

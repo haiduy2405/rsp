@@ -796,5 +796,21 @@
   "affix.warded.desc": "Immune to negative effects",
   "affix.title": "Foe traits",
   "char.form": "Form {n}",
-  "char.form2Preview": "Form 2: stats +{pct}%, stronger skill, max Level {cap}. Form 2 skill below."
+  "char.form2Preview": "Form 2: stats +{pct}%, stronger skill, max Level {cap}. Form 2 skill below.",
+  "battle.enhance": "Enhanced orb!",
+  "battle.four": "{n} orbs! ×1.5",
+  "res.fodder": "Spirit Fodder",
+  "res.offering": "Offerings",
+  "loot.src.normal": "Normal foes",
+  "loot.src.swarm": "Swarm",
+  "loot.src.elite": "Elite",
+  "loot.src.boss": "Boss",
+  "loot.src.chest": "Chest",
+  "loot.src.completion": "Clear reward",
+  "loot.tier": "Tier {n}",
+  "stage.hold": "Hold a difficulty to see foes, traits and drop table",
+  "stage.info.enemy": "Foes",
+  "stage.info.floors": "Floors",
+  "stage.info.loot": "Possible drops (chance · amount)",
+  "stage.info.offering": "Offerings by foe race"
 }

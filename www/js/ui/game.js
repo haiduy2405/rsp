@@ -202,6 +202,38 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       }, q.hold + q.fly);
     }
   }
+  // Hồi máu: mỗi tướng nảy số hồi (xanh) theo phần Hồi của mình, bay vào thanh máu đội; bàn cờ sáng xanh.
+  // Máu cộng ngay khi số tới nơi; đòn hồi của ngọc bị bỏ qua ở flush để không cộng đôi.
+  const HEAL_AT = { x: W / 2, y: 378 };
+  function spawnHealPops(hits, gi, g) {
+    const heal = hits.filter((h) => h.kind === 'heal' && h.from === 'orb' && h.group === gi).reduce((a, h) => a + h.amount, 0);
+    if (heal <= 0) return;
+    const total = Math.max(1, state.members.reduce((a, m) => a + m.heal, 0));
+    let left = heal;
+    const hs = state.members.filter((m) => m.heal > 0);
+    hs.forEach((m, k) => {
+      const amt = k === hs.length - 1 ? left : Math.round((heal * m.heal) / total);
+      left -= amt;
+      if (amt <= 0) return;
+      const pos = memberPos(m.id);
+      const q = { s: `+${fmt(amt)}`, amt, x: pos.x, y: 430 - (k % 2) * 14, el: 5, heal: true, size: Math.round(30 + Math.min(1, amt / Math.max(1, view.maxHp) * 4) * 22), delay: k * 60, age: 0, hold: 360, fly: 300 };
+      view.pops.push(q);
+      setTimeout(() => {
+        if (!alive) return;
+        view.hp = Math.min(view.maxHp, view.hp + amt);
+        view.hpPulse = 1;
+        view.rings.push({ x: HEAL_AT.x, y: HEAL_AT.y, col: 2, age: 0, life: 420 });
+        for (let p = 0; p < 6; p++) view.particles.push({ x: HEAL_AT.x + (p - 3) * 22, y: HEAL_AT.y, vx: (p - 2.5) * 0.02, vy: -0.08 - (p % 3) * 0.03, color: '#8dffb0', age: 0, life: 700 });
+      }, q.delay + q.hold + q.fly);
+    });
+    fx.sfx('heal');
+    view.healGlow = 1;
+    // lá sáng bay lên từ các ngọc tim vừa tan
+    for (const i of g.cells) {
+      const c = cellCenter(i);
+      for (let p = 0; p < 3; p++) view.particles.push({ x: c.x + (p - 1) * 10, y: c.y, vx: (p - 1) * 0.01, vy: -0.09 - p * 0.025, color: p % 2 ? '#b8ffd0' : '#6bf0a0', age: 0, life: 900 });
+    }
+  }
   const splitHits = (hits) => {
     // gộp mọi đòn của cả lượt theo (người đánh, quái): mỗi cặp một quả cầu với tổng sát thương
     const map = new Map();
@@ -216,13 +248,35 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         m.absorbed += h.absorbed || 0;
         m.thawed = m.thawed || !!h.thawed;
         map.set(key, m);
-      } else if (h.kind === 'heal') heal += h.amount;
+      } else if (h.kind === 'heal') {
+        if (h.from !== 'orb') heal += h.amount; // hồi của ngọc đã cộng lúc số nảy
+      }
       else out.push(h);
     }
     const res = [...map.values()];
     if (heal > 0) res.push({ kind: 'heal', amount: heal });
     return res.concat(out);
   };
+  // Nhóm 4 ngọc: nhân hệ số lớn; nhóm 5+ ngọc: sinh ra Ngọc Nâng Cấp (mỗi ngọc nâng cấp trong nhóm sau này +25% sát thương).
+  const i0keep = (g) => (g.size >= 5 ? g.cells[0] : -1);
+  let pendEnh = []; // ô sẽ có Ngọc Nâng Cấp mới sau khi bàn rơi xong
+  function bigMatchFx(g, cx, cy, keep) {
+    const el = g.type;
+    const five = g.size >= 5;
+    floater(five ? t('battle.enhance') : t('battle.four', { n: g.size }), cx, cy - 34, five ? '#ffe27a' : '#ffffff', five ? 30 : 24, 'text', 1200);
+    view.rings.push({ x: cx, y: cy, col: el, age: 0, life: five ? 620 : 420 });
+    view.camShake = Math.max(view.camShake || 0, five ? 7 : 4);
+    fx.sfx(five ? 'enhance' : 'combo', 1.1);
+    fx.vibrate?.(five ? 30 : 15);
+    if (five && keep >= 0) {
+      const to = cellCenter(keep);
+      for (const i of g.cells) {
+        const c = cellCenter(i);
+        view.particles.push({ x: c.x, y: c.y, vx: (to.x - c.x) / 520, vy: (to.y - c.y) / 520, color: '#ffe27a', age: 0, life: 520 });
+      }
+      pendEnh.push(keep);
+    }
+  }
   let celebrated = false;
   async function animate(events, finalKill = false) {
     let pendingHits = [];
@@ -297,6 +351,8 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
           if (g.type !== 5 && !state.members.some((m) => m.element === g.type)) floater(t('battle.noAttacker'), cx, cy + 26, '#ff9aa8', 16);
           await sleep(ANIM.groupHold);
           spawnPops(e.hits, gi);
+          if (g.type === 5) spawnHealPops(e.hits, gi, g);
+          if (g.size >= 4) bigMatchFx(g, cx, cy, i0keep(g));
           const cleared = view.board;
           for (const i of g.cells) {
             const c = cellCenter(i);
@@ -311,6 +367,8 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
           await sleep(ANIM.groupPop);
         }
         view.board = structuredClone(st.board);
+        view.enhPop = pendEnh.map((i) => ({ i, age: 0 }));
+        pendEnh = [];
         view.fall = st.falls;
         fx.sfx('drop');
         await sleep(ANIM.fall, (k) => (view.fallT = easeOut(k)));
@@ -625,7 +683,10 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     if (view.lockFlash) view.lockFlash = Math.max(0, view.lockFlash - dt / 400);
     if (view.slides) for (const k in view.slides) { view.slides[k].age += dt; if (view.slides[k].age > 180) delete view.slides[k]; }
     for (const f of view.floaters) f.age += dt;
-    view.pops = view.pops.filter((q) => (q.age += dt) < q.hold + q.fly);
+    if (view.healGlow > 0) view.healGlow = Math.max(0, view.healGlow - dt / 1100);
+    if (view.hpPulse > 0) view.hpPulse = Math.max(0, view.hpPulse - dt / 500);
+    if (view.enhPop?.length) view.enhPop = view.enhPop.filter((p) => (p.age += dt) < 700);
+    view.pops = view.pops.filter((q) => (q.age += dt) < q.delay + q.hold + q.fly);
     view.floaters = view.floaters.filter((f) => f.age < f.life);
     for (const q of view.particles) {
       q.age += dt;

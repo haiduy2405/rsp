@@ -125,3 +125,9 @@ Sau khi xoay ngọc: mỗi tướng nảy số sát thương của mình ngay tr
 - Thức tỉnh một bậc: lên **Form 2** (chỉ số +20%, kỹ năng chủ động viết lại cho từng tướng trong `characters.json` > `form2`, đội trưởng mạnh hơn). Form 1 tối đa Level 30, Form 2 lên 50. `awaken` trong save là 0/1 (save v8, migrate từ bản cũ).
 - Art Form 2 hiện dùng chung art Form 1 (asset tạm); Duy cấp art sau.
 - Nhịp tiến triển ba giai đoạn (tân thủ/trung kỳ/hậu kỳ): `docs/PROGRESSION.md`; `tools/loot-sim.js` đo số chuyến để đủ Form 2 so với `config.balance.pacing`.
+
+## Hiệu ứng trận, thông tin ải, nhạc mới (v0.18)
+- **Hồi máu**: khi ngọc tim tan, mỗi tướng nảy số hồi (xanh) theo chỉ số Hồi, bay vào thanh máu đội và cộng máu lúc tới nơi; cả bàn sáng xanh với dải sáng quét lên, lá sáng bay từ ngọc tim.
+- **Nhóm 4 ngọc**: nhân ×1.5 (hiện chữ + vòng sóng). **Nhóm 5+ ngọc**: sinh Ngọc Nâng Cấp (hiệu ứng hút hạt, ngọc nảy ra, vòng vàng + tia xoay); mỗi Ngọc Nâng Cấp nằm trong nhóm sau này cộng +25% sát thương/hồi (`group.enhancedBonus`).
+- **Giữ vào độ khó** (chọn ải) hoặc chuột phải: bảng thông tin quái, đặc tính, bảng rớt và tỉ lệ (`core/stageinfo.js`).
+- **Nhạc nền viết lại** (`ui/audio.js` + `data/audio.json`): hợp âm, pad vang, rải nốt, giai điệu 4 ô nhịp, bè trầm, trống; ba bài hub/battle/boss. Kiểm bằng `tests/e2e/music.cjs`.

@@ -1,6 +1,7 @@
 import { buildCtx, loadRaw } from './core/ctx.js';
 import { createRun, runStep, newRunRecord, debugWinBattle } from './core/run.js';
 import { stageOpen, clearsOf, zoneClears } from './core/stage.js';
+import { stageInfo } from './core/stageinfo.js';
 import { applyRunResult } from './core/progress.js';
 import { createStorage, browserAdapter } from './save/storage.js';
 import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useCakes, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
@@ -285,13 +286,57 @@ function showStages(zoneId) {
   const cards = order.map((d, i) => {
     const open = stageOpen(ctx, progress, zoneId, d);
     const df = ctx.config.difficulty[d];
-    return h(
+    const card = h(
       'div',
-      { class: 'card btn gate stage' + (open ? '' : ' locked'), 'data-stage': d, onclick: open ? () => showTeam(undefined, undefined, { zoneId, diff: d }) : null },
+      { class: 'card btn gate stage' + (open ? '' : ' locked'), 'data-stage': d, onclick: () => !heldFlag.v && open && showTeam(undefined, undefined, { zoneId, diff: d }) },
       h('div', { class: 'info' }, h('div', { class: 'name' }, t(`diff.${d}`)), h('small', {}, open ? t('zone.clears', { n: clearsOf(progress, zoneId, d) }) : t('diff.locked', { prev: t(`diff.${order[i - 1]}`) })), h('div', { class: 'muted' }, t('diff.reward', { gold: df.gold, drop: df.drop }))),
     );
+    onHold(card, () => showStageInfo(zoneId, d));
+    return card;
   });
-  screen(h('h2', {}, t(`zone.${zoneId}`)), ...cards, btn(t('back'), showZones, '', { id: 'back' }));
+  screen(h('h2', {}, t(`zone.${zoneId}`)), ...cards, h('div', { class: 'muted hold-hint' }, t('stage.hold')), btn(t('back'), showZones, '', { id: 'back' }));
+}
+
+// Giữ lâu (450ms) trên một phần tử để mở thông tin; thả tay sau khi mở không tính là chạm.
+const heldFlag = { v: false };
+function onHold(el, fn, ms = 450) {
+  let timer = null;
+  const cancel = () => { clearTimeout(timer); timer = null; };
+  el.addEventListener('pointerdown', () => {
+    heldFlag.v = false;
+    timer = setTimeout(() => { heldFlag.v = true; audio.sfx('ui'); fn(); setTimeout(() => (heldFlag.v = false), 400); }, ms);
+  });
+  for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) el.addEventListener(ev, cancel);
+  el.addEventListener('contextmenu', (e) => { e.preventDefault(); cancel(); heldFlag.v = true; fn(); setTimeout(() => (heldFlag.v = false), 400); });
+}
+
+// Thông tin chi tiết một ải: hệ số quái, đặc tính, quái trong khu, bảng rớt và tỉ lệ theo từng nguồn.
+const pctText = (p) => (p <= 0 ? '0%' : p >= 0.995 ? '100%' : `${(p * 100).toFixed(p < 0.1 ? 1 : 0)}%`);
+const rangeText = ([a, b]) => (a === b ? `${a}` : `${a}–${b}`);
+function showStageInfo(zoneId, diff) {
+  const si = stageInfo(ctx, zoneId, diff);
+  const close = () => $('info')?.remove();
+  const row = (k, v) => h('div', { class: 'si-row' }, h('span', {}, k), h('b', {}, v));
+  const names = (ids) => ids.map((m) => t(`monster.${m}`)).join(', ');
+  const dropLabel = (key) => (key.startsWith('stone.') ? `${t('res.stone')} ${t(`stone.${key.slice(6)}`)}` : t(`res.${key}`));
+  const src = si.sources.map((s) => h('div', { class: 'si-src' },
+    h('div', { class: 'si-head' }, h('b', {}, t(`loot.src.${s.kind}`)), h('small', { class: 'muted' }, `${t('res.gold')} ${rangeText(s.gold)} · ${t('res.essence')} ${rangeText(s.essence)}`)),
+    s.drops.map((d) => row(dropLabel(d.key), `${pctText(d.chance)} · ×${rangeText(d.count)}`)),
+  ));
+  const tiers = si.tiers.map((x) => `${t('loot.tier', { n: x.tier })} ${pctText(x.pct)}`).join(' · ');
+  const aff = ['normal', 'swarm', 'elite', 'boss'].map((k) => row(t(`loot.src.${k}`), `${pctText(si.affix[k].chance)} (≤${si.affix[k].max})`));
+  const body = [
+    h('h3', {}, `${t(`zone.${zoneId}`)} · ${t(`diff.${diff}`)}`),
+    h('div', { class: 'si-sec' }, h('b', {}, t('stage.info.enemy')),
+      row(t('stat.hp'), `×${si.hp[0].toFixed(2)} → ×${si.hp[1].toFixed(2)}`),
+      row(t('stat.atk'), `×${si.atk[0].toFixed(2)} → ×${si.atk[1].toFixed(2)}`),
+      row(t('stage.info.floors'), String(si.floors)),
+      h('small', { class: 'muted' }, `${t('door.normal')}: ${names(si.monsters.normal)}`), h('small', { class: 'muted' }, `Elite: ${names(si.monsters.elite)}`), h('small', { class: 'muted' }, `Boss: ${names(si.monsters.boss)}`)),
+    h('div', { class: 'si-sec' }, h('b', {}, t('affix.title')), aff, h('small', { class: 'muted' }, si.affixPool.map((a) => t(`affix.${a}`)).join(', '))),
+    h('div', { class: 'si-sec' }, h('b', {}, t('stage.info.loot')), h('small', { class: 'muted' }, t('diff.reward', { gold: si.gold, drop: si.drop })), src,
+      h('small', { class: 'muted' }, `${t('stage.info.offering')} ${si.races.map((r) => t(`race.${r}`)).join(', ')}: ${tiers}`)),
+  ];
+  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox stageinfo' }, ...body, btn(t('info.close'), close, 'primary', { id: 'info-close' }))));
 }
 
 function showZones() {

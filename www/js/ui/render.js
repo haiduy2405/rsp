@@ -21,6 +21,35 @@ export function cellAt(px, py) {
   return r * COLS + c;
 }
 
+// Ngọc Nâng Cấp: vòng vàng nhấp nháy và bốn tia sáng xoay chậm, nhìn là biết mạnh hơn.
+function enhancedAura(g, x, y, r) {
+  const t = (typeof performance !== 'undefined' ? performance.now() : 0) * 0.001;
+  const pulse = 0.5 + 0.5 * Math.sin(t * 4);
+  g.save();
+  g.shadowColor = '#ffd24a';
+  g.shadowBlur = 10 + 8 * pulse;
+  g.strokeStyle = `rgba(255,226,122,${0.75 + 0.25 * pulse})`;
+  g.lineWidth = 4;
+  g.beginPath();
+  g.arc(x, y, r + 5, 0, Math.PI * 2);
+  g.stroke();
+  g.shadowBlur = 0;
+  g.fillStyle = '#fff6c8';
+  for (let k = 0; k < 4; k++) {
+    const a = t * 0.9 + (k * Math.PI) / 2;
+    const px = x + Math.cos(a) * (r + 5);
+    const py = y + Math.sin(a) * (r + 5);
+    g.beginPath();
+    g.moveTo(px, py - 6);
+    g.lineTo(px + 2.4, py);
+    g.lineTo(px, py + 6);
+    g.lineTo(px - 2.4, py);
+    g.closePath();
+    g.fill();
+  }
+  g.restore();
+}
+
 // Mỗi hệ một hình khác nhau để phân biệt khi mù màu.
 export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
   g.save();
@@ -28,13 +57,7 @@ export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
   const im = getImg(`orb:${type}`);
   if (im) {
     g.drawImage(im, x - r, y - r, r * 2, r * 2);
-    if (enhanced) {
-      g.strokeStyle = '#ffffff';
-      g.lineWidth = 5;
-      g.beginPath();
-      g.arc(x, y, r + 6, 0, Math.PI * 2);
-      g.stroke();
-    }
+    if (enhanced) enhancedAura(g, x, y, r);
     g.restore();
     return;
   }
@@ -73,13 +96,7 @@ export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
   }
   g.fill();
   g.stroke();
-  if (enhanced) {
-    g.strokeStyle = '#ffffff';
-    g.lineWidth = 5;
-    g.beginPath();
-    g.arc(x, y, r + 6, 0, Math.PI * 2);
-    g.stroke();
-  }
+  if (enhanced) enhancedAura(g, x, y, r);
   g.restore();
 }
 
@@ -166,6 +183,7 @@ const bounceOut = (x) => {
 };
 const SANS = '"Be Vietnam Pro", system-ui, sans-serif';
 const SERIF = 'Cormorant, "Times New Roman", serif';
+const HEAL_AT = { x: W / 2, y: 378 }; // thanh máu đội (khớp game.js)
 const TALLY_AT = { x: W / 2 + 90, y: 340 }; // ô tổng sát thương (khớp game.js)
 const POP_LIGHT = ['#b8e0ff', '#ffc0ac', '#b8f5c4', '#fff4b0', '#dcc4ff', '#ffd0e4']; // màu sáng theo hệ cho số của tướng
 const easeOut = (k) => 1 - (1 - k) ** 3;
@@ -391,9 +409,9 @@ export function draw(g, view, t) {
   g.globalAlpha = 1;
   for (const q of view.particles || []) {
     g.globalAlpha = 1 - q.age / q.life;
-    g.fillStyle = COLORS[q.col] || '#fff';
+    g.fillStyle = q.color || COLORS[q.col] || '#fff';
     g.beginPath();
-    g.arc(q.x, q.y, 5, 0, Math.PI * 2);
+    g.arc(q.x, q.y, q.color ? 4 : 5, 0, Math.PI * 2);
     g.fill();
   }
   g.globalAlpha = 1;
@@ -415,6 +433,14 @@ export function draw(g, view, t) {
   if (view.tally && view.tally.shown > 0) outlined(g, new Intl.NumberFormat(document.documentElement.lang || 'vi').format(Math.round(view.tally.shown)), W / 2 + 90, 340, Math.round(50 * (1 + 0.4 * Math.min(1, view.tally.pulse))), '#fff0d0', '#ff7a2a', NUM, 5);
 
   // máu đội chung
+  if (view.hpPulse > 0.01) {
+    g.save();
+    g.shadowColor = '#6bf0a0';
+    g.shadowBlur = 24 * view.hpPulse;
+    g.fillStyle = `rgba(107,240,160,${0.35 * view.hpPulse})`;
+    g.fillRect(14, 370, W - 28, 18);
+    g.restore();
+  }
   bar(g, 16, 372, W - 32, 14, view.hp / view.maxHp, '#2fa86c', '#a8f5cb');
   text(g, `${Math.round(view.hp)} / ${view.maxHp}`, W / 2, 379, 11, '#ffffff', 'center', '800');
 
@@ -546,7 +572,10 @@ export function draw(g, view, t) {
       g.stroke();
       g.restore();
     }
-    drawOrb(g, type, x, y, 34 * pulse, !!view.board.enh[i], 1);
+    const ep = view.enhPop?.find((p) => p.i === i);
+    const born = ep ? Math.min(1, ep.age / 520) : 1;
+    const popK = born < 1 ? easeOut(born) * (1 + 0.5 * Math.sin(born * Math.PI)) : 1;
+    drawOrb(g, type, x, y, 34 * pulse * popK, !!view.board.enh[i], 1);
   }
   // viên bị đi qua nổi lên: to hơn một chút, có bóng, vẽ phía trên viên đang cầm
   for (const l of lifted) {
@@ -559,6 +588,22 @@ export function draw(g, view, t) {
     g.fill();
     g.restore();
     drawOrb(g, l.type, l.x, l.y - up * 8, 34 * (1 + 0.22 * up), !!view.board.enh[l.i]);
+  }
+  // hồi máu: cả bàn cờ sáng xanh, một dải sáng quét từ dưới lên
+  if (view.healGlow > 0.01) {
+    const k = view.healGlow;
+    const gr = g.createLinearGradient(0, BOARD_Y, 0, BOARD_Y + ROWS * CELL);
+    gr.addColorStop(0, `rgba(80,255,150,${0.06 * k})`);
+    gr.addColorStop(1, `rgba(80,255,150,${0.34 * k})`);
+    g.fillStyle = gr;
+    g.fillRect(0, BOARD_Y, W, ROWS * CELL);
+    const sweep = BOARD_Y + ROWS * CELL * (1 - (1 - k) * 1.25);
+    const sg = g.createLinearGradient(0, sweep - 50, 0, sweep + 50);
+    sg.addColorStop(0, 'rgba(190,255,220,0)');
+    sg.addColorStop(0.5, `rgba(190,255,220,${0.5 * k})`);
+    sg.addColorStop(1, 'rgba(190,255,220,0)');
+    g.fillStyle = sg;
+    g.fillRect(0, sweep - 50, W, 100);
   }
   g.restore();
 
@@ -636,12 +681,13 @@ export function draw(g, view, t) {
     let x = q.x, y = q.y - 14 * easeOut(Math.min(1, t / 400)), sc = 0.3 + 0.7 * back, a = 1;
     if (t > q.hold) {
       const e = Math.min(1, (t - q.hold) / q.fly) ** 2.2;
-      x += (TALLY_AT.x - x) * e;
-      y += (TALLY_AT.y - y) * e;
+      const to = q.heal ? HEAL_AT : TALLY_AT;
+      x += (to.x - x) * e;
+      y += (to.y - y) * e;
       sc *= 1 - 0.5 * e;
       a = 1 - 0.7 * e * e;
     }
-    const col = COLORS[q.el] || '#ffd84a';
+    const col = q.heal ? '#35d27c' : COLORS[q.el] || '#ffd84a';
     g.save();
     g.globalAlpha = a;
     g.translate(x, y);
@@ -651,7 +697,7 @@ export function draw(g, view, t) {
     halo.addColorStop(1, `${col}00`);
     g.fillStyle = halo;
     g.fillRect(-q.size * 1.4, -q.size * 1.1, q.size * 2.8, q.size * 2.2);
-    outlined(g, q.s, 0, 0, q.size, POP_LIGHT[q.el] || '#fff0a0', col, NUM, Math.max(5, q.size * 0.16), '700');
+    outlined(g, q.s, 0, 0, q.size, q.heal ? '#d8ffe6' : POP_LIGHT[q.el] || '#fff0a0', col, NUM, Math.max(5, q.size * 0.16), '700');
     g.restore();
   }
   g.restore(); // hết máy quay
