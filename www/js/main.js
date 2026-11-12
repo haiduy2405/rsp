@@ -3,7 +3,7 @@ import { createRun, runStep, newRunRecord, debugWinBattle } from './core/run.js'
 import { stageOpen, clearsOf, zoneClears } from './core/stage.js';
 import { applyRunResult } from './core/progress.js';
 import { createStorage, browserAdapter } from './save/storage.js';
-import { grantCharacter, expToMax, useCakes, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
+import { grantCharacter, expToMax, skillUp, skillUpCost, useCakes, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
 import { KEYS } from './core/effects.js';
 import { summon, redeemCharacter, effectiveRates } from './core/summon.js';
@@ -14,6 +14,7 @@ import { startGame } from './ui/game.js';
 import { preloadAssets, getImg } from './ui/assets.js';
 import { createLoading } from './ui/loading.js';
 import { createHeroUI, COLORS } from './ui/hero-ui.js';
+import { resolveKit, maxSkillLevel, SKILL_KINDS } from './core/kit.js';
 import * as offline from './ui/offline.js';
 import { VERSION, BUILD, BUILD_DATE } from './version.js';
 import { createFxLayer } from './ui/fxlayer.js';
@@ -93,6 +94,11 @@ const save = () => {
   if (!storage.save(progress)) notice = 'hub.saveFail';
 };
 const fodderName = (key) => `${t('fodder.' + key.replace('_', '.'))} ${'★'.repeat(ctx.fodder[key].star)}`;
+const offeringName = (key) => `${t('offering.' + key.replace('_', '.'))} ${'★'.repeat(Number(key.split('_')[1]))}`;
+const offeringsLine = (o, race) => {
+  const parts = Object.keys(o).filter((k) => k.startsWith(`${race}_`)).sort().map((k) => `${offeringName(k)} ×${o[k]}`);
+  return parts.length ? parts.join(', ') : '—';
+};
 const lootLine = (l) => {
   const parts = [];
   if (l.gold) parts.push(`${t('res.gold')} ${l.gold >= 0 ? '+' : ''}${l.gold}`);
@@ -100,6 +106,7 @@ const lootLine = (l) => {
   if (l.spirit) parts.push(`${t('res.spirit')} +${l.spirit}`);
   if (l.shards) parts.push(`${t('res.shard')} +${l.shards}`);
   for (const [k, n] of Object.entries(l.fodder || {})) parts.push(`${fodderName(k)} +${n}`);
+  for (const [k, n] of Object.entries(l.offerings || {})) parts.push(`${offeringName(k)} +${n}`);
   if (l.stones?.normal) parts.push(`${t('res.stone')} ${t('stone.normal')} +${l.stones.normal}`);
   if (l.stones?.rare) parts.push(`${t('res.stone')} ${t('stone.rare')} +${l.stones.rare}`);
   return parts.length ? parts.join(' · ') : t('result.nothing');
@@ -393,7 +400,8 @@ function showChar(id, msg, back) {
   const st = statsFor(ctx, id, pc.level, pc.awaken);
   const aw = awakenCost(ctx, id, pc.awaken + 1);
   const inv = progress.inventory;
-  const keys = [...new Set([...keysOf(c.skill.units), ...ctx.duoList.filter((d) => d.a === id || d.b === id).flatMap((d) => keysOf(d.skill.units))])];
+  const kit = resolveKit(ctx, id, pc.skillLv);
+  const keys = [...new Set([...keysOf(kit.skill.units), ...(kit.passive?.units ? keysOf(kit.passive.units) : []), ...ctx.duoList.filter((d) => d.a === id || d.b === id).flatMap((d) => keysOf(d.skill.units))])];
   // Thực hiện một hành động nâng cấp (hàm thuần trả {ok, progress}), lưu, vẽ lại với thông báo.
   const act = (fn, okMsg) => {
     const r = fn();
@@ -423,16 +431,34 @@ function showChar(id, msg, back) {
             : h('div', { class: 'muted' }, t('char.noFodder')),
         ],
   );
+  const skills = h(
+    'div',
+    { class: 'hp-grow' },
+    h('b', {}, t('char.skillUp')),
+    h('div', { class: 'muted' }, `${t('items.offerings')}: ${offeringsLine(inv.offerings, c.race)}`),
+    SKILL_KINDS.map((kind) => {
+      const lv = pc.skillLv[kind];
+      const cost = skillUpCost(ctx, id, kind, lv);
+      return h(
+        'div',
+        { class: 'skillup-row', 'data-skillup': kind },
+        h('span', {}, `${t(`char.tag.${kind}`)} · ${t('skill.lv', { n: lv, max: maxSkillLevel(ctx, id) })}`, cost ? h('small', { class: 'muted' }, ` ${t('skill.upCost', { count: cost.count, name: offeringName(cost.offering), gold: cost.gold })}`) : null),
+        cost ? btn(t('skill.upBtn'), () => act(() => skillUp(ctx, progress, id, kind), () => t('skill.upDone')), '', { id: `skillup-${kind}` }) : h('small', { class: 'muted' }, t('skill.lvMax')),
+      );
+    }),
+  );
   screen(
     heroUI.header(id),
     msg ? h('div', { class: 'notice' }, msg) : null,
     heroUI.statGrid(st, id),
     heroUI.levelBar(id, pc),
-    heroUI.activeBox(id, { cooldown: skillCooldown(ctx, id, pc.awaken) }),
-    heroUI.leaderBox(id),
+    heroUI.activeBox(id, { cooldown: skillCooldown(ctx, id, pc.awaken, pc.skillLv), skillLv: pc.skillLv }),
+    heroUI.leaderBox(id, pc.skillLv),
+    heroUI.passiveBox(id, pc.skillLv),
     heroUI.duoBox(id),
     keys.length ? h('div', { class: 'card' }, keywordBlock(keys)) : null,
     grow,
+    skills,
     h('div', { class: 'hp-grow' }, h('div', { class: 'muted' }, t('char.awaken', { n: pc.awaken })), aw
       ? [h('div', { class: 'muted' }, t('char.awakenCost', { shards: aw.shards, stones: aw.stones, kind: t(`stone.${aw.stone}`), element: el(aw.element), gold: aw.gold })), btn(t('char.awakenBtn'), () => act(() => awaken(ctx, progress, id)), '', { id: 'awaken' })]
       : h('div', { class: 'muted' }, t('char.maxAwaken'))),
@@ -505,7 +531,7 @@ function showTeam(slot, msg, stage) {
       btn(t('team.clear'), () => { apply(clearTeam(progress)); again(0); }, '', { id: 'team-clear', ...(members.length ? {} : { disabled: '' }) }),
       slot > 0 && team[slot] ? btn(t('team.makeLeader', { name: t(`char.${team[slot]}`) }), () => { apply(makeLeader(progress, slot)); again(0); }, '', { id: 'make-leader' }) : null,
     ),
-    members.length ? h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(ctx.characters[members[0]].leader)}`) : null,
+    members.length ? h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(resolveKit(ctx, members[0], progress.characters[members[0]].skillLv).leader)}`) : null,
     h('div', { class: 'muted' }, members.length < 2 ? t('team.noDuo') : duos.length ? `${t('team.duoActive')}: ${duos.map((d) => t(`duo.${d.id}`)).join(', ')}` : t('team.noDuo')),
     stage ? [needLeader || !members.length ? h('div', { class: 'notice' }, t(members.length ? 'team.needLeader' : 'team.needAny')) : null, btn(t('team.go'), () => (activeRunInfo() ? askAbandon(stage) : startRun(stage)), 'primary', { id: 'team-go', ...(needLeader ? { disabled: '' } : {}) })] : null,
     h('p', { class: 'muted' }, t('team.holdHint')),
@@ -536,6 +562,8 @@ function showItems() {
           return h('div', { class: 'card fodder-row', 'data-fodder': k }, h('span', {}, `${fodderName(k)} ×${inv.fodder[k]} `, h('small', { class: 'muted' }, `${ctx.fodder[k].sell} ${t('res.gold')}`)), btn(t('fodder.sell'), () => sell(1)), btn(t('fodder.sellAll'), () => sell(999)));
         })
       : h('div', { class: 'muted' }, t('char.noFodder')),
+    h('h3', {}, t('items.offerings')),
+    Object.keys(inv.offerings).length ? Object.keys(inv.offerings).sort().map((k) => row(offeringName(k), inv.offerings[k], COLORS[4])) : h('div', { class: 'muted' }, t('items.noOfferings')),
     h('h3', {}, t('items.stones')),
     [0, 1, 2, 3, 4, 5].map((e) => row(`${el(e)} · ${t('stone.normal')} / ${t('stone.rare')}`, `${inv.stones[e].normal} / ${inv.stones[e].rare}`, COLORS[e])),
     btn(t('back'), showHub, '', { id: 'back' }),
@@ -1188,12 +1216,12 @@ function showSkillAsk(idx, confirm) {
   if (!st || $('info')) return;
   const m = st.members[idx];
   if (!m) return;
-  const c = ctx.characters[m.id];
-  const keys = keysOf(c.skill.units);
+  const kit = resolveKit(ctx, m.id, m.skillLv);
+  const keys = keysOf(kit.skill.units);
   const close = () => $('info')?.remove();
   const body = [
     h('div', { class: 'charrow' }, portrait(m.id, 72), h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`skill.${m.id}`)), h('div', { class: 'muted' }, t(`char.${m.id}`), ' · ', t('char.cooldown', { n: m.skillMax })))),
-    h('div', { class: 'card' }, c.skill.units.map((u) => h('div', {}, unitText(u)))),
+    h('div', { class: 'card' }, kit.skill.units.map((u) => h('div', {}, unitText(u)))),
     keys.length ? h('div', { class: 'card' }, keywordBlock(keys)) : null,
     h('div', { class: 'row' }, btn(t('skill.ok'), () => { close(); confirm(); }, 'primary', { id: 'skill-ok' }), btn(t('skill.cancel'), close, '', { id: 'skill-cancel' })),
   ];
@@ -1213,8 +1241,9 @@ function showInspect(kind, idx) {
       heroUI.statGrid(m, m.id),
       heroUI.levelBar(m.id, { level: m.level, exp: 0 }),
       h('div', { class: 'muted' }, t('info.teamHp', { hp: Math.round(st.hp), max: st.maxHp })),
-      heroUI.activeBox(m.id, { cooldown: m.skillMax, status: m.skillCd === 0 ? t('info.skillReady') : t('info.skillWait', { n: m.skillCd }) }),
-      idx === 0 && c.leader ? heroUI.leaderBox(m.id) : null,
+      heroUI.activeBox(m.id, { skillLv: m.skillLv, cooldown: m.skillMax, status: m.skillCd === 0 ? t('info.skillReady') : t('info.skillWait', { n: m.skillCd }) }),
+      idx === 0 && c.leader ? heroUI.leaderBox(m.id, m.skillLv) : null,
+      heroUI.passiveBox(m.id, m.skillLv),
       heroUI.duoBox(m.id, false),
       h('div', { class: 'card' }, h('b', {}, t('info.teamEffects')), effectRows(st.team.effects)),
     ];
@@ -1242,6 +1271,7 @@ const REWARD_ICON = {
   spirit: '<path d="M12 2.500l7.500 6.500-7.500 12.500L4.500 9z" fill="#6bd5ff" stroke="#1f6f9a" stroke-width="1.4" stroke-linejoin="round"/><path d="M4.500 9h15M12 2.500L9 9l3 12.500L15 9z" fill="none" stroke="#e6f8ff" stroke-width="1" opacity=".8"/>',
   shard: '<path d="M7 3.500l8.500 2L19 14l-6.500 6.500L5 14z" fill="#ff7fb0" stroke="#a83a6a" stroke-width="1.400" stroke-linejoin="round"/><path d="M7 3.500L12.500 12 19 14" fill="none" stroke="#ffe0ee" stroke-width="1" opacity=".8"/>',
   fodder: '<ellipse cx="12" cy="13" rx="7.500" ry="6.500" fill="#8fd69a" stroke="#2f7a45" stroke-width="1.400"/><circle cx="9.500" cy="11.500" r="1.200" fill="#1c3a26"/><circle cx="14.500" cy="11.500" r="1.200" fill="#1c3a26"/>',
+  offering: '<rect x="4.500" y="9" width="15" height="11" rx="1.500" fill="#ffb86b" stroke="#8a4a1a" stroke-width="1.400"/><path d="M4.500 13h15M12 9v11M12 9c-1-4-5-4-5-1.500S11 9 12 9zm0 0c1-4 5-4 5-1.500S13 9 12 9z" fill="none" stroke="#fff0d0" stroke-width="1.200"/>',
   stoneN: '<path d="M12 3l7.500 4.300v8.400L12 20l-7.500-4.300V7.300z" fill="#7d8fd8" stroke="#3a4690" stroke-width="1.400" stroke-linejoin="round"/>',
   stoneR: '<path d="M12 3l7.500 4.300v8.400L12 20l-7.500-4.300V7.300z" fill="#ffd24a" stroke="#8a6a2a" stroke-width="1.400" stroke-linejoin="round"/><path d="M12 3v17M4.500 7.300L19.500 15.700M19.500 7.300L4.500 15.700" stroke="#fff7d6" stroke-width=".8" opacity=".7"/>',
 };
@@ -1254,6 +1284,7 @@ function lootRows(l) {
   const rows = [];
   if (l.gold) rows.push({ k: 'gold', label: t('res.gold'), n: l.gold });
   if (l.essence) rows.push({ k: 'essence', label: t('res.essence'), n: l.essence });
+  for (const [k, n] of Object.entries(l.offerings || {})) rows.push({ k: 'offering', label: offeringName(k), n, rare: Number(k.split('_')[1]) >= 2 });
   for (const [k, n] of Object.entries(l.fodder || {})) rows.push({ k: 'fodder', label: fodderName(k), n, rare: ctx.fodder[k].star === 2 });
   if (l.shards) rows.push({ k: 'shard', label: t('res.shard'), n: l.shards, rare: true });
   if (l.spirit) rows.push({ k: 'spirit', label: t('res.spirit'), n: l.spirit, rare: true });
@@ -1454,6 +1485,7 @@ if (DEBUG) {
     p.inventory.essence += 5000;
     p.inventory.gold += 20000;
     p.inventory.shards += 100;
+    for (const r of ctx.config.races) for (const t of [1, 2, 3]) p.inventory.offerings[`${r}_${t}`] = (p.inventory.offerings[`${r}_${t}`] || 0) + 40;
     for (let e = 0; e < 6; e++) {
       p.inventory.stones[e].normal += 30;
       p.inventory.stones[e].rare += 10;

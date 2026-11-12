@@ -31,7 +31,19 @@
       "element": 0,
       "pct": 0.25
     },
-    "culture": "viet"
+    "culture": "viet",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "turn",
+      "units": [
+        {
+          "type": "damage",
+          "target": "all",
+          "mult": 0.8
+        }
+      ],
+      "every": 4
+    }
   },
   {
     "id": "ran",
@@ -65,7 +77,14 @@
       "element": 0,
       "pct": 0.2
     },
-    "culture": "bacau"
+    "culture": "bacau",
+    "passive": {
+      "kind": "stat",
+      "stat": "hp",
+      "scope": "element",
+      "pct": 0.08,
+      "element": 0
+    }
   },
   {
     "id": "thetis",
@@ -94,7 +113,21 @@
       "element": 0,
       "pct": 0.15
     },
-    "culture": "hylap"
+    "culture": "hylap",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "turn",
+      "units": [
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "shield",
+          "turns": 2,
+          "value": 0.1
+        }
+      ],
+      "every": 4
+    }
   },
   {
     "id": "coc_kien_troi",
@@ -127,7 +160,19 @@
       "template": "start_cd",
       "n": 1
     },
-    "culture": "viet"
+    "culture": "viet",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "turn",
+      "units": [
+        {
+          "type": "damage",
+          "target": "one",
+          "mult": 1.0
+        }
+      ],
+      "every": 4
+    }
   },
   {
     "id": "thanh_giong",
@@ -161,7 +206,13 @@
       "element": 1,
       "pct": 0.25
     },
-    "culture": "viet"
+    "culture": "viet",
+    "passive": {
+      "kind": "stat",
+      "stat": "atk",
+      "scope": "self",
+      "pct": 0.2
+    }
   },
   {
     "id": "hephaestus",
@@ -197,7 +248,13 @@
       "element": 1,
       "pct": 0.2
     },
-    "culture": "hylap"
+    "culture": "hylap",
+    "passive": {
+      "kind": "stat",
+      "stat": "hp",
+      "scope": "all",
+      "pct": 0.05
+    }
   },
   {
     "id": "surtr",
@@ -231,7 +288,21 @@
       "element": 1,
       "pct": 0.2
     },
-    "culture": "bacau"
+    "culture": "bacau",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "turn",
+      "units": [
+        {
+          "type": "applyEffect",
+          "target": "all",
+          "key": "burn",
+          "turns": 2,
+          "value": 0.03
+        }
+      ],
+      "every": 3
+    }
   },
   {
     "id": "bennu",
@@ -263,7 +334,18 @@
       "template": "heal_boost",
       "pct": 0.2
     },
-    "culture": "aicap"
+    "culture": "aicap",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "turn",
+      "units": [
+        {
+          "type": "heal",
+          "pctMax": 0.03
+        }
+      ],
+      "every": 3
+    }
   },
   {
     "id": "son_tinh",
@@ -297,7 +379,13 @@
       "element": 2,
       "pct": 0.25
     },
-    "culture": "viet"
+    "culture": "viet",
+    "passive": {
+      "kind": "stat",
+      "stat": "hp",
+      "scope": "all",
+      "pct": 0.08
+    }
   },
   {
     "id": "mai_an_tiem",
@@ -327,7 +415,13 @@
       "template": "heal_boost",
       "pct": 0.25
     },
-    "culture": "viet"
+    "culture": "viet",
+    "passive": {
+      "kind": "stat",
+      "stat": "heal",
+      "scope": "all",
+      "pct": 0.08
+    }
   },
   {
     "id": "artemis",
@@ -361,7 +455,13 @@
       "element": 2,
       "pct": 0.2
     },
-    "culture": "hylap"
+    "culture": "hylap",
+    "passive": {
+      "kind": "stat",
+      "stat": "atk",
+      "scope": "self",
+      "pct": 0.15
+    }
   },
   {
     "id": "atalanta",
@@ -394,7 +494,20 @@
       "template": "start_cd",
       "n": 1
     },
-    "culture": "hylap"
+    "culture": "hylap",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "start",
+      "units": [
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "atkUp",
+          "turns": 3,
+          "value": 0.15
+        }
+      ]
+    }
   },
   {
     "id": "apollo",
@@ -432,7 +545,21 @@
       "element": 3,
       "pct": 0.25
     },
-    "culture": "hylap"
+    "culture": "hylap",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "turn",
+      "units": [
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "atkUp",
+          "turns": 2,
+          "value": 0.1
+        }
+      ],
+      "every": 4
+    }
   },
   {
     "id": "ra",
@@ -466,7 +593,14 @@
       "element": 3,
       "pct": 0.2
     },
-    "culture": "aicap"
+    "culture": "aicap",
+    "passive": {
+      "kind": "stat",
+      "stat": "atk",
+      "scope": "element",
+      "pct": 0.1,
+      "element": 3
+    }
   },
   {
     "id": "eos",
@@ -499,7 +633,19 @@
       "template": "start_cd",
       "n": 1
     },
-    "culture": "hylap"
+    "culture": "hylap",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "turn",
+      "units": [
+        {
+          "type": "convert",
+          "to": 3,
+          "count": 2
+        }
+      ],
+      "every": 5
+    }
   },
   {
     "id": "heimdall",
@@ -535,7 +681,20 @@
       "element": 3,
       "pct": 0.15
     },
-    "culture": "bacau"
+    "culture": "bacau",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "start",
+      "units": [
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "immune",
+          "turns": 2,
+          "value": 0
+        }
+      ]
+    }
   },
   {
     "id": "hel",
@@ -569,7 +728,21 @@
       "element": 4,
       "pct": 0.25
     },
-    "culture": "bacau"
+    "culture": "bacau",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "turn",
+      "units": [
+        {
+          "type": "applyEffect",
+          "target": "all",
+          "key": "atkDown",
+          "turns": 2,
+          "value": 0.15
+        }
+      ],
+      "every": 4
+    }
   },
   {
     "id": "loki",
@@ -602,7 +775,21 @@
       "template": "start_cd",
       "n": 2
     },
-    "culture": "bacau"
+    "culture": "bacau",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "turn",
+      "units": [
+        {
+          "type": "applyEffect",
+          "target": "one",
+          "key": "freeze",
+          "turns": 1,
+          "value": 0
+        }
+      ],
+      "every": 5
+    }
   },
   {
     "id": "nyx",
@@ -631,7 +818,21 @@
       "element": 4,
       "pct": 0.15
     },
-    "culture": "hylap"
+    "culture": "hylap",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "turn",
+      "units": [
+        {
+          "type": "applyEffect",
+          "target": "all",
+          "key": "stun",
+          "turns": 1,
+          "value": 0
+        }
+      ],
+      "every": 6
+    }
   },
   {
     "id": "fenrir",
@@ -665,7 +866,13 @@
       "element": 4,
       "pct": 0.15
     },
-    "culture": "bacau"
+    "culture": "bacau",
+    "passive": {
+      "kind": "stat",
+      "stat": "atk",
+      "scope": "self",
+      "pct": 0.2
+    }
   },
   {
     "id": "co_tam",
@@ -704,7 +911,13 @@
       "template": "heal_boost",
       "pct": 0.3
     },
-    "culture": "viet"
+    "culture": "viet",
+    "passive": {
+      "kind": "stat",
+      "stat": "heal",
+      "scope": "all",
+      "pct": 0.1
+    }
   },
   {
     "id": "freyja",
@@ -734,7 +947,13 @@
       "template": "heal_boost",
       "pct": 0.25
     },
-    "culture": "bacau"
+    "culture": "bacau",
+    "passive": {
+      "kind": "stat",
+      "stat": "heal",
+      "scope": "all",
+      "pct": 0.08
+    }
   },
   {
     "id": "eir",
@@ -760,7 +979,21 @@
       "element": 5,
       "pct": 0.15
     },
-    "culture": "bacau"
+    "culture": "bacau",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "turn",
+      "units": [
+        {
+          "type": "applyEffect",
+          "target": "team",
+          "key": "regen",
+          "turns": 2,
+          "value": 0.03
+        }
+      ],
+      "every": 3
+    }
   },
   {
     "id": "orpheus",
@@ -792,6 +1025,17 @@
       "template": "heal_boost",
       "pct": 0.2
     },
-    "culture": "hylap"
+    "culture": "hylap",
+    "passive": {
+      "kind": "trigger",
+      "trigger": "turn",
+      "units": [
+        {
+          "type": "heal",
+          "pctMax": 0.04
+        }
+      ],
+      "every": 4
+    }
   }
 ]

@@ -63,6 +63,11 @@ const steps = {
     const characters = Object.fromEntries(Object.entries(data.characters).map(([id, c]) => [id, { ...c, exp: 0 }]));
     return { ...data, version: 6, characters, inventory: { ...data.inventory, fodder: {} } };
   },
+  6(data) {
+    // v7: cấp kỹ năng và Lễ Vật.
+    const characters = Object.fromEntries(Object.entries(data.characters).map(([id, c]) => [id, { ...c, skillLv: { active: 1, leader: 1, passive: 1 } }]));
+    return { ...data, version: 7, characters, inventory: { ...data.inventory, offerings: {} } };
+  },
 };
 
 export function migrate(data, fromVersion, ctx) {

@@ -317,7 +317,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         view.fall = null;
         view.fallT = 1;
         await sleep(ANIM.afterFall);
-      } else if (e.type === 'skill' || e.type === 'duo') {
+      } else if (e.type === 'skill' || e.type === 'duo' || e.type === 'passive') {
         fx.sfx('skill');
         for (const who of e.type === 'duo' ? [e.slot, e.slot + 1] : [e.member]) {
           const m = state.members[who];

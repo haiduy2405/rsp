@@ -1,4 +1,5 @@
 import { statsFor } from './stats.js';
+import { newCharacter, maxSkillLevel, SKILL_KINDS } from './kit.js';
 // Nâng cấp nhân vật: Level (EXP từ Bánh EXP và Tiểu Linh), Thức tỉnh (Mảnh Linh Hồn + Tinh Thạch cùng hệ + Vàng), nhận nhân vật, đổi đội.
 // Mọi hàm thuần: nhận progress, trả { ok, progress?, reason?, ... }. Số liệu ở config.upgrade.
 
@@ -107,6 +108,31 @@ export function awaken(ctx, progress, id) {
   return { ok: true, progress: p, cost };
 }
 
+// Nâng cấp kỹ năng (chủ động / đội trưởng / bị động) từ cấp `lv` lên `lv + 1`: tốn Lễ Vật đúng tộc của tướng và Vàng.
+export function skillUpCost(ctx, id, kind, lv) {
+  const c = ctx.characters[id];
+  const cfg = ctx.config.skillUp;
+  if (!c || lv >= maxSkillLevel(ctx, id)) return null;
+  const m = cfg.cost.rarityMult[c.rarity];
+  return { offering: `${c.race}_${cfg.cost.tier[lv - 1]}`, count: Math.ceil(cfg.cost.count[lv - 1] * m), gold: Math.round(cfg.cost.gold[lv - 1] * m) };
+}
+export function skillUp(ctx, progress, id, kind) {
+  const ch = progress.characters[id];
+  if (!ch) return fail('not_owned');
+  if (!SKILL_KINDS.includes(kind)) return fail('bad_kind');
+  const cost = skillUpCost(ctx, id, kind, ch.skillLv[kind]);
+  if (!cost) return fail('max_skill');
+  const inv = progress.inventory;
+  if ((inv.offerings[cost.offering] || 0) < cost.count) return fail('not_enough_offerings');
+  if (inv.gold < cost.gold) return fail('not_enough_gold');
+  const p = structuredClone(progress);
+  p.inventory.offerings[cost.offering] -= cost.count;
+  if (p.inventory.offerings[cost.offering] === 0) delete p.inventory.offerings[cost.offering];
+  p.inventory.gold -= cost.gold;
+  p.characters[id].skillLv[kind] += 1;
+  return { ok: true, progress: p, cost };
+}
+
 // Nhận nhân vật (M4 Triệu hồi sẽ gọi). Trùng thì tự đổi thành Mảnh Linh Hồn.
 export function grantCharacter(ctx, progress, id) {
   const c = ctx.characters[id];
@@ -117,7 +143,7 @@ export function grantCharacter(ctx, progress, id) {
     p.inventory.shards += shards;
     return { ok: true, progress: p, duplicate: true, shards };
   }
-  p.characters[id] = { level: 1, awaken: 0, exp: 0 };
+  p.characters[id] = newCharacter();
   return { ok: true, progress: p, duplicate: false, shards: 0 };
 }
 
@@ -228,4 +254,4 @@ export function autoTeam(ctx, progress) {
 }
 
 // Đội chuẩn bị vào trận: [{id, level, awaken}].
-export const teamRoster = (progress) => progress.team.filter((id) => id !== null).map((id) => ({ id, level: progress.characters[id].level, awaken: progress.characters[id].awaken }));
+export const teamRoster = (progress) => progress.team.filter((id) => id !== null).map((id) => ({ id, level: progress.characters[id].level, awaken: progress.characters[id].awaken, skillLv: progress.characters[id].skillLv }));

@@ -1,3 +1,4 @@
+import { newCharacter } from './kit.js';
 // Nghi Thức Triệu Hồi. Thuần, xác định theo seed. Số liệu ở config.summon và banners.json.
 // Trạng thái summon: { pity5, pity4, pulls, firstDone, freeDay, history[] }
 //   pity5 = số lượt liên tiếp chưa ra 5★; pity4 = số lượt liên tiếp chưa ra từ 4★ trở lên.
@@ -96,7 +97,7 @@ export function redeemCharacter(ctx, progress, id) {
   if (progress.inventory.shards < cost) return fail('not_enough_shards');
   const p = structuredClone(progress);
   p.inventory.shards -= cost;
-  p.characters[id] = { level: 1, awaken: 0, exp: 0 };
+  p.characters[id] = newCharacter();
   return { ok: true, progress: p, cost };
 }
 

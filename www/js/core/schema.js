@@ -59,6 +59,19 @@ export const characterSchema = {
     atk: { type: 'integer', min: 0 },
     heal: { type: 'integer', min: 0 },
     skill: skillSchema,
+    passive: {
+      type: 'object',
+      required: ['kind'],
+      properties: {
+        kind: { type: 'string', enum: ['stat', 'trigger'] },
+        stat: { type: 'string', enum: ['hp', 'atk', 'heal'] },
+        scope: { type: 'string', enum: ['self', 'all', 'element'] },
+        pct: { type: 'number', min: 0 },
+        trigger: { type: 'string', enum: ['start', 'turn'] },
+        every: { type: 'integer', min: 1 },
+        units: { type: 'array', minItems: 1, items: skillUnit },
+      },
+    },
   },
 };
 

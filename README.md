@@ -103,3 +103,9 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 
 ## Đòn đánh theo từng tướng (v0.13)
 Sau khi xoay ngọc: mỗi tướng nảy số sát thương của mình ngay trên ô tướng (màu theo hệ), giữ một nhịp, rồi lần lượt bay gộp vào ô tổng, tổng nổ to, rồi mới bắn từ tướng vào quái. Nhịp chỉnh ở `ANIM` (game.js), vẽ ở `render.js` (`view.pops`). Test thủ công: `tests/e2e/pause.cjs` cho tạm dừng; xem hiệu ứng bằng `?debug`.
+
+## Cấp kỹ năng, Lễ Vật, bị động (v0.14)
+- **Kỹ năng có cấp** (chủ động, đội trưởng, bị động): 3★ tối đa cấp 3, 4★ cấp 4, 5★ cấp 5. Mỗi cấp +10% sức mạnh (`config.skillUp.perLevel`); cấp tối đa giảm 1 hồi chiêu. Tính ở `core/kit.js` (`resolveKit`).
+- **Lễ Vật** theo tộc, 3 bậc (`than_1`…`linh_3`): rớt theo tộc của quái trong trận, độ khó cao rớt bậc cao (`config.offeringTier`). Nâng kỹ năng tốn Lễ Vật đúng tộc của tướng + Vàng (`config.skillUp.cost`).
+- **Bị động**: kiểu `stat` (tăng HP/ATK/Hồi cho bản thân, cả đội hoặc một hệ) hoặc kiểu `trigger` (đầu trận, hoặc mỗi N lượt chạy các đơn vị kỹ năng như kỹ năng chủ động). Dữ liệu ở `characters.json` (`passive`).
+- Lưu game v7 (migrate thêm `skillLv`, `offerings`). Kỹ năng chủ động của 24 tướng giữ nguyên bản cũ, bản thiết kế mới đi cùng Form 2 (v0.15).

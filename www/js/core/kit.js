@@ -4,6 +4,8 @@ export const SKILL_KINDS = ['active', 'leader', 'passive'];
 
 export const maxSkillLevel = (ctx, id) => ctx.config.skillUp.levels[ctx.characters[id].rarity];
 export const newSkillLevels = () => ({ active: 1, leader: 1, passive: 1 });
+// Hồ sơ một tướng mới nhận.
+export const newCharacter = () => ({ level: 1, awaken: 0, exp: 0, skillLv: newSkillLevels() });
 
 const r2 = (x) => Math.round(x * 100) / 100;
 const r3 = (x) => Math.round(x * 1000) / 1000;

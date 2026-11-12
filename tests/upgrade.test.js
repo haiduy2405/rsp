@@ -117,7 +117,7 @@ test('nhân vật trùng tự đổi thành Mảnh Linh Hồn theo độ hiếm;
   assert.equal(dup.progress.inventory.shards, ctx.config.upgrade.duplicateShards[3]);
   const fresh = grantCharacter(ctx, p, 'hel');
   assert.equal(fresh.duplicate, false);
-  assert.deepEqual(fresh.progress.characters.hel, { level: 1, awaken: 0, exp: 0 });
+  assert.deepEqual(fresh.progress.characters.hel, { level: 1, awaken: 0, exp: 0, skillLv: { active: 1, leader: 1, passive: 1 } });
   const dup5 = grantCharacter(ctx, fresh.progress, 'hel');
   assert.equal(dup5.shards, ctx.config.upgrade.duplicateShards[5]);
   assert.equal(grantCharacter(ctx, p, 'nobody').ok, false);
@@ -132,7 +132,7 @@ test('đội hình: 5 nhân vật khác nhau, đã sở hữu; thứ tự đư�
   assert.equal(setTeam(p, ['hel', 'hel', 'thetis', 'bennu', 'eir']).reason, 'bad_team');
   assert.equal(setTeam(p, ['zeus', 'loki', 'thetis', 'bennu', 'eir']).reason, 'not_owned');
   assert.equal(setTeam(p, t.slice(0, 4)).reason, 'bad_team');
-  assert.deepEqual(teamRoster(p)[0], { id: 'hel', level: 1, awaken: 0 });
+  assert.deepEqual(teamRoster(p)[0], { id: 'hel', level: 1, awaken: 0, skillLv: { active: 1, leader: 1, passive: 1 } });
 });
 
 test('save: migrate v2 lên v3 chuyển đội mẫu cũ sang đội khởi đầu, giữ kho', () => {
