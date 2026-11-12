@@ -3,7 +3,9 @@ import { createRun, runStep, newRunRecord, debugWinBattle, runLayout } from './c
 import { stageOpen, tierOpen, stagesDone, zoneClears } from './core/stage.js';
 import { stageInfo } from './core/stageinfo.js';
 import { applyRunResult, firstClearStageSpirit } from './core/progress.js';
-import { createStorage, browserAdapter } from './save/storage.js';
+import { browserAdapter } from './save/storage.js';
+import { createSlots } from './save/slots.js';
+import { install as installSlots } from './ui/screen-slots.js';
 import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useElixir, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
 import { KEYS } from './core/effects.js';
@@ -34,7 +36,17 @@ const load = (f) => fetch(`js/${f}`).then((r) => r.json());
 const [raw, audioCfg, vi, en] = await Promise.all([loadRaw(load), load('data/audio.json'), load('i18n/vi.json'), load('i18n/en.json')]);
 const ctx = buildCtx(raw);
 const dicts = { vi, en };
-const storage = createStorage(browserAdapter(), ctx);
+// 3 ô lưu: `storage` là lớp bọc trỏ tới ô đang chơi (đổi bằng enterSlot).
+const slots = createSlots(browserAdapter(), ctx);
+let activeSlot = null;
+let curStore = slots.storage(slots.last() || 1);
+const storage = {
+  save: (p) => curStore.save(p),
+  load: () => curStore.load(),
+  clear: () => curStore.clear(),
+  exportText: (p) => curStore.exportText(p),
+  importText: (t) => curStore.importText(t),
+};
 const DEBUG = new URLSearchParams(location.search).has('debug');
 
 let lang = (() => {
@@ -45,9 +57,8 @@ let lang = (() => {
   }
 })();
 let t = createT(dicts[lang], en);
-const loaded = storage.load();
-let progress = loaded.progress;
-let notice = loaded.recovered ? 'hub.recovered' : null;
+let progress = newProgress(ctx);
+let notice = null;
 // Nạp trước phông cho canvas (DOM chỉ nạp khi dùng tới).
 for (const f of ['650 20px Fraunces', '600 14px "Be Vietnam Pro"', '700 20px Oswald']) document.fonts?.load(f, 'Aáảạ');
 const audio = createAudio(audioCfg, {
@@ -95,7 +106,23 @@ const screen = (...kids) => {
 };
 const save = () => {
   if (!storage.save(progress)) notice = 'hub.saveFail';
+  else if (activeSlot) slots.touch(activeSlot);
 };
+// Vào một ô lưu: nạp tiến trình của ô đó rồi tới màn chính (hoặc mở đầu nếu ô còn trống).
+function enterSlot(n) {
+  activeSlot = n;
+  curStore = slots.storage(n);
+  slots.setLast(n);
+  const l = curStore.load();
+  progress = l.progress;
+  notice = l.recovered ? 'hub.recovered' : null;
+  run = null;
+  record = null;
+  runPath = [];
+  ui.resetDrafts?.();
+  if (progress.onboarding.done) showHub();
+  else ui.showOnboarding();
+}
 const fodderName = (key) => `${t('fodder.' + key.replace('_', '.'))} ${'★'.repeat(ctx.fodder[key].star)}`;
 const offeringName = (key) => `${t('offering.' + key.replace('_', '.'))} ${'★'.repeat(Number(key.split('_')[1]))}`;
 const offeringsLine = (o, race) => {
@@ -1232,7 +1259,7 @@ function showInstallHelp() {
 // ---- Màn hình tách module: dùng chung trạng thái qua `app`, gọi chéo qua `app.*` / `ui.*`
 const ui = {};
 const app = {
-  ctx, audio, storage, dicts, h, btn, $, el, chip, portrait, CUR_COL, fodderName, offeringName, pct, save, screen, setLang, showHub,
+  ctx, audio, storage, slots, enterSlot, dicts, h, btn, $, el, chip, portrait, CUR_COL, fodderName, offeringName, pct, save, screen, setLang, showHub,
   t: (...a) => t(...a),
   get lang() { return lang; },
   set lang(v) { lang = v; },
@@ -1244,6 +1271,7 @@ const app = {
 Object.assign(ui, installItems(app));
 Object.assign(ui, installSummon(app));
 Object.assign(ui, installProfile(app));
+Object.assign(ui, installSlots(app));
 Object.assign(app, ui);
 Object.assign(ui, installShop(app));
 Object.assign(app, ui);
@@ -1300,5 +1328,5 @@ const bootStart = performance.now();
 await preloadAssets((d, n) => loading.setProgress(n ? (d / n) * 0.95 : 0));
 if (!DEBUG) await new Promise((r) => setTimeout(r, Math.max(0, 1400 - (performance.now() - bootStart)))); // đủ lâu để đọc 1 mẹo
 await loading.ready();
-if (progress.onboarding.done) showHub();
-else ui.showOnboarding();
+if (DEBUG && !location.search.includes('slots')) enterSlot(slots.last() || 1);
+else ui.showSlots();

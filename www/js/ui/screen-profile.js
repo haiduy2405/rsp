@@ -178,6 +178,7 @@ export function install(app) {
             showOnboarding();
           }, () => showSettings(), t('set.deleteYes'))
         : btn(t('set.delete'), () => showSettings(null, true), '', { id: 'delete' }),
+      btn(t('slot.switch'), () => { save(); app.showSlots(); }, '', { id: 'set-slots' }),
       btn(t('back'), showHub, '', { id: 'back' }),
     );
     $('lang').value = app.lang;
@@ -187,6 +188,7 @@ export function install(app) {
   const ob = { hometown: '', culture: null, avatar: 0, photo: null, name: '', callsign: '' };
 
   function showOnboarding(step = 1, err = null) {
+    if (step === 1) Object.assign(ob, { hometown: '', culture: null, avatar: 0, photo: null, name: '', callsign: '' });
     app.obTimers.forEach(clearTimeout);
     app.obTimers = [];
     const o = ctx.config.onboarding;
@@ -232,5 +234,5 @@ export function install(app) {
     }
   }
 
-  return { audioControls, offlineSection, photoPicker, showOnboarding, showProfile, showSettings, showStory };
+  return { audioControls, offlineSection, photoPicker, showOnboarding, showProfile, showSettings, showStory, resetDrafts: () => { profDraft = null; } };
 }

@@ -26,7 +26,9 @@ export function decode(text, ctx) {
   return data && isValidProgress(data) ? data : null;
 }
 
-export function createStorage(adapter, ctx) {
+export function createStorage(adapter, ctx, keys = { key: KEY, bak: BAK_KEY }) {
+  const KEY_ = keys.key;
+  const BAK_ = keys.bak;
   const safeGet = (k) => {
     try {
       return adapter.getItem(k);
@@ -37,25 +39,25 @@ export function createStorage(adapter, ctx) {
   return {
     save(progress) {
       const text = encode(progress);
-      const prev = safeGet(KEY);
+      const prev = safeGet(KEY_);
       try {
         // Chỉ sao lưu bản chính nếu nó còn lành, để không ghi đè bản dự phòng tốt bằng bản hỏng.
-        if (prev && decode(prev, ctx)) adapter.setItem(BAK_KEY, prev);
-        adapter.setItem(KEY, text);
+        if (prev && decode(prev, ctx)) adapter.setItem(BAK_, prev);
+        adapter.setItem(KEY_, text);
         return true;
       } catch {
         return false; // hết dung lượng / bị chặn
       }
     },
     load() {
-      const rawMain = safeGet(KEY);
+      const rawMain = safeGet(KEY_);
       const main = decode(rawMain, ctx);
       if (main) return { progress: main, source: 'main', recovered: false };
-      const rawBak = safeGet(BAK_KEY);
+      const rawBak = safeGet(BAK_);
       const bak = decode(rawBak, ctx);
       if (bak) {
         try {
-          adapter.setItem(KEY, encode(bak));
+          adapter.setItem(KEY_, encode(bak));
         } catch {
           /* bỏ qua */
         }
@@ -65,12 +67,16 @@ export function createStorage(adapter, ctx) {
     },
     clear() {
       try {
-        adapter.removeItem(KEY);
-        adapter.removeItem(BAK_KEY);
+        adapter.removeItem(KEY_);
+        adapter.removeItem(BAK_);
         return true;
       } catch {
         return false;
       }
+    },
+    // Xem nhanh một ô lưu (không ghi gì): progress hợp lệ hoặc null.
+    peek() {
+      return decode(safeGet(KEY_), ctx) || decode(safeGet(BAK_), ctx);
     },
     exportText: (progress) => encode(progress),
     importText(text) {

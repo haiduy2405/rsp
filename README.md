@@ -280,3 +280,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 ## v0.39.0
 - Gợi ý đường kéo giờ kéo dài suốt cả chuyến đầu tiên (mọi trận), hiện lại nếu kéo hụt/không hợp lệ.
 - Kéo chéo dễ hơn: ngón tay lệch >= 38% ô theo CẢ HAI trục so với tâm ô đang cầm thì tính là bước chéo (hằng DIAG_ASSIST trong ui/game.js); chỉ đổi cách nhận cử chỉ, luật chơi/lõi không đổi.
+
+## v0.40.0 — 3 ván lưu
+- Sau màn tải là màn chọn ván lưu: 3 ô, mỗi ô một tiến trình riêng (chơi, ván mới, đổi tên, xóa có xác nhận). Ô 1 dùng khóa cũ `rsp.save` nên save cũ thành ván 1; ô 2, 3 dùng `rsp.save.s2/.s3`; tên đặt riêng + lần chơi cuối ở `rsp.slots`.
+- Cài đặt có nút "Đổi ván lưu". Chế độ `?debug` tự vào ván gần nhất (thêm `&slots` để xem màn chọn ván).
+- Export/Import/Xóa dữ liệu trong Cài đặt áp dụng cho ván đang chơi.
