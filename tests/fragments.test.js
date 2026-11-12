@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { newProgress, isValidProgress, applyRunResult } from '../www/js/core/progress.js';
 import { addFragments, redeemFragments, redeemGeneric, useSoulTickets, heroFragCost } from '../www/js/core/fragments.js';
 import { grantCharacter } from '../www/js/core/upgrade.js';
-import { ensureShop, buyOffer, rollOffers, leftStock } from '../www/js/core/shop.js';
+import { ensureShop, buyOffer, rollOffers, leftStock, hasFreeOffer } from '../www/js/core/shop.js';
 import { rollLoot } from '../www/js/core/loot.js';
 import { mulberry32 } from '../www/js/core/rng.js';
 import { loadCtx } from './helpers.js';
@@ -122,4 +122,13 @@ test('shop ngày: món xác định theo ngày, reset khi sang ngày, món đầ
   assert.equal(f.progress.inventory.fragments[s.shop.offers.find((o) => o.id === 'frag4').give.key], 1);
   assert.equal(f.progress.inventory.spirit, 5000 - 400);
   assert.ok(isValidProgress(f.progress));
+});
+
+test('chấm đỏ cửa hàng: còn quà miễn phí → true, nhận xong → false, sang ngày → true', async () => {
+  const ctx = await loadCtx();
+  const p0 = newProgress(ctx);
+  assert.equal(hasFreeOffer(ctx, p0, 100), true);
+  const a = buyOffer(ctx, ensureShop(ctx, p0, 100), 100, 'free');
+  assert.equal(hasFreeOffer(ctx, a.progress, 100), false);
+  assert.equal(hasFreeOffer(ctx, a.progress, 101), true);
 });

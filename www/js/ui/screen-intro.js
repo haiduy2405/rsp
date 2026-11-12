@@ -127,7 +127,7 @@ export function install(app) {
     sc.classList.remove('hubin');
     void sc.offsetWidth;
     sc.classList.add('hubin');
-    setTimeout(() => sc.classList.remove('hubin'), 1800);
+    // không gỡ class bằng timer: gỡ giữa chừng làm lớp compositor bị vẽ lại → nháy 1 khung; screen() sẽ gỡ khi sang màn khác
   }
 
   return { showPrologue, showStarterReward, showCutscene };

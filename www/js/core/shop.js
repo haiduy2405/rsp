@@ -34,6 +34,12 @@ export function ensureShop(ctx, progress, dayKey) {
 
 export const leftStock = (progress, offer) => offer.stock - (progress.shop.bought[offer.id] || 0);
 
+// Còn món miễn phí chưa nhận hôm nay? (dùng cho chấm đỏ ở biểu tượng cửa hàng)
+export function hasFreeOffer(ctx, progress, dayKey) {
+  const p = ensureShop(ctx, progress, dayKey);
+  return p.shop.offers.some((o) => o.price.cur === 'free' && leftStock(p, o) > 0);
+}
+
 function grant(ctx, p, g) {
   const inv = p.inventory;
   if (g.kind === 'spirit') inv.spirit += g.count;

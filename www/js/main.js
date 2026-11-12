@@ -1,4 +1,5 @@
 import { buildCtx, loadRaw } from './core/ctx.js';
+import { hasFreeOffer } from './core/shop.js';
 import { createRun, runStep, newRunRecord, debugWinBattle, runLayout } from './core/run.js';
 import { stageOpen, tierOpen, stagesDone, zoneClears } from './core/stage.js';
 import { stageInfo } from './core/stageinfo.js';
@@ -101,7 +102,7 @@ const screen = (...kids) => {
     b.innerHTML = '<img src="assets/ui/icons/back.webp" alt="" draggable="false">';
     el.prepend(h('div', { class: 'back-wrap' }, b));
   }
-  el.classList.remove('hub', 'mapscreen');
+  el.classList.remove('hub', 'mapscreen', 'hubin');
   el.classList.add('show');
   el.scrollTop = 0;
 };
@@ -163,9 +164,10 @@ const ICONS = {
   clues: '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/>',
 };
 const ART_ICONS = new Set(['team', 'summon', 'shop', 'quests', 'help', 'settings', 'collection', 'glossary', 'story', 'items', 'clues']);
-function dockBtn(icon, label, onclick, id, cls = '') {
+function dockBtn(icon, label, onclick, id, cls = '', dot = false) {
   const b = h('button', { onclick, id, class: cls, 'aria-label': label, title: label });
   b.innerHTML = ART_ICONS.has(icon) ? `<img src="assets/ui/icons/${icon}.webp" alt="" draggable="false">` : `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[icon]}</svg>`;
+  if (dot) b.append(h('i', { class: 'red-dot', 'aria-hidden': 'true' }));
   return b;
 }
 const CUR_COL = { gold: '#ffd24a', spirit: '#b58bff', ticket: '#ff9a4a', shard: '#ff9acb' };
@@ -229,7 +231,7 @@ function showHub() {
       dockBtn('team', t('hub.team'), () => showTeam(), 'b-team'),
       dockBtn('summon', t('hub.summon'), () => ui.showSummon('standard'), 'b-summon', 'sub'),
       h('button', { class: 'battle', id: 'b-battle', onclick: () => showZones(), 'aria-label': t('hub.battle') }, h('img', { src: 'assets/ui/icons/battle.webp', alt: '', draggable: 'false' }), h('span', {}, t('hub.battle'))),
-      dockBtn('shop', t('hub.shop'), () => ui.showShop(), 'b-shop'),
+      dockBtn('shop', t('hub.shop'), () => ui.showShop(), 'b-shop', '', hasFreeOffer(ctx, progress, ui.dayKey())),
       dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest'),
     ),
   );
@@ -968,7 +970,7 @@ function startTutorial(retry = false) {
     fx: audio,
     hint: false, // gợi ý do setGuide điều khiển; hint tự động sẽ vẽ đường/chữ khác rồi bị thay → giật
     onInspect: showInspect,
-    onSkillAsk(idx, go) { go(); }, // tutorial: dùng kỹ năng ngay, không hỏi xác nhận
+    onSkillAsk: showSkillAsk, // tutorial cũng hỏi xác nhận như trận thường để người chơi quen
     celebrate,
     onReject(a) { coach(a.type === 'skill' ? 'tut.wrongSkill' : 'tut.wrong'); },
     onSettled(state) {

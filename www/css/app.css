@@ -895,3 +895,5 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .sm-res.one .sumcard { aspect-ratio: 3 / 4; min-height: 0; }
 
 .loading .ld-ver { position: absolute; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); text-align: center; font-size: 11px; color: rgba(255, 233, 173, .55); pointer-events: none; }
+.dock button { position: relative; }
+.red-dot { position: absolute; top: 4px; left: calc(50% + 10px); width: 13px; height: 13px; border-radius: 50%; background: #ff3b30; border: 2px solid #1b0f08; box-shadow: 0 0 6px rgba(255, 59, 48, .8); pointer-events: none; }

@@ -353,3 +353,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ### v0.47.0
 - Chữ hướng dẫn tutorial hiện giữa bàn ngọc, rồi mờ dần và trôi lên trên, ra khỏi bàn để người chơi xoay ngọc. Mỗi bài mới lặp lại như vậy; lời "Chơi tự do" mờ hẳn.
+
+### v0.48.0
+- Tutorial: dùng skill tướng cũng hỏi xác nhận như trận thường.
+- Cửa hàng: chấm đỏ ở biểu tượng shop khi còn quà miễn phí chưa nhận hôm nay (`hasFreeOffer` trong core/shop.js, có test).
+- Sửa nháy sau cutscene 4★ → màn chính: không gỡ class `hubin` bằng timer nữa (gỡ giữa chừng làm màn nháy 1 khung lộ bàn đấu bên dưới).
