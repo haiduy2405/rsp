@@ -137,7 +137,9 @@ export function runTargets(teams = 60, runsPer = 2, K = 10, seed0 = 1, diff = 'e
   for (const z of ctx.zoneList) {
     const base = bal.targets[z.id];
     // Độ khó cao hơn: đội mạnh hơn (Level/Thức tỉnh cộng thêm, tối đa 30/5), dải thắng dịch xuống.
-    const tg = { level: Math.min(ctx.config.progression.levelMax, base.level + sim.levelBonus), awaken: Math.min(5, base.awaken + sim.awakenBonus), win: base.win.map((x) => x + sim.winShift) };
+    const level = Math.min(ctx.config.progression.levelMax, base.level + sim.levelBonus);
+    // Level trên trần Form 1 thì bắt buộc đã Thức tỉnh Form 2.
+    const tg = { level, awaken: level > ctx.config.progression.levelCapForm1 ? 1 : Math.min(1, base.awaken + sim.awakenBonus), win: base.win.map((x) => x + sim.winShift) };
     let won = 0, runs = 0, turns = 0;
     ids.forEach((team, ti) => {
       for (let r = 0; r < runsPer; r++) {

@@ -17,7 +17,7 @@ import {
   shieldPool,
 } from './effects.js';
 import { statsFor, skillCooldown, normTeam } from './stats.js';
-import { resolveKit } from './kit.js';
+import { resolveKit, formOf } from './kit.js';
 import { relicMods } from './relic.js';
 import { applyAffixes } from './affix.js';
 
@@ -32,7 +32,7 @@ export function buildMembers(ctx, team, mods = relicMods(ctx, [])) {
     const c = ctx.characters[id];
     if (!c) throw new Error('unknown character ' + id);
     const st = statsFor(ctx, id, level, awaken);
-    const kit = resolveKit(ctx, id, skillLv);
+    const kit = resolveKit(ctx, id, skillLv, formOf(awaken));
     kits.push(kit);
     return {
       id,

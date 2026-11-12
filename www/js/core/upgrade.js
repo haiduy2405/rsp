@@ -5,10 +5,13 @@ import { newCharacter, maxSkillLevel, SKILL_KINDS } from './kit.js';
 
 const fail = (reason) => ({ ok: false, reason });
 
-// EXP cần để lên cấp kế (từ `level` lên `level + 1`). null nếu đã tối đa.
-export function expToNext(ctx, id, level) {
+// Cấp tối đa theo bậc Thức tỉnh: Form 1 bị chặn ở levelCapForm1, Form 2 lên tới levelMax.
+export const levelCap = (ctx, awaken) => (awaken >= 1 ? ctx.config.progression.levelMax : ctx.config.progression.levelCapForm1);
+
+// EXP cần để lên cấp kế (từ `level` lên `level + 1`). null nếu đã tới cấp tối đa (theo `awaken`).
+export function expToNext(ctx, id, level, awaken = 1) {
   const c = ctx.characters[id];
-  if (!c || level >= ctx.config.progression.levelMax) return null;
+  if (!c || level >= levelCap(ctx, awaken)) return null;
   const u = ctx.config.exp;
   return Math.round(u.base * (1 + u.growth * (level - 1)) * u.rarityMult[c.rarity]);
 }
@@ -16,7 +19,7 @@ export function expToNext(ctx, id, level) {
 // EXP còn thiếu để đạt cấp tối đa (tính cả EXP đang tích).
 export function expToMax(ctx, id, ch) {
   let total = -ch.exp;
-  for (let l = ch.level; l < ctx.config.progression.levelMax; l++) total += expToNext(ctx, id, l);
+  for (let l = ch.level; l < levelCap(ctx, ch.awaken); l++) total += expToNext(ctx, id, l, ch.awaken);
   return total;
 }
 
@@ -24,11 +27,11 @@ export function expToMax(ctx, id, ch) {
 function grantExp(ctx, ch, id, amount) {
   const before = ch.level;
   ch.exp += amount;
-  for (let need = expToNext(ctx, id, ch.level); need !== null && ch.exp >= need; need = expToNext(ctx, id, ch.level)) {
+  for (let need = expToNext(ctx, id, ch.level, ch.awaken); need !== null && ch.exp >= need; need = expToNext(ctx, id, ch.level, ch.awaken)) {
     ch.exp -= need;
     ch.level += 1;
   }
-  if (ch.level >= ctx.config.progression.levelMax) ch.exp = 0;
+  if (ch.level >= levelCap(ctx, ch.awaken)) ch.exp = 0;
   return ch.level - before;
 }
 
@@ -82,7 +85,7 @@ export function sellFodder(ctx, progress, key, count = 1) {
   return { ok: true, progress: p, sold: n, gold: f.sell * n };
 }
 
-// stage: 1..5 (bậc sắp đạt). Trả null nếu đã tối đa.
+// stage: 1 (bậc sắp đạt; hiện chỉ có Form 2). Trả null nếu đã tối đa.
 export function awakenCost(ctx, id, stage) {
   const c = ctx.characters[id];
   const def = ctx.config.upgrade.awaken.stages[stage - 1];

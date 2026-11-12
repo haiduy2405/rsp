@@ -1,8 +1,8 @@
 // Thành phần giao diện thẻ tướng dùng chung: màn chi tiết (Bộ sưu tập, Đội hình) và bảng thông tin trong trận.
 // Chỉ dựng DOM từ dữ liệu; không giữ trạng thái game. `h` tạo phần tử, `T` là hàm dịch hiện tại (đổi theo ngôn ngữ).
 import { getImg } from './assets.js';
-import { expToNext } from '../core/upgrade.js';
-import { resolveKit, maxSkillLevel, newSkillLevels } from '../core/kit.js';
+import { expToNext, levelCap } from '../core/upgrade.js';
+import { resolveKit, maxSkillLevel, newSkillLevels, formOf } from '../core/kit.js';
 
 export const COLORS = ['#3b9cff', '#ff5a3c', '#4cc46a', '#ffd84a', '#9a5cff', '#ff7fb0'];
 const pct = (v) => Math.round(v * 100);
@@ -72,8 +72,8 @@ export function createHeroUI({ h, T, ctx }) {
 
   // Cấp và thanh EXP.
   function levelBar(id, ch) {
-    const max = ctx.config.progression.levelMax;
-    const need = expToNext(ctx, id, ch.level);
+    const max = levelCap(ctx, ch.awaken);
+    const need = expToNext(ctx, id, ch.level, ch.awaken);
     return h(
       'div',
       { class: 'hp-level' },
@@ -86,17 +86,17 @@ export function createHeroUI({ h, T, ctx }) {
   const skillBox = (tagKey, title, ...lines) => h('div', { class: 'hp-skill' }, h('span', { class: `hp-tag ${tagKey}` }, T(`char.tag.${tagKey}`)), title ? h('b', { class: 'hp-sname' }, title) : null, ...lines);
 
   const lvTag = (id, lv) => (lv ? h('small', { class: 'muted' }, T('skill.lv', { n: lv, max: maxSkillLevel(ctx, id) })) : null);
-  function activeBox(id, { cooldown, status, skillLv } = {}) {
-    const kit = resolveKit(ctx, id, skillLv || newSkillLevels());
+  function activeBox(id, { cooldown, status, skillLv, awaken = 0 } = {}) {
+    const kit = resolveKit(ctx, id, skillLv || newSkillLevels(), formOf(awaken));
     return skillBox('active', T(`skill.${id}`), lvTag(id, skillLv?.active), h('div', { class: 'muted' }, [status, T('char.cooldown', { n: cooldown ?? kit.skill.cooldown })].filter(Boolean).join(' · ')), kit.skill.units.map((u) => h('div', {}, unitText(u))));
   }
-  const leaderBox = (id, skillLv) => skillBox('leader', null, lvTag(id, skillLv?.leader), h('div', {}, leaderText(resolveKit(ctx, id, skillLv || newSkillLevels()).leader)));
+  const leaderBox = (id, skillLv, awaken = 0) => skillBox('leader', null, lvTag(id, skillLv?.leader), h('div', {}, leaderText(resolveKit(ctx, id, skillLv || newSkillLevels(), formOf(awaken)).leader)));
   function passiveText(p) {
     if (p.kind === 'stat') return [h('div', {}, T('passive.stat', { pct: pct(p.pct), stat: T(`stat.${p.stat}`), scope: T(`passive.scope.${p.scope}`, { element: p.element != null ? el(p.element) : '' }) }))];
     return [h('div', { class: 'muted' }, p.trigger === 'start' ? T('passive.start') : T('passive.turn', { n: p.every })), ...p.units.map((u) => h('div', {}, unitText(u)))];
   }
-  function passiveBox(id, skillLv) {
-    const p = resolveKit(ctx, id, skillLv || newSkillLevels()).passive;
+  function passiveBox(id, skillLv, awaken = 0) {
+    const p = resolveKit(ctx, id, skillLv || newSkillLevels(), formOf(awaken)).passive;
     return p ? skillBox('passive', T(`passive.${id}`), lvTag(id, skillLv?.passive), passiveText(p)) : null;
   }
   function duoBox(id, detail = true) {

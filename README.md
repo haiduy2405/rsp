@@ -120,3 +120,8 @@ Sau khi xoay ngọc: mỗi tướng nảy số sát thương của mình ngay tr
 ## Đặc tính quái, khó lên (v0.16)
 - **Đặc tính quái** (`config.affix`, `core/affix.js`): 8 buff riêng của từng quái (Cứng cáp, Cuồng nộ, Giáp Khiên, Gai nhọn, Tái sinh, Xuyên giáp, Nhanh nhẹn, Bất khuất), mở dần theo khu và độ khó. Cuộn lúc sinh cửa nên hiện trước ở danh sách cửa (`[Cứng cáp, Cuồng nộ]`) và trên quái trong trận. Elite hay có, Boss luôn có 1-3.
 - Hệ số khu `run.zoneScale` chỉnh lại; chi tiết số liệu ở `docs/BALANCE_LOG.md`.
+
+## Form 2 (v0.17)
+- Thức tỉnh một bậc: lên **Form 2** (chỉ số +20%, kỹ năng chủ động viết lại cho từng tướng trong `characters.json` > `form2`, đội trưởng mạnh hơn). Form 1 tối đa Level 30, Form 2 lên 50. `awaken` trong save là 0/1 (save v8, migrate từ bản cũ).
+- Art Form 2 hiện dùng chung art Form 1 (asset tạm); Duy cấp art sau.
+

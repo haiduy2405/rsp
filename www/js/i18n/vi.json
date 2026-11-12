@@ -293,11 +293,10 @@
   "stat.atk": "Công",
   "stat.heal": "Hồi",
   "char.level": "Cấp {n}/{max}",
-  "char.awaken": "Thức tỉnh {n}/5",
-  "char.awakenBtn": "Thức tỉnh",
+  "char.awakenBtn": "Thức tỉnh lên Form 2",
   "char.awakenCost": "Cần {shards} Mảnh, {stones} Tinh Thạch {kind} {element}, {gold} Vàng",
   "char.maxLevel": "Đã đạt cấp tối đa",
-  "char.maxAwaken": "Đã Thức tỉnh tối đa",
+  "char.maxAwaken": "Đã ở Form 2",
   "char.skill": "Kỹ năng chủ động",
   "char.cooldown": "Hồi chiêu {n} lượt",
   "char.leader": "Kỹ năng đội trưởng",
@@ -795,5 +794,7 @@
   "affix.swift.desc": "Đánh sớm hơn 1 lượt, công -15%",
   "affix.warded": "Bất khuất",
   "affix.warded.desc": "Miễn nhiễm hiệu ứng xấu",
-  "affix.title": "Đặc tính quái"
+  "affix.title": "Đặc tính quái",
+  "char.form": "Form {n}",
+  "char.form2Preview": "Form 2: chỉ số +{pct}%, kỹ năng mạnh hơn, Level tối đa {cap}. Dưới đây là kỹ năng Form 2."
 }

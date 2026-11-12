@@ -8,6 +8,7 @@ import { statsFor, skillCooldown } from '../www/js/core/stats.js';
 import { createBattle, step } from '../www/js/core/battle.js';
 import { buildCtx, DATA_FILES } from '../www/js/core/ctx.js';
 import { DEFAULT_TEAM } from '../www/js/core/progress.js';
+import { KEYS } from '../www/js/core/effects.js';
 import { readJson } from './helpers.js';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -48,10 +49,10 @@ test('roster: schema hợp lệ, tên và tên kỹ năng có đủ vi/en', () =
   }
 });
 
-test('ngân sách chỉ số: không ai vượt trần của độ hiếm tại Level tối đa + Thức tỉnh 5', () => {
+test('ngân sách chỉ số: không ai vượt trần của độ hiếm tại Level tối đa + Form 2', () => {
   const cap = { 3: 330, 4: 420, 5: 520 };
   for (const c of chars) {
-    const s = statsFor(ctx, c.id, config.progression.levelMax, 5);
+    const s = statsFor(ctx, c.id, config.progression.levelMax, 1);
     const pts = s.hp * config.budgetWeights.hp + s.atk * config.budgetWeights.atk + s.heal * config.budgetWeights.heal;
     assert.ok(pts <= config.budget[c.rarity], `${c.id}: ${pts} > ${config.budget[c.rarity]}`);
     assert.equal(config.budget[c.rarity], cap[c.rarity]);
@@ -115,12 +116,27 @@ test('leader: khuôn mẫu tác động đúng cho ô 1 và không cho ô khác'
   assert.equal(cd.members[1].skillCd, ctx.characters.bennu.skill.startCooldown - 1);
 });
 
-test('Thức tỉnh giảm hồi chiêu ở bậc 3 và 5, có sàn; Level tăng chỉ số', () => {
-  const base = ctx.characters.thetis.skill.cooldown;
-  assert.deepEqual([0, 1, 2, 3, 4, 5].map((a) => skillCooldown(ctx, 'thetis', a)), [base, base, base, base - 1, base - 1, base - 2]);
+test('Form 2: tăng chỉ số, kỹ năng thay thế có sàn hồi chiêu; Level tăng chỉ số', () => {
   assert.ok(statsFor(ctx, 'thetis', 30, 0).atk > statsFor(ctx, 'thetis', 1, 0).atk);
-  assert.ok(statsFor(ctx, 'thetis', 1, 4).hp > statsFor(ctx, 'thetis', 1, 2).hp);
-  assert.equal(statsFor(ctx, 'thetis', 1, 3).hp, statsFor(ctx, 'thetis', 1, 2).hp);
+  assert.ok(statsFor(ctx, 'thetis', 1, 1).hp > statsFor(ctx, 'thetis', 1, 0).hp);
+  for (const c of chars) {
+    assert.ok(c.form2?.skill, `${c.id} thiếu Form 2`);
+    assert.ok(skillCooldown(ctx, c.id, 1) >= config.progression.minCooldown, c.id);
+    assert.ok(skillCooldown(ctx, c.id, 1) <= skillCooldown(ctx, c.id, 0), `${c.id}: Form 2 không chậm hơn`);
+  }
+});
+
+test('Form 2: kỹ năng chỉ dùng đơn vị và từ khóa hợp lệ, mạnh hơn Form 1', () => {
+  for (const c of chars) {
+    const f = c.form2;
+    assert.ok(f.skill.units.length >= c.skill.units.length, c.id);
+    for (const u of f.skill.units) {
+      assert.ok(['damage', 'heal', 'convert', 'applyEffect'].includes(u.type), c.id);
+      if (u.type === 'applyEffect') assert.ok(KEYS.includes(u.key), `${c.id} ${u.key}`);
+    }
+    const power = (units) => units.reduce((a, u) => a + (u.mult || 0) + (u.pctMax || 0) * 5, 0);
+    assert.ok(power(f.skill.units) >= power(c.skill.units), `${c.id}: Form 2 không yếu hơn`);
+  }
 });
 
 test('đội khởi đầu là 5 nhân vật 3★ đủ 5 hệ khác nhau', () => {

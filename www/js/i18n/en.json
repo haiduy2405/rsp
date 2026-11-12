@@ -293,11 +293,10 @@
   "stat.atk": "ATK",
   "stat.heal": "Heal",
   "char.level": "Level {n}/{max}",
-  "char.awaken": "Awakening {n}/5",
-  "char.awakenBtn": "Awaken",
+  "char.awakenBtn": "Awaken to Form 2",
   "char.awakenCost": "Needs {shards} Shards, {stones} {kind} {element} Stones, {gold} Gold",
   "char.maxLevel": "Max level reached",
-  "char.maxAwaken": "Fully awakened",
+  "char.maxAwaken": "Already Form 2",
   "char.skill": "Active skill",
   "char.cooldown": "Cooldown {n} turns",
   "char.leader": "Leader skill",
@@ -795,5 +794,7 @@
   "affix.swift.desc": "Attacks 1 turn sooner, ATK -15%",
   "affix.warded": "Unyielding",
   "affix.warded.desc": "Immune to negative effects",
-  "affix.title": "Foe traits"
+  "affix.title": "Foe traits",
+  "char.form": "Form {n}",
+  "char.form2Preview": "Form 2: stats +{pct}%, stronger skill, max Level {cap}. Form 2 skill below."
 }

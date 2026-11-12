@@ -3,7 +3,7 @@ import { newPlayer } from './onboarding.js';
 import { mergeCounts } from './loot.js';
 import { newCharacter, SKILL_KINDS } from './kit.js';
 // Tiến trình người chơi (dữ liệu được lưu). Hàm thuần: nhận progress, trả progress mới.
-export const SAVE_VERSION = 7;
+export const SAVE_VERSION = 8;
 
 export const DEFAULT_TEAM = ['thetis', 'bennu', 'atalanta', 'eos', 'eir'];
 
@@ -43,7 +43,7 @@ export function isValidProgress(p) {
   const ids = p.team.filter((id) => id !== null);
   if (new Set(ids).size !== ids.length) return false;
   if (!p.characters || typeof p.characters !== 'object') return false;
-  for (const c of Object.values(p.characters)) if (!Number.isInteger(c.level) || c.level < 1 || !Number.isInteger(c.exp) || c.exp < 0 || !Number.isInteger(c.awaken) || c.awaken < 0 || c.awaken > 5 || !c.skillLv || SKILL_KINDS.some((k) => !Number.isInteger(c.skillLv[k]) || c.skillLv[k] < 1)) return false;
+  for (const c of Object.values(p.characters)) if (!Number.isInteger(c.level) || c.level < 1 || !Number.isInteger(c.exp) || c.exp < 0 || !Number.isInteger(c.awaken) || c.awaken < 0 || c.awaken > 1 || !c.skillLv || SKILL_KINDS.some((k) => !Number.isInteger(c.skillLv[k]) || c.skillLv[k] < 1)) return false;
   if (!ids.every((id) => p.characters[id])) return false;
   if (!p.player || typeof p.player.name !== 'string' || !p.onboarding || typeof p.onboarding.done !== 'boolean') return false;
   const sm = p.summon;

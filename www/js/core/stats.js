@@ -1,4 +1,4 @@
-import { resolveKit, newSkillLevels } from './kit.js';
+import { resolveKit, newSkillLevels, formOf } from './kit.js';
 // Chỉ số nhân vật theo Level và Thức tỉnh. Hằng số nằm trong config.progression.
 export function levelMult(cfg, level) {
   return 1 + cfg.progression.levelGrowth * (level - 1);
@@ -10,12 +10,6 @@ export function awakenStatBonus(cfg, awaken) {
   return b;
 }
 
-export function awakenCooldownCut(cfg, awaken) {
-  let c = 0;
-  cfg.progression.awaken.slice(0, awaken).forEach((a) => (c += a.cd || 0));
-  return c;
-}
-
 export function statsFor(ctx, id, level = 1, awaken = 0) {
   const c = ctx.characters[id];
   if (!c) throw new Error('unknown character ' + id);
@@ -25,9 +19,7 @@ export function statsFor(ctx, id, level = 1, awaken = 0) {
 }
 
 export function skillCooldown(ctx, id, awaken = 0, skillLv = newSkillLevels()) {
-  const base = resolveKit(ctx, id, skillLv).skill.cooldown;
-  if (!ctx.config.progression) return base;
-  return Math.max(ctx.config.progression.minCooldown, base - awakenCooldownCut(ctx.config, awaken));
+  return resolveKit(ctx, id, skillLv, formOf(awaken)).skill.cooldown;
 }
 
 export const normTeam = (team) => team.map((m) => ({ level: 1, awaken: 0, skillLv: newSkillLevels(), ...(typeof m === 'string' ? { id: m } : m) }));

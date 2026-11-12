@@ -5,6 +5,7 @@ import { expToNext, expToMax, useCakes, feedFodder, sellFodder, fodderExp, awake
 import { migrate } from '../www/js/save/migrate.js';
 import { createRun, playRun, newRunRecord, runStep } from '../www/js/core/run.js';
 import { statsFor } from '../www/js/core/stats.js';
+import { resolveKit, formOf } from '../www/js/core/kit.js';
 import { loadCtx } from './helpers.js';
 
 const ctx = loadCtx();
@@ -36,10 +37,15 @@ test('EXP: cần nhiều hơn theo cấp và độ hiếm, trần ở levelMax, 
   p.inventory.essence = 10 ** 6;
   const total = expToMax(ctx, 'thetis', p.characters.thetis);
   const q = useCakes(ctx, p, 'thetis', 10 ** 9);
-  assert.equal(q.progress.characters.thetis.level, max);
+  const cap1 = ctx.config.progression.levelCapForm1;
+  assert.equal(q.progress.characters.thetis.level, cap1, 'Form 1 bị chặn ở levelCapForm1');
   assert.equal(q.progress.characters.thetis.exp, 0);
   assert.equal(q.used, total);
   assert.equal(useCakes(ctx, q.progress, 'thetis', 10).reason, 'max_level');
+  // Thức tỉnh Form 2 mở trần tới levelMax
+  const f2 = structuredClone(q.progress);
+  f2.characters.thetis.awaken = 1;
+  assert.equal(useCakes(ctx, f2, 'thetis', 10 ** 9).progress.characters.thetis.level, max);
 });
 
 test('Tiểu Linh: cho ăn lấy EXP (cùng hệ được thêm), bán lấy Vàng, không ăn thừa', () => {
@@ -66,30 +72,28 @@ test('Tiểu Linh: cho ăn lấy EXP (cùng hệ được thêm), bán lấy Và
   assert.equal(feedFodder(ctx, m, 'thetis', '0_1', 1).reason, 'max_level');
 });
 
-test('Thức tỉnh: bậc 1-3 dùng Tinh Thạch Thường, bậc 4-5 dùng Hiếm, đúng hệ, đủ 3 thứ phí', () => {
-  const stages = [1, 2, 3, 4, 5].map((s) => awakenCost(ctx, 'thetis', s));
-  assert.deepEqual(stages.map((c) => c.stone), ['normal', 'normal', 'normal', 'rare', 'rare']);
-  assert.ok(stages.every((c) => c.element === 0));
-  assert.equal(awakenCost(ctx, 'thetis', 6), null);
-  assert.ok(awakenCost(ctx, 'thuy_tinh', 1).shards > awakenCost(ctx, 'thetis', 1).shards);
-  let p = rich();
+test('Thức tỉnh Form 2: một bậc, tốn Tinh Thạch Hiếm đúng hệ, Mảnh và Vàng', () => {
+  const c = awakenCost(ctx, 'thetis', 1);
+  assert.equal(c.stone, 'rare');
+  assert.equal(c.element, 0);
+  assert.equal(awakenCost(ctx, 'thetis', 2), null);
+  assert.ok(awakenCost(ctx, 'thuy_tinh', 1).shards > c.shards, 'hiếm hơn thì đắt hơn');
+  const p = rich();
   const before = structuredClone(p.inventory);
   const r = awaken(ctx, p, 'thetis');
   assert.equal(r.progress.characters.thetis.awaken, 1);
   assert.equal(r.progress.inventory.shards, before.shards - r.cost.shards);
-  assert.equal(r.progress.inventory.stones[0].normal, before.stones[0].normal - r.cost.stones);
-  assert.equal(r.progress.inventory.stones[1].normal, before.stones[1].normal); // hệ khác không bị trừ
+  assert.equal(r.progress.inventory.stones[0].rare, before.stones[0].rare - r.cost.stones);
+  assert.equal(r.progress.inventory.stones[1].rare, before.stones[1].rare); // hệ khác không bị trừ
   assert.equal(r.progress.inventory.gold, before.gold - r.cost.gold);
-  for (let i = 0; i < 5; i++) p = awaken(ctx, p, 'thetis').progress;
-  assert.equal(p.characters.thetis.awaken, 5);
-  assert.equal(awaken(ctx, p, 'thetis').reason, 'max_awaken');
+  assert.equal(awaken(ctx, r.progress, 'thetis').reason, 'max_awaken');
 });
 
 test('Thức tỉnh: thiếu từng loại nguyên liệu đều bị từ chối và không đổi gì', () => {
   const p = rich();
   for (const [reason, mut] of [
     ['not_enough_shards', (q) => (q.inventory.shards = 0)],
-    ['not_enough_stones', (q) => (q.inventory.stones[0].normal = 0)],
+    ['not_enough_stones', (q) => (q.inventory.stones[0].rare = 0)],
     ['not_enough_gold', (q) => (q.inventory.gold = 0)],
   ]) {
     const q = structuredClone(p);
@@ -98,16 +102,13 @@ test('Thức tỉnh: thiếu từng loại nguyên liệu đều bị từ chố
     assert.equal(awaken(ctx, q, 'thetis').reason, reason);
     assert.equal(JSON.stringify(q), snap);
   }
-  const q = structuredClone(p);
-  q.inventory.stones[0].normal = 100;
-  q.characters.thetis.awaken = 3;
-  q.inventory.stones[0].rare = 1;
-  assert.equal(awaken(ctx, q, 'thetis').reason, 'not_enough_stones');
 });
 
-test('Thức tỉnh tăng chỉ số ở bậc 1, 2, 4 và giảm hồi chiêu ở bậc 3, 5', () => {
-  const hp = [0, 1, 2, 3, 4, 5].map((a) => statsFor(ctx, 'thetis', 1, a).hp);
-  assert.ok(hp[1] > hp[0] && hp[2] > hp[1] && hp[3] === hp[2] && hp[4] > hp[3] && hp[5] === hp[4]);
+test('Form 2 tăng chỉ số và đổi kỹ năng', () => {
+  assert.ok(statsFor(ctx, 'thetis', 1, 1).hp > statsFor(ctx, 'thetis', 1, 0).hp);
+  const k1 = resolveKit(ctx, 'thetis', undefined, 1).skill;
+  const k2 = resolveKit(ctx, 'thetis', undefined, formOf(1)).skill;
+  assert.notDeepEqual(k1.units, k2.units);
 });
 
 test('nhân vật trùng tự đổi thành Mảnh Linh Hồn theo độ hiếm; nhân vật mới được thêm', () => {
@@ -234,4 +235,18 @@ test('sửa hồ sơ: hợp lệ, giữ Tín Vật, từ chối dữ liệu xấ
   assert.equal(updateProfile(ctx, p0, { name: '', callsign: 'x', avatar: 0 }).ok, false);
   assert.equal(updateProfile(ctx, p0, { name: 'x', callsign: 'x', avatar: 99 }).ok, false);
   assert.equal(updateProfile(ctx, newProgress(ctx), { name: 'x', callsign: 'x', avatar: 0 }).ok, false);
+});
+
+test('migrate v7 → v8: Thức tỉnh thành Form 2; vượt cấp 30 cũng lên Form 2', () => {
+  const p = newProgress(ctx);
+  const old = { ...structuredClone(p), version: 7 };
+  old.characters = {
+    ...old.characters,
+    a: { level: 10, awaken: 3, exp: 0, skillLv: { active: 1, leader: 1, passive: 1 } },
+    b: { level: 40, awaken: 0, exp: 0, skillLv: { active: 1, leader: 1, passive: 1 } },
+    c: { level: 5, awaken: 0, exp: 0, skillLv: { active: 1, leader: 1, passive: 1 } },
+  };
+  const out = migrate(old, 7, ctx);
+  assert.deepEqual([out.characters.a.awaken, out.characters.b.awaken, out.characters.c.awaken], [1, 1, 0]);
+  assert.equal(out.version, 8);
 });

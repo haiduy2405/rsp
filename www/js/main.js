@@ -3,7 +3,7 @@ import { createRun, runStep, newRunRecord, debugWinBattle } from './core/run.js'
 import { stageOpen, clearsOf, zoneClears } from './core/stage.js';
 import { applyRunResult } from './core/progress.js';
 import { createStorage, browserAdapter } from './save/storage.js';
-import { grantCharacter, expToMax, skillUp, skillUpCost, useCakes, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
+import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useCakes, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
 import { KEYS } from './core/effects.js';
 import { summon, redeemCharacter, effectiveRates } from './core/summon.js';
@@ -14,7 +14,7 @@ import { startGame } from './ui/game.js';
 import { preloadAssets, getImg } from './ui/assets.js';
 import { createLoading } from './ui/loading.js';
 import { createHeroUI, COLORS } from './ui/hero-ui.js';
-import { resolveKit, maxSkillLevel, SKILL_KINDS } from './core/kit.js';
+import { resolveKit, maxSkillLevel, SKILL_KINDS, formOf } from './core/kit.js';
 import * as offline from './ui/offline.js';
 import { VERSION, BUILD, BUILD_DATE } from './version.js';
 import { createFxLayer } from './ui/fxlayer.js';
@@ -352,7 +352,7 @@ function charCard(id, onclick, extra) {
       'div',
       { style: 'flex:1;min-width:0' },
       h('h3', {}, t(`char.${id}`), ' ', h('small', {}, '★'.repeat(def.rarity))),
-      h('div', {}, h('span', { class: 'chip', style: `background:${COLORS[def.element]}` }, el(def.element)), ' ', h('small', {}, c ? `${t('char.level', { n: c.level, max: ctx.config.progression.levelMax })} · ${t('char.awaken', { n: c.awaken })}` : '???')),
+      h('div', {}, h('span', { class: 'chip', style: `background:${COLORS[def.element]}` }, el(def.element)), ' ', h('small', {}, c ? `${t('char.level', { n: c.level, max: levelCap(ctx, c.awaken) })} · ${t('char.form', { n: formOf(c.awaken) })}` : '???')),
       extra,
     ),
   );
@@ -400,7 +400,7 @@ function showChar(id, msg, back) {
   const st = statsFor(ctx, id, pc.level, pc.awaken);
   const aw = awakenCost(ctx, id, pc.awaken + 1);
   const inv = progress.inventory;
-  const kit = resolveKit(ctx, id, pc.skillLv);
+  const kit = resolveKit(ctx, id, pc.skillLv, formOf(pc.awaken));
   const keys = [...new Set([...keysOf(kit.skill.units), ...(kit.passive?.units ? keysOf(kit.passive.units) : []), ...ctx.duoList.filter((d) => d.a === id || d.b === id).flatMap((d) => keysOf(d.skill.units))])];
   // Thực hiện một hành động nâng cấp (hàm thuần trả {ok, progress}), lưu, vẽ lại với thông báo.
   const act = (fn, okMsg) => {
@@ -452,15 +452,15 @@ function showChar(id, msg, back) {
     msg ? h('div', { class: 'notice' }, msg) : null,
     heroUI.statGrid(st, id),
     heroUI.levelBar(id, pc),
-    heroUI.activeBox(id, { cooldown: skillCooldown(ctx, id, pc.awaken, pc.skillLv), skillLv: pc.skillLv }),
-    heroUI.leaderBox(id, pc.skillLv),
-    heroUI.passiveBox(id, pc.skillLv),
+    heroUI.activeBox(id, { cooldown: skillCooldown(ctx, id, pc.awaken, pc.skillLv), skillLv: pc.skillLv, awaken: pc.awaken }),
+    heroUI.leaderBox(id, pc.skillLv, pc.awaken),
+    heroUI.passiveBox(id, pc.skillLv, pc.awaken),
     heroUI.duoBox(id),
     keys.length ? h('div', { class: 'card' }, keywordBlock(keys)) : null,
     grow,
     skills,
-    h('div', { class: 'hp-grow' }, h('div', { class: 'muted' }, t('char.awaken', { n: pc.awaken })), aw
-      ? [h('div', { class: 'muted' }, t('char.awakenCost', { shards: aw.shards, stones: aw.stones, kind: t(`stone.${aw.stone}`), element: el(aw.element), gold: aw.gold })), btn(t('char.awakenBtn'), () => act(() => awaken(ctx, progress, id)), '', { id: 'awaken' })]
+    h('div', { class: 'hp-grow' }, h('div', { class: 'muted' }, t('char.form', { n: formOf(pc.awaken) })), aw
+      ? [h('div', { class: 'muted' }, t('char.form2Preview', { cap: ctx.config.progression.levelMax, pct: Math.round(ctx.config.progression.awaken[0].stat * 100) })), heroUI.activeBox(id, { skillLv: pc.skillLv, awaken: 1, cooldown: skillCooldown(ctx, id, 1, pc.skillLv) }), h('div', { class: 'muted' }, t('char.awakenCost', { shards: aw.shards, stones: aw.stones, kind: t(`stone.${aw.stone}`), element: el(aw.element), gold: aw.gold })), btn(t('char.awakenBtn'), () => act(() => awaken(ctx, progress, id)), '', { id: 'awaken' })]
       : h('div', { class: 'muted' }, t('char.maxAwaken'))),
     h('div', { class: 'muted' }, `${t('res.shard')} ${inv.shards} · ${t('res.gold')} ${inv.gold} · ${t('res.stone')} ${el(c.element)}: ${inv.stones[c.element].normal}/${inv.stones[c.element].rare}`),
     btn(t('back'), goBack, '', { id: 'back' }),
@@ -531,7 +531,7 @@ function showTeam(slot, msg, stage) {
       btn(t('team.clear'), () => { apply(clearTeam(progress)); again(0); }, '', { id: 'team-clear', ...(members.length ? {} : { disabled: '' }) }),
       slot > 0 && team[slot] ? btn(t('team.makeLeader', { name: t(`char.${team[slot]}`) }), () => { apply(makeLeader(progress, slot)); again(0); }, '', { id: 'make-leader' }) : null,
     ),
-    members.length ? h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(resolveKit(ctx, members[0], progress.characters[members[0]].skillLv).leader)}`) : null,
+    members.length ? h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(resolveKit(ctx, members[0], progress.characters[members[0]].skillLv, formOf(progress.characters[members[0]].awaken)).leader)}`) : null,
     h('div', { class: 'muted' }, members.length < 2 ? t('team.noDuo') : duos.length ? `${t('team.duoActive')}: ${duos.map((d) => t(`duo.${d.id}`)).join(', ')}` : t('team.noDuo')),
     stage ? [needLeader || !members.length ? h('div', { class: 'notice' }, t(members.length ? 'team.needLeader' : 'team.needAny')) : null, btn(t('team.go'), () => (activeRunInfo() ? askAbandon(stage) : startRun(stage)), 'primary', { id: 'team-go', ...(needLeader ? { disabled: '' } : {}) })] : null,
     h('p', { class: 'muted' }, t('team.holdHint')),
@@ -1271,7 +1271,7 @@ function showSkillAsk(idx, confirm) {
   if (!st || $('info')) return;
   const m = st.members[idx];
   if (!m) return;
-  const kit = resolveKit(ctx, m.id, m.skillLv);
+  const kit = resolveKit(ctx, m.id, m.skillLv, formOf(m.awaken));
   const keys = keysOf(kit.skill.units);
   const close = () => $('info')?.remove();
   const body = [
@@ -1296,9 +1296,9 @@ function showInspect(kind, idx) {
       heroUI.statGrid(m, m.id),
       heroUI.levelBar(m.id, { level: m.level, exp: 0 }),
       h('div', { class: 'muted' }, t('info.teamHp', { hp: Math.round(st.hp), max: st.maxHp })),
-      heroUI.activeBox(m.id, { skillLv: m.skillLv, cooldown: m.skillMax, status: m.skillCd === 0 ? t('info.skillReady') : t('info.skillWait', { n: m.skillCd }) }),
-      idx === 0 && c.leader ? heroUI.leaderBox(m.id, m.skillLv) : null,
-      heroUI.passiveBox(m.id, m.skillLv),
+      heroUI.activeBox(m.id, { skillLv: m.skillLv, awaken: m.awaken, cooldown: m.skillMax, status: m.skillCd === 0 ? t('info.skillReady') : t('info.skillWait', { n: m.skillCd }) }),
+      idx === 0 && c.leader ? heroUI.leaderBox(m.id, m.skillLv, m.awaken) : null,
+      heroUI.passiveBox(m.id, m.skillLv, m.awaken),
       heroUI.duoBox(m.id, false),
       h('div', { class: 'card' }, h('b', {}, t('info.teamEffects')), effectRows(st.team.effects)),
     ];

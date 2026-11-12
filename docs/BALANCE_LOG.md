@@ -50,3 +50,9 @@ Theo nguyên tắc "buff quái, không nerf người chơi": quái có thêm **�
 - Bài học chỉnh: hồi máu theo % máu tối đa của quái cực mạnh vì mỗi lượt đội chỉ gây ~10% máu tổng. Tái sinh 6% làm chuyến dài gấp 3 (~28 phút), hạ xuống 2% thì về ~10 phút. Khiên 25% cũng hạ 15%.
 - `zoneScale`: hp [1.35,1.35,1.5,1.7,2.3,2.6], atk [1.15,1.3,1.5,2.1,3.1,3.8] (Thủy khó hơn, Mộc/Quang/Tim dịu lại để bù đặc tính).
 - Kết quả sim (24 đội ×2, K=8): Dễ 98/81/65/75/60/65%, Vừa 96/69/63/63/50/46%, Khó 88/60/50/46/35/31%, đa số trong dải. Còn lệch: Thủy Vừa/Khó hơi dễ, thời gian khu Quang/Tim Vừa-Khó ~19-22 phút (quái nhiều máu + đặc tính).
+
+## v0.17: Form 2 thay Thức tỉnh 5 bậc
+- Thức tỉnh còn **một bậc = Form 2**: chỉ số +20% (`progression.awaken`), kỹ năng chủ động viết lại riêng cho từng tướng (`characters[id].form2.skill`, thường thêm 1 đơn vị, hồi chiêu -1 tới -2, số mạnh ~+30%), đội trưởng +20% hiệu lực. Chi phí: 20 Mảnh + 3 Tinh Thạch Hiếm đúng hệ + 3000 Vàng (nhân 1/1.5/2 theo độ hiếm).
+- Form 1 bị chặn ở Level 30 (`progression.levelCapForm1`), Form 2 mở tới 50, nên Thức tỉnh là cột mốc rõ ràng thay cho 5 bậc nhỏ.
+- Sim: Level > 30 bắt buộc Form 2; `awakenBonus` Vừa/Khó về 0 (bonus Level đã đủ). Khu Quang/Tim chỉnh hp: [1.35,1.35,1.5,1.85,2.3,2.4], atk [1.15,1.3,1.4,2.1,3.1,3.5].
+- Còn lệch: Thủy Vừa/Khó vẫn dễ (98/83%), Quang Vừa hơi dễ (75%), Tim Khó thấp (23%) và Tim mất ~23 phút/chuyến. Cần dữ liệu chơi thật trước khi chỉnh tiếp.
