@@ -422,7 +422,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       sync();
       busy = false;
       view.canAct = true;
-      if (hint && view.hintKeep) view.hint = view.hintKeep;
+      if (view.hintKeep) view.hint = view.hintKeep;
       return;
     }
     view.tally = { shown: 0, target: 0, pulse: 0 };
@@ -463,7 +463,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       fx.vibrate?.(30);
       onReject?.({ type: 'move', path: d.path });
     } else if (d.path.length >= 2) run({ type: 'move', path: d.path });
-    else { view.board = structuredClone(state.board); if (hint && view.hintKeep) view.hint = view.hintKeep; }
+    else { view.board = structuredClone(state.board); if (view.hintKeep) view.hint = view.hintKeep; }
   }
 
   // Nhấn giữ tướng/quái: xem chi tiết. Chạm nhanh vào tướng: dùng kỹ năng.

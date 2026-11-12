@@ -31,7 +31,7 @@ function enterFullscreen() {
 }
 
 // Trả { el, setProgress(0..1), ready(): Promise } — ready() hiện lời nhắc "chạm để vào" và resolve khi người chơi chạm.
-export function createLoading({ t, title, subtitle, auto = false }) {
+export function createLoading({ t, title, subtitle, version = '', auto = false }) {
   const el = document.createElement('div');
   el.className = 'loading';
   const bar = document.createElement('i');
@@ -59,6 +59,12 @@ export function createLoading({ t, title, subtitle, auto = false }) {
   track.append(bar);
   box.append(h1, ...(subtitle && subtitle !== title ? [sub] : []), track, pct, tip, tap);
   el.append(box);
+  if (version) {
+    const ver = document.createElement('div');
+    ver.className = 'ld-ver';
+    ver.textContent = version;
+    el.append(ver);
+  }
 
   const floors = [...el.querySelectorAll('.fl')];
   let n = Math.floor(Math.random() * TIP_COUNT); // chỉ UI, không phải core

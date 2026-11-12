@@ -965,8 +965,7 @@ function startTutorial(retry = false) {
     intro: null,
     stepper: (state, action) => battleStep(ctx, state, action),
     fx: audio,
-    hint: true,
-    hintOpts: tc.hint,
+    hint: false, // gợi ý do setGuide điều khiển; hint tự động sẽ vẽ đường/chữ khác rồi bị thay → giật
     onInspect: showInspect,
     onSkillAsk(idx, go) { go(); }, // tutorial: dùng kỹ năng ngay, không hỏi xác nhận
     celebrate,
@@ -988,7 +987,7 @@ function startTutorial(retry = false) {
     },
   });
   window.__game = game;
-  setTimeout(() => startLesson(0), 400);
+  startLesson(0);
 }
 
 function startBattleUI() {
@@ -1409,7 +1408,7 @@ try {
 }
 document.title = t('game.title');
 document.documentElement.lang = lang;
-const loading = createLoading({ t, title: t('game.title'), subtitle: 'Rift Spire: Pantheon', auto: DEBUG });
+const loading = createLoading({ t, title: t('game.title'), subtitle: 'Rift Spire: Pantheon', version: `v${VERSION} · build ${BUILD}`, auto: DEBUG });
 screen(loading.el);
 const bootStart = performance.now();
 await preloadAssets((d, n) => loading.setProgress(n ? (d / n) * 0.95 : 0));

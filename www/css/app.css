@@ -891,3 +891,5 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .sm-res .sumgrid { grid-auto-rows: auto; align-content: center; max-height: none; margin: 0; }
 .sm-res .sumcard { aspect-ratio: 3 / 4.3; }
 .sm-res.one .sumcard { aspect-ratio: 3 / 4; min-height: 0; }
+
+.loading .ld-ver { position: absolute; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); text-align: center; font-size: 11px; color: rgba(255, 233, 173, .55); pointer-events: none; }
