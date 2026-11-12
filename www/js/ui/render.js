@@ -496,15 +496,6 @@ export function draw(g, view, t) {
     g.globalAlpha = 1;
   });
 
-  for (const r of view.rings || []) {
-    const k = r.age / r.life;
-    g.globalAlpha = 1 - k;
-    g.strokeStyle = COLORS[r.col];
-    g.lineWidth = 8 * (1 - k) + 2;
-    g.beginPath();
-    g.arc(r.x, r.y, 20 + k * 120, 0, Math.PI * 2);
-    g.stroke();
-  }
   g.globalAlpha = 1;
   for (const sh of view.shots || []) {
     const k = (sh.age - sh.delay) / sh.life;
@@ -528,22 +519,14 @@ export function draw(g, view, t) {
     g.fill();
   }
   g.globalAlpha = 1;
-  for (const q of view.particles || []) {
-    g.globalAlpha = 1 - q.age / q.life;
-    g.fillStyle = q.color || COLORS[q.col] || '#fff';
-    g.beginPath();
-    g.arc(q.x, q.y, q.color ? 4 : 5, 0, Math.PI * 2);
-    g.fill();
-  }
-  g.globalAlpha = 1;
-
   // HUD
   hud(g, view);
   const sh = (view.teamFx || []).find((e) => e.key === 'shield');
   if (sh) text(g, view.t('battle.shield', { n: sh.pool }), W - 16, 336, 15, '#6bd5ff', 'right', '700');
   if (view.teamFx?.length) badges(g, view.teamFx, 16, 326, view);
   if (view.combo > 0) {
-    outlined(g, `${view.combo}`, W / 2 - 128, 338, 54 + Math.min(16, view.combo * 2), '#fff3b0', '#e2a52a', NUM, 5);
+    const heat = view.combo >= 10 ? ['#ffd9d0', '#ff3d2e'] : view.combo >= 6 ? ['#ffe6b0', '#ff8a1f'] : ['#fff3b0', '#e2a52a']; // combo cao: nóng dần
+    outlined(g, `${view.combo}`, W / 2 - 128, 338, Math.round((54 + Math.min(16, view.combo * 2)) * (1 + 0.32 * (view.comboPop || 0))), heat[0], heat[1], NUM, 5);
     text(g, view.t('battle.comboWord'), W / 2 - 128, 364, 13, '#f6edd6', 'center', '700');
   }
   if (view.tally && view.tally.shown > 0) outlined(g, new Intl.NumberFormat(document.documentElement.lang || 'vi').format(Math.round(view.tally.shown)), W / 2 + 90, 340, Math.round(50 * (1 + 0.4 * Math.min(1, view.tally.pulse))), '#fff0d0', '#ff7a2a', NUM, 5);
@@ -853,6 +836,49 @@ export function draw(g, view, t) {
     g.restore();
   }
   // số sát thương từng tướng: nảy ở ô tướng, rồi bay gộp vào ô tổng
+  // Vòng sóng + hạt + lóe màu vẽ SAU bàn ngọc (trước đây nằm dưới bàn nên hạt nổ ở ô ngọc bị che mất)
+  for (const r of view.rings || []) {
+    const k = r.age / r.life;
+    g.globalAlpha = 1 - k;
+    g.strokeStyle = COLORS[r.col];
+    g.lineWidth = 8 * (1 - k) + 2;
+    g.beginPath();
+    g.arc(r.x, r.y, 20 + k * 120, 0, Math.PI * 2);
+    g.stroke();
+  }
+  g.globalAlpha = 1;
+  if (view.tint) {
+    const k = view.tint.age / view.tint.life;
+    g.globalAlpha = 0.2 * Math.sin(Math.min(1, k * 1.6) * Math.PI) * (1 - k * 0.5);
+    g.fillStyle = COLORS[view.tint.col];
+    g.fillRect(0, 0, W, H);
+    g.globalAlpha = 1;
+  }
+  for (const q of view.particles || []) {
+    const k = q.age / q.life;
+    g.globalAlpha = 1 - k;
+    const col = q.color || COLORS[q.col] || '#fff';
+    g.fillStyle = col;
+    if (q.shape === 'bubble') {
+      g.strokeStyle = col; g.lineWidth = 2; g.beginPath(); g.arc(q.x, q.y, q.size, 0, Math.PI * 2); g.stroke();
+      g.globalAlpha = (1 - k) * 0.4; g.fillStyle = '#ffffff'; g.beginPath(); g.arc(q.x - q.size * 0.35, q.y - q.size * 0.35, q.size * 0.22, 0, Math.PI * 2); g.fill();
+    } else if (q.shape === 'leaf') {
+      g.save(); g.translate(q.x, q.y); g.rotate(q.rot); g.beginPath(); g.ellipse(0, 0, q.size, q.size * 0.45, 0, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = 'rgba(20,60,20,.6)'; g.lineWidth = 1; g.beginPath(); g.moveTo(-q.size, 0); g.lineTo(q.size, 0); g.stroke(); g.restore();
+    } else if (q.shape === 'spark') {
+      const sz = q.size * (0.6 + 0.4 * Math.sin(k * Math.PI)); // nhấp nháy: nở rồi tắt
+      g.beginPath(); g.moveTo(q.x, q.y - sz); g.lineTo(q.x + sz * 0.22, q.y - sz * 0.22); g.lineTo(q.x + sz, q.y); g.lineTo(q.x + sz * 0.22, q.y + sz * 0.22);
+      g.lineTo(q.x, q.y + sz); g.lineTo(q.x - sz * 0.22, q.y + sz * 0.22); g.lineTo(q.x - sz, q.y); g.lineTo(q.x - sz * 0.22, q.y - sz * 0.22); g.closePath(); g.fill();
+    } else if (q.shape === 'wisp') {
+      g.globalAlpha = (1 - k) * 0.35; g.beginPath(); g.arc(q.x, q.y, q.size * (1 + k * 0.6), 0, Math.PI * 2); g.fill();
+    } else if (q.shape === 'heart') {
+      g.font = `${Math.round(q.size * 2)}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('♥', q.x, q.y);
+    } else {
+      g.beginPath(); g.arc(q.x, q.y, q.size ?? (q.color ? 4 : 5), 0, Math.PI * 2); g.fill();
+    }
+  }
+  g.globalAlpha = 1;
+
   for (const q of view.pops || []) {
     if (q.age < q.delay) continue;
     const t = q.age - q.delay;

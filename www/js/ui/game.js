@@ -58,6 +58,8 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     hint: null,
     shots: [],
     rings: [],
+    tint: null, // lóe màu hệ phủ cả màn khi tung kỹ năng
+    comboPop: 0, // 1→0: số combo nảy to mỗi lần tăng
     hurt: 0,
     shake: null,
     canAct: true,
@@ -92,6 +94,19 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
 
   const TALLY = { x: W / 2 + 90, y: 340 }; // nơi vẽ tổng sát thương (khớp render.js)
   const enemyX = (i) => (W / state.enemies.length) * i + W / state.enemies.length / 2;
+  // Kỹ năng theo hệ: lớp hạt riêng (bong bóng / tàn lửa / lá / tia sáng / khói tím / tim) + lóe màu nhẹ toàn màn.
+  const castFx = (el) => {
+    const R = Math.random;
+    const P = view.particles;
+    const add = (n, mk) => { for (let i = 0; i < n; i++) P.push({ age: 0, ...mk(i) }); };
+    view.tint = { col: el, age: 0, life: 520 };
+    if (el === 0) add(20, () => ({ shape: 'bubble', x: R() * W, y: 560 + R() * 360, vx: (R() - 0.5) * 0.03, vy: -0.05 - R() * 0.09, g: -0.00003, size: 5 + R() * 9, col: 0, life: 1100 + R() * 500 }));
+    else if (el === 1) add(44, () => ({ shape: 'ember', x: R() * W, y: 700 + R() * 240, vx: (R() - 0.5) * 0.06, vy: -0.13 - R() * 0.2, g: -0.00008, size: 3 + R() * 4.5, color: R() < 0.5 ? '#ffb347' : '#ff6a2a', life: 800 + R() * 500 }));
+    else if (el === 2) add(18, () => ({ shape: 'leaf', x: R() * W, y: -10 + R() * 120, vx: (R() - 0.5) * 0.05, vy: 0.05 + R() * 0.08, g: 0, size: 7 + R() * 6, rot: R() * 6, vr: (R() - 0.5) * 0.008, col: 2, life: 1300 + R() * 500 }));
+    else if (el === 3) add(26, () => ({ shape: 'spark', x: 30 + R() * (W - 60), y: 130 + R() * 640, vx: 0, vy: -0.01, g: 0, size: 5 + R() * 8, color: R() < 0.5 ? '#fff6c0' : '#ffd84a', life: 700 + R() * 600 }));
+    else if (el === 4) add(16, () => ({ shape: 'wisp', x: R() * W, y: 200 + R() * 400, vx: (R() - 0.5) * 0.03, vy: -0.02 - R() * 0.04, g: 0, size: 14 + R() * 16, color: R() < 0.5 ? '#8a4cff' : '#4b2a8a', life: 1100 + R() * 500 }));
+    else add(14, () => ({ shape: 'heart', x: 40 + R() * (W - 80), y: 520 + R() * 380, vx: (R() - 0.5) * 0.03, vy: -0.07 - R() * 0.08, g: 0, size: 12 + R() * 10, color: R() < 0.5 ? '#ff8fba' : '#ffc2d8', life: 1100 + R() * 400 }));
+  };
   const floater = (s, x, y, color, size = 26, kind = 'text', life = 1000) => view.floaters.push({ s, x: Math.max(70, Math.min(W - 70, x)), y, color, size, kind, age: 0, life });
   const nf = new Intl.NumberFormat(typeof document !== 'undefined' ? document.documentElement.lang || 'vi' : 'vi');
   const fmt = (n) => nf.format(n);
@@ -340,6 +355,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
           const cy = xs.reduce((a, q) => a + q.y, 0) / xs.length;
           view.hl = new Set(g.cells);
           view.combo = e.comboStart + gi;
+          view.comboPop = 1;
           fx.sfx(view.combo > 1 ? 'combo' : 'match', 1 + Math.min(8, view.combo - 1) * 0.06);
           fx.vibrate(10);
           floater(t('battle.combo', { n: view.combo }), cx, cy, '#ffffff', 22 + Math.min(14, view.combo));
@@ -372,6 +388,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         await sleep(ANIM.afterFall);
       } else if (e.type === 'skill' || e.type === 'duo' || e.type === 'passive') {
         // Kỹ năng đúng hệ của tướng tung ra (Duo dùng tiếng kép riêng); thiếu mẫu thì rơi về tiếng chung.
+        castFx(state.members[e.type === 'duo' ? e.slot : e.member]?.element ?? 5);
         fx.sfx(e.type === 'duo' ? 'skill2' : `skill_${SKILL_SFX[state.members[e.member]?.element] ?? 'heart'}`);
         for (const who of e.type === 'duo' ? [e.slot, e.slot + 1] : [e.member]) {
           const m = state.members[who];
@@ -729,8 +746,11 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       q.age += dt;
       q.x += q.vx * dt;
       q.y += q.vy * dt;
-      q.vy += 0.0004 * dt;
+      q.vy += (q.g ?? 0.0004) * dt;
+      if (q.vr) q.rot += q.vr * dt;
     }
+    if (view.tint && (view.tint.age += dt) > view.tint.life) view.tint = null;
+    if (view.comboPop > 0) view.comboPop = Math.max(0, view.comboPop - dt / 260);
     view.particles = view.particles.filter((q) => q.age < q.life);
     view.hurt = Math.max(0, view.hurt - dt / 450);
     if (view.lunge) { view.lunge.age += dt; if (view.lunge.age > 520) view.lunge = null; }
@@ -780,6 +800,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     getHint: () => (view.hint ? view.hint.path.slice() : null),
     getDragPath: () => (drag ? drag.path.slice() : null),
     getState: () => state,
+    fxCast: castFx, fxView: () => view, // dùng cho ảnh chụp kiểm tra hiệu ứng
     refresh: sync, // dùng cho test/debug: đồng bộ view từ state
     isBusy: () => busy,
     destroy() {

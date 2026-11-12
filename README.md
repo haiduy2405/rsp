@@ -443,3 +443,9 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - **Nhạc nền thật (CC0):** 18 bài của Juhani Junkala (JRPG Music Pack #1 Exploration, #2 Towns, #3 Evil, #5 Action; CC0, không bắt buộc ghi nguồn nhưng xin cảm ơn tác giả: juhanijunkala.com), nén mp3 56 kbps lặp liền mạch vào `www/assets/music/` (10.7 MB). Bảng ghép tên bài trong game → file nằm ở `data/audio.json` mục `music` (sinh bởi `tools/build-music.py <thư mục ogg>`; ogg gốc không nằm trong repo).
 - Ghép: màn chính=Home Town, hướng dẫn=Grasslands, đội hình=Where Time Stands Still, shop=Bazaar, triệu hồi=Whispers From Beyond, sự kiện=Sneaking Around; map vùng Thủy/Hỏa/Mộc/Quang/Ám/Tâm = Tropical Island / Tha'el Mines / Prairie Nights / Sunshine Coast / Catacombs / Where Time Stands Still; trận = Action 1-3 xoay theo vùng; boss = Evil 1/3/4. Ước, thắng, thua vẫn dùng bản tự sinh.
 - `ui/audio.js`: phát file qua AudioBuffer lặp, tải khi cần (giữ tối đa 3 bài trong RAM), chuyển bài mờ dần; bài file tải lỗi (offline chưa tải) tự rơi về bài tự sinh cùng tên. "Tải dữ liệu offline" nay nặng hơn (~17 MB).
+
+### v0.61.0
+- **Hiệu ứng kỹ năng theo hệ** (`castFx` trong `ui/game.js`): Thủy bong bóng nổi lên, Hỏa tàn lửa bay, Mộc lá rơi, Quang tia sao nhấp nháy, Ám khói tím, Tâm trái tim bay lên, cộng lóe màu hệ nhẹ phủ cả màn. Hạt có hình riêng (`shape`: bubble/ember/leaf/spark/wisp/heart) và trọng lực riêng (`g`).
+- **Sửa lỗi hiển thị:** vòng sóng và hạt nổ khi ngọc vỡ trước đây vẽ DƯỚI bàn ngọc nên không thấy; nay vẽ sau bàn.
+- Số combo nảy to mỗi lần tăng và ngả nóng dần (vàng → cam từ combo 6 → đỏ từ combo 10).
+- `tests/e2e/castfx.cjs`: chụp 6 hiệu ứng kỹ năng ở màn hướng dẫn (dùng `__game.fxCast`).
