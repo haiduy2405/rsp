@@ -189,3 +189,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 ## v0.28.2 – Cân bằng khu
 - Theo lệnh Duy: Thủy khó hơn (HP ×1,4, ATK ×1,25), Hỏa nhẹ lên (×1,1/×1,08), Ám giảm nhẹ (×0,92), Tim dễ hơn (×0,78/×0,8). Máy chơi giả: thắng Thủy 99% · Hỏa 95% · Mộc 90% · Quang 81% · Ám 78% · Tim 70% (trước: 100/98/90/81/69/43), thời lượng chuyến Thủy 8,6→13,6 phút.
 - Nguồn mảnh 5★: sẽ đến từ các sự kiện sau này (chưa làm gì ở bản này).
+
+## v0.28.3 – Màu trận đấu theo art mới
+- Bàn ngọc, thẻ tướng và chấm kỹ năng đổi từ chàm sang nâu đất; bỏ lớp khử bão hòa/phủ tối của nền trận cũ vì nền mới đã ấm sẵn.

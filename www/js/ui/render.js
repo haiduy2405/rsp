@@ -138,11 +138,11 @@ function brackets(g, x, y, w, h, len, color, lw = 2) {
 }
 function panel(g, x, y, w, h, accent) {
   const gr = g.createLinearGradient(0, y, 0, y + h);
-  gr.addColorStop(0, 'rgba(46, 36, 118, 0.88)');
+  gr.addColorStop(0, 'rgba(84, 52, 30, 0.9)');
   gr.addColorStop(1, 'rgba(34,20,12, 0.94)');
   g.fillStyle = gr;
   g.fillRect(x, y, w, h);
-  g.strokeStyle = 'rgba(130,119,216,0.95)';
+  g.strokeStyle = 'rgba(211,154,94,0.95)';
   g.lineWidth = 1;
   g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
   if (accent) {
@@ -300,16 +300,9 @@ export function draw(g, view, t) {
   const bg = getImg('bg:battle');
   if (bg) {
     g.drawImage(bg, 0, 0, W, H);
-    // Phối lại cho hợp bảng màu mực: bớt bão hòa nền tím, phủ mực tối và một vệt đỏ ấm ở chân cảnh.
-    g.save();
-    g.globalCompositeOperation = 'saturation';
-    g.globalAlpha = 0.55;
-    g.fillStyle = '#808080';
-    g.fillRect(0, 0, W, 372);
-    g.restore();
     const ink = g.createLinearGradient(0, 0, 0, 372);
-    ink.addColorStop(0, 'rgba(28,16,9,0.5)');
-    ink.addColorStop(1, 'rgba(60,18,16,0.38)');
+    ink.addColorStop(0, 'rgba(28,16,9,0.12)');
+    ink.addColorStop(1, 'rgba(60,30,16,0.12)');
     g.fillStyle = ink;
     g.fillRect(0, 0, W, 372);
   }
@@ -491,7 +484,7 @@ export function draw(g, view, t) {
       const gap = Math.min(12, 80 / n);
       const x0 = x + 49 - ((n - 1) * gap) / 2;
       for (let k = 0; k < n; k++) {
-        g.fillStyle = k < m.skillCd ? '#8a93d8' : 'rgba(138,147,216,0.25)';
+        g.fillStyle = k < m.skillCd ? '#e8b878' : 'rgba(232,184,120,0.25)';
         g.beginPath();
         g.arc(x0 + k * gap, y + 62 + oy, 3, 0, Math.PI * 2);
         g.fill();
@@ -514,7 +507,7 @@ export function draw(g, view, t) {
     g.beginPath();
     g.roundRect(cx - 28, 384, 56, 22, 3);
     g.fill();
-    g.strokeStyle = ready ? '#fff0bd' : '#4a56b8';
+    g.strokeStyle = ready ? '#fff0bd' : '#9a6a3a';
     g.lineWidth = 1;
     g.stroke();
     text(g, ready ? view.t('battle.duo') : `${view.t('battle.duo')} ${d.cd}`, cx, 395.5, 12, ready ? '#2a1600' : '#aab0ff', 'center', '800');
@@ -537,7 +530,7 @@ export function draw(g, view, t) {
   g.fillRect(0, BOARD_Y, W, ROWS * CELL);
   for (let r = 0; r < ROWS; r++)
     for (let c = 0; c < COLS; c++) {
-      g.fillStyle = (r + c) % 2 ? 'rgba(44, 34, 108, 0.55)' : 'rgba(26, 20, 76, 0.55)';
+      g.fillStyle = (r + c) % 2 ? 'rgba(96, 62, 36, 0.6)' : 'rgba(66, 40, 22, 0.6)';
       g.beginPath();
       g.roundRect(BOARD_X + c * CELL + 2, BOARD_Y + r * CELL + 2, CELL - 4, CELL - 4, 8);
       g.fill();
