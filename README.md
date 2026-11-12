@@ -381,3 +381,7 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ### v0.51.0
 - Lần đầu vào Đội hình: chỉ tay vào 1 tướng (nhấn giữ để xem chi tiết). Mở chi tiết lần đầu thì dẫn từng mục (tên/hệ/tộc, chỉ số, cấp, chủ động, đội trưởng, bị động, Duo, từ khóa, nâng cấp, nâng kỹ năng, thức tỉnh) bằng vòng sáng + chú thích, có nút Tiếp/Bỏ qua. Lưu ở `progress.onboarding.teamTour`. Test: `tests/e2e/herotour.cjs`.
+
+### v0.51.1
+- Thêm `docs/AUDIT_PROMPT.md` (prompt kiểm định tái dùng) và `docs/AUDIT_2026-11-12.md` (kết quả lần chạy đầu).
+- `tools/balance-sim.js`: bot biết bấm Tiêu khi Dừng Thời Gian (trước đó kẹt, mỗi chuyến ~120 phút).

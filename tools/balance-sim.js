@@ -70,8 +70,10 @@ function playTurn(state, rng, K) {
   for (let k = 0; k < K; k++) {
     const p = randomPath(rng, s.locked);
     if (!p) continue;
-    const r = step(ctx, s, { type: 'move', path: p });
+    let r = step(ctx, s, { type: 'move', path: p });
     if (r.events[0]?.type === 'invalid') continue;
+    // Dừng Thời Gian: nước kéo chỉ hoán đổi; bot hoán đổi 1 lần rồi bấm Tiêu (clear) để tính cụm và tốn lượt.
+    if (r.events[0]?.type === 'swap') { const c = step(ctx, r.state, { type: 'clear' }); if (c.events[0]?.type === 'invalid') continue; r = c; }
     const sc = score(r.events, s, r.state);
     if (!best || sc > best.sc) best = { sc, state: r.state };
   }
