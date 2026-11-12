@@ -15,9 +15,9 @@ const ctx = buildCtx({
   zones: rd('zones.json'), events: rd('events.json'),
 });
 
-export function simulateRun(ctx, seed, zoneId, pityMissed) {
+export function simulateRun(ctx, seed, zoneId, pityMissed, diff = 'easy') {
   const pick = mulberry32(seed ^ 0x9e3779b9);
-  let run = createRun(ctx, { seed, zoneId, team: DEFAULT_TEAM, pityMissed });
+  let run = createRun(ctx, { seed, zoneId, team: DEFAULT_TEAM, pityMissed, diff });
   for (let guard = 0; run.phase !== 'end' && guard < 200; guard++) {
     if (run.phase === 'doors') run = runStep(ctx, run, { type: 'door', index: pick.int(run.doors.length) }).run;
     else if (run.phase === 'battle') run = debugWinBattle(ctx, run);

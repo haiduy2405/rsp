@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { expected } from '../tools/check-assets.js';
 
-test('danh sách mong đợi: 24 nhân vật x2 + 24 quái + 6 ngọc + 3', () => {
-  assert.equal(Object.keys(expected()).length, 24 * 2 + 24 + 6 + 3);
+test('danh sách mong đợi: 24 nhân vật x2 + 27 quái + 6 ngọc + 3', () => {
+  assert.equal(Object.keys(expected()).length, 24 * 2 + 27 + 6 + 3);
 });
 
 test('manifest chỉ chứa mục hợp lệ và file có thật', () => {

@@ -1,7 +1,7 @@
 import { newSummonState } from './summon.js';
 import { newPlayer } from './onboarding.js';
 // Tiến trình người chơi (dữ liệu được lưu). Hàm thuần: nhận progress, trả progress mới.
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 
 export const DEFAULT_TEAM = ['thetis', 'bennu', 'atalanta', 'eos', 'eir'];
 
@@ -12,7 +12,7 @@ export function newProgress(ctx) {
     version: SAVE_VERSION,
     inventory: { gold: 0, essence: 0, spirit: 0, shards: 0, stones },
     unlocked: [ctx.zoneList[0].id],
-    clears: {},
+    clears: {}, // { zoneId: { easy, normal, hard } } số lần thắng
     pity: {},
     stats: { runs: 0, wins: 0, losses: 0 },
     characters: Object.fromEntries(DEFAULT_TEAM.map((id) => [id, { level: 1, awaken: 0 }])),
@@ -48,7 +48,7 @@ export function isValidProgress(p) {
   return true;
 }
 
-// Cộng kết quả một chuyến đã kết thúc vào tiến trình. Thắng mở khu kế tiếp.
+// Cộng kết quả một chuyến đã kết thúc vào tiến trình. Thắng Dễ mở khu kế tiếp, thắng độ khó nào thì mở độ khó sau của khu đó (xem core/stage.js).
 export function applyRunResult(ctx, progress, run) {
   if (run.phase !== 'end') throw new Error('run chưa kết thúc');
   const p = structuredClone(progress);
@@ -64,9 +64,10 @@ export function applyRunResult(ctx, progress, run) {
   p.stats.runs += 1;
   if (run.result === 'won') {
     p.stats.wins += 1;
-    p.clears[run.zoneId] = (p.clears[run.zoneId] || 0) + 1;
+    const c = (p.clears[run.zoneId] ??= {});
+    c[run.diff] = (c[run.diff] || 0) + 1;
     const next = ctx.zoneList[zone.order + 1];
-    if (next && !p.unlocked.includes(next.id)) p.unlocked.push(next.id);
+    if (run.diff === ctx.config.difficulty.order[0] && next && !p.unlocked.includes(next.id)) p.unlocked.push(next.id); // thắng Dễ mở khu kế
   } else {
     p.stats.losses += 1;
   }

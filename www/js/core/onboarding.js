@@ -1,4 +1,5 @@
 // Tạo nhân vật người chơi (phi hành gia, chỉ Cấp Neo, không chỉ số chiến đấu) và nhật ký cốt truyện.
+import { zoneClears } from './stage.js';
 const fail = (reason) => ({ ok: false, reason });
 const clean = (s) => String(s ?? '').replace(/\s+/g, ' ').trim();
 
@@ -48,5 +49,5 @@ export function completeTutorial(progress) {
 // Các đoạn nhật ký đã mở: đoạn mở đầu (sau onboarding) và đoạn theo từng khu đã vượt.
 export function storyUnlocked(ctx, progress) {
   if (!progress.onboarding.done) return [];
-  return ctx.storyList.filter((s) => s.after === null || (progress.clears[s.after] || 0) > 0).map((s) => s.id);
+  return ctx.storyList.filter((s) => s.after === null || zoneClears(progress, s.after) > 0).map((s) => s.id);
 }

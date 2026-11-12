@@ -16,16 +16,19 @@ export function addLoot(a, b) {
 const between = (rng, [lo, hi]) => lo + rng.int(hi - lo + 1);
 
 // kind: 'normal' | 'elite' | 'boss' | 'chest' | 'completion'. Thứ tự gọi rng cố định.
-export function rollLoot(ctx, kind, rng) {
+// diff: độ khó. Khó hơn thì Vàng/Tinh Hoa nhiều hơn (difficulty.gold) và mọi tỉ lệ rớt cao hơn (difficulty.drop, tối đa 100%).
+export function rollLoot(ctx, kind, rng, diff = 'easy') {
   const spec = ctx.config.loot[kind];
+  const d = ctx.config.difficulty[diff];
+  const chance = (c) => Math.min(1, c * d.drop);
   const out = emptyLoot();
-  out.gold = between(rng, spec.gold);
-  out.essence = between(rng, spec.essence);
+  out.gold = Math.round(between(rng, spec.gold) * d.gold);
+  out.essence = Math.round(between(rng, spec.essence) * d.gold);
   if (spec.stone) {
-    if (rng.next() < spec.stone.normalChance) out.stones.normal = between(rng, spec.stone.normalCount);
-    if (rng.next() < spec.stone.rareChance) out.stones.rare = 1;
+    if (rng.next() < chance(spec.stone.normalChance)) out.stones.normal = between(rng, spec.stone.normalCount);
+    if (rng.next() < chance(spec.stone.rareChance)) out.stones.rare = 1;
   }
-  if (spec.shard && rng.next() < spec.shard.chance) out.shards = between(rng, spec.shard.count);
-  if (spec.spirit && rng.next() < spec.spirit.chance) out.spirit = between(rng, spec.spirit.count);
+  if (spec.shard && rng.next() < chance(spec.shard.chance)) out.shards = between(rng, spec.shard.count);
+  if (spec.spirit && rng.next() < chance(spec.spirit.chance)) out.spirit = between(rng, spec.spirit.count);
   return out;
 }

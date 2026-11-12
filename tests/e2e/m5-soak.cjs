@@ -29,6 +29,7 @@ const minutes = Number(process.argv[2] || 30);
     if (await click('#leave')) continue;
     if (await click('[data-choice="0"]')) continue;
     if (await click('[data-door="0"]')) continue;
+    if (await click('[data-stage=easy]')) continue;
     if (await click('#back')) continue;
     if (await click('#ob-hub')) continue;
     if (await click('[data-zone]')) continue;

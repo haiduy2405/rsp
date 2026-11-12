@@ -85,3 +85,10 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 - `www/js/ui/loading.js`: màn hình tải (tháp sáng dần theo tiến độ, mẹo xoay vòng `load.tip.*`, "Chạm để vào" cũng mở khóa âm thanh). Thêm mẹo mới: thêm key `load.tip.N` ở cả hai file i18n và tăng `TIP_COUNT`.
 - `www/js/ui/offline.js` + Cài đặt → "Dữ liệu offline": tải toàn bộ tệp liệt kê trong `www/precache.json` vào Cache Storage `rsp-v1` (cùng kho với `sw.js`). `precache.json` do `tools/gen-precache.js` sinh, tự chạy trong `npm run stamp`.
 - Khi game nặng hơn (art/nhạc thật): không cần sửa code, chỉ stamp lại là nút tải tính đúng dung lượng.
+
+## Ải 3 độ khó, đường đi roguelike (v0.11)
+- Mỗi khu có 3 độ khó **Dễ → Vừa → Khó**, mở lần lượt (`core/stage.js`). Thắng Dễ mở khu kế; Vừa/Khó chỉ để farm nguyên liệu (rớt nhiều và ngon hơn: `config.difficulty.*.gold/drop`).
+- Mọi ải cùng bố cục `config.run.layout` (5 tầng, 3 cửa mỗi tầng): 2 tầng toàn cửa đánh (thường, thỉnh thoảng Elite), 1 tầng tự do (rương/nghỉ/sự kiện/shop/trận), 1 tầng Elite bắt buộc, rồi Boss cuối ải. Mọi đường đều qua ít nhất 2 trận thường + 1 Elite + Boss. Mọi khu có Boss riêng.
+- Chưa có năng lượng/stamina. Khi làm: thêm chi phí theo độ khó vào `config.difficulty` (Dễ ít, Khó nhiều) và trừ lúc `startRun` trong `main.js`.
+- Save v5: `clears` theo độ khó `{ zoneId: { easy, normal, hard } }` (migrate v4 → v5 tự động).
+- Cân bằng: `DIFF=hard node tools/balance-sim.js --targets` (đội mạnh hơn theo `difficulty.*.sim`).

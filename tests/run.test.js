@@ -38,59 +38,81 @@ function rigLose(run) {
 const winMove = { type: 'battle', action: { type: 'move', path: [0, 1] } };
 const noMatchMove = { type: 'battle', action: { type: 'move', path: [0, 1] } };
 
-function findRun(pred, zoneId = 'zone_water') {
+// Tìm chuyến có cửa thỏa pred ở tầng `floor` (mặc định tầng 0). Tầng tự do (xen kẽ) là nơi có rương/nghỉ/sự kiện/shop.
+function findRun(pred, zoneId = 'zone_water', floor = 0) {
   for (let seed = 1; seed < 2000; seed++) {
     const run = mk(seed, zoneId);
+    if (floor) { run.floor = floor; run.doors = freeDoors(seed); }
     const idx = pred(run);
     if (idx >= 0) return { run, idx };
   }
   throw new Error('không tìm được seed');
 }
+const freeDoors = (seed) => { const all = ['normal', 'chest', 'rest', 'event', 'shop']; const o = seed % all.length; return [all[o], all[(o + 1) % 5], all[(o + 2) % 5]]; };
 const doorOf = (type) => (run) => run.doors.indexOf(type);
 
-test('run: tạo chuyến xác định, 3-5 ải, hai cửa khác nhau trừ ải cuối', () => {
+test('run: tạo chuyến xác định, mọi ải cùng số tầng, 3 cửa mỗi tầng trừ Boss cuối', () => {
   assert.deepEqual(mk(5), mk(5));
-  const seen = new Set();
+  const { layout } = ctx.config.run;
   for (let seed = 0; seed < 300; seed++) {
     const r = mk(seed);
-    assert.ok(r.floors >= 3 && r.floors <= 5);
-    assert.equal(r.doors.length, 2);
-    assert.notEqual(r.doors[0], r.doors[1]);
+    assert.equal(r.floors, layout.length);
+    assert.equal(r.doors.length, layout[0].doors);
+    assert.equal(r.doors.length, 3);
     assert.equal(r.hp, r.maxHp, 'chuyến mới hồi đầy máu');
-    seen.add(r.floors);
   }
-  assert.deepEqual([...seen].sort(), [3, 4, 5]);
 });
 
-test('run: ải cuối cố định, Boss ở khu 2/4/6 và Elite ở khu 1/3/5', () => {
+test('run: mọi đường đều qua trận thường, đúng 1 tầng Elite bắt buộc rồi Boss cuối ải (mọi khu)', () => {
+  const { layout, pools } = ctx.config.run;
+  assert.equal(layout.at(-1).pool, 'boss');
+  assert.deepEqual(Object.keys(pools.boss), ['boss']);
+  assert.deepEqual(Object.keys(pools.elite), ['elite']);
+  assert.equal(layout.filter((l) => l.pool === 'elite').length, 1);
+  assert.ok(layout.filter((l) => l.pool === 'fight').length >= 2, 'vài tầng toàn cửa đánh');
+  assert.deepEqual(Object.keys(pools.fight).sort(), ['elite', 'normal']);
   for (const z of ctx.zoneList) {
-    const expect = z.order % 2 === 1 ? 'boss' : 'elite';
-    assert.equal(z.final, expect, z.id);
-    let run = mk(3, z.id);
-    // đánh thẳng đến ải cuối bằng cách thắng mọi trận
-    let guard = 0;
-    while (run.floor < run.floors - 1 && guard++ < 200) {
-      if (run.phase === 'doors') run = runStep(ctx, run, { type: 'door', index: 0 }).run;
-      else if (run.phase === 'battle') run = runStep(ctx, rigWin(run), winMove).run;
-      else if (run.phase === 'result') run = runStep(ctx, run, { type: 'continue' }).run;
-      else if (run.phase === 'event') run = runStep(ctx, run, { type: 'eventChoice', index: 1 }).run;
-      else if (run.phase === 'shop') run = runStep(ctx, run, { type: 'leaveShop' }).run;
+    assert.ok(z.monsters.boss.length >= 1, z.id);
+    // Đường nào cũng vậy: chọn lần lượt từng cửa (0, 1, 2) đi hết ải; mỗi tầng "fight/elite/boss" chỉ có cửa đánh.
+    for (const pick of [0, 1, 2]) {
+      let run = mk(3, z.id);
+      let fights = 0;
+      let elites = 0;
+      let guard = 0;
+      while (run.phase !== 'end' && guard++ < 300) {
+        if (run.phase === 'doors') {
+          const pool = layout[run.floor].pool;
+          if (pool !== 'free') assert.ok(run.doors.every((d) => ['normal', 'elite', 'boss'].includes(d)), `${pool}: ${run.doors}`);
+          if (pool === 'free') assert.equal(new Set(run.doors).size, run.doors.length, 'cửa tầng tự do khác nhau');
+          if (pool === 'elite') assert.ok(run.doors.every((d) => d === 'elite'));
+          if (pool === 'boss') assert.deepEqual(run.doors, ['boss']);
+          const door = Math.min(pick, run.doors.length - 1);
+          if (['normal', 'elite', 'boss'].includes(run.doors[door])) fights++;
+          if (run.doors[door] === 'elite') elites++;
+          run = runStep(ctx, run, { type: 'door', index: door }).run;
+        } else if (run.phase === 'battle') run = runStep(ctx, rigWin(run), winMove).run;
+        else if (run.phase === 'result') run = runStep(ctx, run, { type: 'continue' }).run;
+        else if (run.phase === 'event') run = runStep(ctx, run, { type: 'eventChoice', index: 1 }).run;
+        else if (run.phase === 'shop') run = runStep(ctx, run, { type: 'leaveShop' }).run;
+      }
+      assert.equal(run.result, 'won', z.id);
+      assert.ok(fights >= 4, `${z.id} đường ${pick}: ${fights} trận`); // >= 2 thường + 1 elite + boss
+      assert.ok(elites >= 1);
     }
-    assert.deepEqual(run.doors, [expect], z.id);
   }
 });
 
 test('run: rương nhận loot, nghỉ hồi máu không quá tối đa, sau đó sang ải kế', () => {
-  const { run, idx } = findRun(doorOf('chest'));
+  const { run, idx } = findRun(doorOf('chest'), 'zone_water', 1);
   const r1 = runStep(ctx, run, { type: 'door', index: idx }).run;
   assert.equal(r1.phase, 'result');
   assert.equal(r1.lastResult.kind, 'chest');
   assert.ok(r1.loot.gold > 0 && r1.loot.essence > 0);
   const r2 = runStep(ctx, r1, { type: 'continue' }).run;
   assert.equal(r2.phase, 'doors');
-  assert.equal(r2.floor, 1);
+  assert.equal(r2.floor, 2);
 
-  const f = findRun(doorOf('rest'));
+  const f = findRun(doorOf('rest'), 'zone_water', 1);
   const hurt = { ...f.run, hp: 100 };
   const rr = runStep(ctx, hurt, { type: 'door', index: f.idx }).run;
   assert.equal(rr.hp, 100 + Math.round(rr.maxHp * ctx.config.run.restHealPct));
@@ -128,7 +150,7 @@ test('run: quái mạnh dần theo ải (floorScale)', () => {
   const base = Math.round(ctx.monsters[a.battle.enemies[0].id].hp * (zs.hp[order] ?? 1));
   assert.equal(a.battle.enemies[0].maxHp, base); // ải 0: chỉ nhân hệ số khu
   const later = { ...run, floor: 2 };
-  later.doors = ['normal', 'chest'];
+  later.doors = ['normal', 'chest', 'rest'];
   const b = runStep(ctx, later, { type: 'door', index: 0 }).run;
   assert.equal(b.battle.enemies[0].maxHp, Math.round(ctx.monsters[b.battle.enemies[0].id].hp * (1 + ctx.config.run.floorScale.hp * 2) * (zs.hp[order] ?? 1)));
 });
@@ -229,7 +251,7 @@ test('event: mọi lựa chọn của mọi sự kiện áp dụng được, má
 });
 
 test('shop: mua cần đủ Vàng, mỗi ô chỉ mua một lần, rời shop sang ải kế', () => {
-  const { run, idx } = findRun(doorOf('shop'));
+  const { run, idx } = findRun(doorOf('shop'), 'zone_water', 1);
   let r = runStep(ctx, run, { type: 'door', index: idx }).run;
   assert.equal(r.phase, 'shop');
   assert.equal(r.shop.length, ctx.config.run.shopSlots);
@@ -243,7 +265,7 @@ test('shop: mua cần đủ Vàng, mỗi ô chỉ mua một lần, rời shop sa
   assert.equal(runStep(ctx, r, { type: 'buy', slot: 0 }).events[0].reason, 'bad_slot');
   r = runStep(ctx, r, { type: 'leaveShop' }).run;
   assert.equal(r.phase, 'doors');
-  assert.equal(r.floor, 1);
+  assert.equal(r.floor, 2);
 });
 
 test('run: hành động sai pha bị từ chối, state không đổi', () => {
@@ -319,7 +341,7 @@ test('progress: kết quả chuyến cộng vào kho, thắng mở khu kế, thu
   assert.equal(p.inventory.gold, won.loot.gold);
   assert.equal(p.inventory.stones[0].normal, won.loot.stones.normal); // Thủy = hệ 0
   assert.equal(p.inventory.stones[1].normal, 0);
-  assert.equal(p.clears.zone_water, 1);
+  assert.equal(p.clears.zone_water.easy, 1);
   assert.equal(p.stats.wins, 1);
   assert.equal(p.pity.zone_water, won.rareMissed);
   assert.ok(isValidProgress(p));

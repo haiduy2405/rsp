@@ -44,21 +44,51 @@
     "base": 1.0
   },
   "run": {
-    "floors": {
-      "min": 3,
-      "max": 5
+    "layout": [
+      {
+        "pool": "fight",
+        "doors": 3
+      },
+      {
+        "pool": "fight",
+        "doors": 3
+      },
+      {
+        "pool": "free",
+        "doors": 3,
+        "distinct": true
+      },
+      {
+        "pool": "elite",
+        "doors": 3
+      },
+      {
+        "pool": "boss",
+        "doors": 1
+      }
+    ],
+    "pools": {
+      "fight": {
+        "normal": 80,
+        "elite": 20
+      },
+      "free": {
+        "normal": 30,
+        "chest": 20,
+        "rest": 20,
+        "event": 15,
+        "shop": 15
+      },
+      "elite": {
+        "elite": 1
+      },
+      "boss": {
+        "boss": 1
+      }
     },
     "floorScale": {
-      "hp": 0.15,
-      "atk": 0.1
-    },
-    "doorWeights": {
-      "normal": 50,
-      "elite": 14,
-      "chest": 10,
-      "rest": 10,
-      "event": 8,
-      "shop": 8
+      "hp": 0.12,
+      "atk": 0.08
     },
     "restHealPct": 0.3,
     "shopSlots": 3,
@@ -77,14 +107,21 @@
       }
     },
     "zoneScale": {
-      "hp": [1.2, 1.25, 2.2, 2.6, 3.2, 3.5],
+      "hp": [
+        1.15,
+        1.15,
+        1.45,
+        1.85,
+        2.3,
+        2.6
+      ],
       "atk": [
         1,
-        1.38,
+        1.3,
+        1.6,
         2.1,
-        2.5,
-        4.1,
-        5.0
+        3.1,
+        4.2
       ]
     }
   },
@@ -421,6 +458,46 @@
           0.5,
           0.75
         ]
+      }
+    }
+  },
+  "difficulty": {
+    "order": [
+      "easy",
+      "normal",
+      "hard"
+    ],
+    "easy": {
+      "hp": 1.0,
+      "atk": 1.0,
+      "gold": 1.0,
+      "drop": 1.0,
+      "sim": {
+        "levelBonus": 0,
+        "awakenBonus": 0,
+        "winShift": 0
+      }
+    },
+    "normal": {
+      "hp": 1.2,
+      "atk": 1.35,
+      "gold": 1.5,
+      "drop": 1.5,
+      "sim": {
+        "levelBonus": 4,
+        "awakenBonus": 1,
+        "winShift": -0.1
+      }
+    },
+    "hard": {
+      "hp": 1.4,
+      "atk": 1.65,
+      "gold": 2.2,
+      "drop": 2.2,
+      "sim": {
+        "levelBonus": 8,
+        "awakenBonus": 1,
+        "winShift": -0.2
       }
     }
   }

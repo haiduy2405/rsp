@@ -6,7 +6,7 @@ const { chromium, devices } = require('playwright');
   await p.goto('http://localhost:8080/?debug'); await p.evaluate(() => localStorage.clear()); await p.reload();
   await p.tap('#ob-skip'); await p.tap('#ob-next'); await p.tap('[data-culture=viet]'); await p.tap('#ob-next'); await p.tap('#ob-next');
   await p.fill('#ob-name', 'Duy'); await p.fill('#ob-callsign', 'Sao'); await p.tap('#ob-start'); await p.tap('#ob-hub');
-  await p.tap('[data-zone]'); await p.tap('#team-go');
+  await p.tap('[data-zone]'); await p.tap('[data-stage=easy]'); await p.tap('#team-go');
   for (const d of [0, 1, 2]) { if (!(await p.locator('[data-door]').count())) break; await p.tap(`[data-door="${d}"]`).catch(() => {}); await p.waitForTimeout(300); if (await p.locator('#continue').count()) { await p.tap('#continue'); continue; } break; }
   for (const s2 of ['#tut-next', '#tut-next', '#tut-go']) { await p.waitForSelector(s2, { timeout: 800 }).catch(() => {}); if (await p.locator(s2).count()) await p.tap(s2); }
   await p.waitForTimeout(500);

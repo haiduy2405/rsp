@@ -2,7 +2,7 @@ const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 411, height: 732 } });
   p.on('pageerror',e=>console.log('PAGEERR',e.message)); p.on('console',m=>m.type()==='error'&&console.log('CONSOLEERR',m.text())); await p.goto('http://localhost:8080/?debug'); await p.click('#ob-skip'); await p.click('#ob-next'); await p.click('[data-culture=viet]'); await p.click('#ob-next'); await p.click('#ob-next');
-  await p.fill('#ob-name','P'); await p.fill('#ob-callsign','P'); await p.click('#ob-start'); await p.click('#ob-hub'); await p.click('[data-zone]'); await p.click('#team-go');
+  await p.fill('#ob-name','P'); await p.fill('#ob-callsign','P'); await p.click('#ob-start'); await p.click('#ob-hub'); await p.click('[data-zone]'); await p.click('[data-stage=easy]'); await p.click('#team-go');
   for (let i=0;i<6;i++){ if (await p.locator('[data-door]').count()) { await p.click('[data-door="0"]'); } for (const s of ['#tut-skip','#continue','#leave']) if (await p.locator(s).count()) await p.click(s).catch(()=>{}); if (await p.evaluate(()=>!!window.__game && !document.getElementById('screen').classList.contains('show'))) break; await p.waitForTimeout(300); }
   const box = await p.locator('#cv').boundingBox();
   const pt=(c,r)=>({x:box.x+(c+.5)*box.width/6,y:box.y+(480+(r+.5)*90)/960*box.height});

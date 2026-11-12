@@ -3,7 +3,6 @@
     "id": "zone_water",
     "order": 0,
     "element": 0,
-    "final": "elite",
     "monsters": {
       "normal": [
         "water_n1",
@@ -12,14 +11,15 @@
       "elite": [
         "water_e1"
       ],
-      "boss": []
+      "boss": [
+        "water_b1"
+      ]
     }
   },
   {
     "id": "zone_fire",
     "order": 1,
     "element": 1,
-    "final": "boss",
     "monsters": {
       "normal": [
         "fire_n1",
@@ -37,7 +37,6 @@
     "id": "zone_wood",
     "order": 2,
     "element": 2,
-    "final": "elite",
     "monsters": {
       "normal": [
         "wood_n1",
@@ -46,14 +45,15 @@
       "elite": [
         "wood_e1"
       ],
-      "boss": []
+      "boss": [
+        "wood_b1"
+      ]
     }
   },
   {
     "id": "zone_light",
     "order": 3,
     "element": 3,
-    "final": "boss",
     "monsters": {
       "normal": [
         "light_n1",
@@ -71,7 +71,6 @@
     "id": "zone_dark",
     "order": 4,
     "element": 4,
-    "final": "elite",
     "monsters": {
       "normal": [
         "dark_n1",
@@ -80,14 +79,15 @@
       "elite": [
         "dark_e1"
       ],
-      "boss": []
+      "boss": [
+        "dark_b1"
+      ]
     }
   },
   {
     "id": "zone_heart",
     "order": 5,
     "element": 5,
-    "final": "boss",
     "monsters": {
       "normal": [
         "heart_n1",

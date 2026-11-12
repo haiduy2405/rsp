@@ -3,6 +3,7 @@
 // v2: Tinh Thạch tách Thường/Hiếm, có unlocked, pity, stats.
 // v3: thêm characters (level, awaken).
 // v4: thêm player, onboarding, summon, settings; xem core/progress.js.
+// v5: clears theo độ khó { zoneId: { easy, normal, hard } }.
 import { SAVE_VERSION, DEFAULT_TEAM } from '../core/progress.js';
 
 const steps = {
@@ -50,6 +51,12 @@ const steps = {
       summon: { pity5: 0, pity4: 0, pulls: 0, firstDone: false, freeDay: -1, history: [] },
       settings: { volume: 80 },
     };
+  },
+  4(data) {
+    // Các lần thắng cũ tính vào độ khó Dễ.
+    const clears = {};
+    for (const [zone, n] of Object.entries(data.clears || {})) clears[zone] = { easy: n };
+    return { ...data, version: 5, clears };
   },
 };
 

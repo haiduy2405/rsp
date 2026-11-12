@@ -19,24 +19,28 @@ function weighted(rng, weights, exclude = []) {
   return entries[entries.length - 1][0];
 }
 
+// Cửa của một tầng theo bố cục config.run.layout: mọi đường đều qua trận thường, tầng Elite rồi Boss cuối.
+// Tầng "fight": toàn cửa đánh; tầng "free": cửa phục vụ (rương, nghỉ, sự kiện, shop) xen trận thường.
 function makeDoors(ctx, run, rng) {
-  if (run.floor === run.floors - 1) return [ctx.zones[run.zoneId].final === 'boss' ? 'boss' : 'elite'];
-  const a = weighted(rng, ctx.config.run.doorWeights);
-  const b = weighted(rng, ctx.config.run.doorWeights, [a]);
-  return [a, b];
+  const { layout, pools } = ctx.config.run;
+  const slot = layout[run.floor];
+  const doors = [];
+  for (let i = 0; i < slot.doors; i++) doors.push(weighted(rng, pools[slot.pool], slot.distinct ? doors : []));
+  return doors;
 }
 
-export function createRun(ctx, { seed, zoneId, team, pityMissed = false }) {
+export function createRun(ctx, { seed, zoneId, team, pityMissed = false, diff = 'easy' }) {
+  if (!ctx.config.difficulty[diff]) throw new Error('unknown difficulty ' + diff);
   const zone = ctx.zones[zoneId];
   if (!zone) throw new Error('unknown zone ' + zoneId);
   const rng = mulberry32(seed);
-  const { min, max } = ctx.config.run.floors;
-  const floors = min + rng.int(max - min + 1);
+  const floors = ctx.config.run.layout.length; // mọi ải có số tầng bằng nhau
   const { maxHp } = buildMembers(ctx, team);
   const run = {
     version: 1,
     seed,
     zoneId,
+    diff,
     team,
     floors,
     floor: 0,
@@ -75,9 +79,10 @@ function startBattle(ctx, run, rng, kind) {
   else enemies = [pick(rng, zone.monsters.boss), pick(rng, normals)];
   const rc = ctx.config.run;
   const zs = rc.zoneScale || { hp: [], atk: [] };
+  const df = ctx.config.difficulty[run.diff];
   const scale = {
-    hp: (1 + rc.floorScale.hp * run.floor) * (zs.hp[zone.order] ?? 1),
-    atk: (1 + rc.floorScale.atk * run.floor) * (zs.atk[zone.order] ?? 1),
+    hp: (1 + rc.floorScale.hp * run.floor) * (zs.hp[zone.order] ?? 1) * df.hp,
+    atk: (1 + rc.floorScale.atk * run.floor) * (zs.atk[zone.order] ?? 1) * df.atk,
   };
   const seed = rng.int(4294967296);
   run.battle = createBattle(ctx, {
@@ -112,7 +117,7 @@ function enterNode(ctx, run, rng, type) {
   if (type === 'normal' || type === 'elite' || type === 'boss') {
     startBattle(ctx, run, rng, type);
   } else if (type === 'chest') {
-    const loot = rollLoot(ctx, 'chest', rng);
+    const loot = rollLoot(ctx, 'chest', rng, run.diff);
     run.loot = addLoot(run.loot, loot);
     run.lastResult = { kind: 'chest', loot };
     run.phase = 'result';
@@ -149,7 +154,7 @@ function advanceFloor(ctx, run, rng) {
 
 function endRun(ctx, run, rng, won) {
   if (won) {
-    const comp = rollLoot(ctx, 'completion', rng);
+    const comp = rollLoot(ctx, 'completion', rng, run.diff);
     // Bảo hiểm xui: chuyến trước hụt Tinh Thạch Hiếm thì chuyến này chắc chắn có khi hoàn thành.
     if (run.pityMissed && comp.stones.rare + run.loot.stones.rare === 0) {
       comp.stones.rare = 1;
@@ -167,7 +172,7 @@ function endRun(ctx, run, rng, won) {
 
 function onBattleWon(ctx, run, rng) {
   const kind = run.node === 'boss' ? 'boss' : run.node === 'elite' ? 'elite' : 'normal';
-  const loot = rollLoot(ctx, kind, rng);
+  const loot = rollLoot(ctx, kind, rng, run.diff);
   run.loot = addLoot(run.loot, loot);
   run.lastResult = { kind: 'battle', nodeType: run.node, loot };
   if (run.floor === run.floors - 1) endRun(ctx, run, rng, true);
@@ -257,9 +262,9 @@ export function runStep(ctx, run, action) {
   return { run: nr, events };
 }
 
-// Record: { seed, zoneId, team, pityMissed, actions } -> run cuối.
-export function newRunRecord(seed, zoneId, team, pityMissed = false) {
-  return { seed, zoneId, team, pityMissed, actions: [] };
+// Record: { seed, zoneId, diff, team, pityMissed, actions } -> run cuối.
+export function newRunRecord(seed, zoneId, team, pityMissed = false, diff = 'easy') {
+  return { seed, zoneId, diff, team, pityMissed, actions: [] };
 }
 
 export function playRun(ctx, record) {

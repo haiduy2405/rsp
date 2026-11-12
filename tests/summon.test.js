@@ -197,7 +197,7 @@ test('nhật ký cốt truyện: mở đầu sau onboarding, mỗi khu vượt m
   assert.deepEqual(storyUnlocked(ctx, newProgress(ctx)), []);
   const p = onboarded();
   assert.deepEqual(storyUnlocked(ctx, p), ['s0']);
-  p.clears = { zone_water: 1, zone_wood: 2 };
+  p.clears = { zone_water: { easy: 1 }, zone_wood: { hard: 2 } };
   assert.deepEqual(storyUnlocked(ctx, p), ['s0', 's1', 's3']);
 });
 

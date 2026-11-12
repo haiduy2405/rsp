@@ -178,10 +178,15 @@ function text(g, s, x, y, size, color = '#e8ebff', align = 'center', weight = '6
 const NEG = new Set(['burn', 'poison', 'stun', 'freeze', 'atkDown', 'lock']);
 // Biểu tượng hiệu ứng: ô chữ viết tắt + số lượt, tiêu cực màu đỏ, tích cực màu xanh (khác nhau cả viền).
 function badges(g, effects, x, y, view, align = 'left') {
-  const w = 46;
-  const total = effects.length * (w + 4) - 4;
+  g.font = `600 11px ${SANS}`;
+  const items = effects.map((e) => {
+    const base = view.t(`effect.${e.key}.short`) + (e.key === 'poison' ? `×${e.stacks}` : '');
+    const label = `${base} ${e.turns > 99 ? '∞' : e.turns}`;
+    return { e, label, w: Math.max(46, Math.ceil(g.measureText(label).width) + 12) }; // ô tự giãn theo chữ, không bị cắt
+  });
+  const total = items.reduce((a, i) => a + i.w + 4, -4);
   let bx = align === 'center' ? x - total / 2 : x;
-  for (const e of effects) {
+  for (const { e, label, w } of items) {
     const neg = NEG.has(e.key);
     g.fillStyle = neg ? '#6b2a35' : '#1f5a42';
     g.strokeStyle = neg ? '#ff8a98' : '#7dffb0';
@@ -190,9 +195,7 @@ function badges(g, effects, x, y, view, align = 'left') {
     g.roundRect(bx, y, w, 18, neg ? 3 : 9);
     g.fill();
     g.stroke();
-    let label = view.t(`effect.${e.key}.short`);
-    if (e.key === 'poison') label += `×${e.stacks}`;
-    text(g, `${label} ${e.turns > 99 ? '∞' : e.turns}`, bx + w / 2, y + 9, 11, '#ffffff');
+    text(g, label, bx + w / 2, y + 9, 11, '#ffffff');
     bx += w + 4;
   }
 }

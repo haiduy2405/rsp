@@ -119,8 +119,6 @@
   "zone.locked": "Locked",
   "zone.clears": "Cleared {n}×",
   "zone.enter": "Enter",
-  "zone.final.elite": "Final: Elite",
-  "zone.final.boss": "Final: Boss",
   "hub.export": "Export save",
   "hub.import": "Import save",
   "hub.import.ok": "Save imported.",
@@ -550,5 +548,13 @@
   "load.tip.5": "The first slot is the Leader. Pick your sturdiest hero or the one with the best leader skill.",
   "load.tip.6": "Leaving the tower between floors costs nothing. Come back and continue exactly where you stopped.",
   "load.tip.7": "At a fork, inns restore HP and chests give items. Guess what you need most.",
-  "load.tip.8": "AIDA has chosen you. Each floor is a crack in the old world. Climb and see what it hides."
+  "load.tip.8": "AIDA has chosen you. Each floor is a crack in the old world. Climb and see what it hides.",
+  "monster.water_b1": "Tidebound Sovereign",
+  "monster.wood_b1": "Elder of the Deepwood",
+  "monster.dark_b1": "Lord of the Abyss",
+  "diff.easy": "Easy",
+  "diff.normal": "Normal",
+  "diff.hard": "Hard",
+  "diff.locked": "Clear {prev} to unlock",
+  "diff.reward": "Rewards ×{gold} · drop rate ×{drop}"
 }

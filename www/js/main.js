@@ -1,5 +1,6 @@
 import { buildCtx } from './core/ctx.js';
 import { createRun, runStep, newRunRecord, debugWinBattle } from './core/run.js';
+import { stageOpen, clearsOf, zoneClears } from './core/stage.js';
 import { applyRunResult } from './core/progress.js';
 import { createStorage, browserAdapter } from './save/storage.js';
 import { grantCharacter, levelCost, levelUp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
@@ -188,7 +189,7 @@ ${orbs}
   const box = h('div', { class: 'hub-scene' + (DEBUG ? ' static' : '') });
   box.innerHTML = svg;
   box.querySelectorAll('[data-zone]').forEach((n) => {
-    const go = () => showTeam(undefined, undefined, n.getAttribute('data-zone'));
+    const go = () => showStages(n.getAttribute('data-zone'));
     n.addEventListener('click', go);
     n.addEventListener('keydown', (e) => e.key === 'Enter' && go());
   });
@@ -236,7 +237,7 @@ function showProfile(msg) {
   if (!profDraft) profDraft = { ...progress.player };
   const d = profDraft;
   const st = progress.stats;
-  const clears = Object.values(progress.clears).reduce((a, b) => a + b, 0);
+  const clears = Object.keys(progress.clears).reduce((a, z) => a + zoneClears(progress, z), 0);
   const stat = (label, v) => h('div', { class: 'card item-row' }, h('span', {}, label), h('b', {}, new Intl.NumberFormat(lang).format(v)));
   const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (d.avatar === i ? ' sel' : ''), 'data-avatar': i, style: `background:${COLORS[i % 6]}`, onclick: () => { d.avatar = i; showProfile(); } }, (d.name || '?')[0].toUpperCase()));
   const save1 = () => {
@@ -273,10 +274,27 @@ function showProfile(msg) {
 
 function resumeChip() {
   const r = activeRunInfo().run;
-  return h('button', { class: 'resume', id: 'b-resume', onclick: resumeRun }, h('span', { class: 'rs-t' }, t('run.resume')), h('small', {}, `${t(`zone.${r.zoneId}`)} · ${t('run.floor', { n: r.floor + 1, total: r.floors })}`));
+  return h('button', { class: 'resume', id: 'b-resume', onclick: resumeRun }, h('span', { class: 'rs-t' }, t('run.resume')), h('small', {}, `${stageLabel(r)} · ${t('run.floor', { n: r.floor + 1, total: r.floors })}`));
 }
 
 // Chọn khu vực (từ nút CHIẾN ĐẤU).
+const stageLabel = (r) => `${t(`zone.${r.zoneId}`)} · ${t(`diff.${r.diff}`)}`;
+
+// Chọn độ khó của một khu: Dễ -> Vừa -> Khó, mở lần lượt. Khó hơn thì rớt ngon hơn.
+function showStages(zoneId) {
+  const order = ctx.config.difficulty.order;
+  const cards = order.map((d, i) => {
+    const open = stageOpen(ctx, progress, zoneId, d);
+    const df = ctx.config.difficulty[d];
+    return h(
+      'div',
+      { class: 'card btn gate stage' + (open ? '' : ' locked'), 'data-stage': d, onclick: open ? () => showTeam(undefined, undefined, { zoneId, diff: d }) : null },
+      h('div', { class: 'info' }, h('div', { class: 'name' }, t(`diff.${d}`)), h('small', {}, open ? t('zone.clears', { n: clearsOf(progress, zoneId, d) }) : t('diff.locked', { prev: t(`diff.${order[i - 1]}`) })), h('div', { class: 'muted' }, t('diff.reward', { gold: df.gold, drop: df.drop }))),
+    );
+  });
+  screen(h('h2', {}, t(`zone.${zoneId}`)), ...cards, btn(t('back'), showZones, '', { id: 'back' }));
+}
+
 function showZones() {
   const inv = progress.inventory;
   const zoneCards = ctx.zoneList.map((z) => {
@@ -284,13 +302,13 @@ function showZones() {
     const st = inv.stones[z.element];
     return h(
       'div',
-      { class: 'card btn gate' + (open ? '' : ' locked'), 'data-zone-card': z.id, style: `--el:${COLORS[z.element]}`, onclick: open ? () => showTeam(undefined, undefined, z.id) : null },
+      { class: 'card btn gate' + (open ? '' : ' locked'), 'data-zone-card': z.id, style: `--el:${COLORS[z.element]}`, onclick: open ? () => showStages(z.id) : null },
       getImg(`orb:${z.element}`) ? h('img', { src: getImg(`orb:${z.element}`).src, alt: '' }) : null,
       h(
         'div',
         { class: 'info' },
         h('div', { class: 'name' }, t(`zone.${z.id}`)),
-        h('small', {}, open ? `${t(`zone.final.${z.final}`)} · ${t('zone.clears', { n: progress.clears[z.id] || 0 })}` : t('zone.locked')),
+        h('small', {}, open ? t('zone.clears', { n: zoneClears(progress, z.id) }) : t('zone.locked')),
         open ? h('div', { class: 'muted' }, `${t('stone.normal')}: ${st.normal} · ${t('stone.rare')}: ${st.rare}`) : null,
       ),
     );
@@ -298,7 +316,7 @@ function showZones() {
   const act0 = activeRunInfo();
   screen(
     h('h2', {}, t('hub.zones')),
-    act0 ? h('div', { class: 'card' }, h('b', {}, t('run.resume')), h('div', { class: 'muted' }, `${t(`zone.${act0.run.zoneId}`)} · ${t('run.floor', { n: act0.run.floor + 1, total: act0.run.floors })}`), h('div', { class: 'row' }, btn(t('run.resume'), resumeRun, 'primary', { id: 'zones-resume' }), btn(t('run.abandon'), () => { clearActiveRun(); showZones(); }, '', { id: 'zones-abandon' }))) : null,
+    act0 ? h('div', { class: 'card' }, h('b', {}, t('run.resume')), h('div', { class: 'muted' }, `${stageLabel(act0.run)} · ${t('run.floor', { n: act0.run.floor + 1, total: act0.run.floors })}`), h('div', { class: 'row' }, btn(t('run.resume'), resumeRun, 'primary', { id: 'zones-resume' }), btn(t('run.abandon'), () => { clearActiveRun(); showZones(); }, '', { id: 'zones-abandon' }))) : null,
     zoneCards,
     h('details', {}, h('summary', {}, t('hub.debug')), h('label', {}, t('hub.seed'), h('input', { id: 'seed', inputmode: 'numeric', value: seedText, oninput: (e) => (seedText = e.target.value) })), h('p', { class: 'muted' }, t('hub.progress'))),
     btn(t('back'), showHub, '', { id: 'back' }),
@@ -460,8 +478,8 @@ function tile(id, slotNo) {
   );
 }
 
-// Màn đội hình: dùng cả ở menu (Đội hình) lẫn trước khi vào trận (zoneId có giá trị).
-function showTeam(slot, msg, zoneId) {
+// Màn đội hình: dùng cả ở menu (Đội hình) lẫn trước khi vào trận (stage = { zoneId, diff } có giá trị).
+function showTeam(slot, msg, stage) {
   const team = progress.team;
   if (slot === undefined || slot === null) slot = Math.max(0, team.indexOf(null));
   const members = team.filter((id) => id !== null);
@@ -477,7 +495,7 @@ function showTeam(slot, msg, zoneId) {
     }
     return r.ok;
   };
-  const again = (sl) => showTeam(sl, undefined, zoneId);
+  const again = (sl) => showTeam(sl, undefined, stage);
   const pick = (id) => {
     const wasEmpty = team[slot] === null;
     if (!apply(placeInSlot(progress, slot, id))) return again(slot);
@@ -486,7 +504,7 @@ function showTeam(slot, msg, zoneId) {
     again(nxt >= 0 ? nxt : slot);
   };
   const cur = progress.preset ?? 0;
-  const tabs = h('div', { class: 'row' }, presetsOf(progress).map((_, i) => h('button', { class: 'btn' + (i === cur ? ' primary' : ''), 'data-preset': i, onclick: () => { apply(selectPreset(progress, i)); showTeam(undefined, undefined, zoneId); } }, t('team.preset', { n: i + 1 }))));
+  const tabs = h('div', { class: 'row' }, presetsOf(progress).map((_, i) => h('button', { class: 'btn' + (i === cur ? ' primary' : ''), 'data-preset': i, onclick: () => { apply(selectPreset(progress, i)); showTeam(undefined, undefined, stage); } }, t('team.preset', { n: i + 1 }))));
   const slots = h('div', { class: 'slots' }, team.map((id, i) => {
     const lead = i === 0;
     const sel = i === slot;
@@ -498,7 +516,7 @@ function showTeam(slot, msg, zoneId) {
   const needLeader = team[0] === null;
   const sorted = owned().slice().sort((a, b) => b.rarity - a.rarity || a.element - b.element || progress.characters[b.id].level - progress.characters[a.id].level || (a.id < b.id ? -1 : 1));
   screen(
-    h('h2', {}, zoneId ? t('team.prep', { zone: t(`zone.${zoneId}`) }) : t('hub.team')),
+    h('h2', {}, stage ? t('team.prep', { zone: `${t(`zone.${stage.zoneId}`)} · ${t(`diff.${stage.diff}`)}` }) : t('hub.team')),
     tabs,
     slots,
     h(
@@ -511,7 +529,7 @@ function showTeam(slot, msg, zoneId) {
     ),
     members.length ? h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(ctx.characters[members[0]].leader)}`) : null,
     h('div', { class: 'muted' }, members.length < 2 ? t('team.noDuo') : duos.length ? `${t('team.duoActive')}: ${duos.map((d) => t(`duo.${d.id}`)).join(', ')}` : t('team.noDuo')),
-    zoneId ? [needLeader || !members.length ? h('div', { class: 'notice' }, t(members.length ? 'team.needLeader' : 'team.needAny')) : null, btn(t('team.go'), () => (activeRunInfo() ? askAbandon(zoneId) : startRun(zoneId)), 'primary', { id: 'team-go', ...(needLeader ? { disabled: '' } : {}) })] : null,
+    stage ? [needLeader || !members.length ? h('div', { class: 'notice' }, t(members.length ? 'team.needLeader' : 'team.needAny')) : null, btn(t('team.go'), () => (activeRunInfo() ? askAbandon(stage) : startRun(stage)), 'primary', { id: 'team-go', ...(needLeader ? { disabled: '' } : {}) })] : null,
     h('p', { class: 'muted' }, t('team.holdHint')),
     h('div', { class: 'roster' }, sorted.map((c) => longPress(Object.assign(tile(c.id, team.indexOf(c.id) + 1 || 0), { onclick: () => pick(c.id) }), () => showChar(c.id, undefined, () => again(slot))))),
     btn(`${t('hub.collection')} ${owned().length}/${ctx.characterList.length}`, () => showCollection(), '', { id: 'team-col' }),
@@ -886,10 +904,10 @@ function activeRunInfo() {
   if (!a?.run || !ctx.zones[a.run.zoneId] || a.run.phase !== 'doors') return null;
   return a;
 }
-function askAbandon(zoneId) {
+function askAbandon(stage) {
   screen(
     h('h2', {}, t('run.resume')),
-    confirmBox(t('run.abandonAsk'), () => startRun(zoneId), () => showTeam(undefined, undefined, zoneId), t('run.abandon')),
+    confirmBox(t('run.abandonAsk'), () => startRun(stage), () => showTeam(undefined, undefined, stage), t('run.abandon')),
     btn(t('run.resume'), resumeRun, '', { id: 'ask-resume' }),
   );
 }
@@ -909,12 +927,12 @@ function leaveRun() {
   showHub();
 }
 
-function startRun(zoneId) {
+function startRun({ zoneId, diff }) {
   const seed = pickSeed();
   const pity = !!progress.pity[zoneId];
   const team = teamRoster(progress);
-  run = createRun(ctx, { seed, zoneId, team, pityMissed: pity });
-  record = newRunRecord(seed, zoneId, team, pity);
+  run = createRun(ctx, { seed, zoneId, team, pityMissed: pity, diff });
+  record = newRunRecord(seed, zoneId, team, pity, diff);
   runPath = [];
   savedThisRun = false;
   delete progress.activeRun;
@@ -941,7 +959,7 @@ function render() {
   return showEnd();
 }
 
-const floorTitle = () => h('h2', {}, `${t(`zone.${run.zoneId}`)} · ${t('run.floor', { n: run.floor + 1, total: run.floors })}`);
+const floorTitle = () => h('h2', {}, `${stageLabel(run)} · ${t('run.floor', { n: run.floor + 1, total: run.floors })}`);
 
 // ---- Bản đồ leo tháp (kiểu đường đi Slay the Spire): đáy là cổng vào, đỉnh là trùm; mỗi tầng chọn một trong các cửa.
 const NODE = {
@@ -965,12 +983,13 @@ function runMapSVG() {
   const bottom = 468;
   const step = n > 1 ? (bottom - top) / (n - 1) : 0;
   const rowY = (r) => bottom - r * step;
-  const xs = (r, count) => (count === 1 ? [200] : [112 + Math.sin(r * 2.1) * 16, 288 + Math.cos(r * 1.7) * 16]);
-  const final = ctx.zones[run.zoneId].final === 'boss' ? 'boss' : 'elite';
+  const xs = (r, count) => (count === 1 ? [200] : count === 2 ? [118, 282] : [78 + Math.sin(r * 2.1) * 10, 200 + Math.cos(r * 1.7) * 10, 322 + Math.sin(r * 1.3) * 10]);
+  // Tầng chưa tới: Elite/Boss đã biết trước (bố cục cố định), còn lại là '?'.
+  const future = (r) => { const slot = ctx.config.run.layout[r]; return Array(slot.doors).fill(slot.pool === 'elite' || slot.pool === 'boss' ? slot.pool : '?'); };
   const rows = [];
   for (let r = 0; r < n; r++) {
     const past = runPath.find((e) => e.floor === r);
-    const kinds = past ? past.doors : r === run.floor ? run.doors : r === n - 1 ? [final] : ['?', '?'];
+    const kinds = past ? past.doors : r === run.floor ? run.doors : future(r);
     rows.push({ r, y: rowY(r), kinds, xs: xs(r, kinds.length), pick: past ? past.pick : null, cur: r === run.floor && run.phase === 'doors', past: !!past });
   }
   const start = { x: 200, y: 548 };
@@ -1047,11 +1066,11 @@ function showDoors() {
     nd.addEventListener('click', go);
     nd.addEventListener('keydown', (e) => e.key === 'Enter' && go());
   });
-  const cur = run.doors.map((d) => t(`door.desc.${d}`));
+  const kinds = [...new Set(run.doors)];
   screen(
     h('div', { class: 'mapnav' }, floorTitle(), h('div', { class: 'muted' }, `${t('run.hp')}: ${Math.round(run.hp)} / ${run.maxHp}`), h('div', { class: 'hpbar' }, h('i', { style: `width:${Math.max(0, (run.hp / run.maxHp) * 100)}%` }))),
     map,
-    h('p', { class: 'sub mapcap' }, run.doors.length > 1 ? t('run.chooseDoor') : t('run.finalDoor'), run.doors.length > 1 ? h('small', {}, `${t(`door.${run.doors[0]}`)}: ${cur[0]}  ·  ${t(`door.${run.doors[1]}`)}: ${cur[1]}`) : h('small', {}, cur[0])),
+    h('p', { class: 'sub mapcap' }, run.doors.length > 1 ? t('run.chooseDoor') : t('run.finalDoor'), h('small', {}, kinds.map((k) => `${t(`door.${k}`)}: ${t(`door.desc.${k}`)}`).join('  ·  '))),
     items,
     btn(t('run.leave'), leaveRun, '', { id: 'leave-run' }),
   );
@@ -1298,7 +1317,7 @@ function showResult() {
     const isBoss = r.nodeType === 'boss';
     return lootScene({
       title: r.kind === 'chest' ? t('result.chest') : t(isBoss ? 'result.victoryBoss' : 'result.victory'),
-      sub: h('div', { class: 'muted' }, `${t(`zone.${run.zoneId}`)} · ${t('run.floor', { n: run.floor + 1, total: run.floors })}`),
+      sub: h('div', { class: 'muted' }, `${stageLabel(run)} · ${t('run.floor', { n: run.floor + 1, total: run.floors })}`),
       loot: r.loot,
       onContinue: () => act({ type: 'continue' }),
     });

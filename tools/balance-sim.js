@@ -91,9 +91,9 @@ function pickDoor(run) {
   return best;
 }
 
-export function playFullRun(seed, zoneId, team, K) {
+export function playFullRun(seed, zoneId, team, K, diff = 'easy') {
   const rng = mulberry32(seed ^ 0xabcdef);
-  let run = createRun(ctx, { seed, zoneId, team, pityMissed: false });
+  let run = createRun(ctx, { seed, zoneId, team, pityMissed: false, diff });
   let turns = 0;
   for (let guard = 0; run.phase !== 'end' && guard < 2000; guard++) {
     if (run.phase === 'doors') {
@@ -123,7 +123,8 @@ import { debugFinishBattle } from '../www/js/core/run.js';
 const finishBattle = (run, b) => debugFinishBattle(ctx, run, b);
 
 // Chế độ --targets: mỗi khu chạy ở Level/Thức tỉnh dự kiến và so với dải thắng trong config.balance.targets.
-export function runTargets(teams = 60, runsPer = 2, K = 10, seed0 = 1) {
+export function runTargets(teams = 60, runsPer = 2, K = 10, seed0 = 1, diff = 'easy') {
+  const sim = ctx.config.difficulty[diff].sim;
   const bal = ctx.config.balance;
   const pr = mulberry32(seed0 * 7919);
   const chars = ctx.characterList;
@@ -131,11 +132,13 @@ export function runTargets(teams = 60, runsPer = 2, K = 10, seed0 = 1) {
   const ids = Array.from({ length: teams }, () => shuffle(chars).slice(0, 5).map((c) => c.id));
   const out = [];
   for (const z of ctx.zoneList) {
-    const tg = bal.targets[z.id];
+    const base = bal.targets[z.id];
+    // Độ khó cao hơn: đội mạnh hơn (Level/Thức tỉnh cộng thêm, tối đa 30/5), dải thắng dịch xuống.
+    const tg = { level: Math.min(ctx.config.progression.levelMax, base.level + sim.levelBonus), awaken: Math.min(5, base.awaken + sim.awakenBonus), win: base.win.map((x) => x + sim.winShift) };
     let won = 0, runs = 0, turns = 0;
     ids.forEach((team, ti) => {
       for (let r = 0; r < runsPer; r++) {
-        const res = playFullRun(seed0 * 1000 + ti * 10 + r, z.id, team.map((id) => ({ id, level: tg.level, awaken: tg.awaken })), K);
+        const res = playFullRun(seed0 * 1000 + ti * 10 + r, z.id, team.map((id) => ({ id, level: tg.level, awaken: tg.awaken })), K, diff);
         runs++; won += res.won ? 1 : 0; turns += res.turns;
       }
     });
@@ -148,8 +151,9 @@ export function runTargets(teams = 60, runsPer = 2, K = 10, seed0 = 1) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv[2] === '--targets') {
   const [teams = 60, runsPer = 2, K = 10, seed0 = 1] = process.argv.slice(3).map(Number);
-  for (const r of runTargets(teams, runsPer, K, seed0)) {
-    console.log(`${r.zone.padEnd(11)} Lv${String(r.level).padEnd(2)} A${r.awaken} thắng ${(100 * r.win).toFixed(0)}% (dải ${r.band.map((x) => x * 100).join('-')}%) ${r.okWin ? 'OK ' : 'LỆCH'} | ~${r.minutes.toFixed(1)} phút ${r.okTime ? 'OK' : 'LỆCH'}`);
+  const only = process.env.DIFF ? [process.env.DIFF] : ctx.config.difficulty.order;
+  for (const diff of only) for (const r of runTargets(teams, runsPer, K, seed0, diff)) {
+    console.log(`${diff.padEnd(6)} ${r.zone.padEnd(11)} Lv${String(r.level).padEnd(2)} A${r.awaken} thắng ${(100 * r.win).toFixed(0)}% (dải ${r.band.map((x) => x * 100).join('-')}%) ${r.okWin ? 'OK ' : 'LỆCH'} | ~${r.minutes.toFixed(1)} phút ${r.okTime ? 'OK' : 'LỆCH'}`);
   }
 } else if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [teams = 40, runsPer = 2, level = 10, awaken = 2, K = 10, seed0 = 1] = process.argv.slice(2).map(Number);

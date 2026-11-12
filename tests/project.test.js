@@ -55,10 +55,9 @@ test('data: zones, monsters, events tham chiếu đúng và đủ chuỗi i18n',
   zones.forEach((z, i) => {
     assert.equal(z.order, i);
     assert.equal(z.element, i);
-    assert.equal(z.final, i % 2 === 1 ? 'boss' : 'elite');
     assert.ok(vi['zone.' + z.id], z.id);
     assert.ok(z.monsters.normal.length >= 2 && z.monsters.elite.length >= 1);
-    if (z.final === 'boss') assert.ok(z.monsters.boss.length >= 1, z.id);
+    assert.ok(z.monsters.boss.length >= 1, z.id); // mọi khu đều có Boss cuối ải
     for (const kind of ['normal', 'elite', 'boss'])
       for (const id of z.monsters[kind]) {
         assert.ok(monsters[id], id);

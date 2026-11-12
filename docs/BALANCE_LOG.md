@@ -33,3 +33,7 @@ Thời gian chuyến mô phỏng: 7,0 / 9,0 / 10,4 / 12,8 / 10,5 / 14,6 phút (k
 - `combo.step` 0.25 → 0.5: nhóm thứ n trong một nước kéo nhân (1 + 0,5 × (n − 1)); tổng hệ số của n combo = n + 0,25·n·(n − 1), bằng cách tính "tổng combo × hệ số" của ToS nhưng vẫn tăng dần theo từng nhóm để số đếm nhảy lên mượt.
 - Bù lại: `run.zoneScale.hp` [1, 1.1, 1.8, 2.1, 3, 3.3] → [1.2, 1.25, 2.2, 2.6, 3.2, 3.5].
 - Kết quả `--targets`: water 100, fire 86, wood 81, light 75, dark 76, heart 73 (cả sáu khu trong dải).
+
+## v0.11: 3 độ khó, 5 tầng, Boss mọi khu
+Bố cục mới dài hơn (nhiều trận hơn mỗi chuyến) nên giảm `floorScale` (hp 0.12, atk 0.08) và `zoneScale` (hp [1.15,1.15,1.45,1.85,2.3,2.6], atk [1,1.3,1.6,2.1,3.1,4.2]). Độ khó: Vừa hp×1.2 atk×1.35, Khó hp×1.4 atk×1.65 (sim: đội cộng +4/+8 Level, +1 Thức tỉnh).
+Dễ (40 đội x2, K=8): Thủy 99%, Hỏa 74%, Mộc 65%, Quang 75%, Ám 69%, Tim 70%, ~11-15 phút/chuyến, đều trong dải. Vừa/Khó: phần lớn trong dải; Thủy dễ hơn dải (tầng đầu), Khó khu Ám/Tim hơi thấp (~25-30%) vì đội đã chạm trần Level 30/Thức tỉnh 5. Chấp nhận, hiệu chỉnh lại khi có art/chỉ số thật.

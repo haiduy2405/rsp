@@ -10,7 +10,7 @@ const { chromium } = require('playwright');
   await p.evaluate(() => history.back()); await p.waitForTimeout(200);
   console.log('back ở hub giữ nguyên:', await p.locator('#b-summon').count());
   await p.click('#b-set'); await p.evaluate(() => history.back()); await p.waitForSelector('#b-summon'); console.log('back từ cài đặt về hub OK');
-  await p.click('[data-zone]'); await p.click('#team-go'); await p.click('[data-door="0"]').catch(()=>{});
+  await p.click('[data-zone]'); await p.click('[data-stage=easy]'); await p.click('#team-go'); await p.click('[data-door="0"]').catch(()=>{});
   for (const s of ['#tut-next','#tut-next','#tut-go']) { await p.waitForSelector(s,{timeout:3000}).catch(()=>{}); if (await p.locator(s).count()) await p.click(s); }
   await p.waitForTimeout(500);
   const fps = await p.evaluate(() => new Promise(r => { let n = 0; const t = performance.now(); (function f(){ n++; if (performance.now()-t < 2000) requestAnimationFrame(f); else r(n/2); })(); }));

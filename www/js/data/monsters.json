@@ -52,6 +52,26 @@
     ]
   },
   {
+    "id": "water_b1",
+    "element": 0,
+    "hp": 9000,
+    "atk": 370,
+    "attackEvery": 3,
+    "kind": "boss",
+    "onAttack": [
+      {
+        "key": "atkDown",
+        "turns": 2,
+        "value": 0.25
+      },
+      {
+        "key": "freeze",
+        "turns": 1,
+        "value": 0
+      }
+    ]
+  },
+  {
     "id": "fire_n1",
     "element": 1,
     "hp": 1700,
@@ -134,6 +154,26 @@
     ]
   },
   {
+    "id": "wood_b1",
+    "element": 2,
+    "hp": 9400,
+    "atk": 380,
+    "attackEvery": 3,
+    "kind": "boss",
+    "onAttack": [
+      {
+        "key": "poison",
+        "turns": 4,
+        "value": 0.02
+      },
+      {
+        "key": "lock",
+        "turns": 2,
+        "value": 3
+      }
+    ]
+  },
+  {
     "id": "light_n1",
     "element": 3,
     "hp": 1900,
@@ -212,6 +252,26 @@
         "key": "lock",
         "turns": 3,
         "value": 4
+      }
+    ]
+  },
+  {
+    "id": "dark_b1",
+    "element": 4,
+    "hp": 9900,
+    "atk": 400,
+    "attackEvery": 3,
+    "kind": "boss",
+    "onAttack": [
+      {
+        "key": "lock",
+        "turns": 3,
+        "value": 5
+      },
+      {
+        "key": "stun",
+        "turns": 1,
+        "value": 0
       }
     ]
   },
