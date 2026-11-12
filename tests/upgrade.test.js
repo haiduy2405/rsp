@@ -114,16 +114,17 @@ test('Form 2 tăng chỉ số và đổi kỹ năng', () => {
   assert.notDeepEqual(k1.units, k2.units);
 });
 
-test('nhân vật trùng tự đổi thành Mảnh Linh Hồn theo độ hiếm; nhân vật mới được thêm', () => {
+test('nhân vật trùng tự đổi thành mảnh chung theo độ hiếm; nhân vật mới được thêm', () => {
   const p = newProgress(ctx);
   const dup = grantCharacter(ctx, p, 'thetis');
-  assert.deepEqual([dup.duplicate, dup.shards], [true, ctx.config.upgrade.duplicateShards[3]]);
-  assert.equal(dup.progress.inventory.shards, ctx.config.upgrade.duplicateShards[3]);
+  assert.deepEqual([dup.duplicate, dup.generic], [true, 3]);
+  assert.equal(dup.progress.inventory.generic[3], 3);
   const fresh = grantCharacter(ctx, p, 'hel');
   assert.equal(fresh.duplicate, false);
   assert.deepEqual(fresh.progress.characters.hel, { level: 1, awaken: 0, exp: 0, skillLv: { active: 1, leader: 1, passive: 1 } });
   const dup5 = grantCharacter(ctx, fresh.progress, 'hel');
-  assert.equal(dup5.shards, ctx.config.upgrade.duplicateShards[5]);
+  assert.equal(dup5.generic, 5);
+  assert.equal(dup5.progress.inventory.generic[5], 5);
   assert.equal(grantCharacter(ctx, p, 'nobody').ok, false);
 });
 
@@ -251,5 +252,5 @@ test('migrate v7 → v8: Thức tỉnh thành Form 2; vượt cấp 30 cũng lê
   };
   const out = migrate(old, 7, ctx);
   assert.deepEqual([out.characters.a.awaken, out.characters.b.awaken, out.characters.c.awaken], [1, 1, 0]);
-  assert.equal(out.version, 9);
+  assert.equal(out.version, 10);
 });

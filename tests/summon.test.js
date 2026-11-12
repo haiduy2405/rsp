@@ -138,18 +138,18 @@ test('lượt miễn phí: 1 lần mỗi ngày, chỉ đơn lẻ, không tốn V
   assert.equal(summon(ctx, p, { bannerId: 'standard', count: 10, free: true, dayKey: 100, seed: 1 }).reason, 'bad_count');
 });
 
-test('nhân vật trùng thành Mảnh Linh Hồn; kết quả báo mới/trùng; progress luôn hợp lệ', () => {
+test('nhân vật trùng thành mảnh chung; kết quả báo mới/trùng; progress luôn hợp lệ', () => {
   let p = rich();
   p.summon.firstDone = true;
   let shards = 0;
   for (let i = 0; i < 20; i++) {
     const r = summon(ctx, p, { bannerId: 'standard', count: 10, dayKey: 1, seed: 100 + i });
     p = r.progress;
-    shards += r.results.reduce((a, x) => a + x.shards, 0);
+    shards += r.results.reduce((a, x) => a + x.generic, 0);
     assert.ok(isValidProgress(p));
   }
   assert.ok(shards > 0);
-  assert.equal(p.inventory.shards, shards);
+  assert.equal(p.inventory.generic[3] + p.inventory.generic[4] + p.inventory.generic[5], shards);
   assert.ok(Object.keys(p.characters).length <= 24);
 });
 

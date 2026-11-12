@@ -24,6 +24,7 @@ export function stageInfo(ctx, zoneId, diff) {
     if (spec.shard) add('shard', spec.shard.chance, spec.shard.count);
     if (spec.fodder) add('fodder', spec.fodder.chance, spec.fodder.count);
     if (spec.offering) add('offering', spec.offering.chance, spec.offering.count);
+    if (spec.fragment) add('fragment', spec.fragment.chance, [1, 1]);
     for (const [tier, e] of Object.entries(spec.elixir || {})) add(`elixir.${tier}`, e.chance, e.count);
     return { kind, gold: spec.gold.map((x) => Math.round(x * d.gold)), drops };
   });

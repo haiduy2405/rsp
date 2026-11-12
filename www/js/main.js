@@ -26,6 +26,7 @@ import { itemIcon, rewardIcon, REWARD_ICON } from './ui/icons.js';
 import { install as installItems } from './ui/screen-items.js';
 import { install as installSummon } from './ui/screen-summon.js';
 import { install as installProfile } from './ui/screen-profile.js';
+import { install as installShop } from './ui/screen-shop.js';
 
 let fxl = null;
 const celebrate = () => (fxl ||= createFxLayer($('fx'))).celebrate();
@@ -101,6 +102,7 @@ const lootLine = (l) => {
   if (l.gold) parts.push(`${t('res.gold')} ${l.gold >= 0 ? '+' : ''}${l.gold}`);
   for (const tier of [1, 2, 3]) if (l.elixir?.[tier]) parts.push(`${t(`res.elixir.${tier}`)} +${l.elixir[tier]}`);
   if (l.shards) parts.push(`${t('res.shard')} +${l.shards}`);
+  for (const [id, n] of Object.entries(l.fragments || {})) parts.push(`${t('res.fragment', { name: t(`char.${id}`) })} +${n}`);
   for (const [k, n] of Object.entries(l.fodder || {})) parts.push(`${fodderName(k)} +${n}`);
   for (const [k, n] of Object.entries(l.offerings || {})) parts.push(`${offeringName(k)} +${n}`);
   if (l.stones?.normal) parts.push(`${t('res.stone')} ${t('stone.normal')} +${l.stones.normal}`);
@@ -216,7 +218,7 @@ function showHub() {
       dockBtn('team', t('hub.team'), () => showTeam(), 'b-team'),
       dockBtn('summon', t('hub.summon'), () => ui.showSummon('standard'), 'b-summon', 'sub'),
       h('button', { class: 'battle', id: 'b-battle', onclick: () => showZones(), 'aria-label': t('hub.battle') }, h('span', {}, t('hub.battle'))),
-      dockBtn('shop', t('hub.shop'), () => showHubShop(), 'b-shop'),
+      dockBtn('shop', t('hub.shop'), () => ui.showShop(), 'b-shop'),
       dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest'),
     ),
   );
@@ -271,7 +273,7 @@ function showStageInfo(zoneId, diff) {
   const close = () => $('info')?.remove();
   const row = (k, v) => h('div', { class: 'si-row' }, h('span', {}, k), h('b', {}, v));
   const names = (ids) => ids.map((m) => t(`monster.${m}`)).join(', ');
-  const dropLabel = (key) => (key.startsWith('elixir.') ? t(`res.${key}`) : key.startsWith('stone.') ? `${t('res.stone')} ${t(`stone.${key.slice(6)}`)}` : t(`res.${key}`));
+  const dropLabel = (key) => (key === 'fragment' ? t('items.tab.frag') : key.startsWith('elixir.') ? t(`res.${key}`) : key.startsWith('stone.') ? `${t('res.stone')} ${t(`stone.${key.slice(6)}`)}` : t(`res.${key}`));
   const src = si.sources.map((s) => h('div', { class: 'si-src' },
     h('div', { class: 'si-head' }, h('b', {}, t(`loot.src.${s.kind}`)), h('small', { class: 'muted' }, `${t('res.gold')} ${rangeText(s.gold)}`)),
     s.drops.map((d) => row(dropLabel(d.key), `${pctText(d.chance)} · ×${rangeText(d.count)}`)),
@@ -540,14 +542,6 @@ function showTeam(slot, msg, stage) {
 }
 
 // Cửa hàng và Nhiệm vụ: khung chờ, chưa có nội dung (gói ủng hộ ở M6; nhiệm vụ làm sau).
-function showHubShop() {
-  screen(
-    h('h2', {}, t('hub.shop')),
-    h('div', { class: 'card soon' }, h('b', {}, t('soon.title')), h('p', { class: 'muted' }, t('shop.soon'))),
-    btn(t('hub.items'), ui.showItems, '', { id: 'shop-items' }),
-    btn(t('back'), showHub, '', { id: 'back' }),
-  );
-}
 function showQuests() {
   screen(
     h('h2', {}, t('hub.quests')),
@@ -981,6 +975,7 @@ function lootRows(l) {
   for (const tier of [1, 2, 3]) if (l.elixir?.[tier]) rows.push({ k: `elixir${tier}`, label: t(`res.elixir.${tier}`), n: l.elixir[tier], rare: tier >= 3 });
   for (const [k, n] of Object.entries(l.offerings || {})) rows.push({ k: 'offering', label: offeringName(k), n, rare: Number(k.split('_')[1]) >= 2 });
   for (const [k, n] of Object.entries(l.fodder || {})) rows.push({ k: 'fodder', label: fodderName(k), n, rare: ctx.fodder[k].star === 2 });
+  for (const [id, n] of Object.entries(l.fragments || {})) rows.push({ k: 'fragment', label: t('res.fragment', { name: t(`char.${id}`) }), n, rare: true });
   if (l.shards) rows.push({ k: 'shard', label: t('res.shard'), n: l.shards, rare: true });
   if (l.stones?.normal) rows.push({ k: 'stoneN', label: `${t('res.stone')} ${t('stone.normal')}`, n: l.stones.normal });
   if (l.stones?.rare) rows.push({ k: 'stoneR', label: `${t('res.stone')} ${t('stone.rare')}`, n: l.stones.rare, rare: true });
@@ -1190,6 +1185,8 @@ Object.assign(ui, installItems(app));
 Object.assign(ui, installSummon(app));
 Object.assign(ui, installProfile(app));
 Object.assign(app, ui);
+Object.assign(ui, installShop(app));
+Object.assign(app, ui);
 
 if ('serviceWorker' in navigator && !DEBUG && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 
@@ -1199,6 +1196,7 @@ if (DEBUG) {
     const p = structuredClone(progress);
     for (const tier of [1, 2, 3]) p.inventory.elixir[tier] += 50;
     p.inventory.tickets += 30;
+    p.inventory.spirit += 2000;
     p.inventory.gold += 20000;
     p.inventory.shards += 100;
     for (const r of ctx.config.races) for (const t of [1, 2, 3]) p.inventory.offerings[`${r}_${t}`] = (p.inventory.offerings[`${r}_${t}`] || 0) + 40;

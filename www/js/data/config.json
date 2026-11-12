@@ -149,6 +149,7 @@
         300,
         600
       ],
+      "fragment": { "chance": 0.02 },
       "elixir": {
         "1": { "chance": 0.25, "count": [1, 2] }
       },
@@ -188,6 +189,7 @@
         700,
         1200
       ],
+      "fragment": { "chance": 0.12 },
       "elixir": {
         "1": { "chance": 0.6, "count": [1, 2] },
         "2": { "chance": 0.15, "count": [1, 1] }
@@ -228,6 +230,7 @@
         1200,
         2000
       ],
+      "fragment": { "chance": 0.3 },
       "elixir": {
         "1": { "chance": 0.8, "count": [2, 3] },
         "2": { "chance": 0.4, "count": [1, 1] },
@@ -269,6 +272,7 @@
         600,
         1200
       ],
+      "fragment": { "chance": 0.15 },
       "elixir": {
         "1": { "chance": 0.5, "count": [1, 3] },
         "2": { "chance": 0.25, "count": [1, 1] }
@@ -309,6 +313,7 @@
         1500,
         2500
       ],
+      "fragment": { "chance": 0.4 },
       "elixir": {
         "2": { "chance": 0.7, "count": [1, 2] },
         "3": { "chance": 0.1, "count": [1, 1] }
@@ -341,6 +346,7 @@
         450,
         900
       ],
+      "fragment": { "chance": 0.02 },
       "elixir": {
         "1": { "chance": 0.35, "count": [1, 2] }
       },
@@ -414,11 +420,6 @@
       "stages": [
         { "shards": 20, "stone": "rare", "stones": 3, "gold": 30000 }
       ]
-    },
-    "duplicateShards": {
-      "3": 10,
-      "4": 30,
-      "5": 100
     }
   },
   "summon": {
@@ -551,6 +552,29 @@
         "winShift": -0.2
       }
     }
+  },
+  "fragments": {
+    "heroCost": { "3": 3, "4": 4, "5": 5 },
+    "genericCost": { "3": 6, "4": 8, "5": 10 },
+    "dupGeneric": { "3": 3, "4": 4, "5": 5 },
+    "dropRarity": 3
+  },
+  "soulTicket": { "star2Chance": 0.15 },
+  "shop": {
+    "freeSpirit": 50,
+    "offers": [
+      { "id": "free", "give": { "kind": "spirit", "count": 50 }, "price": { "cur": "free", "amount": 0 }, "stock": 1 },
+      { "id": "el1", "give": { "kind": "elixir", "key": "1", "count": 1 }, "price": { "cur": "gold", "amount": 800 }, "stock": 5 },
+      { "id": "el2", "give": { "kind": "elixir", "key": "2", "count": 1 }, "price": { "cur": "gold", "amount": 3500 }, "stock": 2 },
+      { "id": "el3", "give": { "kind": "elixir", "key": "3", "count": 1 }, "price": { "cur": "gold", "amount": 15000 }, "stock": 1 },
+      { "id": "soul", "give": { "kind": "soulTicket", "count": 1 }, "price": { "cur": "gold", "amount": 400 }, "stock": 5 },
+      { "id": "stoneN", "give": { "kind": "stoneN", "pick": "element", "count": 5 }, "price": { "cur": "gold", "amount": 2500 }, "stock": 2 },
+      { "id": "stoneR", "give": { "kind": "stoneR", "pick": "element", "count": 1 }, "price": { "cur": "gold", "amount": 9000 }, "stock": 1 },
+      { "id": "off1", "give": { "kind": "offering", "pick": "race", "tier": 1, "count": 3 }, "price": { "cur": "gold", "amount": 2000 }, "stock": 2 },
+      { "id": "off2", "give": { "kind": "offering", "pick": "race", "tier": 2, "count": 2 }, "price": { "cur": "gold", "amount": 6000 }, "stock": 1 },
+      { "id": "frag3", "give": { "kind": "fragment", "pick": "hero", "rarity": 3, "count": 1 }, "price": { "cur": "spirit", "amount": 80 }, "stock": 3 },
+      { "id": "frag4", "give": { "kind": "fragment", "pick": "hero", "rarity": 4, "count": 1 }, "price": { "cur": "spirit", "amount": 400 }, "stock": 2 }
+    ]
   },
   "firstClear": {
     "spirit": { "easy": 60, "normal": 100, "hard": 150 },

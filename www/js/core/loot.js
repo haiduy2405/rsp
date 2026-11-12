@@ -1,6 +1,6 @@
 // Loot: số lượng và tỉ lệ nằm trong config.loot. Mọi ngẫu nhiên qua rng truyền vào.
 export function emptyLoot() {
-  return { gold: 0, elixir: { 1: 0, 2: 0, 3: 0 }, shards: 0, stones: { normal: 0, rare: 0 }, fodder: {}, offerings: {} };
+  return { gold: 0, elixir: { 1: 0, 2: 0, 3: 0 }, shards: 0, stones: { normal: 0, rare: 0 }, fodder: {}, offerings: {}, fragments: {} };
 }
 
 // Cộng hai bảng đếm { khóa: số } (không sửa đầu vào).
@@ -18,6 +18,7 @@ export function addLoot(a, b) {
     stones: { normal: a.stones.normal + b.stones.normal, rare: a.stones.rare + b.stones.rare },
     fodder: mergeCounts(a.fodder, b.fodder),
     offerings: mergeCounts(a.offerings, b.offerings),
+    fragments: mergeCounts(a.fragments, b.fragments),
   };
 }
 
@@ -58,6 +59,11 @@ export function rollLoot(ctx, kind, rng, diff = 'easy', element = 0, races = [],
       }
     }
     out.offerings[`${race}_${tier}`] = n;
+  }
+  // Mảnh tướng: chỉ tướng ≤ dropRarity★ (3★) thuộc hệ khu vực; 4–5★ không rớt từ ải.
+  if (spec.fragment && rng.next() < chance(spec.fragment.chance)) {
+    const pool = ctx.characterList.filter((c) => c.rarity <= ctx.config.fragments.dropRarity && c.rarity >= 3 && !c.reserve && c.element === element);
+    if (pool.length) out.fragments[pool[rng.int(pool.length)].id] = 1;
   }
   return out;
 }

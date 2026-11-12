@@ -8,7 +8,7 @@ export function h(tag, props = {}, ...kids) {
     else if (k.startsWith('on')) el[k] = v;
     else el.setAttribute(k, v);
   }
-  for (const k of kids.flat()) if (k != null && k !== false) el.append(k);
+  for (const k of kids.flat(Infinity)) if (k != null && k !== false) el.append(k);
   return el;
 }
 export const btn = (label, onclick, cls = '', extra = {}) => h('button', { class: cls, onclick, ...extra }, label);

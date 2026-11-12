@@ -1,4 +1,5 @@
 import { statsFor } from './stats.js';
+import { settleFragments } from './fragments.js';
 import { newCharacter, maxSkillLevel, SKILL_KINDS } from './kit.js';
 // Nâng cấp nhân vật: Level (EXP từ Bánh EXP và Tiểu Linh), Thức tỉnh (Mảnh Linh Hồn + Tinh Thạch cùng hệ + Vàng), nhận nhân vật, đổi đội.
 // Mọi hàm thuần: nhận progress, trả { ok, progress?, reason?, ... }. Số liệu ở config.upgrade.
@@ -144,12 +145,13 @@ export function grantCharacter(ctx, progress, id) {
   if (!c) return fail('unknown_character');
   const p = structuredClone(progress);
   if (p.characters[id]) {
-    const shards = ctx.config.upgrade.duplicateShards[c.rarity];
-    p.inventory.shards += shards;
-    return { ok: true, progress: p, duplicate: true, shards };
+    const generic = ctx.config.fragments.dupGeneric[c.rarity] || 0; // tướng trùng → mảnh chung cùng sao (3/4/5)
+    if (generic) p.inventory.generic[c.rarity] += generic;
+    return { ok: true, progress: p, duplicate: true, generic };
   }
   p.characters[id] = newCharacter();
-  return { ok: true, progress: p, duplicate: false, shards: 0 };
+  settleFragments(ctx, p, id);
+  return { ok: true, progress: p, duplicate: false, generic: 0 };
 }
 
 // Đội gồm 5 ô; mỗi ô là id hoặc null (trống). Không trùng, đều đã sở hữu. Ô 1 là đội trưởng.

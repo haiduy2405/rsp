@@ -81,7 +81,7 @@ export function summon(ctx, progress, { bannerId, count, free = false, dayKey, s
     const g = grantCharacter(ctx, p, pull.id);
     p = g.progress;
     p.summon = st; // grantCharacter clone giữ nguyên state đã sửa
-    results.push({ id: pull.id, rarity: pull.rarity, isNew: !g.duplicate, shards: g.shards, forced: pull.forced });
+    results.push({ id: pull.id, rarity: pull.rarity, isNew: !g.duplicate, generic: g.generic, forced: pull.forced });
     st.history.push({ n: st.pulls, id: pull.id, rarity: pull.rarity, banner: bannerId, day: dayKey });
   }
   if (st.history.length > cfg.historyMax) st.history.splice(0, st.history.length - cfg.historyMax);

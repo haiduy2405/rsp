@@ -97,7 +97,7 @@ export function install(app) {
         ...[
           portrait(r.id, 96),
           h('h3', {}, t(`char.${r.id}`), ' ', h('small', {}, '★'.repeat(r.rarity))),
-          h('small', {}, r.isNew ? t('summon.new') : t('summon.dup', { n: r.shards })),
+          h('small', {}, r.isNew ? t('summon.new') : t('summon.dup', { n: r.generic, s: r.rarity })),
           r.forced ? h('div', { class: 'muted' }, t('summon.forced')) : null,
         ].filter(Boolean),
       );

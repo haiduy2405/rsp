@@ -79,7 +79,7 @@ export function install(app) {
           ? h('div', { class: 'card', 'data-story': s.id }, h('b', {}, t(`story.${s.id}.title`)), h('p', {}, t(`story.${s.id}.body`)))
           : h('div', { class: 'card locked' }, h('b', {}, '???'), h('div', { class: 'muted' }, t('story.locked', { zone: t(`zone.${s.after}`) }))),
       ),
-      btn(t('back'), showSettings, '', { id: 'back' }),
+      btn(t('back'), () => showSettings(), '', { id: 'back' }),
     );
   }
 

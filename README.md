@@ -151,3 +151,9 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## Tách main.js (v0.23.1)
 - `ui/dom.js` (h, btn, $), `ui/icons.js` (icon vật phẩm), `ui/screen-items.js` (Hòm đồ, bách khoa), `ui/screen-summon.js` (triệu hồi), `ui/screen-profile.js` (hồ sơ, cài đặt, onboarding). Mỗi màn là `install(app)`; trạng thái dùng chung (progress, lang…) đi qua đối tượng `app`, màn gọi chéo qua `app.*`. main.js còn ~1250 dòng (chuyến leo, chọn đội, màn tướng).
+
+## Mảnh ghép, Shop hằng ngày, Vé Triệu Linh (v0.24)
+- **Mảnh riêng**: 3/4/5 mảnh của một tướng 3/4/5★ đổi đúng tướng đó. **Mảnh chung** theo sao: 6/8/10 mảnh đổi tướng ngẫu nhiên chưa có. Tướng trùng (triệu hồi hay mảnh của tướng đã có) tự đổi thành mảnh chung 3/4/5. Không có mảnh 1–2★ (`config.fragments`, `core/fragments.js`).
+- **Nguồn mảnh**: ải rớt mảnh tướng 3★ theo hệ khu vực; shop bán mảnh 3–4★ (Linh Thạch); mảnh 5★ không rớt ải, không bán shop (chỉ qua mảnh chung từ tướng 5★ trùng; nguồn khó hơn sẽ thêm sau).
+- **Vé Triệu Linh**: mỗi vé ra 1 Tiểu Linh 1★ (85%) / 2★ (15%) hệ ngẫu nhiên.
+- **Shop hằng ngày** (`core/shop.js`, `config.shop.offers`): reset theo ngày; món đầu tiên miễn phí = 50 Linh Thạch; bán Đan, Vé Triệu Linh, Tinh Thạch, Lễ Vật, mảnh 3–4★. Save v10.
