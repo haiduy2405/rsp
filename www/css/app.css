@@ -977,3 +977,12 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 @media (prefers-reduced-motion: reduce) { .wheel { transition: none !important; } }
 .hub-top .help-btn { position: relative; }
 .hub-top .help-btn .red-dot { top: -2px; right: -2px; left: auto; }
+
+/* Nút triệu hồi gọn: tiêu đề + giá bằng biểu tượng; chấm đỏ nằm trong nút (nút bị cắt góc nên không để ngoài) */
+.row.pulls button.pull { flex-direction: column; gap: 3px; padding: 8px 6px; }
+.row.pulls button.pull b { font-size: 14px; line-height: 1.1; white-space: nowrap; }
+.pl-cost { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 700; opacity: .9; white-space: nowrap; }
+.pl-cost .ricon { width: 17px; height: 17px; }
+.pl-sep { font-style: normal; opacity: .55; margin: 0 1px; }
+.row.pulls button.free { flex: 1; }
+.row.pulls .free .red-dot { top: 6px; right: 12px; left: auto; }

@@ -53,6 +53,8 @@ export function install(app) {
       const art = getImg(`card:${c.id}`);
       return h('div', { class: `fan-card r${c.rarity} pos${fan.length === 3 ? i : i + 1}` }, art ? h('img', { src: art.src, alt: '', draggable: 'false' }) : portrait(c.id, 96), h('b', {}, '★'.repeat(c.rarity)));
     };
+    // Giá: số vé, hoặc số Linh Thạch nếu thiếu vé (hai biểu tượng, không chữ).
+    const costLine = (tickets, spirit) => h('span', { class: 'pl-cost' }, itemIcon('ticket', 'sm'), String(tickets), h('i', { class: 'pl-sep' }, '/'), itemIcon('spirit', 'sm'), String(spirit));
     const pityPct = Math.min(100, (sm.pity5 / cfg.pity5) * 100);
     screen(
       h('h2', {}, t('summon.title')),
@@ -102,8 +104,8 @@ export function install(app) {
             'div',
             { class: 'row pulls' },
             freeAvail ? (() => { const b = btn(t('summon.free'), () => doSummon(1, true), 'primary free', { id: 'pull-free' }); b.append(h('i', { class: 'red-dot', 'aria-hidden': 'true' })); return b; })() : h('div', { class: 'muted' }, t('summon.freeUsed')),
-            h('button', { id: 'pull-1', onclick: () => ask(1) }, itemIcon('ticket', 'sm'), h('span', {}, t('summon.x1', { cost: cfg.ticketsPerPull }), h('small', { class: 'alt-cost' }, t('summon.orSpirit', { n: spiritFor(1)?.spirit ?? 0 })))),
-            h('button', { class: 'primary', id: 'pull-10', onclick: () => ask(cfg.multiCount) }, itemIcon('ticket', 'sm'), h('span', {}, t('summon.x10', { cost: cfg.ticketsPerPull * cfg.multiCount }), h('small', { class: 'alt-cost' }, t('summon.orSpirit', { n: spiritFor(cfg.multiCount)?.spirit ?? 0 })))),
+            h('button', { id: 'pull-1', class: 'pull', onclick: () => ask(1) }, h('b', {}, t('summon.x1')), costLine(cfg.ticketsPerPull, spiritFor(1)?.spirit ?? 0)),
+            h('button', { class: 'primary pull', id: 'pull-10', onclick: () => ask(cfg.multiCount) }, h('b', {}, t('summon.x10')), costLine(cfg.ticketsPerPull * cfg.multiCount, spiritFor(cfg.multiCount)?.spirit ?? 0)),
           ),
     );
   }

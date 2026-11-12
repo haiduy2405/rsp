@@ -408,3 +408,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ### v0.55.1
 - Art thật cho Slime và Gnome (12 quái, sinh bằng ChatGPT cùng phong cách viền mực đậm + tô phẳng, nhập bằng `tools/art-import-mon.py`) và 3 quái tutorial (`tut_*` dùng lại art slime Hỏa, slime Thủy, gnome Ám). Manifest 117 mục.
+
+### v0.55.2
+- Nút triệu hồi gọn lại: tiêu đề "Triệu hồi ×1/×10" và giá bằng hai biểu tượng (vé / Linh Thạch), bỏ chữ "hoặc ... Linh Thạch". Chấm đỏ của "Miễn phí hôm nay" nằm trong nút nên không bị cắt góc che mất.
