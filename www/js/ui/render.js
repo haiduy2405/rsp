@@ -54,6 +54,14 @@ function enhancedAura(g, x, y, r) {
 export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
   g.save();
   g.globalAlpha = alpha;
+  // Ngọc Nâng Cấp có art riêng (huy hiệu viền vàng, cánh, miện); chưa có art thì vẽ ngọc thường + hào quang.
+  const imE = enhanced ? getImg(`orbE:${type}`) : null;
+  if (imE) {
+    const R = r * 1.14;
+    g.drawImage(imE, x - R, y - R, R * 2, R * 2);
+    g.restore();
+    return;
+  }
   const im = getImg(`orb:${type}`);
   if (im) {
     g.drawImage(im, x - r, y - r, r * 2, r * 2);
@@ -556,40 +564,39 @@ export function draw(g, view, t) {
   view.members.forEach((m, i) => {
     const x = 12 + i * 104;
     const lead = i === 0;
-    const y = lead ? 384 : 394; // đội trưởng cao hơn 10px
-    const oy = lead ? 10 : 0;
+    const th = lead ? 84 : 76; // đáy hai loại ô thẳng hàng ở 466; đội trưởng cao hơn 8px
+    const y = 466 - th;
     const ready = m.skillCd === 0;
-    panel(g, x, y, 98, 70 + oy, lead ? '#ffd24a' : COLORS[m.element]);
+    panel(g, x, y, 98, th, lead ? '#ffd24a' : COLORS[m.element]);
     if (lead) {
       g.save();
       g.globalAlpha = 0.7 + 0.3 * Math.sin(t * 0.004);
       g.strokeStyle = '#ffd24a';
       g.lineWidth = 2;
-      g.strokeRect(x + 1, y + 1, 96, 68 + oy);
+      g.strokeRect(x + 1, y + 1, 96, th - 2);
       g.restore();
-      // vương miện nhỏ + nhãn
+      // vương miện ở góc trên trái (viền vàng + miện đủ nhận biết đội trưởng, nhường chỗ cho ảnh tướng lớn hơn)
       g.fillStyle = '#ffd24a';
       g.beginPath();
-      const cx0 = x + 14, cy0 = y + 15;
-      g.moveTo(cx0 - 7, cy0 + 4); g.lineTo(cx0 - 8, cy0 - 5); g.lineTo(cx0 - 3, cy0); g.lineTo(cx0, cy0 - 7); g.lineTo(cx0 + 3, cy0); g.lineTo(cx0 + 8, cy0 - 5); g.lineTo(cx0 + 7, cy0 + 4);
+      const cx0 = x + 15, cy0 = y + 12;
+      g.moveTo(cx0 - 9, cy0 + 5); g.lineTo(cx0 - 10, cy0 - 6); g.lineTo(cx0 - 4, cy0); g.lineTo(cx0, cy0 - 9); g.lineTo(cx0 + 4, cy0); g.lineTo(cx0 + 10, cy0 - 6); g.lineTo(cx0 + 9, cy0 + 5);
       g.closePath();
       g.fill();
-      text(g, view.t('team.leader'), x + 52, y + 14, 10, '#f6edd6', 'center', '800');
     }
-    const icy = lead ? y + 38 : y + 24;
+    const icy = 466 - 48; // tâm ảnh tướng cách đáy 48 (cùng cao ở mọi ô)
     const ic = getImg(`icon:${m.id}`);
     if (ic) {
-      const S = 32;
+      const S = 44;
       g.save();
       g.beginPath();
-      g.roundRect(x + 49 - S / 2, icy - S / 2, S, S, 8);
+      g.roundRect(x + 49 - S / 2, icy - S / 2, S, S, 9);
       g.clip();
       g.drawImage(ic, x + 49 - S / 2, icy - S / 2, S, S);
       g.restore();
       g.strokeStyle = COLORS[m.element];
       g.lineWidth = 2;
       g.beginPath();
-      g.roundRect(x + 49 - S / 2, icy - S / 2, S, S, 8);
+      g.roundRect(x + 49 - S / 2, icy - S / 2, S, S, 9);
       g.stroke();
       // icon hệ nhỏ ở góc ô
       g.fillStyle = 'rgba(20,12,6,0.85)';
@@ -597,9 +604,14 @@ export function draw(g, view, t) {
       g.arc(x + 87, y + 13, 10, 0, Math.PI * 2);
       g.fill();
       drawOrb(g, m.element, x + 87, y + 13, 8);
-    } else drawOrb(g, m.element, x + 49, icy, 18);
-    text(g, view.t(`char.${m.id}`), x + 49, y + 50 + oy, 11, lead ? '#fff4c9' : '#e7eaff', 'center', lead ? '800' : '600');
-    if (ready) text(g, view.t('battle.skillReady'), x + 49, y + 63 + oy, 11, '#7dffa0', 'center', '700');
+    } else drawOrb(g, m.element, x + 49, icy, 22);
+    let nm = view.t(`char.${m.id}`);
+    g.font = `${lead ? 800 : 700} 13px ${SANS}`;
+    const nfs = Math.max(11, Math.min(13, (13 * 90) / Math.max(1, g.measureText(nm).width)));
+    g.font = `${lead ? 800 : 700} ${nfs}px ${SANS}`;
+    if (g.measureText(nm).width > 92) { while (nm.length > 3 && g.measureText(`${nm}…`).width > 92) nm = nm.slice(0, -1).trimEnd(); nm += '…'; } // tên quá dài: cắt bớt, xem đủ khi bấm giữ
+    text(g, nm, x + 49, y + th - 22, nfs, lead ? '#fff4c9' : '#f0f2ff', 'center', lead ? '800' : '700');
+    if (ready) text(g, view.t('battle.skillReady'), x + 49, y + th - 8, 12, '#7dffa0', 'center', '800');
     else {
       // hồi chiêu: chấm đầy = số lượt còn lại
       const n = m.skillMax || 1;
@@ -608,24 +620,24 @@ export function draw(g, view, t) {
       for (let k = 0; k < n; k++) {
         g.fillStyle = k < m.skillCd ? '#e8b878' : 'rgba(232,184,120,0.25)';
         g.beginPath();
-        g.arc(x0 + k * gap, y + 62 + oy, 3, 0, Math.PI * 2);
+        g.arc(x0 + k * gap, y + th - 8, 3.5, 0, Math.PI * 2);
         g.fill();
       }
     }
     if (ready) {
       // hào quang dâng lên từ chân ô khi kỹ năng sẵn sàng
-      const gr = g.createLinearGradient(0, y + 70 + oy, 0, y);
+      const gr = g.createLinearGradient(0, y + th, 0, y);
       gr.addColorStop(0, 'rgba(125,255,160,0.5)');
       gr.addColorStop(0.7, 'rgba(125,255,160,0.1)');
       gr.addColorStop(1, 'rgba(125,255,160,0)');
       g.save();
-      g.beginPath(); g.rect(x, y, 98, 70 + oy); g.clip();
-      g.fillStyle = gr; g.fillRect(x, y, 98, 70 + oy);
+      g.beginPath(); g.rect(x, y, 98, th); g.clip();
+      g.fillStyle = gr; g.fillRect(x, y, 98, th);
       g.fillStyle = '#d8ffe2';
       for (let k = 0; k < 4; k++) {
         const ph = (t * 0.0009 + i * 0.37 + k * 0.25) % 1;
         g.globalAlpha = 0.9 * Math.sin(ph * Math.PI);
-        g.beginPath(); g.arc(x + 12 + ((i * 29 + k * 23) % 74), y + 66 + oy - ph * (62 + oy), 3, 0, Math.PI * 2); g.fill();
+        g.beginPath(); g.arc(x + 12 + ((i * 29 + k * 23) % 74), y + th - 4 - ph * (th - 8), 3, 0, Math.PI * 2); g.fill();
       }
       g.restore();
     }
@@ -633,7 +645,7 @@ export function draw(g, view, t) {
       const glow = 0.55 + 0.45 * Math.sin(t * 0.006);
       g.save();
       g.globalAlpha = glow;
-      brackets(g, x - 2, y - 2, 102, 74 + oy, 12, '#7dffa0', 2.5);
+      brackets(g, x - 2, y - 2, 102, th + 4, 12, '#7dffa0', 2.5);
       g.restore();
     }
   });
@@ -654,14 +666,15 @@ export function draw(g, view, t) {
 
   // đồng hồ kéo
   g.fillStyle = 'rgba(28,16,9, 0.9)';
-  g.fillRect(0, 468, W, 10);
+  g.fillRect(0, 466, W, 14);
   if (view.timer !== null) {
     const low = view.timer < 0.25;
     g.fillStyle = low ? '#ff5468' : '#dcc3a0';
     g.shadowColor = g.fillStyle;
     g.shadowBlur = low ? 14 : 8;
-    g.fillRect(0, 470, W * view.timer, 6);
+    g.fillRect(0, 468, W * view.timer, 10);
     g.shadowBlur = 0;
+    if (view.timerSec !== undefined) outlined(g, `${view.timerSec.toFixed(1)}`, W / 2, 473, 12, '#ffffff', '#ffffff', NUM, 3, '800');
   }
 
   // Dừng thời gian: chữ báo còn mấy lượt + nút Tiêu

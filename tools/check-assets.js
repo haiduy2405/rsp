@@ -17,6 +17,7 @@ export function expected() {
   }
   for (const mo of JSON.parse(fs.readFileSync(path.join(root, 'js/data/monsters.json'), 'utf8'))) m[`monster:${mo.id}`] = `assets/monsters/${mo.id}.webp`;
   for (let i = 0; i < 6; i++) m[`orb:${i}`] = `assets/orbs/orb${i}.webp`;
+  for (let i = 0; i < 6; i++) m[`orbE:${i}`] = `assets/orbs/orb${i}e.webp`; // ngọc nâng cấp
   for (const k of ['burn', 'poison', 'stun', 'freeze', 'shield', 'regen', 'atkUp', 'atkDown', 'reflect', 'pierce', 'lock', 'immune']) m[`fx:${k}`] = `assets/ui/fx/${k}.webp`;
   for (const z of JSON.parse(fs.readFileSync(path.join(root, 'js/data/zones.json'), 'utf8'))) m[`zone:${z.id}`] = `assets/ui/zones/${z.id}.webp`;
   m['bg:hub'] = 'assets/bg/hub.webp';

@@ -411,3 +411,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ### v0.55.2
 - Nút triệu hồi gọn lại: tiêu đề "Triệu hồi ×1/×10" và giá bằng hai biểu tượng (vé / Linh Thạch), bỏ chữ "hoặc ... Linh Thạch". Chấm đỏ của "Miễn phí hôm nay" nằm trong nút nên không bị cắt góc che mất.
+
+### v0.56.0
+- **Ô tướng trong trận to và dễ đọc hơn:** ảnh tướng 32→44 px, tên 13 px (tên dài tự co rồi cắt "…", xem đủ khi bấm giữ), chữ "Sẵn sàng" 12 px; đội trưởng chỉ còn vương miện góc ô thay cho chữ nhãn. Đáy ô thẳng hàng ở y=466.
+- **Đồng hồ kéo ngọc có số giây** (vd "4.2") ở giữa thanh; thanh cao 14 px.
+- **Ngọc Nâng Cấp có art riêng** (6 hệ, `assets/orbs/orb{0-5}e.webp`, sinh bằng ChatGPT): huy hiệu viền vàng có cánh và miện, vẫn giữ họa tiết hệ bên trong. Chưa có art thì vẫn rơi về ngọc thường + hào quang cũ. Manifest 123 mục.

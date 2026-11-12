@@ -98,7 +98,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
 
   const memberPos = (id) => {
     const i = Math.max(0, state.members.findIndex((m) => m.id === id));
-    return { x: 12 + i * 104 + 49, y: 394 + 26, el: state.members[i]?.element ?? 3 };
+    return { x: 12 + i * 104 + 49, y: 466 - 48, el: state.members[i]?.element ?? 3 };
   };
   // cỡ số theo tỉ lệ máu quái bị mất: đòn nhỏ vẫn đọc được, đòn lớn nổi bật nhưng không tràn màn
   const dmgSize = (a, maxHp) => 34 + Math.min(1, (a / Math.max(1, maxHp)) * 3) * 34;
@@ -512,7 +512,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     if (state.status !== 'playing' || busy) {
       // đang bận: chỉ cho xem chi tiết
       if (onTeamFx(p0)) { startPress('team', 0, p0, ev); return; }
-      if (p0.y >= 384 && p0.y <= 466) { const i = Math.floor((p0.x - 12) / 104); if (i >= 0 && i < state.members.length) startPress('member', i, p0, ev); }
+      if (p0.y >= 382 && p0.y <= 468) { const i = Math.floor((p0.x - 12) / 104); if (i >= 0 && i < state.members.length) startPress('member', i, p0, ev); }
       else if (p0.y >= 80 && p0.y <= 330 && state.enemies.length) startPress('enemy', Math.min(state.enemies.length - 1, Math.floor(p0.x / (W / state.enemies.length))), p0, ev);
       return;
     }
@@ -526,7 +526,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         return;
       }
     }
-    if (p.y >= 384 && p.y <= 466) {
+    if (p.y >= 382 && p.y <= 468) {
       const idx = Math.floor((p.x - 12) / 104);
       if (idx >= 0 && idx < state.members.length) startPress('member', idx, p, ev);
       return;
@@ -684,6 +684,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     if (drag && drag.t0 && !(state.freeze > 0)) {
       const k = 1 - (now - drag.t0) / dragMs;
       view.timer = Math.max(0, k);
+      view.timerSec = (view.timer * dragMs) / 1000;
       if (k <= 0) release();
     }
     if (view.tally) { const ty = view.tally; ty.shown += (ty.target - ty.shown) * Math.min(1, real / 120); if (Math.abs(ty.target - ty.shown) < 1) ty.shown = ty.target; ty.pulse = Math.max(0, ty.pulse - dt / 500); }
