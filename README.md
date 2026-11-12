@@ -405,3 +405,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - **Cầu nguyện (ước):** nút ở góc trên màn chính (chấm đỏ khi còn lượt). Mỗi ngày 1 lượt quay vòng xoay 12 ô, kết quả tính ở `core/wish.js` theo seed, tỉ lệ ở `config.wish.slices` (có bảng tỉ lệ trong màn).
 - Phần thưởng và tỉ lệ: Vàng 600 (21%) / 2500 (14%); Linh Thạch 15 (17%) / 40 (10%); Mảnh Chung 3★×2 (10%) / 4★ (5%) / 5★ (1.5%); Mảnh tướng 3★ (7%) / 4★ (4%) / 5★ (1.5%) (tướng ngẫu nhiên, ưu tiên tướng chưa có); Vé Triệu Linh (5%); Vé Triệu Hồi (4%). Kỳ vọng nhỏ, không lấn thưởng nhiệm vụ.
 - Trạng thái `progress.wish = { day, slice }` (tùy chọn, không đổi SAVE_VERSION). Test `tests/wish.test.js`, e2e `tests/e2e/wish.cjs`.
+
+### v0.55.1
+- Art thật cho Slime và Gnome (12 quái, sinh bằng ChatGPT cùng phong cách viền mực đậm + tô phẳng, nhập bằng `tools/art-import-mon.py`) và 3 quái tutorial (`tut_*` dùng lại art slime Hỏa, slime Thủy, gnome Ám). Manifest 117 mục.
