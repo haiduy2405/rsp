@@ -345,6 +345,12 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
           view.enemies[e.enemy].hp = Math.max(0, view.enemies[e.enemy].hp - e.amount);
           floater(`-${e.amount}`, enemyX(e.enemy), 150, '#ff9f6b');
         }
+      } else if (e.type === 'revive') {
+        fx.sfx('fanfare');
+        view.whiteFlash = 0.6;
+        view.hp = e.hp;
+        floater(t('battle.revive'), W / 2, 300, '#ffd24a', 40, 'dmg', 1400);
+        await sleep(700);
       } else if (e.type === 'dot' || e.type === 'regen') {
         const good = e.type === 'regen';
         if (e.target === 'enemy') floater(`${good ? '+' : '-'}${e.amount}`, enemyX(e.enemy), 120, good ? '#7dffa0' : '#c58bff');

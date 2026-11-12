@@ -6,7 +6,7 @@ export function indexById(list) {
 }
 
 // Mọi tệp dữ liệu game (www/js/data/<tên>.json). Thêm tệp mới chỉ cần thêm tên vào đây và vào buildCtx.
-export const DATA_FILES = ['config', 'characters', 'monsters', 'zones', 'events', 'duos', 'banners', 'story', 'fodder'];
+export const DATA_FILES = ['config', 'characters', 'monsters', 'zones', 'events', 'duos', 'banners', 'story', 'fodder', 'relics'];
 
 // Đọc toàn bộ dữ liệu qua hàm read(đường dẫn tương đối trong js/) trả JSON (đồng bộ hoặc Promise).
 export async function loadRaw(read) {
@@ -30,6 +30,8 @@ export function buildCtx(raw) {
     storyList: raw.story || [],
     duos: indexById(raw.duos || []),
     duoList: raw.duos || [],
+    relicList: raw.relics || [],
+    relics: indexById(raw.relics || []),
     fodderList: raw.fodder || [],
     fodder: Object.fromEntries((raw.fodder || []).map((f) => [`${f.element}_${f.star}`, f])), // khóa 'hệ_sao'
     duoByPair: Object.fromEntries((raw.duos || []).flatMap((d) => [[`${d.a}|${d.b}`, d], [`${d.b}|${d.a}`, d]])),

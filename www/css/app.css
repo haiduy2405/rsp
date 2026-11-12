@@ -350,3 +350,10 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 
 .skillup-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .skillup-row > span { flex: 1; min-width: 0; }
+
+/* Di Vật */
+.relic-strip { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.rchip { padding: 4px 10px; font-size: 12px; border-radius: 999px; border: 1.5px solid #9fb0ff; background: rgba(8, 10, 34, .7); color: #e8ebff; }
+.card.relic { border-width: 1.5px; border-style: solid; }
+.doorlist { display: flex; flex-direction: column; gap: 4px; font-size: 13px; text-align: left; width: 100%; }
+.doorlist .dl { padding: 4px 8px; border-left: 2px solid #4a5090; background: rgba(8, 10, 34, .5); }

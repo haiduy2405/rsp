@@ -37,3 +37,8 @@ Thời gian chuyến mô phỏng: 7,0 / 9,0 / 10,4 / 12,8 / 10,5 / 14,6 phút (k
 ## v0.11: 3 độ khó, 5 tầng, Boss mọi khu
 Bố cục mới dài hơn (nhiều trận hơn mỗi chuyến) nên giảm `floorScale` (hp 0.12, atk 0.08) và `zoneScale` (hp [1.15,1.15,1.45,1.85,2.3,2.6], atk [1,1.3,1.6,2.1,3.1,4.2]). Độ khó: Vừa hp×1.2 atk×1.35, Khó hp×1.4 atk×1.65 (sim: đội cộng +4/+8 Level, +1 Thức tỉnh).
 Dễ (40 đội x2, K=8): Thủy 99%, Hỏa 74%, Mộc 65%, Quang 75%, Ám 69%, Tim 70%, ~11-15 phút/chuyến, đều trong dải. Vừa/Khó: phần lớn trong dải; Thủy dễ hơn dải (tầng đầu), Khó khu Ám/Tim hơi thấp (~25-30%) vì đội đã chạm trần Level 30/Thức tỉnh 5. Chấp nhận, hiệu chỉnh lại khi có art/chỉ số thật.
+
+
+## v0.15: Di Vật, bố cục xen kẽ
+Nguyên tắc cân bằng (Duy chốt): **làm tính năng thật phê trước, rồi mới chỉnh quái/chỉ số cho hợp. Không nerf để tránh "OP" làm game nhạt.** Hệ quả: Di Vật, kỹ năng bị động, kỹ năng có cấp làm đội mạnh lên rõ rệt, nên mức khó phải tăng ở phía quái.
+- Chạy `DIFF=easy node tools/balance-sim.js --targets 24 2 8` sau v0.15: tỉ lệ thắng cao hơn dải mục tiêu ở các khu 2-5 (Hỏa 98%, Mộc 85%, Quang 92%, Ám 83%, Tim 77%), thời gian 8.6-10.4 phút. Việc cần làm ở v0.16: nâng `zoneScale`/quái theo từng khu thay vì giảm sức người chơi.

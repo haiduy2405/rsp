@@ -9,6 +9,7 @@ const { chromium } = require('playwright');
   await p.fill('#ob-name', 'Bot'); await p.fill('#ob-callsign', 'B'); await p.click('#ob-start'); await p.click('#ob-hub');
   await p.evaluate(() => window.__cheat && window.__cheat([])); // mở dữ liệu debug nếu có
   await p.click('[data-zone]'); await p.click('[data-stage=easy]'); await p.click('#team-go');
+  const shotDir = process.argv[2]; const shot = {};
   const click = async (sel) => { if (await p.locator(sel).count()) { await p.click(sel, { timeout: 1500 }).catch(() => {}); return true; } return false; };
   let battles = 0, moves = 0, ended = false, guard = 0;
   while (!ended && guard++ < 1500) {
@@ -39,6 +40,8 @@ const { chromium } = require('playwright');
     }
     if (await click('#tut-skip')) continue;
     if (await click('#continue')) continue;
+    if (shotDir) for (const [key, sel] of [['doors', '.doorlist'], ['relic', '[data-pick]'], ['shop', '#leave']]) if (!shot[key] && await p.locator(sel).count()) { shot[key] = 1; await p.waitForTimeout(500); await p.screenshot({ path: `${shotDir}/run-${key}.png` }); }
+    if (await click('[data-pick="0"]')) continue;
     if (await click('#leave')) continue;
     if (await click('[data-choice="0"]')) continue;
     if (await click('[data-door="0"]')) { battles++; continue; }

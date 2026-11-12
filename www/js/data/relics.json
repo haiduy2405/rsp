@@ -1,0 +1,213 @@
+[
+  {
+    "id": "whetstone",
+    "rarity": 1,
+    "mods": {
+      "atkPct": 0.08
+    }
+  },
+  {
+    "id": "ironheart",
+    "rarity": 1,
+    "mods": {
+      "hpPct": 0.1
+    }
+  },
+  {
+    "id": "herb_pouch",
+    "rarity": 1,
+    "mods": {
+      "turnHeal": 0.015
+    }
+  },
+  {
+    "id": "cracked_hourglass",
+    "rarity": 1,
+    "mods": {
+      "dragMs": 800
+    }
+  },
+  {
+    "id": "lucky_coin",
+    "rarity": 1,
+    "mods": {
+      "goldPct": 0.3
+    }
+  },
+  {
+    "id": "campfire",
+    "rarity": 1,
+    "mods": {
+      "restPct": 0.5
+    }
+  },
+  {
+    "id": "wardstone",
+    "rarity": 1,
+    "mods": {
+      "startShield": 0.12
+    }
+  },
+  {
+    "id": "tide_pearl",
+    "rarity": 1,
+    "mods": {
+      "atkPct": 0.2
+    },
+    "element": 0
+  },
+  {
+    "id": "ember_core",
+    "rarity": 1,
+    "mods": {
+      "atkPct": 0.2
+    },
+    "element": 1
+  },
+  {
+    "id": "elder_seed",
+    "rarity": 1,
+    "mods": {
+      "atkPct": 0.2
+    },
+    "element": 2
+  },
+  {
+    "id": "sun_tear",
+    "rarity": 1,
+    "mods": {
+      "atkPct": 0.2
+    },
+    "element": 3
+  },
+  {
+    "id": "void_shard",
+    "rarity": 1,
+    "mods": {
+      "atkPct": 0.2
+    },
+    "element": 4
+  },
+  {
+    "id": "berserker_plate",
+    "rarity": 2,
+    "mods": {
+      "atkPct": 0.18
+    }
+  },
+  {
+    "id": "vampire_fang",
+    "rarity": 2,
+    "mods": {
+      "leech": 0.06
+    }
+  },
+  {
+    "id": "comet_tail",
+    "rarity": 2,
+    "mods": {
+      "comboStep": 0.05
+    }
+  },
+  {
+    "id": "prism",
+    "rarity": 2,
+    "mods": {
+      "aoeCut": 1
+    }
+  },
+  {
+    "id": "wind_boots",
+    "rarity": 2,
+    "mods": {
+      "startCdCut": 2
+    }
+  },
+  {
+    "id": "phoenix_feather",
+    "rarity": 2,
+    "mods": {
+      "revive": 0.4
+    }
+  },
+  {
+    "id": "giant_bane",
+    "rarity": 2,
+    "mods": {
+      "bossDmg": 0.35
+    }
+  },
+  {
+    "id": "heartstone",
+    "rarity": 2,
+    "mods": {
+      "heartPct": 0.5,
+      "healPct": 0.1
+    }
+  },
+  {
+    "id": "mirror_shield",
+    "rarity": 2,
+    "mods": {
+      "startReflect": 0.3
+    }
+  },
+  {
+    "id": "dragon_heart",
+    "rarity": 3,
+    "mods": {
+      "atkPct": 0.25,
+      "hpPct": 0.15
+    }
+  },
+  {
+    "id": "gods_blessing",
+    "rarity": 3,
+    "mods": {
+      "startShield": 0.25,
+      "startAtkUp": 0.25
+    }
+  },
+  {
+    "id": "time_lord",
+    "rarity": 3,
+    "mods": {
+      "dragMs": 3000,
+      "startCdCut": 3,
+      "skillDmg": 0.3
+    }
+  },
+  {
+    "id": "overflow_ring",
+    "rarity": 3,
+    "mods": {
+      "firstTurn": 0.8,
+      "comboStep": 0.08
+    }
+  },
+  {
+    "id": "soul_harvest",
+    "rarity": 3,
+    "mods": {
+      "leech": 0.12,
+      "bossDmg": 0.2
+    }
+  },
+  {
+    "id": "golden_age",
+    "rarity": 3,
+    "mods": {
+      "goldPct": 0.6,
+      "dropPct": 0.5
+    }
+  },
+  {
+    "id": "war_banner",
+    "rarity": 3,
+    "mods": {
+      "atkPct": 0.12,
+      "hpPct": 0.12,
+      "healPct": 0.12
+    }
+  }
+]

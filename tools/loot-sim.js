@@ -21,6 +21,7 @@ export function simulateRun(ctx, seed, zoneId, pityMissed, diff = 'easy') {
     else if (run.phase === 'result') run = runStep(ctx, run, { type: 'continue' }).run;
     else if (run.phase === 'event') run = runStep(ctx, run, { type: 'eventChoice', index: pick.int(2) }).run;
     else if (run.phase === 'shop') run = runStep(ctx, run, { type: 'leaveShop' }).run;
+    else if (run.phase === 'relic') run = runStep(ctx, run, { type: 'pickRelic', index: 0 }).run;
   }
   return run;
 }

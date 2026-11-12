@@ -81,7 +81,7 @@ function playTurn(state, rng, K) {
 // Chọn cửa theo máu hiện tại.
 function pickDoor(run) {
   const low = run.hp / run.maxHp < 0.6;
-  const order = low ? ['rest', 'chest', 'event', 'shop', 'normal', 'elite', 'boss'] : ['chest', 'normal', 'shop', 'event', 'elite', 'rest', 'boss'];
+  const order = low ? ['rest', 'shrine', 'chest', 'event', 'shop', 'normal', 'swarm', 'elite', 'boss'] : ['shrine', 'chest', 'normal', 'shop', 'event', 'swarm', 'elite', 'rest', 'boss'];
   let best = 0;
   let rank = 99;
   run.doors.forEach((d, i) => { const r = order.indexOf(d); if (r < rank) { rank = r; best = i; } });
@@ -104,10 +104,16 @@ export function playFullRun(seed, zoneId, team, K, diff = 'easy') {
       run = finishBattle(run, b);
     } else if (run.phase === 'result') run = runStep(ctx, run, { type: 'continue' }).run;
     else if (run.phase === 'event') run = runStep(ctx, run, { type: 'eventChoice', index: 0 }).run;
-    else if (run.phase === 'shop') {
-      for (let i = 0; i < run.shop.length; i++) {
-        const s = run.shop[i];
-        if (!s.sold && s.item !== 'time' && run.loot.gold >= s.price) run = runStep(ctx, run, { type: 'buy', slot: i }).run;
+    else if (run.phase === 'relic') {
+      // Bot chọn Di Vật hiếm nhất.
+      const best = run.relicChoices.reduce((bi, id, i, a) => (ctx.relics[id].rarity > ctx.relics[a[bi]].rarity ? i : bi), 0);
+      run = runStep(ctx, run, { type: 'pickRelic', index: best }).run;
+    } else if (run.phase === 'shop') {
+      // Ưu tiên Di Vật (hiếm trước), rồi vật phẩm.
+      const order = run.shop.map((sl, i) => i).sort((a, b) => (ctx.relics[run.shop[b].relic]?.rarity || 0) - (ctx.relics[run.shop[a].relic]?.rarity || 0));
+      for (const i of order) {
+        const sl = run.shop[i];
+        if (!sl.sold && sl.item !== 'time' && run.loot.gold >= sl.price) run = runStep(ctx, run, { type: 'buy', slot: i }).run;
       }
       run = runStep(ctx, run, { type: 'leaveShop' }).run;
     }

@@ -18,12 +18,13 @@ import {
 } from './effects.js';
 import { statsFor, skillCooldown, normTeam } from './stats.js';
 import { resolveKit } from './kit.js';
+import { relicMods } from './relic.js';
 
 // ctx = { config, characters, monsters, duoByPair, ... } (dữ liệu từ JSON, không đổi)
 export { indexById } from './ctx.js';
 
 // Dựng 5 thành viên (chỉ số theo Level/Thức tỉnh, thưởng đội trưởng). Dùng chung cho trận và chuyến.
-export function buildMembers(ctx, team) {
+export function buildMembers(ctx, team, mods = relicMods(ctx, [])) {
   const roster = normTeam(team);
   const kits = [];
   const members = roster.map(({ id, level, awaken, skillLv }) => {
@@ -64,6 +65,13 @@ export function buildMembers(ctx, team) {
       if (hit) m[p.stat] = Math.round(m[p.stat] * (1 + p.pct));
     }
   });
+  // Di Vật: tăng chỉ số toàn đội hoặc theo hệ, giảm hồi chiêu đầu trận.
+  for (const m of members) {
+    m.atk = Math.round(m.atk * (1 + mods.atkPct + (mods.elAtk[m.element] || 0)));
+    m.hp = Math.round(m.hp * (1 + mods.hpPct + (mods.elHp[m.element] || 0)));
+    m.heal = Math.round(m.heal * (1 + mods.healPct));
+    m.skillCd = Math.max(0, m.skillCd - mods.startCdCut);
+  }
   for (const m of members) m.skillCd = Math.min(m.skillCd, m.skillMax);
   return { members, lead, maxHp: members.reduce((a, m) => a + m.hp, 0) };
 }
@@ -77,10 +85,10 @@ const triggerPassives = (ctx, s, trigger) =>
 // team: danh sách id hoặc {id, level, awaken}. Ô đầu là đội trưởng.
 // Tùy chọn cho chuyến leo tháp: scale {hp, atk} nhân chỉ số quái, hp (máu đội mang theo),
 // startEffects (hiệu ứng đội có sẵn, vd Bùa Khiên), dragBonusMs (cộng thời gian kéo cho UI).
-export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects, dragBonusMs }) {
+export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects, dragBonusMs, mods = relicMods(ctx, []), big = false, reviveUsed = false }) {
   const rng = mulberry32(seed);
   const board = createBoard(rng);
-  const { members, lead, maxHp } = buildMembers(ctx, team);
+  const { members, lead, maxHp } = buildMembers(ctx, team, mods);
   // Duo: hai nhân vật đứng liền ô và thuộc một cặp định sẵn.
   const duos = [];
   for (let i = 0; i + 1 < members.length; i++) {
@@ -118,7 +126,10 @@ export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects
     locked: [],
     hp: Math.min(maxHp, hp ?? maxHp),
     maxHp,
-    dragBonusMs: dragBonusMs ?? 0,
+    dragBonusMs: (dragBonusMs ?? 0) + mods.dragMs,
+    mods: { aoeCut: mods.aoeCut, comboStep: mods.comboStep, heartPct: mods.heartPct, bossDmg: mods.bossDmg, leech: mods.leech, turnHeal: mods.turnHeal, revive: mods.revive, firstTurn: mods.firstTurn, skillDmg: mods.skillDmg },
+    big,
+    reviveUsed,
     enemies: foes,
     focus: null,
   };
@@ -143,12 +154,16 @@ function hitEnemy(s, idx, amount, hits, from, element) {
   const dealt = Math.min(e.hp, r.hpLoss);
   e.hp -= dealt;
   hits.push({ kind: 'damage', enemy: idx, amount: dealt, raw: amount, absorbed: r.absorbed, thawed: r.thawed, from, killed: e.hp <= 0 });
+  if (s.mods.leech > 0 && dealt > 0) healTeam(s, Math.round(dealt * s.mods.leech), hits, from);
   if (r.reflect > 0) {
     const back = Math.min(r.reflect, reflectCap(s.maxHp));
     s.hp = Math.max(0, s.hp - back);
     hits.push({ kind: 'reflect', to: 'team', amount: back });
   }
 }
+
+// Hệ số sát thương từ Di Vật: Elite/Boss, đòn đầu trận, kỹ năng.
+const dmgBoost = (s, { skill = false, first = false } = {}) => (1 + (s.big ? s.mods.bossDmg : 0)) * (1 + (skill ? s.mods.skillDmg : 0)) * (1 + (first && s.turn === 0 ? s.mods.firstTurn : 0));
 
 function healTeam(s, amount, hits, from) {
   const before = s.hp;
@@ -158,7 +173,13 @@ function healTeam(s, amount, hits, from) {
 
 function checkEnd(s) {
   if (s.enemies.every((e) => e.hp <= 0)) s.status = 'won';
-  else if (s.hp <= 0) s.status = 'lost';
+  else if (s.hp <= 0) {
+    if (s.mods.revive > 0 && !s.reviveUsed) {
+      s.reviveUsed = true;
+      s.hp = Math.max(1, Math.round(s.maxHp * s.mods.revive));
+      s.revivedNow = true; // step đọc cờ này để phát sự kiện rồi xóa
+    } else s.status = 'lost';
+  }
 }
 
 // Áp hiệu ứng lên Đội (Khóa ngọc chọn ô bằng rng).
@@ -178,7 +199,7 @@ function runUnits(ctx, s, rng, units, caster) {
       const el = u.element ?? caster.element;
       for (const i of targets) {
         const mult = elementMultiplier(el, s.enemies[i].element, ctx.config);
-        hitEnemy(s, i, Math.round(caster.atk * teamAtk * u.mult * mult), hits, caster.id, el);
+        hitEnemy(s, i, Math.round(caster.atk * teamAtk * u.mult * mult * dmgBoost(s, { skill: true })), hits, caster.id, el);
       }
     } else if (u.type === 'heal') {
       healTeam(s, Math.round(s.maxHp * u.pctMax), hits, caster.id);
@@ -255,6 +276,13 @@ function endOfTurn(s, events) {
     s.hp += th;
     events.push({ type: 'regen', target: 'team', amount: th });
   }
+  if (s.mods.turnHeal > 0) {
+    const g = Math.min(Math.round(s.maxHp * s.mods.turnHeal), s.maxHp - s.hp);
+    if (g > 0) {
+      s.hp += g;
+      events.push({ type: 'regen', target: 'team', amount: g });
+    }
+  }
   for (const e of s.enemies) if (e.hp > 0) expire(e);
   expire(s.team);
   if (!hasEffect(s.team, 'lock')) s.locked = [];
@@ -287,7 +315,7 @@ export function step(ctx, state, action) {
     events.push({ type: 'skill', member: action.index, hits, board: structuredClone(s.board) });
     checkEnd(s);
     s.rng = rng.state;
-    return { state: s, events };
+    return done(s, events);
   }
 
   if (action.type === 'duo') {
@@ -303,7 +331,7 @@ export function step(ctx, state, action) {
     events.push({ type: 'duo', slot: d.slot, hits, board: structuredClone(s.board) });
     checkEnd(s);
     s.rng = rng.state;
-    return { state: s, events };
+    return done(s, events);
   }
 
   if (action.type !== 'move') return invalid('unknown_action');
@@ -322,20 +350,20 @@ export function step(ctx, state, action) {
     st.groups.forEach((g, gi) => {
       const from = hits.length;
       comboN++;
-      const cm = comboMultiplier(comboN, ctx.config);
+      const cm = comboMultiplier(comboN, ctx.config) + s.mods.comboStep * (comboN - 1);
       const gf = groupFactor(g, ctx.config);
       if (g.type === ORB_HEART) {
         const total = s.members.reduce((a, m) => a + m.heal, 0);
-        healTeam(s, Math.round(total * ctx.config.heal.base * gf * cm), hits, 'orb');
+        healTeam(s, Math.round(total * ctx.config.heal.base * gf * cm * (1 + s.mods.heartPct)), hits, 'orb');
       } else {
         // Nhóm từ aoeSize ngọc trở lên: tướng đánh toàn bộ quái còn sống (mỗi quái tính khắc hệ riêng), còn lại đánh mục tiêu hiện tại.
-        const aoe = g.size >= ctx.config.group.aoeSize;
+        const aoe = g.size >= ctx.config.group.aoeSize - s.mods.aoeCut;
         for (const m of s.members) {
           if (m.element !== g.type) continue;
           const targets = aoe ? aliveIdx(s) : [firstAlive(s)].filter((i) => i >= 0);
           for (const idx of targets) {
             const mult = elementMultiplier(m.element, s.enemies[idx].element, ctx.config);
-            hitEnemy(s, idx, Math.round(m.atk * teamAtk * gf * cm * mult), hits, m.id, m.element);
+            hitEnemy(s, idx, Math.round(m.atk * teamAtk * gf * cm * mult * dmgBoost(s, { first: true })), hits, m.id, m.element);
           }
         }
       }
@@ -376,6 +404,15 @@ export function step(ctx, state, action) {
   if (s.status === 'playing') endOfTurn(s, events);
   s.turn += 1;
   s.rng = rng.state;
+  return done(s, events);
+}
+
+// Kết thúc một bước: nếu Di Vật vừa hồi sinh đội thì phát sự kiện cho giao diện.
+function done(s, events) {
+  if (s.revivedNow) {
+    delete s.revivedNow;
+    events.push({ type: 'revive', hp: s.hp });
+  }
   return { state: s, events };
 }
 

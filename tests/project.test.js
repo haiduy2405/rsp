@@ -65,7 +65,7 @@ test('data: zones, monsters, events tham chiếu đúng và đủ chuỗi i18n',
       }
   });
   const events = readJson('events.json');
-  assert.ok(events.length >= 8 && events.length <= 10);
+  assert.ok(events.length >= 16);
   for (const ev of events) {
     assert.ok(vi[`ev.${ev.id}.title`] && vi[`ev.${ev.id}.body`], ev.id);
     assert.equal(ev.choices.length, 2);

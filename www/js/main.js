@@ -981,6 +981,7 @@ function render() {
   if (run.phase === 'result') return showResult();
   if (run.phase === 'event') return showEvent();
   if (run.phase === 'shop') return showShop();
+  if (run.phase === 'relic') return showRelicPick();
   return showEnd();
 }
 
@@ -991,6 +992,8 @@ const NODE = {
   normal: { col: '#6f86ff', ring: '#c9d3ff', icon: '<path d="M6 18L17 7M7 7l11 11M5 19l2.5-.5M19 19l-2.5-.5M5 5l.5 2.5M19 5l-.5 2.5"/>' },
   elite: { col: '#ff7a3c', ring: '#ffd0b0', icon: '<path d="M6 10c0-4 3-6 6-6s6 2 6 6v3l-2 2v3H8v-3l-2-2zM9 11h2M13 11h2M10 18v2M14 18v2"/>' },
   boss: { col: '#ff4b5c', ring: '#ffe0b0', icon: '<path d="M4 18l1.5-9 4 4 2.5-7 2.5 7 4-4 1.5 9zM4 21h16"/>' },
+  swarm: { col: '#8fb3ff', ring: '#dbe6ff', icon: '<path d="M12 5a3 3 0 1 0 0 .1M5.500 14a3 3 0 1 0 0 .1M18.500 14a3 3 0 1 0 0 .1M8 20h8M3 20h2M19 20h2"/>' },
+  shrine: { col: '#ff8fd0', ring: '#ffd6ee', icon: '<path d="M12 3l5 6-5 12-5-12zM7 9h10M12 3v18"/>' },
   chest: { col: '#ffc83a', ring: '#fff1b8', icon: '<path d="M4 11h16v8H4zM4 11a8 6 0 0 1 16 0M12 11v3M10.5 14h3"/>' },
   rest: { col: '#4ed08a', ring: '#c9ffe0', icon: '<path d="M12 4c2 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3.500 2-4.500 0 1.500 1 2 1.500 2C10.500 8 11 6 12 4zM9 21h6"/>' },
   event: { col: '#b07cff', ring: '#e6d4ff', icon: '<path d="M9 9a3 3 0 1 1 4.500 2.600C12.500 12.200 12 13 12 14.500M12 18v.5"/>' },
@@ -1010,7 +1013,12 @@ function runMapSVG() {
   const rowY = (r) => bottom - r * step;
   const xs = (r, count) => (count === 1 ? [200] : count === 2 ? [118, 282] : [78 + Math.sin(r * 2.1) * 10, 200 + Math.cos(r * 1.7) * 10, 322 + Math.sin(r * 1.3) * 10]);
   // Tầng chưa tới: Elite/Boss đã biết trước (bố cục cố định), còn lại là '?'.
-  const future = (r) => { const slot = ctx.config.run.layout[r]; return Array(slot.doors).fill(slot.pool === 'elite' || slot.pool === 'boss' ? slot.pool : '?'); };
+  const future = (r) => {
+    const slot = ctx.config.run.layout[r];
+    const pool = ctx.config.run.pools[slot.pool];
+    const combat = Object.keys(pool).every((k) => ['normal', 'swarm', 'elite', 'boss'].includes(k));
+    return Array(slot.doors).fill(slot.pool === 'elite' || slot.pool === 'boss' ? slot.pool : combat ? 'f?' : '?'); // tầng đánh hiện ⚔ mờ, tầng sự kiện hiện ?
+  };
   const rows = [];
   for (let r = 0; r < n; r++) {
     const past = runPath.find((e) => e.floor === r);
@@ -1037,14 +1045,14 @@ function runMapSVG() {
   const curRow = rows.find((x) => x.cur);
   if (curRow) curRow.xs.forEach((x, i) => (gold += link(last, [x, curRow.y], 'lk now')));
   let nodes = `<g class="nd start"><circle cx="${start.x}" cy="${start.y}" r="15" fill="#15183f" stroke="#e2b75a" stroke-width="2"/><path d="M${start.x - 6} ${start.y + 7}v-8a6 6 0 0 1 12 0v8z" fill="none" stroke="#e2b75a" stroke-width="1.8"/></g>`;
-  const label = (x, y, k, strong) => `<text x="${x}" y="${y}" text-anchor="middle" class="nl${strong ? ' strong' : ''}">${k === '?' ? '' : t(`door.${k}`)}</text>`;
+  const label = (x, y, k, strong) => `<text x="${x}" y="${y}" text-anchor="middle" class="nl${strong ? ' strong' : ''}">${k === '?' || k === 'f?' ? '' : t(`door.${k}`)}</text>`;
   for (const row of rows) {
     row.kinds.forEach((k, i) => {
       const [x, y] = pos(row, i);
       const big = k === 'boss' || (row.r === n - 1);
       const rad = big ? 30 : 23;
-      if (k === '?') {
-        nodes += `<g class="nd ghost"><circle cx="${x}" cy="${y}" r="${rad - 3}" fill="#101338" stroke="#4a5090" stroke-width="1.6" stroke-dasharray="3 4"/><text x="${x}" y="${y + 6}" text-anchor="middle" class="q">?</text></g>`;
+      if (k === '?' || k === 'f?') {
+        nodes += `<g class="nd ghost"><circle cx="${x}" cy="${y}" r="${rad - 3}" fill="#101338" stroke="#4a5090" stroke-width="1.6" stroke-dasharray="3 4"/>${k === 'f?' ? `<g transform="translate(${x - 9} ${y - 9}) scale(.75)" fill="none" stroke="#7d86d0" stroke-width="2" stroke-linecap="round">${NODE.normal.icon}</g>` : `<text x="${x}" y="${y + 6}" text-anchor="middle" class="q">?</text>`}</g>`;
         return;
       }
       const d = NODE[k];
@@ -1069,6 +1077,48 @@ function runMapSVG() {
 <rect width="400" height="600" fill="url(#rg)"/>${stars}${cols}${faint}${gold}${nodes}</svg>`;
 }
 
+// ---- Di Vật
+const RELIC_COL = { 1: '#9fb0ff', 2: '#c58bff', 3: '#ffd24a' };
+const relicName = (id) => t(`relic.${id}`);
+const modLines = (id) => {
+  const r = ctx.relics[id];
+  const pct = (v) => Math.round(v * 100);
+  return Object.entries(r.mods).map(([k, v]) => {
+    const el = r.element != null && (k === 'atkPct' || k === 'hpPct');
+    return t(`relic.mod.${k}${el ? 'El' : ''}`, { pct: pct(v), sec: v / 1000, n: v, element: r.element != null ? t(`element.${r.element}`) : '' });
+  });
+};
+function relicCard(id, extra) {
+  const r = ctx.relics[id];
+  return h('div', { class: 'card relic', 'data-relic': id, style: `border-color:${RELIC_COL[r.rarity]}` }, h('b', {}, relicName(id), ' ', h('small', { style: `color:${RELIC_COL[r.rarity]}` }, t(`relic.rarity.${r.rarity}`))), modLines(id).map((l) => h('div', { class: 'muted' }, l)), extra);
+}
+// Hàng chip Di Vật đang giữ; bấm một chip xem chi tiết.
+const relicStrip = () =>
+  run.relics.length
+    ? h('div', { class: 'relic-strip' }, run.relics.map((id) => h('button', { class: 'rchip', 'data-relic': id, style: `border-color:${RELIC_COL[ctx.relics[id].rarity]}`, onclick: () => showRelicSheet(id) }, relicName(id))))
+    : null;
+function showRelicSheet(id) {
+  if ($('info')) return;
+  const close = () => $('info')?.remove();
+  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox' }, h('h3', {}, t('relic.sheet')), id ? relicCard(id) : run.relics.map((r) => relicCard(r)), btn(t('info.close'), close, 'primary', { id: 'info-close' }))));
+}
+function showRelicPick() {
+  screen(
+    floorTitle(),
+    hpBar(),
+    h('h2', {}, t('relic.title')),
+    run.relicChoices.map((id, i) => relicCard(id, btn(t('relic.pick'), () => act({ type: 'pickRelic', index: i }), 'primary', { 'data-pick': i }))),
+    relicStrip(),
+  );
+}
+// Quái xem trước của từng cửa chiến đấu.
+function doorList() {
+  return h('div', { class: 'doorlist' }, run.doors.map((k, i) => {
+    const foes = run.preview?.[i];
+    return h('div', { class: 'dl', 'data-dl': i }, h('b', {}, `${i + 1}. ${t(`door.${k}`)}`), ' ', foes ? h('small', { class: 'muted' }, foes.map((m) => t(`monster.${m}`)).join(', ')) : h('small', { class: 'muted' }, t(`door.desc.${k}`)));
+  }));
+}
+
 function showDoors() {
   saveActiveRun();
   const rc = ctx.config.run.items;
@@ -1091,11 +1141,12 @@ function showDoors() {
     nd.addEventListener('click', go);
     nd.addEventListener('keydown', (e) => e.key === 'Enter' && go());
   });
-  const kinds = [...new Set(run.doors)];
   screen(
     h('div', { class: 'mapnav' }, floorTitle(), h('div', { class: 'muted' }, `${t('run.hp')}: ${Math.round(run.hp)} / ${run.maxHp}`), h('div', { class: 'hpbar' }, h('i', { style: `width:${Math.max(0, (run.hp / run.maxHp) * 100)}%` }))),
     map,
-    h('p', { class: 'sub mapcap' }, run.doors.length > 1 ? t('run.chooseDoor') : t('run.finalDoor'), h('small', {}, kinds.map((k) => `${t(`door.${k}`)}: ${t(`door.desc.${k}`)}`).join('  ·  '))),
+    h('p', { class: 'sub mapcap' }, run.doors.length > 1 ? t('run.chooseDoor') : t('run.finalDoor')),
+    doorList(),
+    relicStrip(),
     items,
     btn(t('run.leave'), leaveRun, '', { id: 'leave-run' }),
   );
@@ -1192,6 +1243,7 @@ function showPause(confirmQuit = false) {
   };
   const body = [
     h('h3', {}, t('pause.title')),
+    run?.relics?.length && confirmQuit !== true ? h('div', { class: 'relic-strip' }, run.relics.map((id) => h('span', { class: 'rchip', style: `border-color:${RELIC_COL[ctx.relics[id].rarity]}`, title: modLines(id).join(' · ') }, relicName(id)))) : null,
     confirmQuit === true
       ? confirmBox(t('pause.quitAsk'), quit, () => { close(); showPause(); }, t('pause.quit'))
       : [...audioControls(), btn(t('pause.resume'), close, 'primary', { id: 'pause-resume' }), btn(t('pause.quit'), () => { close(); showPause(true); }, '', { id: 'pause-quit' })],
@@ -1380,7 +1432,7 @@ function showResult() {
   let body;
   if (r.kind === 'event') {
     const key = `ev.${r.eventId}`;
-    body = h('div', { class: 'card' }, h('b', {}, t(`${key}.title`)), h('p', {}, t(`${key}.o${r.choice}_${r.outcome}`)));
+    body = h('div', { class: 'card' }, h('b', {}, t(`${key}.title`)), h('p', {}, t(`${key}.o${r.choice}_${r.outcome}`)), run.lastRelic ? relicCard(run.lastRelic) : null);
   } else body = h('div', { class: 'card' }, h('b', {}, t('result.rest', { n: r.heal })));
   screen(floorTitle(), hpBar(), body, h('div', { class: 'muted' }, `${t('end.loot')}: ${lootLine(run.loot)}`), btn(t('result.continue'), () => act({ type: 'continue' }), 'primary', { id: 'continue' }));
 }
@@ -1401,14 +1453,11 @@ function showShop() {
   screen(
     h('h2', {}, t('shop.title')),
     h('div', { class: 'muted' }, t('shop.gold', { n: run.loot.gold })),
-    run.shop.map((s, i) =>
-      h(
-        'div',
-        { class: 'card' },
-        h('b', {}, t(`item.${s.item}`)),
-        s.sold ? h('div', { class: 'muted' }, t('shop.sold')) : btn(t('shop.buy', { price: s.price }), () => act({ type: 'buy', slot: i }), '', { 'data-slot': i, ...(run.loot.gold < s.price ? { disabled: '' } : {}) }),
-      ),
-    ),
+    run.shop.map((sl, i) => {
+      const buy = sl.sold ? h('div', { class: 'muted' }, t('shop.sold')) : btn(t('shop.buy', { price: sl.price }), () => act({ type: 'buy', slot: i }), '', { 'data-slot': i, ...(run.loot.gold < sl.price ? { disabled: '' } : {}) });
+      return sl.relic ? relicCard(sl.relic, buy) : h('div', { class: 'card' }, h('b', {}, t(`item.${sl.item}`)), buy);
+    }),
+    relicStrip(),
     btn(t('shop.leave'), () => act({ type: 'leaveShop' }), 'primary', { id: 'leave' }),
   );
 }

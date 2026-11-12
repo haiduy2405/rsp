@@ -27,10 +27,10 @@ const between = (rng, [lo, hi]) => lo + rng.int(hi - lo + 1);
 // races: các tộc của quái trong trận (rỗng = không rớt Lễ Vật).
 // kind: 'normal' | 'elite' | 'boss' | 'chest' | 'completion'. Thứ tự gọi rng cố định.
 // diff: độ khó. Khó hơn thì Vàng/Tinh Hoa nhiều hơn (difficulty.gold) và mọi tỉ lệ rớt cao hơn (difficulty.drop, tối đa 100%).
-export function rollLoot(ctx, kind, rng, diff = 'easy', element = 0, races = []) {
+export function rollLoot(ctx, kind, rng, diff = 'easy', element = 0, races = [], dropMult = 1) {
   const spec = ctx.config.loot[kind];
   const d = ctx.config.difficulty[diff];
-  const chance = (c) => Math.min(1, c * d.drop);
+  const chance = (c) => Math.min(1, c * d.drop * dropMult);
   const out = emptyLoot();
   out.gold = Math.round(between(rng, spec.gold) * d.gold);
   out.essence = Math.round(between(rng, spec.essence) * d.gold);

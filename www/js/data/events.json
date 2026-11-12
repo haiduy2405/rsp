@@ -326,5 +326,330 @@
         ]
       }
     ]
+  },
+  {
+    "id": "gambler",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 40,
+            "effects": [
+              {
+                "type": "gold",
+                "amount": -50
+              },
+              {
+                "type": "relic",
+                "minRarity": 2
+              }
+            ]
+          },
+          {
+            "weight": 60,
+            "effects": [
+              {
+                "type": "gold",
+                "amount": -50
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "none"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "forge",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 70,
+            "effects": [
+              {
+                "type": "maxHpPct",
+                "amount": 0.08
+              }
+            ]
+          },
+          {
+            "weight": 30,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": -0.1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "none"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "traveler",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 65,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": -0.08
+              },
+              {
+                "type": "relic",
+                "minRarity": 1
+              }
+            ]
+          },
+          {
+            "weight": 35,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": -0.08
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "none"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mirror",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 50,
+            "effects": [
+              {
+                "type": "relic",
+                "minRarity": 2
+              }
+            ]
+          },
+          {
+            "weight": 50,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": -0.2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "none"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "feast",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": 0.3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "item",
+                "item": "potion",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cursed_chest",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 55,
+            "effects": [
+              {
+                "type": "relic",
+                "minRarity": 1
+              }
+            ]
+          },
+          {
+            "weight": 45,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": -0.25
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "none"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "oracle",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 35,
+            "effects": [
+              {
+                "type": "relic",
+                "minRarity": 2
+              }
+            ]
+          },
+          {
+            "weight": 65,
+            "effects": [
+              {
+                "type": "essence",
+                "amount": 30
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 100,
+            "effects": [
+              {
+                "type": "maxHpPct",
+                "amount": 0.05
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hoard",
+    "choices": [
+      {
+        "outcomes": [
+          {
+            "weight": 60,
+            "effects": [
+              {
+                "type": "gold",
+                "amount": 150
+              }
+            ]
+          },
+          {
+            "weight": 40,
+            "effects": [
+              {
+                "type": "hpPct",
+                "amount": -0.2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "outcomes": [
+          {
+            "weight": 30,
+            "effects": [
+              {
+                "type": "stone",
+                "kind": "rare",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "weight": 70,
+            "effects": [
+              {
+                "type": "essence",
+                "amount": 20
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]

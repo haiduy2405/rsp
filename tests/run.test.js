@@ -48,7 +48,7 @@ function findRun(pred, zoneId = 'zone_water', floor = 0) {
   }
   throw new Error('không tìm được seed');
 }
-const freeDoors = (seed) => { const all = ['normal', 'chest', 'rest', 'event', 'shop']; const o = seed % all.length; return [all[o], all[(o + 1) % 5], all[(o + 2) % 5]]; };
+const freeDoors = (seed) => { const all = ['normal', 'chest', 'rest', 'event', 'shop', 'shrine', 'elite']; const o = seed % all.length; return [all[o], all[(o + 1) % 7], all[(o + 2) % 7]]; };
 const doorOf = (type) => (run) => run.doors.indexOf(type);
 
 test('run: tạo chuyến xác định, mọi ải cùng số tầng, 3 cửa mỗi tầng trừ Boss cuối', () => {
@@ -63,17 +63,19 @@ test('run: tạo chuyến xác định, mọi ải cùng số tầng, 3 cửa m�
   }
 });
 
-test('run: mọi đường đều qua trận thường, đúng 1 tầng Elite bắt buộc rồi Boss cuối ải (mọi khu)', () => {
+const COMBAT = ['normal', 'swarm', 'elite', 'boss'];
+test('run: tầng đánh xen kẽ tầng sự kiện; mọi đường đều đủ trận, đúng 1 tầng Elite rồi Boss cuối ải (mọi khu)', () => {
   const { layout, pools } = ctx.config.run;
+  const combatPool = (name) => Object.keys(pools[name]).every((k) => COMBAT.includes(k));
   assert.equal(layout.at(-1).pool, 'boss');
   assert.deepEqual(Object.keys(pools.boss), ['boss']);
   assert.deepEqual(Object.keys(pools.elite), ['elite']);
   assert.equal(layout.filter((l) => l.pool === 'elite').length, 1);
-  assert.ok(layout.filter((l) => l.pool === 'fight').length >= 2, 'vài tầng toàn cửa đánh');
-  assert.deepEqual(Object.keys(pools.fight).sort(), ['elite', 'normal']);
+  assert.ok(layout.filter((l) => combatPool(l.pool)).length >= 4, 'đủ tầng đánh');
+  for (let i = 1; i < layout.length; i++) assert.ok(combatPool(layout[i].pool) || combatPool(layout[i - 1].pool), 'không có hai tầng sự kiện liền nhau');
   for (const z of ctx.zoneList) {
     assert.ok(z.monsters.boss.length >= 1, z.id);
-    // Đường nào cũng vậy: chọn lần lượt từng cửa (0, 1, 2) đi hết ải; mỗi tầng "fight/elite/boss" chỉ có cửa đánh.
+    // Đường nào cũng vậy: chọn lần lượt từng cửa (0, 1, 2) đi hết ải.
     for (const pick of [0, 1, 2]) {
       let run = mk(3, z.id);
       let fights = 0;
@@ -82,21 +84,27 @@ test('run: mọi đường đều qua trận thường, đúng 1 tầng Elite b�
       while (run.phase !== 'end' && guard++ < 300) {
         if (run.phase === 'doors') {
           const pool = layout[run.floor].pool;
-          if (pool !== 'free') assert.ok(run.doors.every((d) => ['normal', 'elite', 'boss'].includes(d)), `${pool}: ${run.doors}`);
-          if (pool === 'free') assert.equal(new Set(run.doors).size, run.doors.length, 'cửa tầng tự do khác nhau');
+          if (combatPool(pool)) {
+            assert.ok(run.doors.every((d) => COMBAT.includes(d)), `${pool}: ${run.doors}`);
+            assert.ok(run.preview.every((e) => e?.length >= 2), 'cửa đánh có quái xem trước');
+          } else {
+            assert.equal(new Set(run.doors).size, run.doors.length, 'cửa tầng sự kiện khác nhau');
+            assert.ok(run.doors.every((d) => !COMBAT.includes(d)));
+          }
           if (pool === 'elite') assert.ok(run.doors.every((d) => d === 'elite'));
           if (pool === 'boss') assert.deepEqual(run.doors, ['boss']);
           const door = Math.min(pick, run.doors.length - 1);
-          if (['normal', 'elite', 'boss'].includes(run.doors[door])) fights++;
+          if (COMBAT.includes(run.doors[door])) fights++;
           if (run.doors[door] === 'elite') elites++;
           run = runStep(ctx, run, { type: 'door', index: door }).run;
         } else if (run.phase === 'battle') run = runStep(ctx, rigWin(run), winMove).run;
         else if (run.phase === 'result') run = runStep(ctx, run, { type: 'continue' }).run;
         else if (run.phase === 'event') run = runStep(ctx, run, { type: 'eventChoice', index: 1 }).run;
         else if (run.phase === 'shop') run = runStep(ctx, run, { type: 'leaveShop' }).run;
+        else if (run.phase === 'relic') run = runStep(ctx, run, { type: 'pickRelic', index: 0 }).run;
       }
       assert.equal(run.result, 'won', z.id);
-      assert.ok(fights >= 4, `${z.id} đường ${pick}: ${fights} trận`); // >= 2 thường + 1 elite + boss
+      assert.ok(fights >= 4, `${z.id} đường ${pick}: ${fights} trận`); // 2 tầng đánh + 1 elite + boss
       assert.ok(elites >= 1);
     }
   }
@@ -250,22 +258,71 @@ test('event: mọi lựa chọn của mọi sự kiện áp dụng được, má
   }
 });
 
-test('shop: mua cần đủ Vàng, mỗi ô chỉ mua một lần, rời shop sang ải kế', () => {
+test('shop: bán Di Vật và vật phẩm; mua cần đủ Vàng, mỗi ô chỉ mua một lần, rời shop sang ải kế', () => {
   const { run, idx } = findRun(doorOf('shop'), 'zone_water', 1);
   let r = runStep(ctx, run, { type: 'door', index: idx }).run;
   assert.equal(r.phase, 'shop');
-  assert.equal(r.shop.length, ctx.config.run.shopSlots);
+  const rc = ctx.config.run;
+  assert.equal(r.shop.length, rc.shopRelics + rc.shopSlots);
+  assert.equal(r.shop.filter((x) => x.relic).length, rc.shopRelics);
   assert.equal(runStep(ctx, r, { type: 'buy', slot: 0 }).events[0].reason, 'not_enough_gold');
   r.loot.gold = 1000;
-  const item = r.shop[0].item;
-  const price = r.shop[0].price;
+  // Di Vật
+  const relic = r.shop[0].relic;
+  const rp = r.shop[0].price;
   r = runStep(ctx, r, { type: 'buy', slot: 0 }).run;
-  assert.equal(r.loot.gold, 1000 - price);
+  assert.equal(r.loot.gold, 1000 - rp);
+  assert.deepEqual(r.relics, [relic]);
+  // Vật phẩm
+  const slot = r.shop.findIndex((x) => x.item);
+  const item = r.shop[slot].item;
+  const price = r.shop[slot].price;
+  r = runStep(ctx, r, { type: 'buy', slot }).run;
+  assert.equal(r.loot.gold, 1000 - rp - price);
   assert.equal(r.items[item], 1);
-  assert.equal(runStep(ctx, r, { type: 'buy', slot: 0 }).events[0].reason, 'bad_slot');
+  assert.equal(runStep(ctx, r, { type: 'buy', slot }).events[0].reason, 'bad_slot');
   r = runStep(ctx, r, { type: 'leaveShop' }).run;
   assert.equal(r.phase, 'doors');
   assert.equal(r.floor, 2);
+});
+
+test('Di Vật: thắng Elite thì chọn 1 trong 3 sau màn thưởng; chọn xong sang ải kế', () => {
+  const { run, idx } = findRun(doorOf('elite'), 'zone_water', 1);
+  let r = runStep(ctx, run, { type: 'door', index: idx }).run;
+  r = runStep(ctx, rigWin(r), winMove).run;
+  assert.equal(r.phase, 'result');
+  assert.equal(r.pendingRelic, true);
+  r = runStep(ctx, r, { type: 'continue' }).run;
+  assert.equal(r.phase, 'relic');
+  assert.equal(r.relicChoices.length, ctx.config.relic.choices);
+  assert.equal(new Set(r.relicChoices).size, r.relicChoices.length);
+  assert.equal(runStep(ctx, r, { type: 'pickRelic', index: 9 }).events[0].reason, 'bad_choice');
+  const id = r.relicChoices[1];
+  r = runStep(ctx, r, { type: 'pickRelic', index: 1 }).run;
+  assert.deepEqual(r.relics, [id]);
+  assert.equal(r.phase, 'doors');
+  assert.equal(r.floor, 2);
+});
+
+test('Di Vật: tăng máu tối đa thì máu hiện tại tăng theo; hiệu lực vào trận', () => {
+  let r = mk(4);
+  const hp0 = r.maxHp;
+  r = runStep(ctx, { ...r, phase: 'relic', relicChoices: ['ironheart'] }, { type: 'pickRelic', index: 0 }).run;
+  assert.ok(r.maxHp > hp0 && r.hp === r.maxHp);
+  r.floor = 2;
+  r.doors = ['normal', 'normal', 'normal'];
+  r.phase = 'doors';
+  const b = runStep(ctx, r, { type: 'door', index: 0 }).run;
+  assert.equal(b.battle.maxHp, r.maxHp);
+});
+
+test('đền thờ: chọn 1 trong 3 Di Vật miễn phí', () => {
+  const { run, idx } = findRun(doorOf('shrine'), 'zone_water', 1);
+  let r = runStep(ctx, run, { type: 'door', index: idx }).run;
+  assert.equal(r.phase, 'relic');
+  assert.equal(r.relicChoices.length, 3);
+  r = runStep(ctx, r, { type: 'pickRelic', index: 0 }).run;
+  assert.equal(r.relics.length, 1);
 });
 
 test('run: hành động sai pha bị từ chối, state không đổi', () => {
@@ -294,6 +351,7 @@ function botRun(seed, zoneId, rngSeed) {
       a = { type: 'battle', action: skill ? { type: 'skill', index: rng.int(5) } : { type: 'move', path: randomPath(rng) } };
     } else if (run.phase === 'result') a = { type: 'continue' };
     else if (run.phase === 'event') a = { type: 'eventChoice', index: rng.int(2) };
+    else if (run.phase === 'relic') a = { type: 'pickRelic', index: rng.int(run.relicChoices.length) };
     else if (run.phase === 'shop') a = rng.next() < 0.5 && run.shop.some((s) => !s.sold) ? { type: 'buy', slot: run.shop.findIndex((s) => !s.sold) } : { type: 'leaveShop' };
     const out = runStep(ctx, run, a);
     if (out.events[0]?.type !== 'invalid') rec.actions.push(a);

@@ -109,3 +109,10 @@ Sau khi xoay ngọc: mỗi tướng nảy số sát thương của mình ngay tr
 - **Lễ Vật** theo tộc, 3 bậc (`than_1`…`linh_3`): rớt theo tộc của quái trong trận, độ khó cao rớt bậc cao (`config.offeringTier`). Nâng kỹ năng tốn Lễ Vật đúng tộc của tướng + Vàng (`config.skillUp.cost`).
 - **Bị động**: kiểu `stat` (tăng HP/ATK/Hồi cho bản thân, cả đội hoặc một hệ) hoặc kiểu `trigger` (đầu trận, hoặc mỗi N lượt chạy các đơn vị kỹ năng như kỹ năng chủ động). Dữ liệu ở `characters.json` (`passive`).
 - Lưu game v7 (migrate thêm `skillLv`, `offerings`). Kỹ năng chủ động của 24 tướng giữ nguyên bản cũ, bản thiết kế mới đi cùng Form 2 (v0.15).
+
+## Đường đi đa dạng, Di Vật, sự kiện (v0.15)
+- **Bố cục 6 tầng** (`config.run.layout`): tầng đánh (toàn cửa chiến đấu) xen kẽ tầng sự kiện (toàn cửa phục vụ), rồi tầng Elite (đủ 3 cửa Elite), rồi Boss. Mọi đường đều qua đủ trận, không thể chỉ nhặt rương/nghỉ rồi tới Boss; các đường vẫn khác nhau vì loại cửa ngẫu nhiên và **quái xem trước ở từng cửa** (`run.preview`).
+- **Cửa mới**: Bầy quái (3 quái yếu hơn, thưởng nhiều hơn), Đền thờ (chọn 1 trong 3 Di Vật miễn phí), Thương nhân (bán Di Vật theo độ hiếm và vật phẩm bằng Vàng trong chuyến).
+- **Di Vật** (`data/relics.json`, `core/relic.js`): 29 món, 3 độ hiếm, chỉ có hiệu lực trong chuyến. Gồm tăng chỉ số, khiên/tăng công đầu trận, hút máu, hồi sinh một lần, đánh toàn bộ quái từ 4 ngọc (Lăng Kính), thêm sát thương combo, giảm hồi chiêu đầu trận, thêm Vàng/rớt đồ... Nguồn: chọn 1 trong 3 sau khi thắng Elite, Đền thờ, Thương nhân, sự kiện.
+- **16 sự kiện** (`data/events.json`), thêm hiệu ứng `relic` (Di Vật ngẫu nhiên, có thể đòi bậc tối thiểu) và `maxHpPct` (máu tối đa của chuyến).
+- Nhớ: bot của balance-sim chọn Di Vật hiếm nhất và mua Di Vật trước vật phẩm.
