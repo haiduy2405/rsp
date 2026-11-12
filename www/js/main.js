@@ -244,6 +244,8 @@ function showHub() {
   $('screen').classList.add('hub');
   atHub = true;
   notice = null;
+  const nEl = document.querySelector('#screen .hub-notice'); // thông báo tự mờ rồi biến mất sau vài giây
+  if (nEl) setTimeout(() => { nEl.classList.add('fade'); setTimeout(() => nEl.remove(), 600); }, 4000);
   // Hướng dẫn tân thủ: shop (quà miễn phí) → Chiến đấu → ải 1 → Vào trận → luật chọn đường
   let gs = guideStep();
   if (gs && gs !== 'shop' && gs !== 'battle') { guideSet('battle'); gs = 'battle'; }

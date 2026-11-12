@@ -375,3 +375,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ### v0.50.2
 - Chữ hướng dẫn triệu hồi: "Đặt pháo vào ống pháo để bắn pháo!"; viên pháo có ngòi cháy.
+
+### v0.50.3
+- Thông báo ở màn chính hết bị lệch phải (width 100% + lề), và tự mờ rồi biến mất sau 4 giây.
