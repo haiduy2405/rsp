@@ -487,7 +487,7 @@
   "items.stones": "Tinh Thạch theo hệ",
   "team.selected": "Đang chọn",
   "team.inTeam": "Đang ở ô {n}",
-  "team.holdHint": "Nhấn giữ một tướng để xem chi tiết. Chọn một ô rồi chạm tướng khác để thay/đổi chỗ.",
+  "team.holdHint": "Chọn một ô rồi chạm tướng bên dưới để đưa vào đội (hoặc đổi chỗ). Nhấn giữ một tướng để xem chi tiết.",
   "hub.shop": "Cửa hàng",
   "hub.quests": "Nhiệm vụ",
   "hub.help": "Hướng dẫn chơi",
@@ -501,5 +501,11 @@
   "help.t2": "Từ 3 ngọc cùng màu liền nhau trở lên sẽ nổ. Càng nhiều combo, sát thương càng lớn.",
   "help.t3": "Ngọc cùng hệ với nhân vật mới gây sát thương; ngọc tim hồi máu cho cả đội.",
   "help.t4": "Chạm nhanh vào tướng sáng \"Sẵn sàng\" để dùng kỹ năng. Hai tướng đứng liền nhau thuộc một cặp Duo sẽ mở kỹ năng ghép.",
-  "help.t5": "Chạm vào quái để khóa mục tiêu cho cả đội. Nhấn giữ tướng hoặc quái để xem chi tiết."
+  "help.t5": "Chạm vào quái để khóa mục tiêu cho cả đội. Nhấn giữ tướng hoặc quái để xem chi tiết.",
+  "team.auto": "Tự lập đội",
+  "team.remove": "Bỏ ra",
+  "team.clear": "Bỏ hết",
+  "team.empty": "Trống",
+  "team.needLeader": "Ô 1 là đội trưởng, cần có tướng ở ô 1 mới vào trận được.",
+  "team.needAny": "Đội đang trống. Chọn ít nhất một tướng vào ô 1."
 }

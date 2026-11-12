@@ -487,7 +487,7 @@
   "items.stones": "Stones by element",
   "team.selected": "Selected",
   "team.inTeam": "In slot {n}",
-  "team.holdHint": "Hold a character for details. Pick a slot, then tap another character to replace/swap.",
+  "team.holdHint": "Pick a slot, then tap a character below to place or swap. Hold a character for details.",
   "hub.shop": "Shop",
   "hub.quests": "Quests",
   "hub.help": "How to play",
@@ -501,5 +501,11 @@
   "help.t2": "3 or more orbs of one color in a line burst. More combos, more damage.",
   "help.t3": "Orbs matching a character's element deal damage; heart orbs heal the whole team.",
   "help.t4": "Tap a glowing \"Ready\" hero to use their skill. Two neighbors forming a Duo pair unlock a combined skill.",
-  "help.t5": "Tap an enemy to lock the target for the whole team. Hold a hero or enemy for details."
+  "help.t5": "Tap an enemy to lock the target for the whole team. Hold a hero or enemy for details.",
+  "team.auto": "Auto team",
+  "team.remove": "Remove",
+  "team.clear": "Clear all",
+  "team.empty": "Empty",
+  "team.needLeader": "Slot 1 is the leader; put a character there to start.",
+  "team.needAny": "The team is empty. Put at least one character in slot 1."
 }

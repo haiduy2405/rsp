@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { newProgress, isValidProgress } from '../www/js/core/progress.js';
-import { levelCost, levelUp, awakenCost, awaken, grantCharacter, setTeam, teamRoster, selectPreset, makeLeader, presetsOf } from '../www/js/core/upgrade.js';
+import { levelCost, levelUp, awakenCost, awaken, grantCharacter, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, placeInSlot, clearTeam, autoTeam, charPower } from '../www/js/core/upgrade.js';
 import { migrate } from '../www/js/save/migrate.js';
 import { createRun, playRun, newRunRecord, runStep } from '../www/js/core/run.js';
 import { statsFor } from '../www/js/core/stats.js';
@@ -131,7 +131,7 @@ test('chuyến leo tháp dùng chỉ số theo Level/Thức tỉnh và vẫn xá
   assert.deepEqual(playRun(ctx, rec), r);
 });
 
-test('đội lưu sẵn + đổi đội trưởng', () => {
+test('đội lưu sẵn: đội 2-3 trống, đội 1 giữ nguyên', () => {
   const p0 = newProgress(ctx);
   const l = makeLeader(p0, 2);
   assert.ok(l.ok);
@@ -140,10 +140,53 @@ test('đội lưu sẵn + đổi đội trưởng', () => {
   assert.ok(isValidProgress(l.progress));
   const a = selectPreset(l.progress, 1);
   assert.ok(a.ok && a.progress.preset === 1);
-  const b = makeLeader(a.progress, 4);
+  assert.deepEqual(a.progress.team, [null, null, null, null, null]);
+  assert.ok(isValidProgress(a.progress));
+  assert.equal(teamRoster(a.progress).length, 0);
+  const b = placeInSlot(a.progress, 0, p0.team[1]);
+  assert.ok(b.ok);
   const c = selectPreset(b.progress, 0);
-  assert.deepEqual(c.progress.team, l.progress.team); // đội 1 giữ nguyên
-  assert.deepEqual(presetsOf(c.progress)[1], b.progress.team); // đội 2 giữ thay đổi
+  assert.deepEqual(c.progress.team, l.progress.team);
+  assert.deepEqual(presetsOf(c.progress)[1], b.progress.team);
   assert.equal(selectPreset(p0, 3).ok, false);
   assert.equal(makeLeader(p0, 9).ok, false);
+});
+
+test('đặt/bỏ tướng vào ô, đổi chỗ, bỏ hết', () => {
+  const p0 = newProgress(ctx);
+  const [a, b] = p0.team;
+  const out = placeInSlot(p0, 1, null);
+  assert.ok(out.ok);
+  assert.equal(out.progress.team[1], null);
+  assert.equal(teamRoster(out.progress).length, 4);
+  const mv = placeInSlot(out.progress, 1, a); // a đang ở ô 0 → ô 0 nhận ô 1 (trống)
+  assert.equal(mv.progress.team[1], a);
+  assert.equal(mv.progress.team[0], null);
+  const sw = placeInSlot(p0, 0, b); // đổi chỗ a, b
+  assert.equal(sw.progress.team[0], b);
+  assert.equal(sw.progress.team[1], a);
+  assert.equal(placeInSlot(p0, 0, 'khong_co').ok, false);
+  const none = clearTeam(p0);
+  assert.ok(none.ok && none.progress.team.every((x) => x === null));
+  assert.ok(isValidProgress(none.progress));
+});
+
+test('auto lập đội: chọn tướng mạnh, không trùng, đội trưởng mạnh nhất', () => {
+  let p = newProgress(ctx);
+  for (const c of ctx.characterList.slice(0, 12)) {
+    const r = grantCharacter(ctx, p, c.id);
+    if (r.ok) p = r.progress;
+  }
+  const r = autoTeam(ctx, p);
+  assert.ok(r.ok);
+  const t = r.progress.team;
+  assert.equal(t.filter(Boolean).length, 5);
+  assert.equal(new Set(t).size, 5);
+  const pw = (id) => charPower(ctx, p, id);
+  assert.ok(t.every((id) => pw(t[0]) >= pw(id)));
+  assert.deepEqual(autoTeam(ctx, p).progress.team, t); // tất định
+  assert.ok(isValidProgress(r.progress));
+  // ít tướng hơn 5 thì để trống
+  const q = autoTeam(ctx, newProgress(ctx));
+  assert.ok(q.ok);
 });

@@ -41,3 +41,11 @@ test('config.balance.targets phủ đủ 6 khu với dải thắng hợp lệ', 
     assert.ok(b.level >= 1 && b.level <= ctx.config.progression.levelMax);
   }
 });
+
+test('đội thiếu người (1-4 tướng) vẫn chơi trọn một chuyến', () => {
+  for (const n of [1, 2, 4]) {
+    const team = ['thetis', 'bennu', 'atalanta', 'eos', 'eir'].slice(0, n).map((id) => ({ id, level: 5, awaken: 0 }));
+    const r = playFullRun(3, 'zone_water', team, 4);
+    assert.ok(r, `n=${n}`);
+  }
+});

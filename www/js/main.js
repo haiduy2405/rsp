@@ -2,7 +2,7 @@ import { buildCtx } from './core/ctx.js';
 import { createRun, runStep, newRunRecord, debugWinBattle } from './core/run.js';
 import { applyRunResult } from './core/progress.js';
 import { createStorage, browserAdapter } from './save/storage.js';
-import { grantCharacter, levelCost, levelUp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT } from './core/upgrade.js';
+import { grantCharacter, levelCost, levelUp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
 import { KEYS } from './core/effects.js';
 import { summon, redeemCharacter, effectiveRates } from './core/summon.js';
@@ -145,7 +145,7 @@ function showHub() {
     const st = inv.stones[z.element];
     return h(
       'div',
-      { class: 'card btn gate' + (open ? '' : ' locked'), 'data-zone': z.id, style: `--el:${COLORS[z.element]}`, onclick: open ? () => showTeam(0, undefined, z.id) : null },
+      { class: 'card btn gate' + (open ? '' : ' locked'), 'data-zone': z.id, style: `--el:${COLORS[z.element]}`, onclick: open ? () => showTeam(undefined, undefined, z.id) : null },
       getImg(`orb:${z.element}`) ? h('img', { src: getImg(`orb:${z.element}`).src, alt: '' }) : null,
       h(
         'div',
@@ -180,7 +180,7 @@ function showHub() {
     h(
       'nav',
       { class: 'dock' },
-      dockBtn('team', t('hub.team'), () => showTeam(0), 'b-team'),
+      dockBtn('team', t('hub.team'), () => showTeam(), 'b-team'),
       dockBtn('shop', t('hub.shop'), () => showHubShop(), 'b-shop', 'sub'),
       dockBtn('summon', t('hub.summon'), () => showSummon('standard'), 'b-summon', 'main'),
       dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest'),
@@ -262,7 +262,7 @@ function showCollection() {
   screen(
     h('h2', {}, `${t('hub.collection')} ${owned().length}/${list.length}`),
     list.map((c) => charCard(c.id, () => showChar(c.id, undefined, showCollection))),
-    btn(t('back'), () => showTeam(0), '', { id: 'back' }),
+    btn(t('back'), () => showTeam(), '', { id: 'back' }),
   );
 }
 
@@ -332,12 +332,29 @@ function showChar(id, msg, back) {
   );
 }
 
+// Ô nhân vật vuông kiểu thẻ: viền độ hiếm, chấm hệ, sao, cấp. `slotNo` = đang ở ô số mấy trong đội.
+function tile(id, slotNo) {
+  const def = ctx.characters[id];
+  const c = progress.characters[id];
+  return h(
+    'div',
+    { class: 'tile' + (slotNo ? ' in' : ''), 'data-char': id },
+    portrait(id, 66),
+    h('i', { class: 'tdot', style: `background:${COLORS[def.element]}` }),
+    slotNo ? h('b', { class: 'tslot' }, String(slotNo)) : null,
+    h('span', { class: 'tlv' }, `${c.level}`),
+    h('span', { class: 'tst' }, '★'.repeat(def.rarity)),
+  );
+}
+
 // Màn đội hình: dùng cả ở menu (Đội hình) lẫn trước khi vào trận (zoneId có giá trị).
 function showTeam(slot, msg, zoneId) {
   const team = progress.team;
+  if (slot === undefined || slot === null) slot = Math.max(0, team.indexOf(null));
+  const members = team.filter((id) => id !== null);
   const duos = [];
-  for (let i = 0; i + 1 < 5; i++) {
-    const d = ctx.duoByPair[`${team[i]}|${team[i + 1]}`];
+  for (let i = 0; i + 1 < members.length; i++) {
+    const d = ctx.duoByPair[`${members[i]}|${members[i + 1]}`];
     if (d) duos.push(d);
   }
   const apply = (r) => {
@@ -345,34 +362,46 @@ function showTeam(slot, msg, zoneId) {
       progress = r.progress;
       save();
     }
+    return r.ok;
   };
+  const again = (sl) => showTeam(sl, undefined, zoneId);
   const pick = (id) => {
-    const t2 = team.slice();
-    const at = t2.indexOf(id);
-    if (at >= 0) [t2[at], t2[slot]] = [t2[slot], t2[at]];
-    else t2[slot] = id;
-    apply(setTeam(progress, t2));
-    showTeam(slot, undefined, zoneId);
+    const wasEmpty = team[slot] === null;
+    if (!apply(placeInSlot(progress, slot, id))) return again(slot);
+    // lấp ô trống xong thì nhảy sang ô trống kế tiếp để chọn liền tay
+    const nxt = wasEmpty ? progress.team.findIndex((x, i) => x === null && i > slot) : -1;
+    again(nxt >= 0 ? nxt : slot);
   };
   const cur = progress.preset ?? 0;
-  const tabs = h('div', { class: 'row' }, presetsOf(progress).map((_, i) => h('button', { class: 'btn' + (i === cur ? ' primary' : ''), 'data-preset': i, onclick: () => { apply(selectPreset(progress, i)); showTeam(0, undefined, zoneId); } }, t('team.preset', { n: i + 1 }))));
-  const slots = h('div', { class: 'row', style: 'align-items:flex-end' }, team.map((id, i) => {
+  const tabs = h('div', { class: 'row' }, presetsOf(progress).map((_, i) => h('button', { class: 'btn' + (i === cur ? ' primary' : ''), 'data-preset': i, onclick: () => { apply(selectPreset(progress, i)); showTeam(undefined, undefined, zoneId); } }, t('team.preset', { n: i + 1 }))));
+  const slots = h('div', { class: 'slots' }, team.map((id, i) => {
     const lead = i === 0;
     const sel = i === slot;
-    return longPress(h('div', { class: 'card btn' + (sel ? ' slot-sel' : ''), style: `width:${lead ? 96 : 84}px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px;${lead ? 'padding-bottom:14px;border-color:#ffd24a;box-shadow:0 0 14px #ffd24a88;' : ''}`, 'data-slot': i, onclick: () => showTeam(i, undefined, zoneId) }, h('small', { style: lead ? 'color:#ffd24a;font-weight:800' : '' }, lead ? '♛ ' + t('team.leader') : t('team.slot', { n: i + 1 })), portrait(id, lead ? 72 : 60), h('small', {}, t(`char.${id}`)), sel ? h('small', { class: 'sel-tag' }, t('team.selected')) : null), () => showChar(id, undefined, () => showTeam(i, undefined, zoneId)));
+    const cls = 'slot' + (lead ? ' lead' : '') + (sel ? ' slot-sel' : '') + (id ? '' : ' empty');
+    const body = id ? [h('small', { class: 'sname' }, lead ? '♛' : String(i + 1)), portrait(id, 60), h('small', { class: 'sn' }, t(`char.${id}`))] : [h('small', { class: 'sname' }, lead ? '♛' : String(i + 1)), h('div', { class: 'plus' }, '+'), h('small', { class: 'sn' }, lead ? t('team.leader') : t('team.empty'))];
+    const node = h('div', { class: cls, 'data-slot': i, onclick: () => again(i) }, ...body);
+    return id ? longPress(node, () => showChar(id, undefined, () => again(i))) : node;
   }));
+  const needLeader = team[0] === null;
+  const sorted = owned().slice().sort((a, b) => b.rarity - a.rarity || a.element - b.element || progress.characters[b.id].level - progress.characters[a.id].level || (a.id < b.id ? -1 : 1));
   screen(
     h('h2', {}, zoneId ? t('team.prep', { zone: t(`zone.${zoneId}`) }) : t('hub.team')),
     tabs,
-    h('p', { class: 'muted' }, t('team.hint'), ' ', t('team.holdHint')),
     slots,
-    slot > 0 ? btn(t('team.makeLeader', { name: t(`char.${team[slot]}`) }), () => { apply(makeLeader(progress, slot)); showTeam(0, undefined, zoneId); }, '', { id: 'make-leader' }) : null,
-    h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(ctx.characters[team[0]].leader)}`),
-    h('div', { class: 'muted' }, duos.length ? `${t('team.duoActive')}: ${duos.map((d) => t(`duo.${d.id}`)).join(', ')}` : t('team.noDuo')),
-    zoneId ? btn(t('team.go'), () => startRun(zoneId), 'primary', { id: 'team-go' }) : null,
+    h(
+      'div',
+      { class: 'row tools' },
+      btn(t('team.auto'), () => { apply(autoTeam(ctx, progress)); again(0); }, '', { id: 'team-auto' }),
+      btn(t('team.remove'), () => { apply(placeInSlot(progress, slot, null)); again(slot); }, '', { id: 'team-remove', ...(team[slot] === null ? { disabled: '' } : {}) }),
+      btn(t('team.clear'), () => { apply(clearTeam(progress)); again(0); }, '', { id: 'team-clear', ...(members.length ? {} : { disabled: '' }) }),
+      slot > 0 && team[slot] ? btn(t('team.makeLeader', { name: t(`char.${team[slot]}`) }), () => { apply(makeLeader(progress, slot)); again(0); }, '', { id: 'make-leader' }) : null,
+    ),
+    members.length ? h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(ctx.characters[members[0]].leader)}`) : null,
+    h('div', { class: 'muted' }, members.length < 2 ? t('team.noDuo') : duos.length ? `${t('team.duoActive')}: ${duos.map((d) => t(`duo.${d.id}`)).join(', ')}` : t('team.noDuo')),
+    zoneId ? [needLeader || !members.length ? h('div', { class: 'notice' }, t(members.length ? 'team.needLeader' : 'team.needAny')) : null, btn(t('team.go'), () => startRun(zoneId), 'primary', { id: 'team-go', ...(needLeader ? { disabled: '' } : {}) })] : null,
+    h('p', { class: 'muted' }, t('team.holdHint')),
+    h('div', { class: 'roster' }, sorted.map((c) => longPress(Object.assign(tile(c.id, team.indexOf(c.id) + 1 || 0), { onclick: () => pick(c.id) }), () => showChar(c.id, undefined, () => again(slot))))),
     btn(`${t('hub.collection')} ${owned().length}/${ctx.characterList.length}`, () => showCollection(), '', { id: 'team-col' }),
-    h('h3', {}, t('team.pickFor', { n: slot === 0 ? t('team.leader') : t('team.slot', { n: slot + 1 }) })),
-    owned().map((c) => longPress(charCard(c.id, () => pick(c.id), team.includes(c.id) ? h('small', { class: 'in-team' }, t('team.inTeam', { n: team.indexOf(c.id) + 1 })) : null), () => showChar(c.id, undefined, () => showTeam(slot, undefined, zoneId)))),
     btn(t('back'), showHub, '', { id: 'back' }),
   );
 }

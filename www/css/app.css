@@ -191,3 +191,24 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 @keyframes selpulse { 50% { box-shadow: 0 0 0 2px #7dffa0, 0 0 28px rgba(125, 255, 160, .85); } }
 .sel-tag { color: #7dffa0; font-weight: 800; }
 .in-team { color: #7dffa0; font-weight: 700; }
+
+.slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; align-items: end; width: 100%; }
+.slot { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 2px 6px; border: 1px solid var(--line); background: linear-gradient(180deg, rgba(29, 35, 88, .74), rgba(12, 15, 44, .88)); border-radius: 6px; cursor: pointer; }
+.slot .sname { color: var(--mute); font-weight: 800; font-size: 11px; line-height: 1; }
+.slot .sn { font-size: 10px; line-height: 1.1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot.lead { padding-top: 12px; padding-bottom: 12px; border-color: #ffd24a; box-shadow: 0 0 14px #ffd24a77; }
+.slot.lead .sname { color: #ffd24a; font-size: 14px; }
+.slot.empty { border-style: dashed; background: rgba(8, 10, 34, .5); min-height: 92px; justify-content: center; }
+.slot .plus { font-size: 30px; line-height: 1; color: var(--mute); font-weight: 300; }
+.slot > div:not(.plus) { width: 100% !important; max-width: 60px; height: auto !important; aspect-ratio: 1; }
+.tools { gap: 6px; }
+.tools button { min-height: 40px; padding: 6px 12px; font-size: 13px; }
+.tools button[disabled] { opacity: .4; }
+.roster { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; width: 100%; justify-items: center; }
+.tile { position: relative; width: 72px; padding: 3px; cursor: pointer; border-radius: 10px; background: rgba(8, 10, 34, .6); user-select: none; }
+.tile > div:first-child { width: 66px !important; height: 66px !important; }
+.tile .tdot { position: absolute; left: 7px; top: 7px; width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid #fff; box-shadow: 0 0 5px rgba(0, 0, 0, .7); }
+.tile .tlv { position: absolute; right: 6px; bottom: 17px; font: 700 11px/1 'Oswald', var(--sans); color: #fff; background: rgba(6, 7, 26, .8); border-radius: 3px; padding: 2px 4px; }
+.tile .tst { display: block; text-align: center; font-size: 9px; line-height: 1.2; color: var(--gold-hi); letter-spacing: -1px; }
+.tile .tslot { position: absolute; right: 6px; top: 6px; min-width: 16px; padding: 1px 3px; text-align: center; font-size: 10px; border-radius: 8px; background: #7dffa0; color: #06210f; }
+.tile.in > div:first-child { opacity: .45; }

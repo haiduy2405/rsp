@@ -35,10 +35,12 @@ export function isValidProgress(p) {
   }
   if (!Array.isArray(p.unlocked) || p.unlocked.length === 0) return false;
   if (!p.clears || !p.pity || !p.stats) return false;
-  if (!Array.isArray(p.team) || p.team.length !== 5 || new Set(p.team).size !== 5) return false;
+  if (!Array.isArray(p.team) || p.team.length !== 5) return false;
+  const ids = p.team.filter((id) => id !== null);
+  if (new Set(ids).size !== ids.length) return false;
   if (!p.characters || typeof p.characters !== 'object') return false;
   for (const c of Object.values(p.characters)) if (!Number.isInteger(c.level) || c.level < 1 || !Number.isInteger(c.awaken) || c.awaken < 0 || c.awaken > 5) return false;
-  if (!p.team.every((id) => p.characters[id])) return false;
+  if (!ids.every((id) => p.characters[id])) return false;
   if (!p.player || typeof p.player.name !== 'string' || !p.onboarding || typeof p.onboarding.done !== 'boolean') return false;
   const sm = p.summon;
   if (!sm || !Number.isInteger(sm.pity5) || !Number.isInteger(sm.pity4) || !Number.isInteger(sm.pulls) || !Array.isArray(sm.history)) return false;
