@@ -750,6 +750,7 @@ function showEnd() {
 }
 
 if (DEBUG) {
+  window.__ctx = ctx;
   window.__cheat = (ids = []) => {
     const p = structuredClone(progress);
     p.inventory.essence += 5000;
