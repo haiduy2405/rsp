@@ -422,3 +422,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - **Màn Đội hình dựng lại:** 3 tab Đội đều nhau, 5 ô đội luôn nằm một hàng (class mới `tm-slot`, hết đụng CSS ô Hòm đồ), huy hiệu Lv trên ảnh tướng, ba nút công cụ chia đều, Kỹ năng đội trưởng + Duo gộp một thẻ.
 - Nút bóng đèn chỉ hiện trong trận (dọn khi sang màn khác).
 - Vuốt mép/Back: đệm 3 mục lịch sử và nạp lại sau mỗi lần chạm để Chrome không bỏ qua. Chặn tuyệt đối chỉ làm được ở bản Capacitor (M6, lắng nghe nút Back native).
+
+### v0.58.0
+- **Nhạc nền theo vùng:** màn chính 1 bài; mỗi vùng Thủy/Hỏa/Mộc/Quang/Ám/Tâm có 3 bài riêng: `map_*` (danh sách ải + bản đồ cửa, êm), `battle_*`, `boss_*` (nhanh, nặng hơn). Mỗi vùng một thang âm + âm sắc + tiết tấu (Thủy Dorian mượt, Hỏa Phrygian dominant dồn dập, Mộc Mixolydian dân gian, Quang Lydian sáng, Ám hòa âm thứ, Tâm trưởng ấm). Chưa có bài riêng thì rơi về `battle`/`boss` cũ.
+- Engine (`ui/audio.js`) nâng cấp: vòng 8 ô nhịp, `form` bật/tắt lớp theo ô nhịp (dạo → cao trào), bè hòa, rung nốt (vibrato), âm có họa âm (chuông), dồn trống cuối vòng, chuyển bài mờ dần 0.5s thay vì cắt cụt.
+- Nhạc vẫn sinh bằng WebAudio, không file, không giấy phép. Dữ liệu sinh bởi `python3 tools/gen-music.py` (hạt giống cố định) vào `data/audio.json`; có thể sửa tay từng bài.

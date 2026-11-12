@@ -10,6 +10,7 @@ export function createAudio(cfg, settings) {
   let step = 0;
   let nextTime = 0;
   let noiseBuf = null;
+  let outBus = null; // bus riêng của bài đang phát (mờ dần khi đổi bài)
 
   const Ctor = typeof window !== 'undefined' ? window.AudioContext || window.webkitAudioContext : null;
 
@@ -160,21 +161,42 @@ export function createAudio(cfg, settings) {
     g.gain.setValueAtTime(Math.max(0.0002, o.gain * (o.sustain ?? 0.6)), t0 + Math.max(a + 0.001, dur * 0.5));
     g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
     lp.connect(g);
-    g.connect(musicBus);
+    g.connect(outBus);
     if (o.reverb && reverbIn) {
       const send = ac.createGain();
       send.gain.value = o.reverb;
       g.connect(send);
       send.connect(reverbIn);
     }
+    let lfo = null;
+    let lfoG = null;
+    if (o.vib) {
+      lfo = ac.createOscillator();
+      lfoG = ac.createGain();
+      lfo.frequency.value = 5.2;
+      lfoG.gain.setValueAtTime(0, t0);
+      lfoG.gain.linearRampToValueAtTime(o.vib, t0 + Math.min(0.25, dur * 0.6)); // rung dần vào, không rung ngay đầu nốt
+      lfo.connect(lfoG);
+      lfo.start(t0);
+      lfo.stop(t0 + dur + 0.05);
+    }
     for (const det of o.detune || [0]) {
-      const osc = ac.createOscillator();
-      osc.type = o.wave;
-      osc.frequency.setValueAtTime(f, t0);
-      osc.detune.value = det;
-      osc.connect(lp);
-      osc.start(t0);
-      osc.stop(t0 + dur + 0.05);
+      for (const [mul, amp] of o.partials || [[1, 1]]) {
+        const osc = ac.createOscillator();
+        osc.type = o.wave;
+        osc.frequency.setValueAtTime(f * mul, t0);
+        osc.detune.value = det;
+        if (lfoG) lfoG.connect(osc.detune);
+        if (amp === 1) osc.connect(lp);
+        else {
+          const pg = ac.createGain();
+          pg.gain.value = amp;
+          osc.connect(pg);
+          pg.connect(lp);
+        }
+        osc.start(t0);
+        osc.stop(t0 + dur + 0.05);
+      }
     }
   }
   function kick(t0, gain) {
@@ -186,7 +208,7 @@ export function createAudio(cfg, settings) {
     g.gain.setValueAtTime(gain, t0);
     g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.22);
     o.connect(g);
-    g.connect(musicBus);
+    g.connect(outBus);
     o.start(t0);
     o.stop(t0 + 0.25);
   }
@@ -201,34 +223,45 @@ export function createAudio(cfg, settings) {
     g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
     src.connect(f);
     f.connect(g);
-    g.connect(musicBus);
+    g.connect(outBus);
     src.start(t0);
     src.stop(t0 + Math.min(dur, 0.3));
   }
 
-  // Xếp lịch một nhịp 1/16 của bài. Cấu trúc: hợp âm (pad), rải (arp), giai điệu (lead), bè trầm, trống.
+  // Xếp lịch một nhịp 1/16 của bài. Cấu trúc: hợp âm (pad), rải (arp), giai điệu (lead), bè hòa (harm), bè trầm, trống.
+  // tr.form[bar] = các lớp đang bật trong ô nhịp đó (p pad, a arp, l lead, h bè hòa, b trầm, d trống): tạo đoạn dạo, cao trào.
   function playStep(tr, n, t0, stepDur) {
-    const bar = Math.floor(n / 16) % tr.chords.length;
+    const bars = tr.chords.length;
+    const bar = Math.floor(n / 16) % bars;
     const i = n % 16;
+    const layers = tr.form?.[bar % tr.form.length] ?? 'palhbd';
+    const on = (c) => layers.includes(c);
     const root = tr.chords[bar];
     const tones = [root, root + 2, root + 4, root + 7];
     const barDur = stepDur * 16;
-    if (i === 0) {
-      for (const d of tones.slice(0, 3)) voice(t0, midi(degree(tr, d)), barDur * 1.02, { wave: tr.padWave, gain: tr.padGain, cut: tr.padCut, attack: 0.35, sustain: 0.85, detune: [-8, 8], reverb: tr.reverb });
+    if (i === 0 && on('p')) {
+      for (const d of tones.slice(0, 3)) voice(t0, midi(degree(tr, d)), barDur * 1.02, { wave: tr.padWave, gain: tr.padGain, cut: tr.padCut, attack: tr.padAttack ?? 0.35, sustain: 0.85, detune: [-8, 8], reverb: tr.reverb });
     }
-    const ap = digit(tr.arp.pattern[i]);
-    if (ap != null) voice(t0, midi(degree(tr, tones[ap % 4]) + 12), stepDur * 2.2, { wave: tr.arp.wave, gain: tr.arp.gain, cut: tr.arp.cut, cutTo: 500, reverb: tr.reverb });
-    const ld = digit(tr.lead.bars[bar % tr.lead.bars.length][i]);
+    const ap = on('a') ? digit(tr.arp.pattern[i]) : null;
+    if (ap != null) voice(t0, midi(degree(tr, tones[ap % 4]) + 12), stepDur * (tr.arp.len ?? 2.2), { wave: tr.arp.wave, gain: tr.arp.gain, cut: tr.arp.cut, cutTo: 500, sustain: tr.arp.sustain, partials: tr.arp.partials, reverb: tr.reverb });
+    const lb = tr.lead.bars[bar % tr.lead.bars.length];
+    const ld = on('l') ? digit(lb[i]) : null;
     if (ld != null) {
       let len = 1;
-      while (len < 8 && tr.lead.bars[bar % tr.lead.bars.length][i + len] === '.' && i + len < 16) len++;
-      voice(t0, midi(degree(tr, ld) + tr.lead.octave), stepDur * Math.min(len, 4) * 0.95, { wave: tr.lead.wave, gain: tr.lead.gain, cut: tr.lead.cut, attack: 0.012, sustain: 0.7, detune: [-5, 5], reverb: tr.reverb });
+      while (len < 8 && lb[i + len] === '.' && i + len < 16) len++;
+      const dur = stepDur * Math.min(len, tr.lead.maxLen ?? 4) * 0.95;
+      const lo = { wave: tr.lead.wave, gain: tr.lead.gain, cut: tr.lead.cut, attack: tr.lead.attack ?? 0.012, sustain: tr.lead.sustain ?? 0.7, detune: [-5, 5], vib: tr.lead.vib, partials: tr.lead.partials, reverb: tr.reverb };
+      voice(t0, midi(degree(tr, ld) + tr.lead.octave), dur, lo);
+      if (tr.harm && on('h')) voice(t0, midi(degree(tr, ld - (tr.harm.below ?? 2)) + tr.lead.octave), dur, { wave: tr.harm.wave, gain: tr.harm.gain, cut: tr.harm.cut ?? tr.lead.cut, attack: 0.02, sustain: 0.6, reverb: tr.reverb });
     }
-    if (tr.bass.pattern[i] !== '.') voice(t0, midi(degree(tr, root) - 12), stepDur * 1.7, { wave: tr.bass.wave, gain: tr.bass.gain, cut: tr.bass.cut ?? 700, sustain: 0.8 });
+    const bp = tr.bass.bars ? tr.bass.bars[bar % tr.bass.bars.length] : tr.bass.pattern;
+    if (on('b') && bp[i] !== '.') voice(t0, midi(degree(tr, root + (bp[i] === '5' ? 4 : 0)) - 12), stepDur * 1.7, { wave: tr.bass.wave, gain: tr.bass.gain, cut: tr.bass.cut ?? 700, sustain: 0.8 });
+    if (!on('d')) return;
     const d = tr.drums;
-    if (d.kick?.[i] === 'x') kick(t0, 0.5);
-    if (d.snare?.[i] === 'x') {
-      filteredNoise(t0, 0.14, 0.22, 'highpass', 1800);
+    const fill = tr.fill && bar === bars - 1 && i >= 12; // cuối vòng: dồn trống dẫn vào vòng mới
+    if (d.kick?.[i] === 'x' && !(fill && i > 12)) kick(t0, 0.5);
+    if (d.snare?.[i] === 'x' || fill) {
+      filteredNoise(t0, 0.14, fill ? 0.12 + (i - 12) * 0.05 : 0.22, 'highpass', 1800);
       voice(t0, 190, 0.09, { wave: 'triangle', gain: 0.2, cut: 1200 });
     }
     if (d.hat?.[i] === 'x') filteredNoise(t0, 0.04, 0.09, 'highpass', 7000);
@@ -241,6 +274,7 @@ export function createAudio(cfg, settings) {
     timer = null;
     if (!ac || !track || ac.state !== 'running') return;
     ensureReverb();
+    if (!outBus) switchBus();
     const tr = cfg.tracks[track];
     const stepDur = 60 / tr.bpm / 4;
     if (nextTime < ac.currentTime) nextTime = ac.currentTime + 0.05;
@@ -252,6 +286,25 @@ export function createAudio(cfg, settings) {
     timer = setTimeout(schedule, 25);
   }
 
+  // Đổi bài: bus cũ mờ đi trong 0.5s rồi ngắt, bus mới hiện dần (không bị cắt cụt, không chồng tiếng).
+  function switchBus() {
+    if (!ac) return;
+    const now = ac.currentTime;
+    const old = outBus;
+    outBus = null;
+    if (old) {
+      old.gain.cancelScheduledValues(now);
+      old.gain.setValueAtTime(old.gain.value, now);
+      old.gain.linearRampToValueAtTime(0.0001, now + 0.5);
+      setTimeout(() => old.disconnect(), 3000);
+    }
+    if (!track) return;
+    outBus = ac.createGain();
+    outBus.gain.setValueAtTime(old ? 0.0001 : 1, now);
+    if (old) outBus.gain.linearRampToValueAtTime(1, now + 0.7);
+    outBus.connect(musicBus);
+  }
+
   function playMusic(name) {
     if (name === track) return;
     track = name && cfg.tracks[name] ? name : null;
@@ -259,6 +312,7 @@ export function createAudio(cfg, settings) {
     nextTime = 0;
     clearTimeout(timer);
     timer = null;
+    if (ac) switchBus();
     if (track && ac) schedule();
   }
 

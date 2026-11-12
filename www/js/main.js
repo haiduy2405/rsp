@@ -89,6 +89,11 @@ let seedText = '';
 // ---- tiện ích DOM
 let atHub = false;
 const track = (kind, n = 1) => { progress = trackQuest(ctx, progress, ui.dayKey(), kind, n); if (kind === 'win_battle') progress = bumpBattles(progress, n); }; // tiến độ nhiệm vụ hằng ngày
+// Nhạc theo vùng: battle_water, boss_fire, map_wood… Chưa có bài riêng thì dùng bài chung.
+const zoneTrack = (kind, zoneId) => {
+  const name = `${kind}_${String(zoneId ?? '').replace('zone_', '')}`;
+  return audioCfg.tracks[name] ? name : kind;
+};
 const guide = createGuide($('wrap'));
 const guideStep = () => progress?.onboarding?.guide;
 const guideSet = (step) => { if (step) progress.onboarding.guide = step; else delete progress.onboarding.guide; save(); };
@@ -300,7 +305,9 @@ function showStages(zoneId, tier) {
     return card;
   });
   const gst = ['zone', 'stage', 'team'].includes(guideStep());
+  const zoneAudio = () => audio.playMusic(zoneTrack('map', zoneId));
   screen(h('h2', {}, t(`zone.${zoneId}`)), tabs, h('div', { class: 'muted tier-note' }, t('diff.reward', { gold: df.gold, drop: df.drop })), h('div', { class: 'stagelist' }, cards), h('div', { class: 'muted hold-hint' }, t('stage.hold')), btn(t('back'), showZones, '', { id: 'back' }));
+  zoneAudio();
   if (gst) { guideSet('stage'); guidePoint(`#screen [data-stage="${done + 1 > total ? 1 : done + 1}"]`, 'guide.stage'); }
 }
 
@@ -1006,6 +1013,7 @@ function showDoors() {
     btn(t('run.leave'), leaveRun, 'ghost', { id: 'leave-run' }),
   );
   $('screen').classList.add('mapscreen');
+  audio.playMusic(zoneTrack('map', run.zoneId));
   if (guideStep() === 'doors') { guideSet(null); showRules(); }
   // cuộn bản đồ tới tầng đang chọn (kéo cuộn để xem phần còn lại)
   const svg = map.querySelector('svg');
@@ -1133,7 +1141,7 @@ function startTutorial(retry = false) {
 
 function startBattleUI() {
   const hint = progress.settings.hint !== false; // gợi ý đường kéo cho nước đi ĐẦU TIÊN của mỗi trận (người chơi tắt được bằng nút bóng đèn)
-  audio.playMusic(run.node === 'boss' ? 'boss' : 'battle');
+  audio.playMusic(zoneTrack(run.node === 'boss' ? 'boss' : 'battle', run.zoneId));
   $('screen').classList.remove('show');
   game?.destroy();
   game = startGame({
