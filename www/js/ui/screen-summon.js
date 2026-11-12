@@ -100,7 +100,7 @@ export function install(app) {
         : h(
             'div',
             { class: 'row pulls' },
-            freeAvail ? btn(t('summon.free'), () => doSummon(1, true), 'primary free', { id: 'pull-free' }) : h('div', { class: 'muted' }, t('summon.freeUsed')),
+            freeAvail ? (() => { const b = btn(t('summon.free'), () => doSummon(1, true), 'primary free', { id: 'pull-free' }); b.append(h('i', { class: 'red-dot', 'aria-hidden': 'true' })); return b; })() : h('div', { class: 'muted' }, t('summon.freeUsed')),
             h('button', { id: 'pull-1', onclick: () => ask(1) }, itemIcon('ticket', 'sm'), h('span', {}, t('summon.x1', { cost: cfg.ticketsPerPull }), h('small', { class: 'alt-cost' }, t('summon.orSpirit', { n: spiritFor(1)?.spirit ?? 0 })))),
             h('button', { class: 'primary', id: 'pull-10', onclick: () => ask(cfg.multiCount) }, itemIcon('ticket', 'sm'), h('span', {}, t('summon.x10', { cost: cfg.ticketsPerPull * cfg.multiCount }), h('small', { class: 'alt-cost' }, t('summon.orSpirit', { n: spiritFor(cfg.multiCount)?.spirit ?? 0 })))),
           ),

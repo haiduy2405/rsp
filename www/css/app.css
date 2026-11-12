@@ -940,3 +940,5 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .alt-cost { display: block; font-size: 11px; font-weight: 600; opacity: .8; }
 .row.pulls button > span { text-align: center; }
 .row.pulls .primary .alt-cost { color: #3a210e; opacity: .85; }
+.row.pulls .free { position: relative; }
+.row.pulls .free .red-dot { top: -4px; right: -4px; left: auto; }
