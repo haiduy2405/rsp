@@ -76,10 +76,10 @@ const audio = createAudio(audioCfg, {
 });
 document.addEventListener('pointerdown', () => audio.unlock(), { capture: true });
 document.addEventListener('click', (e) => {
-  const el = e.target.closest?.('#screen button, #screen [role=button], #screen [data-zone], #screen [data-zone-card], #screen [data-stage], #screen [data-door], #screen .slot, #screen .tier, #screen .rchip, #screen .card.btn, #info button, .dock button');
+  const el = e.target.closest?.('#screen button, #screen [role=button], #screen [data-zone], #screen [data-zone-card], #screen [data-stage], #screen [data-door], #screen .slot, #screen .tm-slot, #screen .tier, #screen .rchip, #screen .card.btn, #info button, .dock button');
   if (!el || el.disabled) return;
   if (el.id === 'door-info') return; // tự phát âm riêng
-  audio.sfx(el.matches('.tier, .rchip, .slot, [data-stage]') ? 'tick' : el.matches('[data-door]') ? 'open' : 'ui');
+  audio.sfx(el.matches('.tier, .rchip, .slot, .tm-slot, [data-stage]') ? 'tick' : el.matches('[data-door]') ? 'open' : 'ui');
 }, { capture: true });
 let run = null;
 let record = null;
@@ -96,6 +96,7 @@ const guidePoint = (target, key, delay) => guide.point(target, t(key), delay);
 const screen = (...kids) => {
   $('info')?.remove();
   $('pause-btn')?.remove();
+  $('hint-btn')?.remove();
   guide.clear();
   $('tour-ui')?.remove();
   $('screen').onpointerdown = null;
@@ -600,12 +601,15 @@ function showTeam(slot, msg, stage) {
     again(nxt >= 0 ? nxt : slot);
   };
   const cur = progress.preset ?? 0;
-  const tabs = h('div', { class: 'row' }, presetsOf(progress).map((_, i) => h('button', { class: 'btn' + (i === cur ? ' primary' : ''), 'data-preset': i, onclick: () => { apply(selectPreset(progress, i)); showTeam(undefined, undefined, stage); } }, t('team.preset', { n: i + 1 }))));
+  const tabs = h('div', { class: 'team-tabs', style: `--n:${presetsOf(progress).length}` }, presetsOf(progress).map((_, i) => h('button', { class: 'btn' + (i === cur ? ' primary' : ''), 'data-preset': i, onclick: () => { apply(selectPreset(progress, i)); showTeam(undefined, undefined, stage); } }, t('team.preset', { n: i + 1 }))));
   const slots = h('div', { class: 'slots' }, team.map((id, i) => {
     const lead = i === 0;
     const sel = i === slot;
-    const cls = 'slot' + (lead ? ' lead' : '') + (sel ? ' slot-sel' : '') + (id ? '' : ' empty');
-    const body = id ? [h('small', { class: 'sname' }, lead ? '♛' : String(i + 1)), portrait(id, 60), h('small', { class: 'sn' }, t(`char.${id}`))] : [h('small', { class: 'sname' }, lead ? '♛' : String(i + 1)), h('div', { class: 'plus' }, '+'), h('small', { class: 'sn' }, lead ? t('team.leader') : t('team.empty'))];
+    const cls = 'tm-slot' + (lead ? ' lead' : '') + (sel ? ' slot-sel' : '') + (id ? '' : ' empty');
+    const tag = h('small', { class: 'sname' }, lead ? '♛' : String(i + 1));
+    const body = id
+      ? [tag, h('div', { class: 'tm-ph' }, portrait(id, 64), h('b', { class: 'tm-lv' }, String(progress.characters[id].level))), h('small', { class: 'sn' }, t(`char.${id}`))]
+      : [tag, h('div', { class: 'plus' }, '+'), h('small', { class: 'sn' }, lead ? t('team.leader') : t('team.empty'))];
     const node = h('div', { class: cls, 'data-slot': i, onclick: () => again(i) }, ...body);
     return id ? longPress(node, () => showChar(id, undefined, () => again(i))) : node;
   }));
@@ -617,14 +621,15 @@ function showTeam(slot, msg, stage) {
     slots,
     h(
       'div',
-      { class: 'row tools' },
+      { class: 'tm-tools' },
       btn(t('team.auto'), () => { apply(autoTeam(ctx, progress)); again(0); }, '', { id: 'team-auto' }),
       btn(t('team.remove'), () => { apply(placeInSlot(progress, slot, null)); again(slot); }, '', { id: 'team-remove', ...(team[slot] === null ? { disabled: '' } : {}) }),
       btn(t('team.clear'), () => { apply(clearTeam(progress)); again(0); }, '', { id: 'team-clear', ...(members.length ? {} : { disabled: '' }) }),
       slot > 0 && team[slot] ? btn(t('team.makeLeader', { name: t(`char.${team[slot]}`) }), () => { apply(makeLeader(progress, slot)); again(0); }, '', { id: 'make-leader' }) : null,
     ),
-    members.length ? h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(resolveKit(ctx, members[0], progress.characters[members[0]].skillLv, formOf(progress.characters[members[0]].awaken)).leader)}`) : null,
-    h('div', { class: 'muted' }, members.length < 2 ? t('team.noDuo') : duos.length ? `${t('team.duoActive')}: ${duos.map((d) => t(`duo.${d.id}`)).join(', ')}` : t('team.noDuo')),
+    h('div', { class: 'card tm-info' },
+      members.length ? h('div', {}, h('b', {}, '♛ ', t('char.leader')), h('span', { class: 'muted' }, ': ', leaderText(resolveKit(ctx, members[0], progress.characters[members[0]].skillLv, formOf(progress.characters[members[0]].awaken)).leader))) : null,
+      h('div', { class: duos.length ? 'tm-duo on' : 'tm-duo' }, h('b', {}, 'Duo'), h('span', { class: 'muted' }, ': ', members.length < 2 || !duos.length ? t('team.noDuo') : duos.map((d) => t(`duo.${d.id}`)).join(', ')))),
     stage ? [needLeader || !members.length ? h('div', { class: 'notice' }, t(members.length ? 'team.needLeader' : 'team.needAny')) : null, btn(t('team.go'), () => (activeRunInfo() ? askAbandon(stage) : startRun(stage)), 'primary', { id: 'team-go', ...(needLeader ? { disabled: '' } : {}) })] : null,
     h('p', { class: 'muted' }, t('team.holdHint')),
     h('div', { class: 'roster' }, sorted.map((c) => longPress(Object.assign(tile(c.id, team.indexOf(c.id) + 1 || 0), { onclick: () => pick(c.id) }), () => showChar(c.id, undefined, () => again(slot))))),
@@ -1533,9 +1538,14 @@ if (DEBUG) {
 }
 // Vuốt mép / nút Back của trình duyệt = bấm nút mũi tên quay lại góc trái trên của màn hiện tại.
 // Luôn đẩy lại một mục lịch sử để trình duyệt không thoát trang; trong chuyến hoặc ở Hub thì bỏ qua.
-history.pushState({ rsp: 1 }, '');
+// Chrome bỏ qua mục lịch sử tạo khi chưa có thao tác người dùng → đệm 3 mục và nạp lại ở mỗi lần chạm đầu tiên sau khi bị tiêu hao.
+let histBuf = 0;
+const refillHist = () => { while (histBuf < 3) { history.pushState({ rsp: 1 }, ''); histBuf++; } };
+refillHist();
+window.addEventListener('pointerdown', () => { if (histBuf < 3) refillHist(); }, { capture: true, passive: true });
 window.addEventListener('popstate', () => {
-  history.pushState({ rsp: 1 }, '');
+  histBuf = Math.max(0, histBuf - 1);
+  refillHist();
   if (run || atHub) return;
   const back = $('back-top') || $('back');
   if (back) {

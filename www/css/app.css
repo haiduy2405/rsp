@@ -196,20 +196,11 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 .back-top svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .back-top:active { transform: scale(.92); }
 
-.slot-sel { border-color: #ffcf7a !important; background: linear-gradient(180deg, rgba(255, 190, 90, .26), rgba(44, 26, 15, .9)) !important; box-shadow: 0 0 0 2px #ffcf7a, 0 0 18px rgba(255, 190, 90, .5) !important; }
+.tm-slot.slot-sel { border-color: #ffcf7a !important; background: linear-gradient(180deg, rgba(255, 190, 90, .26), rgba(44, 26, 15, .9)) !important; box-shadow: 0 0 0 2px #ffcf7a, 0 0 18px rgba(255, 190, 90, .5) !important; }
 @keyframes selpulse { 50% { box-shadow: 0 0 0 2px #ffcf7a, 0 0 28px rgba(255, 190, 90, .85); } }
 .sel-tag { color: #7dffa0; font-weight: 800; }
 .in-team { color: #7dffa0; font-weight: 700; }
 
-.slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; align-items: end; width: 100%; }
-.slot { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 2px 6px; border: 1px solid var(--line); background: linear-gradient(180deg, rgba(84, 52, 30, .78), rgba(42, 24, 16, .92)); border-radius: 6px; cursor: pointer; }
-.slot .sname { color: var(--mute); font-weight: 800; font-size: 11px; line-height: 1; }
-.slot .sn { font-size: 10px; line-height: 1.1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.slot.lead { padding-top: 12px; padding-bottom: 12px; border-color: #ffd24a; box-shadow: 0 0 14px #ffd24a77; }
-.slot.lead .sname { color: #ffd24a; font-size: 14px; }
-.slot.empty { border-style: dashed; background: rgba(44,26,15, .5); min-height: 92px; justify-content: center; }
-.slot .plus { font-size: 30px; line-height: 1; color: var(--mute); font-weight: 300; }
-.slot > div:not(.plus) { width: 100% !important; max-width: 60px; height: auto !important; aspect-ratio: 1; }
 .tools { gap: 6px; }
 .tools button { min-height: 40px; padding: 6px 12px; font-size: 13px; }
 .tools button[disabled] { opacity: .4; }
@@ -605,8 +596,8 @@ button:active:not(:disabled) { transform: scale(.95); filter: brightness(.92); }
 @keyframes awakenGlow { 0%, 100% { box-shadow: 0 0 0 2px rgba(255, 207, 122, .5), 0 0 18px rgba(255, 190, 90, .4); } 50% { box-shadow: 0 0 0 3px rgba(255, 224, 150, .85), 0 0 34px rgba(255, 190, 90, .85); } }
 #awaken.ready { animation: awakenGlow 1.5s ease-in-out infinite; }
 /* Đội hình: ô vừa được đặt tướng bật lên, ô đang chọn nhịp thở */
-.slot-sel { animation: selpulse 1.2s ease-in-out infinite; }
-.slot > div:not(.plus) { animation: popIn .3s ease-out; }
+.tm-slot.slot-sel { animation: selpulse 1.2s ease-in-out infinite; }
+.tm-slot .tm-ph { animation: popIn .3s ease-out; }
 /* Màn chính: tiền nháy khi đổi, chấm thông báo nhịp tim, dock nhún nhẹ */
 @keyframes bump { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
 .cur-pill.bump b { animation: bump .45s ease-out; }
@@ -986,3 +977,28 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .pl-sep { font-style: normal; opacity: .55; margin: 0 1px; }
 .row.pulls button.free { flex: 1; }
 .row.pulls .free .red-dot { top: 6px; right: 12px; left: auto; }
+
+/* Hướng dẫn chơi: mục gập */
+.help-sec summary { cursor: pointer; font-weight: 800; font-size: 15px; padding: 2px 0; }
+.help-sec p { margin: 8px 0 0; line-height: 1.5; }
+
+/* Đội hình: 3 tab đều nhau, 5 ô đội trên một hàng, thanh công cụ ba nút */
+.team-tabs { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 8px; width: 100%; }
+.team-tabs .btn { min-width: 0; width: 100%; padding: 9px 4px; font-size: 14px; }
+.slots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; align-items: end; width: 100%; }
+.tm-slot { position: relative; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 14px 3px 6px; border: 1px solid var(--line); border-radius: 8px; background: linear-gradient(180deg, rgba(84, 52, 30, .78), rgba(42, 24, 16, .92)); cursor: pointer; }
+.tm-slot .sname { position: absolute; top: 2px; left: 0; right: 0; text-align: center; color: var(--mute); font-weight: 800; font-size: 11px; line-height: 1; }
+.tm-slot .sn { width: 100%; text-align: center; font-size: 11px; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tm-slot.lead { border-color: #ffd24a; box-shadow: 0 0 12px #ffd24a66; }
+.tm-slot.lead .sname { color: #ffd24a; font-size: 14px; top: 0; }
+.tm-slot.empty { border-style: dashed; background: rgba(44, 26, 15, .5); min-height: 96px; justify-content: center; }
+.tm-slot .plus { font-size: 28px; line-height: 1; color: var(--mute); font-weight: 300; }
+.tm-ph { position: relative; width: 100%; aspect-ratio: 1; }
+.tm-ph > div { width: 100% !important; height: 100% !important; box-sizing: border-box; }
+.tm-lv { position: absolute; right: 2px; bottom: 2px; font: 700 11px/1 'Oswald', var(--sans); color: #fff; background: rgba(28, 16, 9, .85); border-radius: 3px; padding: 2px 4px; }
+.tm-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; width: 100%; }
+.tm-tools button { min-width: 0; min-height: 40px; padding: 6px 4px; font-size: 13px; }
+.tm-tools button[disabled] { opacity: .4; }
+.tm-tools #make-leader { grid-column: 1 / -1; }
+.tm-info { width: 100%; display: grid; gap: 4px; font-size: 13px; line-height: 1.4; text-align: left; }
+.tm-duo.on b { color: #7dffa0; }

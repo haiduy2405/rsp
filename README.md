@@ -416,3 +416,9 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - **Ô tướng trong trận to và dễ đọc hơn:** ảnh tướng 32→44 px, tên 13 px (tên dài tự co rồi cắt "…", xem đủ khi bấm giữ), chữ "Sẵn sàng" 12 px; đội trưởng chỉ còn vương miện góc ô thay cho chữ nhãn. Đáy ô thẳng hàng ở y=466.
 - **Đồng hồ kéo ngọc có số giây** (vd "4.2") ở giữa thanh; thanh cao 14 px.
 - **Ngọc Nâng Cấp có art riêng** (6 hệ, `assets/orbs/orb{0-5}e.webp`, sinh bằng ChatGPT): huy hiệu viền vàng có cánh và miện, vẫn giữ họa tiết hệ bên trong. Chưa có art thì vẫn rơi về ngọc thường + hào quang cũ. Manifest 123 mục.
+
+### v0.57.0
+- **Hướng dẫn viết lại:** 7 mục gập mở (Chiến đấu, Tướng & kỹ năng, Tháp, Nâng cấp, Triệu hồi, Hằng ngày, Mẹo) + bảng 12 hiệu ứng; nội dung theo đúng tính năng hiện có (Ngọc Nâng Cấp, đồng hồ kéo, Cầu nguyện, Thành tựu, Slime/Gnome).
+- **Màn Đội hình dựng lại:** 3 tab Đội đều nhau, 5 ô đội luôn nằm một hàng (class mới `tm-slot`, hết đụng CSS ô Hòm đồ), huy hiệu Lv trên ảnh tướng, ba nút công cụ chia đều, Kỹ năng đội trưởng + Duo gộp một thẻ.
+- Nút bóng đèn chỉ hiện trong trận (dọn khi sang màn khác).
+- Vuốt mép/Back: đệm 3 mục lịch sử và nạp lại sau mỗi lần chạm để Chrome không bỏ qua. Chặn tuyệt đối chỉ làm được ở bản Capacitor (M6, lắng nghe nút Back native).

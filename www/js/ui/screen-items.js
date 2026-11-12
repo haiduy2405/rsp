@@ -100,10 +100,14 @@ export function install(app) {
     );
   }
 
+  // Hướng dẫn chơi: các mục gập mở được (mục đầu mở sẵn), rồi bảng từ khóa hiệu ứng.
+  const HELP = [["fight", 7], ["heroes", 6], ["tower", 6], ["grow", 5], ["summon", 4], ["daily", 3], ["tips", 3]];
   function showGlossary() {
     screen(
       h('h2', {}, t('hub.help')),
-      h('div', { class: 'card' }, h('b', {}, t('help.how')), [1, 2, 3, 4, 5].map((n) => h('p', { class: 'muted' }, t(`help.t${n}`), ' '))),
+      HELP.map(([id, n], k) => h('details', { class: 'card help-sec', id: `help-${id}`, ...(k === 0 ? { open: '' } : {}) },
+        h('summary', {}, t(`help.${id}.title`)),
+        Array.from({ length: n }, (_, i) => h('p', { class: 'muted' }, t(`help.${id}.${i + 1}`))))),
       h('h3', {}, t('hub.glossary')),
       KEYS.map((k) => h('div', { class: 'card' }, h('b', {}, t(`effect.${k}.name`), ' ', h('small', {}, t(`effect.${k}.short`))), h('div', { class: 'muted' }, t(`effect.${k}.desc`)))),
       btn(t('back'), showHub, '', { id: 'back' }),
