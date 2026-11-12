@@ -20,7 +20,7 @@ const { chromium } = require('playwright');
   await p.click('#sum-done'); console.log('spirit after:', await p.textContent('#spirit'));
   await p.click('#b-history'); console.log('hist rows:', await p.locator('.card').count()); await p.click('#back');
   await p.click('#b-redeem'); await p.click('#back'); await p.click('#back');
-  await p.click('#b-story'); console.log('story unlocked:', await p.locator('[data-story]').count()); await p.click('#back');
+  await p.click('#b-set'); await p.click('#set-story'); console.log('story unlocked:', await p.locator('[data-story]').count()); await p.click('#back'); await p.click('#back');
   await p.reload(); await p.waitForSelector('#b-summon'); console.log('reload keeps hub');
   await p.click('#b-set'); await p.click('#delete'); await p.click('#confirm-yes'); await p.waitForSelector('#ob-skip'); console.log('delete -> onboarding');
   console.log('errors:', errs);

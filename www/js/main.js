@@ -121,12 +121,15 @@ const ICONS = {
   summon: '<path d="M12 3l2.2 6.2L21 12l-6.8 2.8L12 21l-2.2-6.2L3 12l6.8-2.8z"/>',
   story: '<path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6z"/><path d="M6 3v18"/><path d="M10 8h5M10 12h4"/>',
   items: '<path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/>',
-  settings: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+  shop: '<path d="M4 9h16l-1.2-4.2a1 1 0 0 0-1-.8H6.2a1 1 0 0 0-1 .8z"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9"/><path d="M10 20v-5h4v5"/>',
+  quests: '<path d="M8 4h8a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9.5 3h5v3h-5z"/><path d="M9 13l2 2 4-4.5"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M12 2.5l1.6 2.3 2.8-.5.9 2.7 2.7.9-.5 2.8L21.8 12l-2.3 1.6.5 2.8-2.7.9-.9 2.7-2.8-.5L12 21.5l-1.6-2.3-2.8.5-.9-2.7-2.7-.9.5-2.8L2.2 12l2.3-1.6-.5-2.8 2.7-.9.9-2.7 2.8.5z"/>',
+  help: '<circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6.9c0 1.9-2.8 2.3-2.8 4"/><path d="M12 17.6v.2"/>',
+  clues: '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/>',
 };
-function dockBtn(icon, label, onclick, id, main = false) {
-  const b = h('button', { onclick, id, class: main ? 'main' : '', 'aria-label': label });
+function dockBtn(icon, label, onclick, id, cls = '') {
+  const b = h('button', { onclick, id, class: cls, 'aria-label': label, title: label });
   b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[icon]}</svg>`;
-  b.append(h('span', {}, label));
   return b;
 }
 const CUR_COL = { gold: '#ffd24a', spirit: '#b58bff', essence: '#6bd5ff', shard: '#ff9acb' };
@@ -159,6 +162,7 @@ function showHub() {
       { class: 'hub-top' },
       h('div', { class: 'avatar', style: `background:${COLORS[progress.player.avatar % 6]}` }, (progress.player.name || '?')[0].toUpperCase()),
       h('div', { class: 'who' }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, `${progress.player.callsign} · ${t('hub.sub')}`)),
+      dockBtn('help', t('hub.help'), () => showGlossary(), 'b-help', 'help-btn'),
       h('div', { class: 'cur', id: 'cur' }, curPill('gold', inv.gold), curPill('spirit', inv.spirit, 'spirit'), curPill('essence', inv.essence)),
     ),
     notice ? h('div', { class: 'notice' }, t(notice)) : null,
@@ -177,11 +181,9 @@ function showHub() {
       'nav',
       { class: 'dock' },
       dockBtn('team', t('hub.team'), () => showTeam(0), 'b-team'),
-      dockBtn('collection', t('hub.collection'), () => showCollection(), 'b-col'),
-      dockBtn('items', t('hub.items'), () => showItems(), 'b-items'),
-      dockBtn('glossary', t('hub.glossary'), () => showGlossary(), 'b-glos'),
-      dockBtn('summon', t('hub.summon'), () => showSummon('standard'), 'b-summon', true),
-      dockBtn('story', t('hub.story'), () => showStory(), 'b-story'),
+      dockBtn('shop', t('hub.shop'), () => showHubShop(), 'b-shop', 'sub'),
+      dockBtn('summon', t('hub.summon'), () => showSummon('standard'), 'b-summon', 'main'),
+      dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest'),
       dockBtn('settings', t('hub.settings'), () => showSettings(), 'b-set'),
     ),
   );
@@ -260,7 +262,7 @@ function showCollection() {
   screen(
     h('h2', {}, `${t('hub.collection')} ${owned().length}/${list.length}`),
     list.map((c) => charCard(c.id, () => showChar(c.id, undefined, showCollection))),
-    btn(t('back'), showHub, '', { id: 'back' }),
+    btn(t('back'), () => showTeam(0), '', { id: 'back' }),
   );
 }
 
@@ -368,6 +370,7 @@ function showTeam(slot, msg, zoneId) {
     h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(ctx.characters[team[0]].leader)}`),
     h('div', { class: 'muted' }, duos.length ? `${t('team.duoActive')}: ${duos.map((d) => t(`duo.${d.id}`)).join(', ')}` : t('team.noDuo')),
     zoneId ? btn(t('team.go'), () => startRun(zoneId), 'primary', { id: 'team-go' }) : null,
+    btn(`${t('hub.collection')} ${owned().length}/${ctx.characterList.length}`, () => showCollection(), '', { id: 'team-col' }),
     h('h3', {}, t('team.pickFor', { n: slot === 0 ? t('team.leader') : t('team.slot', { n: slot + 1 }) })),
     owned().map((c) => longPress(charCard(c.id, () => pick(c.id), team.includes(c.id) ? h('small', { class: 'in-team' }, t('team.inTeam', { n: team.indexOf(c.id) + 1 })) : null), () => showChar(c.id, undefined, () => showTeam(slot, undefined, zoneId)))),
     btn(t('back'), showHub, '', { id: 'back' }),
@@ -393,8 +396,28 @@ function showItems() {
 
 function showGlossary() {
   screen(
-    h('h2', {}, t('hub.glossary')),
+    h('h2', {}, t('hub.help')),
+    h('div', { class: 'card' }, h('b', {}, t('help.how')), [1, 2, 3, 4, 5].map((n) => h('p', { class: 'muted' }, t(`help.t${n}`), ' '))),
+    h('h3', {}, t('hub.glossary')),
     KEYS.map((k) => h('div', { class: 'card' }, h('b', {}, t(`effect.${k}.name`), ' ', h('small', {}, t(`effect.${k}.short`))), h('div', { class: 'muted' }, t(`effect.${k}.desc`)))),
+    btn(t('back'), showHub, '', { id: 'back' }),
+  );
+}
+
+// Cửa hàng và Nhiệm vụ: khung chờ, chưa có nội dung (gói ủng hộ ở M6; nhiệm vụ làm sau).
+function showHubShop() {
+  screen(
+    h('h2', {}, t('hub.shop')),
+    h('div', { class: 'card soon' }, h('b', {}, t('soon.title')), h('p', { class: 'muted' }, t('shop.soon'))),
+    btn(t('hub.items'), showItems, '', { id: 'shop-items' }),
+    btn(t('back'), showHub, '', { id: 'back' }),
+  );
+}
+function showQuests() {
+  screen(
+    h('h2', {}, t('hub.quests')),
+    h('div', { class: 'row' }, h('button', { class: 'primary', disabled: '' }, t('quest.daily')), h('button', { disabled: '' }, t('quest.achv'))),
+    h('div', { class: 'card soon' }, h('b', {}, t('soon.title')), h('p', { class: 'muted' }, t('quest.soon'))),
     btn(t('back'), showHub, '', { id: 'back' }),
   );
 }
@@ -543,7 +566,7 @@ function showStory() {
         ? h('div', { class: 'card', 'data-story': s.id }, h('b', {}, t(`story.${s.id}.title`)), h('p', {}, t(`story.${s.id}.body`)))
         : h('div', { class: 'card locked' }, h('b', {}, '???'), h('div', { class: 'muted' }, t('story.locked', { zone: t(`zone.${s.after}`) }))),
     ),
-    btn(t('back'), showHub, '', { id: 'back' }),
+    btn(t('back'), showSettings, '', { id: 'back' }),
   );
 }
 
@@ -553,6 +576,7 @@ function showSettings(msg = null, confirmDelete = false) {
   screen(
     h('h2', {}, t('set.title')),
     msg ? h('div', { class: 'notice' }, msg) : null,
+    btn(t('story.title'), showStory, '', { id: 'set-story' }),
     h('label', {}, t('hub.lang'), h('select', { id: 'lang', onchange: (e) => setLang(e.target.value) }, h('option', { value: 'vi' }, 'Tiếng Việt'), h('option', { value: 'en' }, 'English'))),
     h('label', {}, h('span', { id: 'vol-l' }, t('set.volume', { n: progress.settings.volume })), h('input', { id: 'vol', type: 'range', min: '0', max: '100', value: String(progress.settings.volume), oninput: (e) => {
       progress.settings.volume = Number(e.target.value);

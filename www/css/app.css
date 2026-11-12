@@ -96,11 +96,17 @@ details { width: 100%; font-size: 13px; color: var(--mute); }
 .gate .info { flex: 1; min-width: 0; }
 .gate .name { font-family: var(--serif); font-size: 24px; font-weight: 700; color: var(--gold-hi); line-height: 1; }
 .gate .go { color: var(--gold); font-weight: 800; font-size: 13px; }
-.dock { position: sticky; bottom: 0; margin-top: auto; display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; width: calc(100% + 32px); margin-left: -16px; padding: 12px 8px calc(8px + var(--sab)); background: linear-gradient(180deg, transparent, rgba(6, 7, 26, .92) 28%); }
-.dock button { line-height: 1.15; min-height: 58px; padding: 6px 2px 4px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: var(--mute); background: none; border: 0; box-shadow: none; }
-.dock button svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.dock button.main { color: var(--gold-hi); }
-.dock button.main svg { stroke: var(--gold); filter: drop-shadow(0 0 6px rgba(226, 183, 90, .7)); }
+.dock { position: sticky; bottom: 0; margin-top: auto; display: grid; grid-template-columns: 1fr 1fr 1.25fr 1fr 1fr; align-items: end; gap: 2px; width: calc(100% + 32px); margin-left: -16px; padding: 14px 10px calc(8px + var(--sab)); background: linear-gradient(180deg, transparent, rgba(6, 7, 26, .94) 30%); }
+.dock button { min-height: 52px; padding: 0; display: grid; place-items: center; color: var(--mute); background: none; border: 0; box-shadow: none; clip-path: none; }
+.dock button svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.dock button.sub { color: var(--gold); }
+.dock button.sub svg { filter: drop-shadow(0 0 5px rgba(226, 183, 90, .45)); }
+.dock button.main { width: 70px; height: 70px; min-height: 0; margin: -22px auto 0; border-radius: 50%; color: #2a1600; background: radial-gradient(circle at 35% 25%, #fff0bd, #e2b75a 55%, #a87b25); border: 2px solid #fff4c9; box-shadow: 0 0 22px rgba(226, 183, 90, .65), 0 4px 12px rgba(0, 0, 0, .6); animation: mainglow 2.4s ease-in-out infinite; }
+.dock button.main svg { width: 36px; height: 36px; stroke: #2a1600; stroke-width: 1.9; filter: none; }
+@keyframes mainglow { 50% { box-shadow: 0 0 32px rgba(255, 220, 130, .9), 0 4px 12px rgba(0, 0, 0, .6); } }
+.help-btn { width: 36px; height: 36px; min-height: 0; padding: 0; flex: none; display: grid; place-items: center; border-radius: 50%; background: rgba(8, 10, 34, .7); border: 1px solid var(--line); color: var(--gold-hi); box-shadow: none; clip-path: none; }
+.help-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.soon { text-align: center; padding: 28px 16px; }
 .dock button:active { color: var(--text); }
 .hub-pad { height: 6px; flex: none; }
 
