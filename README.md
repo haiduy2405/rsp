@@ -171,3 +171,7 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Màn chính: ảnh `bg/hub.webp` làm nền, ngọc khu đặt trên các đảo nổi (`pos` trong `hubScene`, `main.js`). Bỏ tháp/đảo/mây SVG cũ.
 - Màn tải: logo `ui/logo.webp` thay chữ tiêu đề (tải lỗi thì giữ chữ).
 - Quái và logo đã tách nền phẳng thành alpha bằng `tools/cut-bg.py <file.webp>...` (flood-fill từ viền, mép làm mềm). Ảnh quái chưa tách thì chạy lại công cụ này.
+
+## v0.27.0 – Nâng cấp giao diện (mốc A + Triệu hồi)
+- Bảng màu mới rút từ art (đêm tím chàm, vàng đồng, xanh ngọc) trong `:root` của `app.css`; panel kính tím, nút chính vàng đồng, nút phụ tím; nền các màn con là art hub tối đi; chuyển màn có trượt nhẹ.
+- Triệu hồi: tab banner cuộn ngang, thẻ banner có chân dung tướng của văn hóa, thanh tiến độ bảo đảm, tỉ lệ thu gọn (`<details id="rates">`, vẫn đầy đủ), nút rút dính đáy, kết quả dạng lưới 3 cột với hiệu ứng lật thẻ và quầng sáng 5★.

@@ -40,21 +40,30 @@ export function install(app) {
     screen(
       h('h2', {}, t('summon.title')),
       h('div', { class: 'row' }, h('div', { class: 'res', id: 'tickets' }, itemIcon('ticket', 'sm'), t('summon.tickets', { n: app.progress.inventory.tickets })), h('div', { class: 'res', id: 'spirit' }, t('summon.spirit', { n: app.progress.inventory.spirit }))),
-      h('div', { class: 'row' }, cfg.ticketPacks.map((pk, i) => btn(t('summon.buy', { t: pk.tickets, s: pk.spirit }), () => {
+      h('div', { class: 'row packs' }, cfg.ticketPacks.map((pk, i) => btn(t('summon.buy', { t: pk.tickets, s: pk.spirit }), () => {
         const r = buyTickets(ctx, app.progress, i);
         if (r.ok) { app.progress = r.progress; save(); audio.sfx('reveal'); showSummon(bannerId, null, null); } else showSummon(bannerId, null, `err.${r.reason}`);
       }, '', { id: `buy-${i}` }))),
       msg ? h('div', { class: 'notice' }, t(msg)) : null,
-      h('div', { class: 'row' }, ctx.bannerList.map((b) => btn(t(`banner.${b.id}.name`), () => showSummon(b.id), b.id === bannerId ? 'primary' : '', { 'data-banner': b.id }))),
-      h('div', { class: 'card' }, h('b', {}, t(`banner.${bannerId}.name`)), h('div', { class: 'muted' }, t(`banner.${bannerId}.desc`)), h('div', { class: 'muted' }, rateUp)),
-      // Tỉ lệ và bảo đảm luôn hiện ngay, không cần mở thêm
+      h('div', { class: 'banner-tabs' }, ctx.bannerList.map((b) => btn(t(`banner.${b.id}.name`), () => showSummon(b.id), b.id === bannerId ? 'primary' : '', { 'data-banner': b.id }))),
       h(
         'div',
+        { class: 'card banner-art' },
+        h('h3', {}, t(`banner.${bannerId}.name`)),
+        banner.culture
+          ? h('div', { class: 'banner-heroes' }, ctx.characterList.filter((c) => c.culture === banner.culture && !c.reserve).sort((x, y) => y.rarity - x.rarity).slice(0, 5).map((c) => h('div', { class: `bh r${c.rarity}` }, portrait(c.id, 58))))
+          : null,
+        h('div', { class: 'muted' }, t(`banner.${bannerId}.desc`)),
+        h('div', { class: 'rateup' }, rateUp),
+      ),
+      // Tiến độ bảo đảm gọn một thanh; tỉ lệ đầy đủ nằm ngay dưới, mở một chạm
+      h('div', { class: 'pity' }, h('div', { class: 'pity-bar' }, h('i', { style: `width:${Math.min(100, (sm.pity5 / cfg.pity5) * 100)}%` })), h('small', {}, t('summon.pity5', { max: cfg.pity5, n: sm.pity5 }))),
+      h(
+        'details',
         { class: 'card', id: 'rates' },
-        h('b', {}, t('summon.rates')),
+        h('summary', {}, t('summon.rates')),
         h('div', {}, t('summon.baseRates', { r5: fmtPct(cfg.rates['5']), r4: fmtPct(cfg.rates['4']), r3: fmtPct(cfg.rates['3']) })),
         h('div', {}, t('summon.effRates', { r5: fmtPct(eff[5]), r4: fmtPct(eff[4]), r3: fmtPct(eff[3]) })),
-        h('div', { class: 'muted' }, t('summon.pity5', { max: cfg.pity5, n: sm.pity5 })),
         h('div', { class: 'muted' }, t('summon.pity4', { max: cfg.guarantee4Every, n: sm.pity4 })),
         sm.firstDone ? null : h('div', { class: 'muted' }, t('summon.tokenNote')),
       ),
@@ -62,10 +71,10 @@ export function install(app) {
         ? confirmBox(t('summon.confirm', { cost: pending.cost, count: pending.count, banner: t(`banner.${bannerId}.name`), left: app.progress.inventory.tickets - pending.cost }), () => doSummon(pending.count, false), () => showSummon(bannerId))
         : h(
             'div',
-            { class: 'row' },
+            { class: 'row pulls' },
             freeAvail ? btn(t('summon.free'), () => doSummon(1, true), 'primary', { id: 'pull-free' }) : h('div', { class: 'muted' }, t('summon.freeUsed')),
             btn(t('summon.x1', { cost: cfg.ticketsPerPull }), () => ask(1), '', { id: 'pull-1' }),
-            btn(t('summon.x10', { cost: cfg.ticketsPerPull * cfg.multiCount }), () => ask(cfg.multiCount), '', { id: 'pull-10' }),
+            btn(t('summon.x10', { cost: cfg.ticketsPerPull * cfg.multiCount }), () => ask(cfg.multiCount), 'primary', { id: 'pull-10' }),
           ),
       h('div', { class: 'row' }, btn(t('summon.history'), showHistory, '', { id: 'b-history' }), btn(t('summon.redeem'), () => showRedeem(), '', { id: 'b-redeem' })),
       btn(t('back'), showHub, '', { id: 'back' }),
@@ -77,7 +86,8 @@ export function install(app) {
     const cards = results.map((r, i) =>
       h(
         'div',
-        { class: 'card btn sumcard', 'data-i': i, onclick: (e) => reveal(i, e.currentTarget) },
+        { class: 'card btn sumcard back', 'data-i': i, onclick: (e) => reveal(i, e.currentTarget) },
+        h('div', { class: 'sigil' }, '✦'),
         h('div', { class: 'muted' }, t('summon.tapReveal')),
       ),
     );
@@ -86,6 +96,7 @@ export function install(app) {
       shown.add(i);
       audio.sfx(r.rarity >= 4 ? 'rare' : 'reveal');
       el.className = `card sumcard flip ${rarityCls(r.rarity)}`;
+      el.style.setProperty('--d', `${(i % 10) * 40}ms`);
       if (r.rarity >= 4) {
         const f = $('flash');
         f.classList.remove('go');
@@ -95,7 +106,7 @@ export function install(app) {
       }
       el.replaceChildren(
         ...[
-          portrait(r.id, 96),
+          portrait(r.id, 60),
           h('h3', {}, t(`char.${r.id}`), ' ', h('small', {}, '★'.repeat(r.rarity))),
           h('small', {}, r.isNew ? t('summon.new') : t('summon.dup', { n: r.generic, s: r.rarity })),
           r.forced ? h('div', { class: 'muted' }, t('summon.forced')) : null,
@@ -111,7 +122,7 @@ export function install(app) {
     };
     screen(
       h('h2', {}, t('summon.title')),
-      cards,
+      h('div', { class: 'sumgrid' }, cards),
       h('div', { class: 'row' }, btn(t('summon.reveal'), () => cards.forEach((el, i) => reveal(i, el)), '', { id: 'reveal-all' }), btn(t('summon.done'), () => showSummon(bannerId), 'primary', { id: 'sum-done' })),
     );
   }
