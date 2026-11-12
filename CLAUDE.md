@@ -15,6 +15,7 @@ Khi GDD và prompt mâu thuẫn, hoặc gặp quyết định thiết kế chưa
 8. Làm từng bước nhỏ, chạy test sau mỗi bước.
 9. Không thêm tính năng ngoài phạm vi mốc đang làm.
 10. Không đưa keystore, mật khẩu, khóa API vào repo.
+11. Mỗi lần cập nhật đẩy lên GitHub phải tăng phiên bản trong `package.json` (tính năng: tăng số giữa, sửa lỗi: tăng số cuối) rồi `npm run stamp`, để Duy nhìn số phiên bản ở màn chính biết bản mới đã lên.
 
 ## Cấu trúc
 - `www/` web app (webDir của Capacitor): `js/core` logic thuần, `js/data` JSON, `js/i18n`, `js/ui` canvas + nhập liệu, `js/save`, `assets/`

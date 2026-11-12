@@ -518,5 +518,8 @@
   "profile.wins": "Chuyến thắng",
   "profile.clears": "Lần vượt khu",
   "profile.owned": "Nhân vật đang có",
-  "profile.pulls": "Lượt triệu hồi"
+  "profile.pulls": "Lượt triệu hồi",
+  "intro.go": "Bắt đầu!",
+  "intro.boss": "CẢNH BÁO · TRÙM",
+  "intro.elite": "CẢNH BÁO · TINH ANH"
 }

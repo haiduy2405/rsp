@@ -43,7 +43,7 @@ function findHint(ctx, state) {
   return best?.path ?? null;
 }
 
-export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null }) {
+export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null }) {
   const g = canvas.getContext('2d');
   let state = initial;
   let busy = false;
@@ -93,6 +93,14 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.focus = Number.isInteger(state.focus) && state.enemies[state.focus]?.hp > 0 ? state.focus : -1;
   }
   sync();
+  // Cutscene mở màn: chặn thao tác tới khi xong; chạm để bỏ qua.
+  if (intro) {
+    view.intro = { age: 0, dur: intro.dur || 2600, ...intro };
+    busy = true;
+    view.canAct = false;
+    view.enemies.forEach((e) => (e.landed = false));
+    fx.sfx('whoosh');
+  }
   if (hint) {
     const hp = findHint(ctx, state);
     if (hp) view.hint = { path: hp, text: t('tut.hint') };
@@ -404,6 +412,10 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
 
   function onDown(ev) {
     const p0 = pos(ev);
+    if (view.intro) {
+      view.intro.age = Math.max(view.intro.age, view.intro.dur - 650); // bỏ qua tới "Bắt đầu!"
+      return;
+    }
     if (state.status !== 'playing' || busy) {
       // đang bận: chỉ cho xem chi tiết
       if (p0.y >= 384 && p0.y <= 466) { const i = Math.floor((p0.x - 12) / 104); if (i >= 0 && i < state.members.length) startPress('member', i, p0, ev); }
@@ -559,6 +571,30 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       if (k <= 0) release();
     }
     if (view.tally) { const ty = view.tally; ty.shown += (ty.target - ty.shown) * Math.min(1, real / 120); if (Math.abs(ty.target - ty.shown) < 1) ty.shown = ty.target; ty.pulse = Math.max(0, ty.pulse - dt / 500); }
+    if (view.intro) {
+      const it = view.intro;
+      const prev = it.age;
+      it.age += real;
+      view.enemies.forEach((e, i) => {
+        const land = 250 + i * 230 + 520 * 0.62;
+        if (!e.landed && it.age >= land) {
+          e.landed = true;
+          const ex = (W / Math.max(1, view.enemies.length)) * i + W / Math.max(1, view.enemies.length) / 2;
+          view.rings.push({ x: ex, y: 235, col: e.element, age: 0, life: 520 });
+          for (let k = 0; k < 10; k++) view.particles.push({ x: ex + (k - 5) * 9, y: 232, vx: (k - 4.5) * 0.02, vy: -0.05 - Math.random() * 0.05, col: e.element, age: 0, life: 500 + Math.random() * 300 });
+          view.camShake = Math.max(view.camShake || 0, it.danger ? 9 : 5);
+          fx.sfx('hurt');
+          fx.vibrate?.(it.danger ? 35 : 15);
+        }
+      });
+      if (prev < 650 && it.age >= 650) fx.sfx(it.danger ? 'finale' : 'preview');
+      if (prev < it.dur - 650 && it.age >= it.dur - 650) fx.sfx('combo');
+      if (it.age >= it.dur) {
+        view.intro = null;
+        busy = false;
+        view.canAct = true;
+      }
+    }
     if (view.lockFlash) view.lockFlash = Math.max(0, view.lockFlash - dt / 400);
     if (view.slides) for (const k in view.slides) { view.slides[k].age += dt; if (view.slides[k].age > 180) delete view.slides[k]; }
     for (const f of view.floaters) f.age += dt;

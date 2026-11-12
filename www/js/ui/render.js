@@ -156,6 +156,14 @@ function outlined(g, str, x, y, size, top, bottom, family, lw = 5, weight = '700
   g.fillText(str, x, y);
   g.restore();
 }
+const bounceOut = (x) => {
+  const n1 = 7.5625;
+  const d1 = 2.75;
+  if (x < 1 / d1) return n1 * x * x;
+  if (x < 2 / d1) return n1 * (x -= 1.5 / d1) * x + 0.75;
+  if (x < 2.5 / d1) return n1 * (x -= 2.25 / d1) * x + 0.9375;
+  return n1 * (x -= 2.625 / d1) * x + 0.984375;
+};
 const SANS = '"Be Vietnam Pro", system-ui, sans-serif';
 const SERIF = 'Cormorant, "Times New Roman", serif';
 const NUM = 'Oswald, "Be Vietnam Pro", system-ui, sans-serif'; // số: chữ cao hẹp, dễ đọc khi to
@@ -276,9 +284,13 @@ export function draw(g, view, t) {
     const dead = e.hp <= 0;
     const dk = dead ? Math.min(1, (e.deadAge ?? 9999) / 650) : 0; // tiến độ tan biến
     if (dk >= 1) return;
+    const ik = view.intro ? Math.max(0, Math.min(1, (view.intro.age - (250 + i * 230)) / 520)) : 1; // rơi vào cảnh
+    if (ik <= 0) return;
+    const introY = view.intro ? -(1 - bounceOut(ik)) * 260 : 0;
     const sh = (view.shake && view.shake.enemy === i ? Math.sin(t * 0.06) * 8 : 0) + (e.hit ? Math.sin(t * 0.09) * 10 * e.hit : 0);
     g.save();
-    g.globalAlpha = dead ? 1 - dk : 1;
+    g.translate(0, introY);
+    g.globalAlpha = (dead ? 1 - dk : 1) * Math.min(1, ik * 3);
     g.fillStyle = COLORS[e.element];
     g.globalAlpha *= 0.25;
     if (!getImg(`monster:${e.id}`)) g.fillRect(cx - 70 + sh, 90, 140, 150);
@@ -621,5 +633,62 @@ export function draw(g, view, t) {
   if (view.whiteFlash > 0.01) {
     g.fillStyle = `rgba(255,255,255,${view.whiteFlash * 0.6})`;
     g.fillRect(0, 0, W, H);
+  }
+  if (view.intro) drawIntro(g, view);
+}
+
+// Cutscene mở màn: thanh phim, màn che bàn ngọc, biển tên tầng, cảnh báo đỏ (Elite/Boss), "Bắt đầu!".
+const ease = (x) => 1 - (1 - Math.max(0, Math.min(1, x))) ** 3;
+function drawIntro(g, view) {
+  const it = view.intro;
+  const a = it.age;
+  const T = it.dur;
+  const barK = Math.min(ease(a / 380), 1 - ease((a - (T - 700)) / 420));
+  const bh = 70 * barK;
+  // màn che khu bàn ngọc + HUD, tan dần ở cuối
+  const veil = 0.94 * (1 - ease((a - (T - 900)) / 700));
+  if (veil > 0.01) {
+    g.fillStyle = `rgba(4,5,18,${veil})`;
+    g.fillRect(0, 372, W, H - 372);
+  }
+  if (it.danger) {
+    const pulse = 0.5 + 0.5 * Math.sin(a * 0.012);
+    const k = Math.min(1, a / 300) * (1 - ease((a - (T - 800)) / 500));
+    g.fillStyle = `rgba(190,20,40,${0.22 * pulse * k})`;
+    g.fillRect(0, 0, W, 372);
+  }
+  g.fillStyle = '#05061a';
+  g.fillRect(0, 0, W, bh);
+  g.fillRect(0, H - bh, W, bh);
+  g.fillStyle = it.danger ? '#ff5a6a' : '#e2b75a';
+  g.fillRect(0, bh - 2, W, 2);
+  g.fillRect(0, H - bh, W, 2);
+  // biển tên giữa khu che
+  const bk = ease((a - 650) / 450) * (1 - ease((a - (T - 900)) / 380));
+  if (bk > 0.01) {
+    const cy = 560;
+    g.save();
+    g.globalAlpha = bk;
+    const lw = 250 * bk;
+    g.fillStyle = it.danger ? '#ff5a6a' : '#e2b75a';
+    g.fillRect(W / 2 - lw, cy - 52, lw * 2, 2);
+    g.fillRect(W / 2 - lw, cy + 52, lw * 2, 2);
+    if (it.danger) text(g, it.warn, W / 2, cy - 30, 15, '#ff8a96', 'center', '800');
+    else text(g, it.sub, W / 2, cy - 30, 15, '#e2b75a', 'center', '800');
+    g.translate((1 - bk) * -40, 0);
+    outlined(g, it.title, W / 2, cy + 8, it.title.length > 16 ? 30 : 38, '#ffffff', it.danger ? '#ff5a6a' : '#ffd24a', SERIF, 6, '700');
+    if (it.danger) text(g, it.sub, W / 2, cy + 38, 13, '#ffe9ad', 'center', '700');
+    g.restore();
+  }
+  // "Bắt đầu!"
+  const sk = (a - (T - 650)) / 650;
+  if (sk > 0 && sk < 1) {
+    const pop = ease(sk * 3);
+    g.save();
+    g.globalAlpha = 1 - ease((sk - 0.55) / 0.45);
+    g.translate(W / 2, 330);
+    g.scale(0.6 + 0.5 * pop, 0.6 + 0.5 * pop);
+    outlined(g, it.go, 0, 0, 62, '#ffffff', '#ffd24a', SERIF, 8, '700');
+    g.restore();
   }
 }

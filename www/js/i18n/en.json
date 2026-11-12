@@ -518,5 +518,8 @@
   "profile.wins": "Wins",
   "profile.clears": "Zone clears",
   "profile.owned": "Characters owned",
-  "profile.pulls": "Summons"
+  "profile.pulls": "Summons",
+  "intro.go": "Fight!",
+  "intro.boss": "WARNING · BOSS",
+  "intro.elite": "WARNING · ELITE"
 }

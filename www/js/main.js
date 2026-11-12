@@ -869,6 +869,20 @@ function showDoors() {
   );
 }
 
+function battleIntro() {
+  const danger = run.node === 'boss' || run.node === 'elite';
+  const foes = run.battle.enemies;
+  const lead = foes[foes.length - 1];
+  return {
+    danger,
+    warn: t(run.node === 'boss' ? 'intro.boss' : 'intro.elite'),
+    title: danger ? t(`monster.${lead.id}`) : t(`zone.${run.zoneId}`),
+    sub: t('run.floor', { n: run.floor + 1, total: run.floors }),
+    go: t('intro.go'),
+    dur: danger ? 3000 : 2400,
+  };
+}
+
 function showBattle() {
   if (!progress.onboarding.tutorialDone) return showTutorial(1);
   startBattleUI();
@@ -903,6 +917,7 @@ function startBattleUI() {
     t,
     state: run.battle,
     titleText: `${t('run.floor', { n: run.floor + 1, total: run.floors })}`,
+    intro: DEBUG && !location.search.includes('intro') ? null : battleIntro(),
     stepper(state, action) {
       const r = runStep(ctx, run, { type: 'battle', action });
       if (r.events[0]?.type === 'invalid') return { state, events: r.events };
