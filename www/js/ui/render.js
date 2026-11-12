@@ -633,8 +633,8 @@ export function draw(g, view, t) {
     const pop = Math.min(1, t / 200);
     const back = 1 + 2.4 * Math.pow(pop - 1, 3) + 1.4 * Math.pow(pop - 1, 2);
     let x = q.x, y = q.y - 14 * easeOut(Math.min(1, t / 400)), sc = 0.3 + 0.7 * back, a = 1;
-    if (q.flyAge >= 0) {
-      const f = Math.max(0, q.flyAge - q.flyDelay) / 300, e = Math.min(1, f) ** 2.2;
+    if (t > q.hold) {
+      const e = Math.min(1, (t - q.hold) / q.fly) ** 2.2;
       x += (TALLY_AT.x - x) * e;
       y += (TALLY_AT.y - y) * e;
       sc *= 1 - 0.5 * e;

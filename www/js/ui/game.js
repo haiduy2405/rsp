@@ -176,36 +176,31 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     if (finalKill) view.freeze = 160;
   }
   // Nhịp hoạt ảnh (ms): người chơi được "chiêm ngưỡng" từng combo rồi mới thấy đòn đánh.
-  const ANIM = { popStagger: 170, popHold: 520, flyStagger: 90, flyTime: 300, preview: 900, previewNext: 450, groupHold: 320, groupPop: 200, fall: 560, afterFall: 220, finale: 800, preShot: 200, stagger: 170, postShot: 350 };
+  const ANIM = { popHold: 380, flyTime: 280, preview: 900, previewNext: 450, groupHold: 320, groupPop: 200, fall: 560, afterFall: 220, finale: 800, preShot: 200, stagger: 170, postShot: 350 };
   const tally = (add) => {
     const ty = (view.tally ||= { shown: 0, target: 0, pulse: 0 });
     ty.target = add == null ? 0 : ty.target + add;
     if (add != null) ty.pulse = 1;
   };
-  // Mỗi tướng nảy số sát thương của mình (màu theo hệ) ngay trên ô tướng, giữ một nhịp, rồi lần lượt bay vào ô tổng.
-  async function popAndMerge(hits) {
+  // Nhóm ngọc tan tới đâu, các tướng ăn nhóm đó nảy số sát thương (màu theo hệ) ngay trên ô tướng,
+  // giữ một nhịp rồi bay vào ô tổng. Cuối lượt tổng nổ to rồi mới bắn vào quái.
+  let popN = 0;
+  function spawnPops(hits, gi) {
     const per = new Map();
-    for (const h of hits) if (h.kind === 'damage' && h.amount > 0) per.set(h.from, (per.get(h.from) || 0) + h.amount);
-    const total = [...per.values()].reduce((a, b) => a + b, 0);
-    if (total <= 0) return;
-    const pops = [...per.entries()]
-      .map(([id, amt]) => ({ id, amt, ...memberPos(id) }))
-      .sort((a, b) => a.x - b.x)
-      .map((q, i) => ({ s: fmt(q.amt), amt: q.amt, x: q.x, y: 446, el: q.el, size: Math.round(34 + 30 * Math.sqrt(q.amt / total)), delay: i * ANIM.popStagger, age: 0, flyAge: -1, flyDelay: 0 }));
-    view.pops.push(...pops);
-    pops.forEach((q, i) => setTimeout(() => alive && fx.sfx('match', 1 + i * 0.1), q.delay));
-    await sleep((pops.length - 1) * ANIM.popStagger + ANIM.popHold);
-    await Promise.all(
-      pops.map(async (q, i) => {
-        q.flyDelay = i * ANIM.flyStagger;
-        q.flyAge = 0;
-        await sleep(q.flyDelay + ANIM.flyTime);
-        view.rings.push({ x: TALLY.x, y: TALLY.y, col: q.el, age: 0, life: 360 });
-        fx.sfx('hit', 1 + i * 0.06);
-        tally(q.amt);
-      }),
-    );
-    view.pops = view.pops.filter((q) => !pops.includes(q));
+    for (const h of hits) if (h.kind === 'damage' && h.group === gi && h.amount > 0) per.set(h.from, (per.get(h.from) || 0) + h.amount);
+    const hp0 = Math.max(1, state.enemies[0]?.maxHp || 1);
+    for (const [id, amt] of per) {
+      const pos = memberPos(id);
+      const k = popN++ % 3;
+      const q = { s: fmt(amt), amt, x: pos.x + (k - 1) * 16, y: 440 + (k - 1) * 14, el: pos.el, size: Math.round(32 + Math.min(1, (amt / hp0) * 3) * 26), delay: 0, age: 0, hold: ANIM.popHold, fly: ANIM.flyTime };
+      view.pops.push(q);
+      fx.sfx('hit', 1 + Math.min(6, view.combo) * 0.06);
+      setTimeout(() => {
+        if (!alive) return;
+        view.rings.push({ x: TALLY.x, y: TALLY.y, col: q.el, age: 0, life: 320 });
+        tally(amt);
+      }, q.hold + q.fly);
+    }
   }
   const splitHits = (hits) => {
     // gộp mọi đòn của cả lượt theo (người đánh, quái): mỗi cặp một quả cầu với tổng sát thương
@@ -238,7 +233,6 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       sawStep = false;
       // đòn cuối: số sát thương dự tính nổ to rồi mới bắn
       view.hl = null;
-      await popAndMerge(pendingHits);
       const ty = view.tally;
       if (ty && ty.target > 0) {
         fx.sfx('finale');
@@ -302,6 +296,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
           floater(t('battle.combo', { n: view.combo }), cx, cy, '#ffffff', 22 + Math.min(14, view.combo));
           if (g.type !== 5 && !state.members.some((m) => m.element === g.type)) floater(t('battle.noAttacker'), cx, cy + 26, '#ff9aa8', 16);
           await sleep(ANIM.groupHold);
+          spawnPops(e.hits, gi);
           const cleared = view.board;
           for (const i of g.cells) {
             const c = cellCenter(i);
@@ -624,7 +619,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     if (view.lockFlash) view.lockFlash = Math.max(0, view.lockFlash - dt / 400);
     if (view.slides) for (const k in view.slides) { view.slides[k].age += dt; if (view.slides[k].age > 180) delete view.slides[k]; }
     for (const f of view.floaters) f.age += dt;
-    for (const q of view.pops) { q.age += dt; if (q.flyAge >= 0) q.flyAge += dt; }
+    view.pops = view.pops.filter((q) => (q.age += dt) < q.hold + q.fly);
     view.floaters = view.floaters.filter((f) => f.age < f.life);
     for (const q of view.particles) {
       q.age += dt;

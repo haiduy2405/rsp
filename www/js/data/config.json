@@ -172,6 +172,13 @@
           1,
           2
         ]
+      },
+      "offering": {
+        "chance": 0.25,
+        "count": [
+          1,
+          2
+        ]
       }
     },
     "elite": {
@@ -208,6 +215,13 @@
       "fodder": {
         "chance": 0.8,
         "star2Chance": 0.3,
+        "count": [
+          1,
+          3
+        ]
+      },
+      "offering": {
+        "chance": 0.5,
         "count": [
           1,
           3
@@ -252,6 +266,13 @@
           2,
           3
         ]
+      },
+      "offering": {
+        "chance": 0.9,
+        "count": [
+          2,
+          4
+        ]
       }
     },
     "chest": {
@@ -292,6 +313,13 @@
           1,
           2
         ]
+      },
+      "offering": {
+        "chance": 0.3,
+        "count": [
+          1,
+          2
+        ]
       }
     },
     "completion": {
@@ -323,6 +351,13 @@
         "count": [
           20,
           50
+        ]
+      },
+      "offering": {
+        "chance": 1.0,
+        "count": [
+          3,
+          5
         ]
       }
     }
@@ -550,5 +585,52 @@
       "5": 1.6
     },
     "fodderSameElement": 1.5
+  },
+  "skillUp": {
+    "levels": {
+      "3": 3,
+      "4": 4,
+      "5": 5
+    },
+    "perLevel": 0.1,
+    "maxCooldownCut": 1,
+    "cost": {
+      "tier": [
+        1,
+        2,
+        3,
+        3
+      ],
+      "count": [
+        3,
+        4,
+        6,
+        8
+      ],
+      "gold": [
+        200,
+        500,
+        1000,
+        2000
+      ],
+      "rarityMult": {
+        "3": 1,
+        "4": 1.5,
+        "5": 2
+      }
+    }
+  },
+  "offeringTier": {
+    "easy": {
+      "1": 1
+    },
+    "normal": {
+      "1": 0.6,
+      "2": 0.4
+    },
+    "hard": {
+      "2": 0.6,
+      "3": 0.4
+    }
   }
 }

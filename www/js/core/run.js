@@ -69,6 +69,8 @@ export function createRun(ctx, { seed, zoneId, team, pityMissed = false, diff = 
 }
 
 const pick = (rng, list) => list[rng.int(list.length)];
+// Các tộc quái thường của khu (cho rương và thưởng hoàn thành).
+const zoneRaces = (ctx, zoneId) => [...new Set(ctx.zones[zoneId].monsters.normal.map((m) => ctx.monsters[m].race))];
 
 function startBattle(ctx, run, rng, kind) {
   const zone = ctx.zones[run.zoneId];
@@ -117,7 +119,7 @@ function enterNode(ctx, run, rng, type) {
   if (type === 'normal' || type === 'elite' || type === 'boss') {
     startBattle(ctx, run, rng, type);
   } else if (type === 'chest') {
-    const loot = rollLoot(ctx, 'chest', rng, run.diff, ctx.zones[run.zoneId].element);
+    const loot = rollLoot(ctx, 'chest', rng, run.diff, ctx.zones[run.zoneId].element, zoneRaces(ctx, run.zoneId));
     run.loot = addLoot(run.loot, loot);
     run.lastResult = { kind: 'chest', loot };
     run.phase = 'result';
@@ -154,7 +156,7 @@ function advanceFloor(ctx, run, rng) {
 
 function endRun(ctx, run, rng, won) {
   if (won) {
-    const comp = rollLoot(ctx, 'completion', rng, run.diff, ctx.zones[run.zoneId].element);
+    const comp = rollLoot(ctx, 'completion', rng, run.diff, ctx.zones[run.zoneId].element, zoneRaces(ctx, run.zoneId));
     // Bảo hiểm xui: chuyến trước hụt Tinh Thạch Hiếm thì chuyến này chắc chắn có khi hoàn thành.
     if (run.pityMissed && comp.stones.rare + run.loot.stones.rare === 0) {
       comp.stones.rare = 1;
@@ -172,7 +174,8 @@ function endRun(ctx, run, rng, won) {
 
 function onBattleWon(ctx, run, rng) {
   const kind = run.node === 'boss' ? 'boss' : run.node === 'elite' ? 'elite' : 'normal';
-  const loot = rollLoot(ctx, kind, rng, run.diff, ctx.zones[run.zoneId].element);
+  const races = [...new Set(run.battle.enemies.map((e) => ctx.monsters[e.id].race))];
+  const loot = rollLoot(ctx, kind, rng, run.diff, ctx.zones[run.zoneId].element, races);
   run.loot = addLoot(run.loot, loot);
   run.lastResult = { kind: 'battle', nodeType: run.node, loot };
   if (run.floor === run.floors - 1) endRun(ctx, run, rng, true);

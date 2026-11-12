@@ -17,6 +17,7 @@ import {
   shieldPool,
 } from './effects.js';
 import { statsFor, skillCooldown, normTeam } from './stats.js';
+import { resolveKit } from './kit.js';
 
 // ctx = { config, characters, monsters, duoByPair, ... } (dữ liệu từ JSON, không đổi)
 export { indexById } from './ctx.js';
@@ -24,24 +25,28 @@ export { indexById } from './ctx.js';
 // Dựng 5 thành viên (chỉ số theo Level/Thức tỉnh, thưởng đội trưởng). Dùng chung cho trận và chuyến.
 export function buildMembers(ctx, team) {
   const roster = normTeam(team);
-  const members = roster.map(({ id, level, awaken }) => {
+  const kits = [];
+  const members = roster.map(({ id, level, awaken, skillLv }) => {
     const c = ctx.characters[id];
     if (!c) throw new Error('unknown character ' + id);
     const st = statsFor(ctx, id, level, awaken);
+    const kit = resolveKit(ctx, id, skillLv);
+    kits.push(kit);
     return {
       id,
       element: c.element,
       level,
       awaken,
+      skillLv,
       hp: st.hp,
       atk: st.atk,
       heal: st.heal,
-      skillCd: c.skill ? (c.skill.startCooldown ?? 0) : 0,
-      skillMax: c.skill ? skillCooldown(ctx, id, awaken) : 0,
+      skillCd: kit.skill ? kit.skill.startCooldown : 0,
+      skillMax: kit.skill ? skillCooldown(ctx, id, awaken, skillLv) : 0,
     };
   });
   // Kỹ năng đội trưởng (khuôn mẫu cố định, tham số hóa trong JSON).
-  const lead = ctx.characters[members[0].id].leader || null;
+  const lead = kits[0].leader || null;
   if (lead) {
     for (const m of members) {
       if (lead.template === 'atk_element' && m.element === lead.element) m.atk = Math.round(m.atk * (1 + lead.pct));
@@ -50,9 +55,24 @@ export function buildMembers(ctx, team) {
       else if (lead.template === 'start_cd') m.skillCd = Math.max(0, m.skillCd - lead.n);
     }
   }
+  // Bị động dạng chỉ số: có hiệu lực khi tướng có mặt trong đội (không cần là đội trưởng).
+  members.forEach((src, i) => {
+    const p = kits[i].passive;
+    if (p?.kind !== 'stat') return;
+    for (const m of members) {
+      const hit = p.scope === 'all' || (p.scope === 'self' && m === src) || (p.scope === 'element' && m.element === p.element);
+      if (hit) m[p.stat] = Math.round(m[p.stat] * (1 + p.pct));
+    }
+  });
   for (const m of members) m.skillCd = Math.min(m.skillCd, m.skillMax);
   return { members, lead, maxHp: members.reduce((a, m) => a + m.hp, 0) };
 }
+
+// Bị động dạng kích hoạt ('start' đầu trận, 'turn' cứ mỗi `every` lượt): trả các tướng có loại đó.
+const triggerPassives = (ctx, s, trigger) =>
+  s.members
+    .map((m, i) => ({ i, m, p: resolveKit(ctx, m.id, m.skillLv).passive }))
+    .filter(({ p }) => p?.kind === 'trigger' && p.trigger === trigger);
 
 // team: danh sách id hoặc {id, level, awaken}. Ô đầu là đội trưởng.
 // Tùy chọn cho chuyến leo tháp: scale {hp, atk} nhân chỉ số quái, hp (máu đội mang theo),
@@ -85,7 +105,7 @@ export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects
   });
   const teamHolder = { effects: [], recover: 0, maxHp };
   for (const e of startEffects || []) addEffect(teamHolder, e);
-  return {
+  const state = {
     version: 2,
     turn: 0,
     status: 'playing',
@@ -102,6 +122,9 @@ export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects
     enemies: foes,
     focus: null,
   };
+  for (const { m, p } of triggerPassives(ctx, state, 'start')) runUnits(ctx, state, rng, p.units, { atk: m.atk, element: m.element, id: m.id });
+  state.rng = rng.state;
+  return state;
 }
 
 const firstAliveRaw = (s) => s.enemies.findIndex((e) => e.hp > 0);
@@ -255,10 +278,11 @@ export function step(ctx, state, action) {
 
   if (action.type === 'skill') {
     const m = s.members[action.index];
-    if (!m || !ctx.characters[m.id].skill) return invalid('no_skill');
+    const kit = m && resolveKit(ctx, m.id, m.skillLv);
+    if (!kit?.skill) return invalid('no_skill');
     if (m.skillCd > 0) return invalid('skill_cooldown');
     if (isDisabled(s.team)) return invalid('skill_locked');
-    const hits = runUnits(ctx, s, rng, ctx.characters[m.id].skill.units, { atk: m.atk, element: m.element, id: m.id });
+    const hits = runUnits(ctx, s, rng, kit.skill.units, { atk: m.atk, element: m.element, id: m.id });
     m.skillCd = m.skillMax;
     events.push({ type: 'skill', member: action.index, hits, board: structuredClone(s.board) });
     checkEnd(s);
@@ -295,7 +319,8 @@ export function step(ctx, state, action) {
   for (const st of steps) {
     const hits = [];
     const comboStart = comboN + 1;
-    for (const g of st.groups) {
+    st.groups.forEach((g, gi) => {
+      const from = hits.length;
       comboN++;
       const cm = comboMultiplier(comboN, ctx.config);
       const gf = groupFactor(g, ctx.config);
@@ -314,7 +339,8 @@ export function step(ctx, state, action) {
           }
         }
       }
-    }
+      for (let k = from; k < hits.length; k++) hits[k].group = gi; // để UI gắn số sát thương vào đúng nhóm ngọc đang tan
+    });
     // Ô bị khóa mà ngọc đã được tiêu thì mở khóa.
     if (s.locked.length) s.locked = s.locked.filter((c) => !st.cleared.includes(c));
     events.push({ type: 'step', step: st, comboStart, combos: comboN, hits });
@@ -324,6 +350,14 @@ export function step(ctx, state, action) {
   for (const m of s.members) m.skillCd = Math.max(0, m.skillCd - 1);
   for (const d of s.duos) d.cd = Math.max(0, d.cd - 1);
   checkEnd(s);
+  if (s.status === 'playing') {
+    for (const { i, m, p } of triggerPassives(ctx, s, 'turn')) {
+      if ((s.turn + 1) % p.every !== 0) continue;
+      const hits = runUnits(ctx, s, rng, p.units, { atk: m.atk, element: m.element, id: m.id });
+      events.push({ type: 'passive', member: i, hits, board: structuredClone(s.board) });
+    }
+    checkEnd(s);
+  }
 
   if (s.status === 'playing') {
     for (let i = 0; i < s.enemies.length; i++) {
