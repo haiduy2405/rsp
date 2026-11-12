@@ -17,10 +17,10 @@ function score(r) {
 const better = (a, b) => !b || a.combos !== b.combos ? !b || a.combos > b.combos : a.cleared !== b.cleared ? a.cleared > b.cleared : a.dmg > b.dmg;
 
 // Bản chia lát: generator nhường (yield) khi đã chạy quá sliceMs để không chặn khung hình.
-function* search(ctx, state, step, shouldYield) {
+function* search(ctx, state, step, shouldYield, opts = {}) {
   const diag = ctx.config.board.allowDiagonal;
-  const cap = ctx.config.hint?.maxCombos ?? 6;
-  const maxSteps = ctx.config.hint?.maxSteps ?? 8;
+  const cap = opts.maxCombos ?? ctx.config.hint?.maxCombos ?? 6;
+  const maxSteps = opts.maxSteps ?? ctx.config.hint?.maxSteps ?? 8;
   const N = state.board.cells.length;
   let best = null;
   let beam = [];
@@ -48,18 +48,18 @@ function* search(ctx, state, step, shouldYield) {
   return best ? { path: best.path, combos: best.sc.combos } : null;
 }
 
-export function findHint(ctx, state, step = coreStep) {
-  const it = search(ctx, state, step, () => false);
+export function findHint(ctx, state, step = coreStep, opts = {}) {
+  const it = search(ctx, state, step, () => false, opts);
   let r = it.next();
   while (!r.done) r = it.next();
   return r.value;
 }
 
 // Không chặn luồng chính: mỗi lát ~4ms rồi trả quyền cho trình duyệt (khung hình vẫn đều 60fps).
-export function findHintAsync(ctx, state, step = coreStep, sliceMs = 4) {
+export function findHintAsync(ctx, state, step = coreStep, sliceMs = 4, opts = {}) {
   return new Promise((resolve) => {
     let t0 = 0;
-    const it = search(ctx, state, step, () => performance.now() - t0 > sliceMs);
+    const it = search(ctx, state, step, () => performance.now() - t0 > sliceMs, opts);
     const run = () => {
       t0 = performance.now();
       const r = it.next();

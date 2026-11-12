@@ -593,6 +593,46 @@
     "wave": "triangle",
     "gain": 0.05
    }
+  ],
+  "confirm": [
+   {
+    "t": 0,
+    "f0": 440,
+    "f1": 440,
+    "dur": 0.08,
+    "wave": "sine",
+    "gain": 0.05
+   }
+  ],
+  "error": [
+   {
+    "t": 0,
+    "f0": 440,
+    "f1": 440,
+    "dur": 0.08,
+    "wave": "sine",
+    "gain": 0.05
+   }
+  ],
+  "toggle": [
+   {
+    "t": 0,
+    "f0": 440,
+    "f1": 440,
+    "dur": 0.08,
+    "wave": "sine",
+    "gain": 0.05
+   }
+  ],
+  "sting": [
+   {
+    "t": 0,
+    "f0": 440,
+    "f1": 440,
+    "dur": 0.08,
+    "wave": "sine",
+    "gain": 0.05
+   }
   ]
  },
  "samples": {
@@ -744,6 +784,36 @@
   "skill2": {
    "url": "assets/audio/skill2.mp3",
    "gain": 0.9,
+   "rate": 1
+  },
+  "tick": {
+   "url": "assets/audio/tick.mp3",
+   "gain": 0.5,
+   "rate": 1
+  },
+  "open": {
+   "url": "assets/audio/open.mp3",
+   "gain": 0.45,
+   "rate": 1
+  },
+  "confirm": {
+   "url": "assets/audio/confirm.mp3",
+   "gain": 0.55,
+   "rate": 1
+  },
+  "error": {
+   "url": "assets/audio/error.mp3",
+   "gain": 0.5,
+   "rate": 1
+  },
+  "toggle": {
+   "url": "assets/audio/toggle.mp3",
+   "gain": 0.5,
+   "rate": 1
+  },
+  "sting": {
+   "url": "assets/audio/sting.mp3",
+   "gain": 0.7,
    "rate": 1
   }
  },

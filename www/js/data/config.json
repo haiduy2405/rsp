@@ -3,7 +3,7 @@
     "allowDiagonal": true
   },
   "dragTimeMs": 5000,
-  "hint": { "maxCombos": 6, "maxSteps": 8 },
+  "hint": { "maxCombos": 3, "maxSteps": 3 },
   "elements": [
     "water",
     "fire",
@@ -431,9 +431,10 @@
     "starter": { "four": 1, "three": 9 }
   },
   "tutorial": {
+    "hint": { "maxCombos": 2, "maxSteps": 2 },
     "seed": 20260101,
     "enemies": ["m_ember", "m_tide", "m_shade"],
-    "scale": { "hp": 0.35, "atk": 0.35 }
+    "scale": { "hp": 0.2, "atk": 0.35 }
   },
   "onboarding": {
     "avatars": 12,

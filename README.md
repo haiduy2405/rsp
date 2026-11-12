@@ -306,3 +306,11 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Gợi ý nước đi tính theo lát ~4ms (`findHintAsync`), không còn khựng đầu trận (trước ~45ms/lần trên máy thường).
 - Nhịp phát sáng (thẻ triệu hồi, ải, nút Thức tỉnh, ô đội hình) chuyển sang lớp `::after` chỉ đổi opacity; bỏ `backdrop-filter`; chữ viền trong canvas không dùng `shadowBlur`.
 - Đo bằng `tests/e2e/perf60.cjs` (giảm tốc CPU 4x): p99 mỗi khung ~7ms, không còn long task trong lúc chơi.
+
+## v0.42.0 — Dạo đầu, tutorial dễ hơn, HUD mới
+- Cutscene dạo đầu (cổng Tháp mở, AIDA) trước màn tutorial.
+- Gợi ý nước đầu mỗi ván ngắn và dễ: tối đa 3 ô, 3 combo (`config.hint`); tutorial 2 ô, 2 combo và gợi ý mọi nước (`config.tutorial.hint`). Quái tutorial yếu hơn.
+- Nút bóng đèn trên đầu trận để người cũ tắt/bật gợi ý (lưu `settings.hint`). Nút tạm dừng vẽ lại, đặt góc phải.
+- Tutorial dùng xác nhận kỹ năng như trận thật. Bong bóng hướng dẫn nhỏ, mờ, đặt sát dưới thanh đầu trận để không che quái.
+- Thanh đầu trận mới: bảng "LƯỢT" số lớn và bảng "TẦNG" kèm chấm tiến độ.
+- SFX Kenney CC0 bổ sung: tick, open, confirm, error, toggle, sting (xem docs/CREDITS.md).

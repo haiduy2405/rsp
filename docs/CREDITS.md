@@ -18,3 +18,4 @@ Chưa có art thật (hình khối màu). Khi thêm: lưu prompt + file gốc, g
 ## Âm thanh
 - SFX: bộ "adbertiser-sfx" (CC0, tổng hợp) — cắt/chuẩn hóa bằng `tools/build-audio.py` thành `www/assets/audio/*.mp3`. Thiếu mẫu thì dùng synth WebAudio dự phòng.
 - Nhạc nền: sinh bằng WebAudio (data/audio.json), không dùng nguồn ngoài.
+- SFX bổ sung: Kenney "Interface Sounds" và "Music Jingles" (CC0, kenney.nl). Các file `tick`, `open`, `confirm`, `error`, `toggle`, `sting` trong `www/assets/audio/` lấy từ đó (cắt, mono, mp3).

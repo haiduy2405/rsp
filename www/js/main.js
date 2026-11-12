@@ -927,7 +927,7 @@ function startTutorial(retry = false) {
     bubble.classList.add('on');
     audio.sfx('tick');
   };
-  const done = () => { bubble.remove(); $('pause-btn')?.remove(); };
+  const done = () => { bubble.remove(); $('pause-btn')?.remove(); $('hint-btn')?.remove(); };
   audio.playMusic('battle');
   $('screen').classList.remove('show');
   game?.destroy();
@@ -941,12 +941,14 @@ function startTutorial(retry = false) {
     stepper: (state, action) => battleStep(ctx, state, action),
     fx: audio,
     hint: true,
+    hintOpts: tc.hint,
     onInspect: showInspect,
-    onSkillAsk(idx, go) { skillUsed = true; coach(null); go(); },
+    onSkillAsk(idx, go) { showSkillAsk(idx, () => { skillUsed = true; go(); }); },
     celebrate,
     onSettled(state, action) {
-      if (action.type === 'skill') { coach('tut.c5'); return; }
+      if (action.type === 'skill') { coach('tut.c5'); game.requestHint(); return; }
       moves += 1;
+      if (moves < 4) game.requestHint();
       if (moves === 1) coach('tut.c2');
       else if (moves === 2 && !skillShown && state.members[0].skillCd === 0) { skillShown = true; coach('tut.c4'); }
       else if (moves <= 3) coach('tut.c3');
@@ -971,7 +973,7 @@ function startTutorial(retry = false) {
 }
 
 function startBattleUI() {
-  const hint = true; // gợi ý đường kéo cho nước đi ĐẦU TIÊN của mỗi trận
+  const hint = progress.settings.hint !== false; // gợi ý đường kéo cho nước đi ĐẦU TIÊN của mỗi trận (người chơi tắt được bằng nút bóng đèn)
   audio.playMusic(run.node === 'boss' ? 'boss' : 'battle');
   $('screen').classList.remove('show');
   game?.destroy();
@@ -1002,10 +1004,30 @@ function startBattleUI() {
     },
   });
   window.__game = game;
+  addBattleButtons(true);
+}
+
+// Nút trên đầu trận: tạm dừng và (không phải màn hướng dẫn) bật/tắt gợi ý nước đầu mỗi ván.
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.2" y="5" width="4" height="14" rx="1.6"/><rect x="13.8" y="5" width="4" height="14" rx="1.6"/></svg>';
+const ICON_HINT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>';
+function addBattleButtons(withHint) {
   $('pause-btn')?.remove();
-  const pb = h('button', { id: 'pause-btn', 'aria-label': t('pause.title'), onclick: () => showPause() });
-  pb.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>';
+  $('hint-btn')?.remove();
+  const pb = h('button', { id: 'pause-btn', class: 'bbtn', 'aria-label': t('pause.title'), onclick: () => showPause() });
+  pb.innerHTML = ICON_PAUSE;
   $('wrap').appendChild(pb);
+  if (!withHint) return;
+  const on = () => progress.settings.hint !== false;
+  const hb = h('button', { id: 'hint-btn', class: 'bbtn' + (on() ? '' : ' off'), 'aria-label': t('hint.toggle'), 'aria-pressed': String(on()), title: t('hint.toggle'), onclick: () => {
+    progress.settings.hint = !on();
+    save();
+    hb.classList.toggle('off', !on());
+    hb.setAttribute('aria-pressed', String(on()));
+    if (!on()) game?.hideHint?.();
+    audio.sfx('toggle');
+  } });
+  hb.innerHTML = ICON_HINT;
+  $('wrap').appendChild(hb);
 }
 let pending = null;
 

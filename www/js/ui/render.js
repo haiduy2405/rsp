@@ -194,6 +194,61 @@ const TALLY_AT = { x: W / 2 + 90, y: 340 }; // ô tổng sát thương (khớp g
 const POP_LIGHT = ['#b8e0ff', '#ffc0ac', '#b8f5c4', '#fff4b0', '#dcc4ff', '#ffd0e4']; // màu sáng theo hệ cho số của tướng
 const easeOut = (k) => 1 - (1 - k) ** 3;
 const NUM = 'Oswald, "Be Vietnam Pro", system-ui, sans-serif'; // số: chữ cao hẹp, dễ đọc khi to
+// Thanh đầu trận: bảng "Lượt" (số lớn) và bảng "Tầng" (kèm chấm tiến độ) trên nền gỗ tối viền vàng.
+function plaque(g, x, y, w, h) {
+  const gr = g.createLinearGradient(0, y, 0, y + h);
+  gr.addColorStop(0, 'rgba(84, 52, 30, 0.92)');
+  gr.addColorStop(1, 'rgba(34, 19, 11, 0.92)');
+  g.beginPath();
+  g.roundRect ? g.roundRect(x, y, w, h, 10) : g.rect(x, y, w, h);
+  g.fillStyle = gr;
+  g.fill();
+  g.lineWidth = 1.5;
+  g.strokeStyle = 'rgba(211, 154, 94, 0.9)';
+  g.stroke();
+  g.beginPath();
+  g.moveTo(x + 8, y + 2.5);
+  g.lineTo(x + w - 8, y + 2.5);
+  g.strokeStyle = 'rgba(255, 238, 200, 0.18)';
+  g.lineWidth = 1;
+  g.stroke();
+}
+function hud(g, view) {
+  g.fillStyle = 'rgba(20, 11, 6, 0.7)';
+  g.fillRect(0, 0, W, 56);
+  g.fillStyle = 'rgba(211, 154, 94, 0.7)';
+  g.fillRect(0, 56, W, 1.5);
+  // Lượt
+  plaque(g, 10, 8, 104, 40);
+  text(g, view.t('battle.turnWord'), 22, 28, 12, '#c9a678', 'left', '700');
+  text(g, String(view.turn + 1), 100, 29, 26, '#ffe29a', 'right', '800', NUM);
+  // Tầng: số + chấm tiến độ; không khớp dạng "n/tổng" thì in nguyên chữ
+  const m = /(\d+)\s*\/\s*(\d+)/.exec(view.titleText || '');
+  if (m) {
+    const n = +m[1];
+    const tot = +m[2];
+    const w = Math.max(132, 44 + tot * 16);
+    plaque(g, 122, 8, w, 40);
+    text(g, view.t('battle.floorWord'), 134, 22, 11, '#c9a678', 'left', '700');
+    text(g, `${n}/${tot}`, 134 + 52, 22, 13, '#f6edd6', 'left', '700');
+    for (let i = 0; i < tot; i++) {
+      const px = 134 + i * 16 + 6;
+      g.beginPath();
+      g.arc(px, 38, 4.5, 0, Math.PI * 2);
+      g.fillStyle = i < n - 1 ? '#d39a5e' : i === n - 1 ? '#ffe29a' : 'rgba(255,255,255,0.14)';
+      g.fill();
+      if (i === n - 1) {
+        g.lineWidth = 1.5;
+        g.strokeStyle = '#fff3c9';
+        g.stroke();
+      }
+    }
+  } else if (view.titleText) {
+    plaque(g, 122, 8, 150, 40);
+    text(g, view.titleText, 197, 29, 14, '#f6edd6', 'center', '700');
+  }
+}
+
 function text(g, s, x, y, size, color = '#e8ebff', align = 'center', weight = '600', family = SANS) {
   g.fillStyle = color;
   g.font = `${weight} ${size}px ${family}`;
@@ -446,12 +501,7 @@ export function draw(g, view, t) {
   g.globalAlpha = 1;
 
   // HUD
-  g.fillStyle = 'rgba(28,16,9, 0.62)';
-  g.fillRect(0, 0, W, 38);
-  g.fillStyle = 'rgba(220,195,160,0.55)';
-  g.fillRect(0, 38, W, 1.5);
-  text(g, view.t('battle.turn', { n: view.turn + 1 }), 16, 20, 15, '#f6edd6', 'left', '700');
-  text(g, view.titleText, W - 16, 20, 13, '#aab2f0', 'right');
+  hud(g, view);
   const sh = (view.teamFx || []).find((e) => e.key === 'shield');
   if (sh) text(g, view.t('battle.shield', { n: sh.pool }), W - 16, 336, 15, '#6bd5ff', 'right', '700');
   if (view.teamFx?.length) badges(g, view.teamFx, 16, 326, view);

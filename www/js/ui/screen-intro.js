@@ -2,10 +2,46 @@
 import { $, h, btn } from './dom.js';
 import { itemIcon } from './icons.js';
 import { starterSummon } from '../core/summon.js';
+import { TOWER } from './tower-art.js';
 
 export function install(app) {
   const { audio, ctx, portrait, save, screen, t } = app;
   const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Dạo đầu ngắn trước màn hướng dẫn: cổng Tháp mở ra, AIDA dẫn vào trận đầu.
+  function showPrologue() {
+    $('cut')?.remove();
+    const lines = ['pro.1', 'pro.2', 'pro.3'].map((k) => t(k));
+    const text = h('p', { class: 'cut-line' });
+    const tower = h('div', { class: 'cut-tower' });
+    tower.innerHTML = TOWER;
+    const root = h('div', { id: 'cut', class: 'cut' }, h('div', { class: 'cut-rays' }), h('div', { class: 'cut-glow' }), tower, text, h('div', { class: 'cut-tap' }, t('pro.tap')));
+    $('wrap').appendChild(root);
+    audio.sfx('sting');
+    let i = -1;
+    let timer = null;
+    const next = () => {
+      clearTimeout(timer);
+      i += 1;
+      if (i >= lines.length) return finish();
+      text.classList.remove('on');
+      void text.offsetWidth;
+      text.textContent = lines[i];
+      text.classList.add('on');
+      if (i === 0) tower.classList.add('in');
+      else audio.sfx('tick');
+      timer = setTimeout(next, reduced() ? 2400 : 3000);
+    };
+    const finish = () => {
+      clearTimeout(timer);
+      root.removeEventListener('click', next);
+      audio.sfx('open');
+      root.classList.add('out');
+      setTimeout(() => { root.remove(); app.startTutorial(); }, reduced() ? 50 : 700);
+    };
+    root.addEventListener('click', next);
+    next();
+  }
 
   // Sau tutorial: AIDA tặng 10 vé, người chơi bấm để triệu hồi.
   function showStarterReward() {
@@ -92,5 +128,5 @@ export function install(app) {
     setTimeout(() => sc.classList.remove('hubin'), 1800);
   }
 
-  return { showStarterReward, showCutscene };
+  return { showPrologue, showStarterReward, showCutscene };
 }

@@ -6,6 +6,7 @@ import { finishOnboarding, storyUnlocked, updateProfile } from '../core/onboardi
 import { newProgress } from '../core/progress.js';
 import * as offline from '../ui/offline.js';
 import { flagPicker } from './flags.js';
+import { TOWER } from './tower-art.js';
 
 export function install(app) {
   const { audio, ctx, dicts, save, screen, setLang, showHub, storage, t } = app;
@@ -183,7 +184,6 @@ export function install(app) {
 
   // Mở đầu: cốt truyện -> AIDA hỏi tên, ngoại hình, quê hương -> màn hướng dẫn (trận thật) -> quà 10 vé.
   const ob = { hometown: '', avatar: 0, photo: null, name: '' };
-  const TOWER = '<svg viewBox="0 0 120 220" aria-hidden="true"><defs><linearGradient id="tw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2c27a"/><stop offset="1" stop-color="#3a2013"/></linearGradient></defs><path d="M60 8 L72 40 L68 40 L80 90 L74 90 L90 150 L84 150 L104 210 L16 210 L36 150 L30 150 L46 90 L40 90 L52 40 L48 40 Z" fill="url(#tw)" stroke="#d39a5e" stroke-width="1.5" stroke-linejoin="round"/><circle cx="60" cy="14" r="5" fill="#fff3c9" class="tw-eye"/></svg>';
 
   function showOnboarding(step = 1, err = null) {
     if (step === 1) Object.assign(ob, { hometown: '', avatar: 0, photo: null, name: '' });
@@ -218,7 +218,7 @@ export function install(app) {
             }
             app.progress = r.progress;
             save();
-            app.startTutorial();
+            app.showPrologue();
           }, 'primary', { id: 'ob-start' }),
         ),
       );

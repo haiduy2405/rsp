@@ -23,7 +23,7 @@ const DIAG_ASSIST = 0.38; // tỉ lệ ô: lệch ngang và dọc đều vượt
 const NOFX = { sfx() {}, vibrate() {} };
 
 
-export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null, onSkillAsk = null, onSettled = null }) {
+export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null, onSkillAsk = null, onSettled = null, hintOpts = {} }) {
   const g = canvas.getContext('2d');
   let state = initial;
   let busy = false;
@@ -84,7 +84,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   }
   if (hint) {
     const s0 = state;
-    findHintAsync(ctx, s0).then((hp) => { if (hp && alive && state === s0 && !view.hint) view.hint = { path: hp.path, text: t('tut.hint', { n: hp.combos }) }; });
+    findHintAsync(ctx, s0, undefined, 4, hintOpts).then((hp) => { if (hp && alive && state === s0 && !view.hint) view.hint = { path: hp.path, text: t('tut.hint', { n: hp.combos }) }; });
   }
 
   const TALLY = { x: W / 2 + 90, y: 340 }; // nơi vẽ tổng sát thương (khớp render.js)
@@ -743,6 +743,12 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
 
   return {
     getView: () => view, // test/debug
+    // Tính và hiện gợi ý đơn giản cho nước kế tiếp (dùng trong màn hướng dẫn). opts: { maxSteps, maxCombos }.
+    requestHint(opts = hintOpts) {
+      const s0 = state;
+      findHintAsync(ctx, s0, undefined, 4, opts).then((hp) => { if (hp && alive && state === s0 && !busy) view.hint = { path: hp.path, text: t('tut.hint', { n: hp.combos }) }; });
+    },
+    hideHint() { view.hint = null; view.hintKeep = null; },
     getHint: () => (view.hint ? view.hint.path.slice() : null),
     getDragPath: () => (drag ? drag.path.slice() : null),
     getState: () => state,
