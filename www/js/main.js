@@ -92,7 +92,7 @@ const screen = (...kids) => {
     b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6L3 12l6 6"/><path d="M3 12h11a6 6 0 0 1 6 6v1"/></svg>';
     el.prepend(h('div', { class: 'back-wrap' }, b));
   }
-  el.classList.remove('hub');
+  el.classList.remove('hub', 'mapscreen');
   el.classList.add('show');
   el.scrollTop = 0;
 };
@@ -210,6 +210,7 @@ function showHub() {
     h('div', { class: 'cur', id: 'cur' }, curPill('gold', inv.gold), curPill('spirit', inv.spirit, 'spirit'), curPill('essence', inv.essence)),
     notice ? h('div', { class: 'notice hub-notice' }, t(notice)) : null,
     installRow() ? h('div', { class: 'hub-install' }, installRow()) : null,
+    activeRunInfo() ? resumeChip() : null,
     h('div', { class: 'hub-foot' }, h('div', { class: 'credit' }, h('b', {}, t('hub.credit')), h('span', {}, t('hub.version', { v: VERSION, b: BUILD, d: BUILD_DATE })))),
     h(
       'nav',
@@ -268,6 +269,11 @@ function showProfile(msg) {
   void dirty;
 }
 
+function resumeChip() {
+  const r = activeRunInfo().run;
+  return h('button', { class: 'resume', id: 'b-resume', onclick: resumeRun }, h('span', { class: 'rs-t' }, t('run.resume')), h('small', {}, `${t(`zone.${r.zoneId}`)} · ${t('run.floor', { n: r.floor + 1, total: r.floors })}`));
+}
+
 // Chọn khu vực (từ nút CHIẾN ĐẤU).
 function showZones() {
   const inv = progress.inventory;
@@ -287,8 +293,10 @@ function showZones() {
       ),
     );
   });
+  const act0 = activeRunInfo();
   screen(
     h('h2', {}, t('hub.zones')),
+    act0 ? h('div', { class: 'card' }, h('b', {}, t('run.resume')), h('div', { class: 'muted' }, `${t(`zone.${act0.run.zoneId}`)} · ${t('run.floor', { n: act0.run.floor + 1, total: act0.run.floors })}`), h('div', { class: 'row' }, btn(t('run.resume'), resumeRun, 'primary', { id: 'zones-resume' }), btn(t('run.abandon'), () => { clearActiveRun(); showZones(); }, '', { id: 'zones-abandon' }))) : null,
     zoneCards,
     h('details', {}, h('summary', {}, t('hub.debug')), h('label', {}, t('hub.seed'), h('input', { id: 'seed', inputmode: 'numeric', value: seedText, oninput: (e) => (seedText = e.target.value) })), h('p', { class: 'muted' }, t('hub.progress'))),
     btn(t('back'), showHub, '', { id: 'back' }),
@@ -501,7 +509,7 @@ function showTeam(slot, msg, zoneId) {
     ),
     members.length ? h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(ctx.characters[members[0]].leader)}`) : null,
     h('div', { class: 'muted' }, members.length < 2 ? t('team.noDuo') : duos.length ? `${t('team.duoActive')}: ${duos.map((d) => t(`duo.${d.id}`)).join(', ')}` : t('team.noDuo')),
-    zoneId ? [needLeader || !members.length ? h('div', { class: 'notice' }, t(members.length ? 'team.needLeader' : 'team.needAny')) : null, btn(t('team.go'), () => startRun(zoneId), 'primary', { id: 'team-go', ...(needLeader ? { disabled: '' } : {}) })] : null,
+    zoneId ? [needLeader || !members.length ? h('div', { class: 'notice' }, t(members.length ? 'team.needLeader' : 'team.needAny')) : null, btn(t('team.go'), () => (activeRunInfo() ? askAbandon(zoneId) : startRun(zoneId)), 'primary', { id: 'team-go', ...(needLeader ? { disabled: '' } : {}) })] : null,
     h('p', { class: 'muted' }, t('team.holdHint')),
     h('div', { class: 'roster' }, sorted.map((c) => longPress(Object.assign(tile(c.id, team.indexOf(c.id) + 1 || 0), { onclick: () => pick(c.id) }), () => showChar(c.id, undefined, () => again(slot))))),
     btn(`${t('hub.collection')} ${owned().length}/${ctx.characterList.length}`, () => showCollection(), '', { id: 'team-col' }),
@@ -812,18 +820,63 @@ function pickSeed() {
   return (Math.random() * 4294967296) >>> 0; // UI được phép dùng Math.random; core thì không
 }
 
+// Lưu chuyến leo đang dở (tại màn chọn cửa) để thoát ra rồi vào chơi tiếp.
+function saveActiveRun() {
+  if (!run || run.phase !== 'doors') return;
+  progress.activeRun = { run: structuredClone(run), record: structuredClone(record), path: runPath.slice() };
+  save();
+}
+function clearActiveRun() {
+  if (progress.activeRun) {
+    delete progress.activeRun;
+    save();
+  }
+}
+function activeRunInfo() {
+  const a = progress.activeRun;
+  if (!a?.run || !ctx.zones[a.run.zoneId] || a.run.phase !== 'doors') return null;
+  return a;
+}
+function askAbandon(zoneId) {
+  screen(
+    h('h2', {}, t('run.resume')),
+    confirmBox(t('run.abandonAsk'), () => startRun(zoneId), () => showTeam(undefined, undefined, zoneId), t('run.abandon')),
+    btn(t('run.resume'), resumeRun, '', { id: 'ask-resume' }),
+  );
+}
+function resumeRun() {
+  const a = activeRunInfo();
+  if (!a) return showHub();
+  run = a.run;
+  record = a.record;
+  runPath = a.path || [];
+  savedThisRun = false;
+  render();
+}
+function leaveRun() {
+  saveActiveRun();
+  audio.sfx('back');
+  notice = 'run.saved';
+  showHub();
+}
+
 function startRun(zoneId) {
   const seed = pickSeed();
   const pity = !!progress.pity[zoneId];
   const team = teamRoster(progress);
   run = createRun(ctx, { seed, zoneId, team, pityMissed: pity });
   record = newRunRecord(seed, zoneId, team, pity);
+  runPath = [];
+  savedThisRun = false;
+  delete progress.activeRun;
   render();
 }
 
+let runPath = []; // các cửa đã đi: { floor, doors, pick } — chỉ để vẽ bản đồ
 function act(action) {
   const r = runStep(ctx, run, action);
   if (r.events[0]?.type === 'invalid') return;
+  if (action.type === 'door' && run.phase === 'doors') runPath.push({ floor: run.floor, doors: run.doors.slice(), pick: action.index });
   record.actions.push(action);
   run = r.run;
   render();
@@ -841,32 +894,119 @@ function render() {
 
 const floorTitle = () => h('h2', {}, `${t(`zone.${run.zoneId}`)} · ${t('run.floor', { n: run.floor + 1, total: run.floors })}`);
 
+// ---- Bản đồ leo tháp (kiểu đường đi Slay the Spire): đáy là cổng vào, đỉnh là trùm; mỗi tầng chọn một trong các cửa.
+const NODE = {
+  normal: { col: '#6f86ff', ring: '#c9d3ff', icon: '<path d="M6 18L17 7M7 7l11 11M5 19l2.5-.5M19 19l-2.5-.5M5 5l.5 2.5M19 5l-.5 2.5"/>' },
+  elite: { col: '#ff7a3c', ring: '#ffd0b0', icon: '<path d="M6 10c0-4 3-6 6-6s6 2 6 6v3l-2 2v3H8v-3l-2-2zM9 11h2M13 11h2M10 18v2M14 18v2"/>' },
+  boss: { col: '#ff4b5c', ring: '#ffe0b0', icon: '<path d="M4 18l1.5-9 4 4 2.5-7 2.5 7 4-4 1.5 9zM4 21h16"/>' },
+  chest: { col: '#ffc83a', ring: '#fff1b8', icon: '<path d="M4 11h16v8H4zM4 11a8 6 0 0 1 16 0M12 11v3M10.5 14h3"/>' },
+  rest: { col: '#4ed08a', ring: '#c9ffe0', icon: '<path d="M12 4c2 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3.500 2-4.500 0 1.500 1 2 1.500 2C10.500 8 11 6 12 4zM9 21h6"/>' },
+  event: { col: '#b07cff', ring: '#e6d4ff', icon: '<path d="M9 9a3 3 0 1 1 4.500 2.600C12.500 12.200 12 13 12 14.500M12 18v.5"/>' },
+  shop: { col: '#3cc7c0', ring: '#c8fffb', icon: '<path d="M6 9h12l1 11H5zM9 9V7a3 3 0 0 1 6 0v2M12 12v5M10.500 14h3"/>' },
+};
+const ITEM_ICON = {
+  potion: '<path d="M9 3h6M10 3v5l-4 9a3 3 0 0 0 2.800 4h6.400a3 3 0 0 0 2.800-4l-4-9V3M8 15h8"/>',
+  shield: '<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/>',
+  time: '<path d="M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9s8 4 8 9"/>',
+};
+
+function runMapSVG() {
+  const n = run.floors;
+  const top = 118;
+  const bottom = 468;
+  const step = n > 1 ? (bottom - top) / (n - 1) : 0;
+  const rowY = (r) => bottom - r * step;
+  const xs = (r, count) => (count === 1 ? [200] : [112 + Math.sin(r * 2.1) * 16, 288 + Math.cos(r * 1.7) * 16]);
+  const final = ctx.zones[run.zoneId].final === 'boss' ? 'boss' : 'elite';
+  const rows = [];
+  for (let r = 0; r < n; r++) {
+    const past = runPath.find((e) => e.floor === r);
+    const kinds = past ? past.doors : r === run.floor ? run.doors : r === n - 1 ? [final] : ['?', '?'];
+    rows.push({ r, y: rowY(r), kinds, xs: xs(r, kinds.length), pick: past ? past.pick : null, cur: r === run.floor && run.phase === 'doors', past: !!past });
+  }
+  const start = { x: 200, y: 548 };
+  const pos = (row, i) => [row.xs[i], row.y];
+  let faint = '';
+  let gold = '';
+  const link = (a, b, cls) => `<path d="M${a[0]} ${a[1]} Q${(a[0] + b[0]) / 2 + (a[0] < b[0] ? -12 : 12)} ${(a[1] + b[1]) / 2} ${b[0]} ${b[1]}" class="${cls}"/>`;
+  // nối mờ giữa các tầng liền kề
+  const prevPts = (r) => (r === 0 ? [[start.x, start.y]] : rows[r - 1].xs.map((x) => [x, rows[r - 1].y]));
+  for (const row of rows) for (let i = 0; i < row.xs.length; i++) for (const q of prevPts(row.r)) faint += link(q, pos(row, i), 'lk');
+  // đường đã đi
+  let last = [start.x, start.y];
+  for (const row of rows) {
+    if (!row.past) break;
+    const to = pos(row, row.pick);
+    gold += link(last, to, 'lk done');
+    last = to;
+  }
+  // đường tới các cửa đang chọn (sáng nhẹ)
+  const curRow = rows.find((x) => x.cur);
+  if (curRow) curRow.xs.forEach((x, i) => (gold += link(last, [x, curRow.y], 'lk now')));
+  let nodes = `<g class="nd start"><circle cx="${start.x}" cy="${start.y}" r="15" fill="#15183f" stroke="#e2b75a" stroke-width="2"/><path d="M${start.x - 6} ${start.y + 7}v-8a6 6 0 0 1 12 0v8z" fill="none" stroke="#e2b75a" stroke-width="1.8"/></g>`;
+  const label = (x, y, k, strong) => `<text x="${x}" y="${y}" text-anchor="middle" class="nl${strong ? ' strong' : ''}">${k === '?' ? '' : t(`door.${k}`)}</text>`;
+  for (const row of rows) {
+    row.kinds.forEach((k, i) => {
+      const [x, y] = pos(row, i);
+      const big = k === 'boss' || (row.r === n - 1);
+      const rad = big ? 30 : 23;
+      if (k === '?') {
+        nodes += `<g class="nd ghost"><circle cx="${x}" cy="${y}" r="${rad - 3}" fill="#101338" stroke="#4a5090" stroke-width="1.6" stroke-dasharray="3 4"/><text x="${x}" y="${y + 6}" text-anchor="middle" class="q">?</text></g>`;
+        return;
+      }
+      const d = NODE[k];
+      const taken = row.past && row.pick === i;
+      const skipped = row.past && row.pick !== i;
+      const cls = 'nd' + (row.cur ? ' cur' : '') + (taken ? ' taken' : '') + (skipped ? ' skipped' : '') + (big ? ' big' : '');
+      const attr = row.cur ? ` data-door="${i}" role="button" tabindex="0" aria-label="${t(`door.${k}`)}"` : '';
+      nodes += `<g class="${cls}"${attr} style="--c:${d.col}">${row.cur ? `<circle class="pulse" cx="${x}" cy="${y}" r="${rad + 8}" fill="${d.col}"/>` : ''}<circle cx="${x}" cy="${y}" r="${rad}" fill="#0c0f33" stroke="${taken || row.cur ? d.ring : d.col}" stroke-width="${row.cur ? 3 : 2}"/><circle cx="${x}" cy="${y}" r="${rad - 5}" fill="${d.col}" opacity="${skipped ? 0.1 : taken ? 0.55 : 0.3}"/><g transform="translate(${x - 12 * (rad / 23)} ${y - 12 * (rad / 23)}) scale(${rad / 23})" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="${skipped ? 0.35 : 1}">${d.icon}</g>${row.cur || big ? label(x, y + rad + 17, k, row.cur) : ''}</g>`;
+    });
+  }
+  if (curRow || true) {
+    // dấu vị trí đội: viên ngọc phát sáng ở điểm vừa đi tới
+    nodes += `<g class="you"><circle cx="${last[0] + 26}" cy="${last[1] - 4}" r="6" fill="#ffe9ad"/><circle cx="${last[0] + 26}" cy="${last[1] - 4}" r="11" fill="#ffe9ad" opacity=".25"/></g>`;
+  }
+  let stars = '';
+  for (let i = 0; i < 40; i++) stars += `<circle cx="${(i * 97.3) % 400}" cy="${(i * 53.7) % 600}" r="${0.6 + (i % 3) * 0.4}" fill="#fff" opacity="${0.15 + (i % 4) * 0.1}"/>`;
+  let cols = '';
+  for (const x of [26, 374]) cols += `<g opacity=".5"><rect x="${x - 14}" y="40" width="28" height="560" fill="url(#col)"/>${[110, 230, 350, 470].map((y) => `<rect x="${x - 18}" y="${y}" width="36" height="8" fill="#2a2f6a" stroke="#e2b75a" stroke-opacity=".5"/>`).join('')}</g>`;
+  return `<svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" aria-hidden="false">
+<defs><linearGradient id="col" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0a0c2b"/><stop offset=".5" stop-color="#23286a"/><stop offset="1" stop-color="#0a0c2b"/></linearGradient>
+<radialGradient id="rg" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#3a3f9a" stop-opacity=".55"/><stop offset="1" stop-color="#3a3f9a" stop-opacity="0"/></radialGradient></defs>
+<rect width="400" height="600" fill="url(#rg)"/>${stars}${cols}${faint}${gold}${nodes}</svg>`;
+}
+
 function showDoors() {
+  saveActiveRun();
   const rc = ctx.config.run.items;
   const desc = {
     potion: t('item.desc.potion', { n: Math.round(rc.potion.healPct * 100) }),
     shield: t('item.desc.shield', { n: Math.round(rc.shield.pct * 100) }),
     time: t('item.desc.time', { n: rc.time.bonusMs / 1000 }),
   };
-  const items = ['potion', 'shield', 'time'].map((it) =>
-    h(
-      'div',
-      { class: 'card' },
-      h('b', {}, `${t(`item.${it}`)} ×${run.items[it]}`),
-      h('div', { class: 'muted' }, desc[it]),
-      run.armed[it] ? h('div', { class: 'muted' }, t('run.armed')) : btn(t('run.use'), () => act({ type: 'useItem', item: it }), '', { 'data-item': it, ...(run.items[it] <= 0 || (it === 'potion' && run.hp >= run.maxHp) ? { disabled: '' } : {}) }),
-    ),
-  );
+  const items = h('div', { class: 'itembar' }, ['potion', 'shield', 'time'].map((it) => {
+    const off = run.items[it] <= 0 || (it === 'potion' && run.hp >= run.maxHp) || run.armed[it];
+    const b = h('button', { class: 'itm' + (run.armed[it] ? ' armed' : ''), 'data-item': it, onclick: () => act({ type: 'useItem', item: it }), ...(off ? { disabled: '' } : {}) });
+    b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ITEM_ICON[it]}</svg>`;
+    b.append(h('b', {}, `${t(`item.${it}`)} ×${run.items[it]}`), h('small', {}, run.armed[it] ? t('run.armed') : desc[it]));
+    return b;
+  }));
+  const map = h('div', { class: 'runmap' + (DEBUG ? ' static' : '') });
+  map.innerHTML = runMapSVG();
+  map.querySelectorAll('[data-door]').forEach((nd) => {
+    const go = () => act({ type: 'door', index: Number(nd.getAttribute('data-door')) });
+    nd.addEventListener('click', go);
+    nd.addEventListener('keydown', (e) => e.key === 'Enter' && go());
+  });
+  const cur = run.doors.map((d) => t(`door.desc.${d}`));
   screen(
-    floorTitle(),
-    hpBar(),
-    h('p', { class: 'sub' }, run.doors.length > 1 ? t('run.chooseDoor') : t('run.finalDoor')),
-    run.doors.map((d, i) =>
-      h('div', { class: 'card btn', 'data-door': i, onclick: () => act({ type: 'door', index: i }) }, h('h3', {}, t(`door.${d}`)), h('small', {}, t(`door.desc.${d}`))),
-    ),
-    h('h3', {}, t('run.items')),
+    h('div', { class: 'mapnav' }, floorTitle(), h('div', { class: 'muted' }, `${t('run.hp')}: ${Math.round(run.hp)} / ${run.maxHp}`), h('div', { class: 'hpbar' }, h('i', { style: `width:${Math.max(0, (run.hp / run.maxHp) * 100)}%` }))),
+    map,
+    h('p', { class: 'sub mapcap' }, run.doors.length > 1 ? t('run.chooseDoor') : t('run.finalDoor'), run.doors.length > 1 ? h('small', {}, `${t(`door.${run.doors[0]}`)}: ${cur[0]}  ·  ${t(`door.${run.doors[1]}`)}: ${cur[1]}`) : h('small', {}, cur[0])),
     items,
+    btn(t('run.leave'), leaveRun, '', { id: 'leave-run' }),
   );
+  $('screen').classList.add('mapscreen');
 }
 
 function battleIntro() {
@@ -1154,6 +1294,7 @@ let savedThisRun = false;
 function showEnd() {
   if (!savedThisRun) {
     progress = applyRunResult(ctx, progress, run);
+    delete progress.activeRun;
     save();
     savedThisRun = true;
     window.__lastRecord = record;

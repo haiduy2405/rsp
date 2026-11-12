@@ -523,5 +523,10 @@
   "intro.boss": "CẢNH BÁO · TRÙM",
   "intro.elite": "CẢNH BÁO · TINH ANH",
   "skill.ok": "Dùng kỹ năng",
-  "skill.cancel": "Hủy"
+  "skill.cancel": "Hủy",
+  "run.leave": "Về màn chính (lưu chuyến)",
+  "run.resume": "Tiếp tục chuyến leo",
+  "run.abandon": "Bỏ chuyến",
+  "run.saved": "Đã lưu chuyến leo. Quay lại bất cứ lúc nào bằng nút Tiếp tục.",
+  "run.abandonAsk": "Bắt đầu chuyến mới sẽ bỏ chuyến đang dở. Tiếp tục?"
 }

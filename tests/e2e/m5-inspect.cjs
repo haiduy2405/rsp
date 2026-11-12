@@ -6,8 +6,15 @@ const { chromium, devices } = require('playwright');
   await p.tap('#ob-skip'); await p.tap('#ob-next'); await p.tap('[data-culture=viet]'); await p.tap('#ob-next'); await p.tap('#ob-next');
   await p.fill('#ob-name', 'Duy'); await p.fill('#ob-callsign', 'Sao'); await p.tap('#ob-start'); await p.tap('#ob-hub');
   await p.tap('[data-zone]'); await p.tap('#team-go');
-  for (const d of [0, 1, 2]) { if (!(await p.locator('[data-door]').count())) break; await p.tap(`[data-door="${d}"]`).catch(() => {}); await p.waitForTimeout(300); if (await p.locator('#continue').count()) { await p.tap('#continue'); continue; } break; }
-  for (const s2 of ['#tut-next', '#tut-next', '#tut-go']) { await p.waitForSelector(s2, { timeout: 800 }).catch(() => {}); if (await p.locator(s2).count()) await p.tap(s2); }
+  for (let n = 0; n < 12; n++) { // đi qua rương/nghỉ/sự kiện tới khi vào trận
+    if (await p.evaluate(() => !!window.__game)) break;
+    if (await p.locator('#tut-skip').isVisible().catch(() => false)) { await p.tap('#tut-skip'); await p.waitForTimeout(300); continue; }
+    const m = p.locator('[data-door]').filter({ hasText: /Monsters|Quái thường/ });
+    if (await m.count()) await m.first().tap().catch(() => {});
+    else for (const id of ['#continue', '[data-choice="0"]', '#leave']) if (await p.locator(id).count()) { await p.tap(id).catch(() => {}); break; }
+    await p.waitForTimeout(350);
+  }
+  for (const s2 of ['#tut-next', '#tut-next', '#tut-go']) { await p.waitForSelector(s2, { timeout: 800 }).catch(() => {}); if (await p.locator(s2).isVisible().catch(() => false)) await p.tap(s2); }
   await p.waitForTimeout(500);
   if (!(await p.evaluate(() => !!window.__game))) throw new Error('không vào được trận');
   const box = await p.locator('#cv').boundingBox();

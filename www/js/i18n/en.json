@@ -523,5 +523,10 @@
   "intro.boss": "WARNING · BOSS",
   "intro.elite": "WARNING · ELITE",
   "skill.ok": "Use skill",
-  "skill.cancel": "Cancel"
+  "skill.cancel": "Cancel",
+  "run.leave": "Back to menu (save run)",
+  "run.resume": "Resume run",
+  "run.abandon": "Abandon",
+  "run.saved": "Run saved. Come back anytime with Resume.",
+  "run.abandonAsk": "Starting a new run discards the one in progress. Continue?"
 }

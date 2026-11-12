@@ -28,3 +28,8 @@ Thời gian chuyến mô phỏng: 7,0 / 9,0 / 10,4 / 12,8 / 10,5 / 14,6 phút (k
 ## Cho phép kéo ngọc đi chéo (allowDiagonal = true)
 - Duy yêu cầu. Bot mô phỏng giờ cũng đi chéo. Đi chéo làm thắng nhiều hơn: khu Hỏa 83% -> 91%, Mộc 79% -> 84%.
 - Chỉnh run.zoneScale.atk: Hỏa 1.25 -> 1.38, Mộc 2.0 -> 2.1. Kết quả: Thủy 100 / Hỏa 88 / Mộc 82 / Quang 74 / Ám 70 / Tim 71 (đều trong dải).
+
+## 2026-11-12: combo kiểu ToS
+- `combo.step` 0.25 → 0.5: nhóm thứ n trong một nước kéo nhân (1 + 0,5 × (n − 1)); tổng hệ số của n combo = n + 0,25·n·(n − 1), bằng cách tính "tổng combo × hệ số" của ToS nhưng vẫn tăng dần theo từng nhóm để số đếm nhảy lên mượt.
+- Bù lại: `run.zoneScale.hp` [1, 1.1, 1.8, 2.1, 3, 3.3] → [1.2, 1.25, 2.2, 2.6, 3.2, 3.5].
+- Kết quả `--targets`: water 100, fire 86, wood 81, light 75, dark 76, heart 73 (cả sáu khu trong dải).

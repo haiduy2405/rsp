@@ -240,7 +240,7 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 #screen.hub .hub-top .who b { font-size: 21px; }
 #screen.hub .cur { position: absolute; z-index: 2; right: 12px; top: calc(66px + var(--sat)); flex-direction: row; gap: 6px; align-items: center; }
 #screen.hub .cur-pill { min-width: 0; }
-#screen.hub .hub-notice { position: absolute; z-index: 3; left: 12px; right: 12px; top: calc(104px + var(--sat)); }
+#screen.hub .hub-notice { position: absolute; z-index: 4; left: 12px; right: 12px; top: auto; bottom: calc(214px + var(--sab)); text-align: center; background: rgba(8, 10, 34, .92); }
 .hub-foot { position: absolute; z-index: 2; left: 0; right: 0; bottom: calc(104px + var(--sab)); display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; }
 .hub-foot > * { pointer-events: auto; }
 .hub-foot .row button { min-height: 34px; padding: 4px 12px; font-size: 12px; }
@@ -259,3 +259,37 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 .prof-head { display: grid; place-items: center; }
 .avatar.big { width: 92px; height: 92px; font-size: 44px; }
 .avatar.sel { box-shadow: 0 0 0 3px var(--gold), 0 0 14px rgba(226, 183, 90, .6); }
+
+/* ---- Bản đồ leo tháp */
+#screen.mapscreen { gap: 4px; padding-bottom: calc(10px + var(--sab)); }
+.mapnav { width: 100%; text-align: center; }
+.mapnav h2 { margin: 0 0 2px; font-size: 24px; }
+.mapnav .hpbar { margin-top: 4px; }
+.runmap { flex: 1 1 auto !important; min-height: 0; width: 100%; position: relative; }
+.runmap svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.runmap .lk { fill: none; stroke: #4a5090; stroke-width: 1.6; stroke-dasharray: 4 6; opacity: .55; }
+.runmap .lk.done { stroke: #e2b75a; stroke-width: 3.2; stroke-dasharray: none; opacity: 1; filter: drop-shadow(0 0 4px rgba(226, 183, 90, .8)); }
+.runmap .lk.now { stroke: #ffe9ad; stroke-width: 2.2; stroke-dasharray: 6 6; opacity: .9; animation: march 1.2s linear infinite; }
+@keyframes march { to { stroke-dashoffset: -24; } }
+.runmap .nd.cur { cursor: pointer; }
+.runmap .nd.cur .pulse { opacity: .25; animation: halo 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.runmap .nd.cur:active { opacity: .8; }
+.runmap .nd.skipped { opacity: .55; }
+.runmap .nl { fill: #c9d1ff; font: 700 12px 'Be Vietnam Pro', sans-serif; paint-order: stroke; stroke: #06071a; stroke-width: 3px; }
+.runmap .nl.strong { fill: #ffe9ad; font-size: 13px; }
+.runmap .q { fill: #6f78c8; font: 700 20px 'Cormorant', serif; }
+.runmap .you { animation: bob 3s ease-in-out infinite; }
+.runmap.static * { animation: none !important; }
+.mapcap { margin: 0; text-align: center; }
+.mapcap small { display: block; color: var(--mute); font-weight: 400; font-size: 11px; margin-top: 2px; }
+.itembar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
+.itm { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; padding: 8px 4px; clip-path: none; border-radius: 6px; background: linear-gradient(180deg, rgba(29, 35, 88, .74), rgba(12, 15, 44, .88)); border: 1px solid var(--line); box-shadow: none; }
+.itm svg { width: 26px; height: 26px; fill: none; stroke: var(--gold-hi); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.itm b { font-size: 11px; line-height: 1.15; }
+.itm small { font-size: 9.5px; color: var(--mute); line-height: 1.2; }
+.itm[disabled] { opacity: .45; }
+.itm.armed { opacity: 1; border-color: #7dffa0; box-shadow: 0 0 10px rgba(125, 255, 160, .5); }
+
+#screen.hub .resume { position: absolute; z-index: 3; left: 50%; transform: translateX(-50%); bottom: calc(172px + var(--sab)); min-height: 0; padding: 8px 18px; clip-path: none; border-radius: 999px; display: flex; flex-direction: column; align-items: center; gap: 1px; background: rgba(8, 10, 34, .88); border: 2px solid #7dffa0; color: #eafff0; box-shadow: 0 0 16px rgba(125, 255, 160, .5); animation: selpulse 1.4s ease-in-out infinite; }
+#screen.hub .resume .rs-t { font-weight: 800; font-size: 14px; color: #7dffa0; }
+#screen.hub .resume small { font-size: 11px; color: var(--mute); }
