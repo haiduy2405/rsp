@@ -34,6 +34,8 @@ import { install as installItems } from './ui/screen-items.js';
 import { install as installSummon } from './ui/screen-summon.js';
 import { install as installProfile } from './ui/screen-profile.js';
 import { install as installShop } from './ui/screen-shop.js';
+import { install as installWish } from './ui/screen-wish.js';
+import { wishAvailable } from './core/wish.js';
 
 let fxl = null;
 const celebrate = () => (fxl ||= createFxLayer($('fx'))).celebrate();
@@ -170,6 +172,7 @@ const ICONS = {
   shop: '<path d="M4 9h16l-1.2-4.2a1 1 0 0 0-1-.8H6.2a1 1 0 0 0-1 .8z"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9"/><path d="M10 20v-5h4v5"/>',
   quests: '<path d="M8 4h8a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9.5 3h5v3h-5z"/><path d="M9 13l2 2 4-4.5"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M12 2.5l1.6 2.3 2.8-.5.9 2.7 2.7.9-.5 2.8L21.8 12l-2.3 1.6.5 2.8-2.7.9-.9 2.7-2.8-.5L12 21.5l-1.6-2.3-2.8.5-.9-2.7-2.7-.9.5-2.8L2.2 12l2.3-1.6-.5-2.8 2.7-.9.9-2.7 2.8.5z"/>',
+  wish: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 3v7M12 14v7M3 12h7M14 12h7"/>',
   help: '<circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6.9c0 1.9-2.8 2.3-2.8 4"/><path d="M12 17.6v.2"/>',
   clues: '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/>',
 };
@@ -228,6 +231,7 @@ function showHub() {
       { class: 'hub-top' },
       h('div', { class: 'avatar', id: 'b-profile', role: 'button', tabindex: '0', 'aria-label': t('profile.title'), style: 'cursor:pointer', onclick: () => ui.showProfile() }, avatarNode(progress.player)),
       h('div', { class: 'who', id: 'b-profile-name', style: 'cursor:pointer', onclick: () => ui.showProfile() }, h('b', {}, progress.player.name)),
+      dockBtn('wish', t('hub.wish'), () => ui.showWish(), 'b-wish', 'help-btn', wishAvailable(progress, ui.dayKey())),
       dockBtn('help', t('hub.help'), () => ui.showGlossary(), 'b-help', 'help-btn'),
       dockBtn('settings', t('hub.settings'), () => ui.showSettings(), 'b-set', 'help-btn'),
     ),
@@ -1495,6 +1499,8 @@ Object.assign(ui, installSlots(app));
 Object.assign(ui, installIntro(app));
 Object.assign(app, ui);
 Object.assign(ui, installShop(app));
+Object.assign(app, ui);
+Object.assign(ui, installWish(app));
 Object.assign(app, ui);
 
 if ('serviceWorker' in navigator && !DEBUG && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});

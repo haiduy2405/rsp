@@ -400,3 +400,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Tutorial dùng `tut_slime_fire`, `tut_slime_water`, `tut_gnome_dark` (chỉ số y hệt quái cũ, không hiệu ứng) nên bài học không đổi.
 - Schema cho phép quái hệ Tim (element 5). Chưa có art slime/gnome: hiện là hình khối màu.
 - Cân bằng (sim `--curve`): Dễ 15/18, Vừa 13/18, Hard 10/18 ô trong dải (trước: 16/12/10). Quái Tim giảm 10% chỉ số.
+
+### v0.55.0
+- **Cầu nguyện (ước):** nút ở góc trên màn chính (chấm đỏ khi còn lượt). Mỗi ngày 1 lượt quay vòng xoay 12 ô, kết quả tính ở `core/wish.js` theo seed, tỉ lệ ở `config.wish.slices` (có bảng tỉ lệ trong màn).
+- Phần thưởng và tỉ lệ: Vàng 600 (21%) / 2500 (14%); Linh Thạch 15 (17%) / 40 (10%); Mảnh Chung 3★×2 (10%) / 4★ (5%) / 5★ (1.5%); Mảnh tướng 3★ (7%) / 4★ (4%) / 5★ (1.5%) (tướng ngẫu nhiên, ưu tiên tướng chưa có); Vé Triệu Linh (5%); Vé Triệu Hồi (4%). Kỳ vọng nhỏ, không lấn thưởng nhiệm vụ.
+- Trạng thái `progress.wish = { day, slice }` (tùy chọn, không đổi SAVE_VERSION). Test `tests/wish.test.js`, e2e `tests/e2e/wish.cjs`.

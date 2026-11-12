@@ -961,3 +961,19 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 #tab-daily, #tab-achv { position: relative; }
 #tab-daily .red-dot, #tab-achv .red-dot { top: -4px; right: 6px; left: auto; }
 .quest.achv small { display: block; line-height: 1.35; }
+
+/* Cầu nguyện: vòng xoay */
+.wheel-wrap { position: relative; width: min(78vw, 300px); aspect-ratio: 1; margin: 14px auto 6px; }
+.wheel { position: absolute; inset: 0; border-radius: 50%; border: 4px solid #f6edd6; box-shadow: 0 0 0 3px #3a2416, 0 6px 18px rgba(0, 0, 0, .55); will-change: transform; overflow: hidden; }
+.wslice { position: absolute; inset: 0; pointer-events: none; }
+.wlab { position: absolute; top: 7%; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 1px; color: #fff; text-shadow: 0 1px 2px #000; }
+.wlab .ricon { width: 28px; height: 28px; }
+.wlab small { font-size: 11px; font-weight: 700; line-height: 1; }
+.whub { position: absolute; inset: 40%; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffe9a8, #c88a2a 70%); border: 3px solid #f6edd6; }
+.wptr { position: absolute; top: -10px; left: 50%; width: 0; height: 0; margin-left: -11px; border-left: 11px solid transparent; border-right: 11px solid transparent; border-top: 24px solid #ff3b30; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .6)); z-index: 2; }
+.wish-rates summary { cursor: pointer; font-weight: 700; }
+.wl-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 13px; }
+.wl-row span:nth-child(2) { flex: 1; }
+@media (prefers-reduced-motion: reduce) { .wheel { transition: none !important; } }
+.hub-top .help-btn { position: relative; }
+.hub-top .help-btn .red-dot { top: -2px; right: -2px; left: auto; }

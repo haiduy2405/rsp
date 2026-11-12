@@ -1037,5 +1037,19 @@
   "monster.gnome_heart": "Gnome Tim",
   "monster.tut_slime_fire": "Slime Hỏa",
   "monster.tut_slime_water": "Slime Thủy",
-  "monster.tut_gnome_dark": "Gnome Ám"
+  "monster.tut_gnome_dark": "Gnome Ám",
+  "hub.wish": "Cầu nguyện",
+  "wish.ready": "Mỗi ngày một lượt. Chạm Quay để ước.",
+  "wish.used": "Hôm nay bạn đã ước rồi. Mai quay lại nhé.",
+  "wish.spin": "Quay",
+  "wish.got": "Nhận được: {x}",
+  "wish.rates": "Phần thưởng và tỉ lệ",
+  "wish.give.gold": "{n} Vàng",
+  "wish.give.spirit": "{n} Linh Thạch",
+  "wish.give.ticket": "{n} Vé Triệu Hồi",
+  "wish.give.soulTicket": "{n} Vé Triệu Linh",
+  "wish.give.generic": "Mảnh Chung {s}★ ×{n}",
+  "wish.give.hero": "Mảnh tướng {s}★ ×{n}",
+  "err.wish_used": "Hôm nay đã ước rồi.",
+  "err.bad_prize": "Phần thưởng không hợp lệ."
 }

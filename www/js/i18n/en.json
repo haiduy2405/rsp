@@ -1037,5 +1037,19 @@
   "monster.gnome_heart": "Heart Gnome",
   "monster.tut_slime_fire": "Fire Slime",
   "monster.tut_slime_water": "Water Slime",
-  "monster.tut_gnome_dark": "Dark Gnome"
+  "monster.tut_gnome_dark": "Dark Gnome",
+  "hub.wish": "Wish",
+  "wish.ready": "One spin a day. Tap Spin to wish.",
+  "wish.used": "You've already wished today. Come back tomorrow.",
+  "wish.spin": "Spin",
+  "wish.got": "You got: {x}",
+  "wish.rates": "Prizes and odds",
+  "wish.give.gold": "{n} Gold",
+  "wish.give.spirit": "{n} Spirit Gem",
+  "wish.give.ticket": "{n} Summon Ticket",
+  "wish.give.soulTicket": "{n} Soul Ticket",
+  "wish.give.generic": "Universal Fragment {s}★ ×{n}",
+  "wish.give.hero": "Hero Fragment {s}★ ×{n}",
+  "err.wish_used": "You've already wished today.",
+  "err.bad_prize": "Invalid prize."
 }
