@@ -929,10 +929,11 @@ function startTutorial(retry = false) {
     const full = t(key);
     const cut = full.indexOf('. ');
     bubble.replaceChildren(h('div', { class: 'co-h' }, cut > 0 ? full.slice(0, cut + 1) : full), ...(cut > 0 ? [h('div', { class: 'co-b' }, full.slice(cut + 2))] : []));
-    bubble.classList.remove('dim');
+    // Hiện giữa bàn ngọc, rồi mờ dần và trôi lên khỏi bàn để người chơi thấy ngọc mà xoay.
+    bubble.classList.toggle('last', key === 'tut.free');
+    const wrapH = bubble.parentElement?.clientHeight || 600;
+    bubble.style.setProperty('--dy', `${Math.round(wrapH * 0.75 - (bubble.offsetTop + bubble.offsetHeight / 2))}px`);
     bubble.classList.add('on');
-    clearTimeout(dimTimer);
-    dimTimer = setTimeout(() => bubble.classList.add('dim'), 7000); // đọc xong thì mờ bớt để thấy quái
     audio.sfx('tick');
   };
   const samePath = (a, b) => a.length === b.length && a.every((c, i) => c === b[i]);

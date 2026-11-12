@@ -350,3 +350,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 ### v0.46.3
 - Sửa giật tutorial: trước đây gợi ý tự động (đường kéo + chữ "tạo 2 combo") hiện trước rồi bị thay bằng bài 1 sau 400ms. Nay bài 1 áp dụng ngay khi vào trận, không còn gợi ý tự động.
 - Màn loading đầu hiện số phiên bản + build ở cuối màn hình.
+
+### v0.47.0
+- Chữ hướng dẫn tutorial hiện giữa bàn ngọc, rồi mờ dần và trôi lên trên, ra khỏi bàn để người chơi xoay ngọc. Mỗi bài mới lặp lại như vậy; lời "Chơi tự do" mờ hẳn.

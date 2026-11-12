@@ -799,11 +799,13 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 #coach::after { content: ''; position: absolute; inset: -2px; border-radius: 14px; pointer-events: none; box-shadow: 0 0 22px 3px rgba(255, 205, 100, .85); opacity: 0; will-change: opacity; animation: coachGlow 1.5s ease-in-out infinite; }
 #coach .co-h { font-size: 17px; font-weight: 800; line-height: 1.25; color: #ffd978; text-shadow: 0 1px 0 #000; }
 #coach .co-b { margin-top: 3px; font-size: 13.5px; line-height: 1.35; color: #f6edd6; }
-#coach.on.dim { animation: none; opacity: .62; transform: none; transition: opacity .6s; }
 #coach.dim::after { animation: none; }
 @keyframes coachPop { 0% { opacity: 0; transform: translateY(-10px) scale(.94); } 60% { opacity: 1; transform: translateY(1px) scale(1.03); } 100% { opacity: 1; transform: none; } }
 @keyframes coachGlow { 50% { opacity: .55; } }
-#coach.on { animation: coachPop .45s cubic-bezier(.2, .9, .3, 1.2) forwards; }
+#coach.on { animation: coachFlow 3.4s cubic-bezier(.4, 0, .2, 1) forwards; }
+#coach.on.last { animation-name: coachFlowEnd; }
+@keyframes coachFlow { 0% { opacity: 0; transform: translateY(calc(var(--dy, 200px) + 14px)) scale(.94); } 10% { opacity: 1; transform: translateY(var(--dy, 200px)) scale(1.03); } 16%, 46% { opacity: 1; transform: translateY(var(--dy, 200px)) scale(1); } 100% { opacity: .5; transform: none; } }
+@keyframes coachFlowEnd { 0% { opacity: 0; transform: translateY(calc(var(--dy, 200px) + 14px)) scale(.94); } 10% { opacity: 1; transform: translateY(var(--dy, 200px)) scale(1.03); } 16%, 46% { opacity: 1; transform: translateY(var(--dy, 200px)) scale(1); } 100% { opacity: 0; transform: none; } }
 @keyframes coachIn { to { opacity: 1; transform: none; } }
 
 .st-reward { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; padding: 10px 6px; }
