@@ -160,3 +160,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.25.0 — art thật cho 24/24 tướng
 - Toàn bộ 24 tướng có art thật (sinh bằng Gemini + ChatGPT), nhập bằng `tools/art-import.py <ảnh> <id>` (cắt watermark, 2:3, card 1024×1536 + icon 512).
+
+## v0.25.1 — art thật cho 27/27 quái
+- Toàn bộ 27 quái (512×512) dùng art thật, sinh bằng ChatGPT cùng phong cách viền mực đậm + tô phẳng. Còn lại: nền hub/battle và logo.
