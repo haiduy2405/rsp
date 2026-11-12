@@ -102,7 +102,7 @@ export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
 
 // Thanh máu: rãnh tối, viền, thân có độ bóng và vạch chia.
 function bar(g, x, y, w, h, frac, color, light) {
-  g.fillStyle = 'rgba(7, 8, 9, 0.85)';
+  g.fillStyle = 'rgba(8, 6, 30, 0.85)';
   g.fillRect(x - 1, y - 1, w + 2, h + 2);
   const fw = Math.max(0, w * Math.min(1, frac));
   if (fw > 0) {
@@ -115,9 +115,9 @@ function bar(g, x, y, w, h, frac, color, light) {
     g.fillStyle = 'rgba(255,255,255,0.28)';
     g.fillRect(x, y, fw, Math.max(1, h * 0.28));
   }
-  g.fillStyle = 'rgba(7, 8, 9, 0.3)';
+  g.fillStyle = 'rgba(8, 6, 30, 0.3)';
   for (let k = 1; k < 10; k++) g.fillRect(x + (w * k) / 10 - 0.5, y, 1, h);
-  g.strokeStyle = 'rgba(226,183,90,0.7)';
+  g.strokeStyle = 'rgba(240,185,74,0.7)';
   g.lineWidth = 1;
   g.strokeRect(x - 0.5, y - 0.5, w + 1, h + 1);
 }
@@ -138,11 +138,11 @@ function brackets(g, x, y, w, h, len, color, lw = 2) {
 }
 function panel(g, x, y, w, h, accent) {
   const gr = g.createLinearGradient(0, y, 0, y + h);
-  gr.addColorStop(0, 'rgba(40, 43, 50, 0.88)');
-  gr.addColorStop(1, 'rgba(16, 17, 20, 0.94)');
+  gr.addColorStop(0, 'rgba(46, 36, 118, 0.88)');
+  gr.addColorStop(1, 'rgba(14, 10, 46, 0.94)');
   g.fillStyle = gr;
   g.fillRect(x, y, w, h);
-  g.strokeStyle = 'rgba(77,86,184,0.9)';
+  g.strokeStyle = 'rgba(130,119,216,0.95)';
   g.lineWidth = 1;
   g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
   if (accent) {
@@ -160,7 +160,7 @@ function outlined(g, str, x, y, size, top, bottom, family, lw = 5, weight = '700
   g.lineJoin = 'round';
   g.miterLimit = 2;
   g.lineWidth = lw;
-  g.strokeStyle = 'rgba(11, 12, 14, 0.95)';
+  g.strokeStyle = 'rgba(10, 8, 34, 0.95)';
   g.shadowColor = bottom;
   g.shadowBlur = size * 0.35;
   g.strokeText(str, x, y);
@@ -295,7 +295,7 @@ export function draw(g, view, t) {
     g.scale(view.zoom, view.zoom);
     g.translate(-W / 2, -190);
   }
-  g.fillStyle = '#121316';
+  g.fillStyle = '#0c0a2a';
   g.fillRect(0, 0, W, H);
   const bg = getImg('bg:battle');
   if (bg) {
@@ -308,7 +308,7 @@ export function draw(g, view, t) {
     g.fillRect(0, 0, W, 372);
     g.restore();
     const ink = g.createLinearGradient(0, 0, 0, 372);
-    ink.addColorStop(0, 'rgba(7,8,14,0.55)');
+    ink.addColorStop(0, 'rgba(8,6,30,0.5)');
     ink.addColorStop(1, 'rgba(60,18,16,0.38)');
     g.fillStyle = ink;
     g.fillRect(0, 0, W, 372);
@@ -375,10 +375,10 @@ export function draw(g, view, t) {
     g.globalAlpha = dead ? 1 - dk : 1;
     if (e.affixes?.length && !dead) text(g, e.affixes.map((a) => view.t(`affix.${a}`)).join(' · '), cx, 235, 11, '#ffb46b', 'center', '700');
     panel(g, cx - 82, 244, 164, 76, null);
-    brackets(g, cx - 82, 244, 164, 76, 9, view.focus === i ? '#ff4d5e' : '#b3ac98');
+    brackets(g, cx - 82, 244, 164, 76, 9, view.focus === i ? '#ff4d5e' : '#c3b9d9');
     g.fillStyle = COLORS[e.element];
     g.fillRect(cx - 82, 244, 4, 76);
-    text(g, view.t(`monster.${e.id}`), cx + 2, 258, 15, '#efe7d3', 'center', '700', SERIF);
+    text(g, view.t(`monster.${e.id}`), cx + 2, 258, 15, '#f6edd6', 'center', '700', SERIF);
     bar(g, cx - 70, 270, 140, 11, (e.hpShow ?? e.hp) / e.maxHp, '#e8475b', '#ff9aa6');
     text(g, `${Math.max(0, Math.round(e.hp))}`, cx, 276, 9, '#ffffff', 'center', '800');
     if (!dead) {
@@ -431,18 +431,18 @@ export function draw(g, view, t) {
   g.globalAlpha = 1;
 
   // HUD
-  g.fillStyle = 'rgba(8, 9, 11, 0.62)';
+  g.fillStyle = 'rgba(8, 6, 30, 0.62)';
   g.fillRect(0, 0, W, 38);
-  g.fillStyle = 'rgba(179,172,152,0.55)';
+  g.fillStyle = 'rgba(195,185,217,0.55)';
   g.fillRect(0, 38, W, 1.5);
-  text(g, view.t('battle.turn', { n: view.turn + 1 }), 16, 20, 15, '#efe7d3', 'left', '700');
+  text(g, view.t('battle.turn', { n: view.turn + 1 }), 16, 20, 15, '#f6edd6', 'left', '700');
   text(g, view.titleText, W - 16, 20, 13, '#aab2f0', 'right');
   const sh = (view.teamFx || []).find((e) => e.key === 'shield');
   if (sh) text(g, view.t('battle.shield', { n: sh.pool }), W - 16, 336, 15, '#6bd5ff', 'right', '700');
   if (view.teamFx?.length) badges(g, view.teamFx, 16, 326, view);
   if (view.combo > 0) {
     outlined(g, `${view.combo}`, W / 2 - 128, 338, 54 + Math.min(16, view.combo * 2), '#fff3b0', '#e2a52a', NUM, 5);
-    text(g, view.t('battle.comboWord'), W / 2 - 128, 364, 13, '#efe7d3', 'center', '700');
+    text(g, view.t('battle.comboWord'), W / 2 - 128, 364, 13, '#f6edd6', 'center', '700');
   }
   if (view.tally && view.tally.shown > 0) outlined(g, new Intl.NumberFormat(document.documentElement.lang || 'vi').format(Math.round(view.tally.shown)), W / 2 + 90, 340, Math.round(50 * (1 + 0.4 * Math.min(1, view.tally.pulse))), '#fff0d0', '#ff7a2a', NUM, 5);
 
@@ -480,7 +480,7 @@ export function draw(g, view, t) {
       g.moveTo(cx0 - 7, cy0 + 4); g.lineTo(cx0 - 8, cy0 - 5); g.lineTo(cx0 - 3, cy0); g.lineTo(cx0, cy0 - 7); g.lineTo(cx0 + 3, cy0); g.lineTo(cx0 + 8, cy0 - 5); g.lineTo(cx0 + 7, cy0 + 4);
       g.closePath();
       g.fill();
-      text(g, view.t('team.leader'), x + 58, y + 14, 10, '#efe7d3', 'center', '800');
+      text(g, view.t('team.leader'), x + 58, y + 14, 10, '#f6edd6', 'center', '800');
     }
     drawOrb(g, m.element, x + 49, y + 26 + oy / 2 + (lead ? 4 : 0), 18);
     text(g, view.t(`char.${m.id}`), x + 49, y + 50 + oy, 11, lead ? '#fff4c9' : '#e7eaff', 'center', lead ? '800' : '600');
@@ -510,7 +510,7 @@ export function draw(g, view, t) {
   for (const d of view.duos || []) {
     const cx = 12 + (d.slot + 1) * 104 - 3;
     const ready = d.cd === 0;
-    g.fillStyle = ready ? '#b3ac98' : '#444954';
+    g.fillStyle = ready ? '#c3b9d9' : '#444954';
     g.beginPath();
     g.roundRect(cx - 28, 384, 56, 22, 3);
     g.fill();
@@ -521,11 +521,11 @@ export function draw(g, view, t) {
   }
 
   // đồng hồ kéo
-  g.fillStyle = 'rgba(7, 8, 9, 0.9)';
+  g.fillStyle = 'rgba(8, 6, 30, 0.9)';
   g.fillRect(0, 468, W, 10);
   if (view.timer !== null) {
     const low = view.timer < 0.25;
-    g.fillStyle = low ? '#ff5468' : '#b3ac98';
+    g.fillStyle = low ? '#ff5468' : '#c3b9d9';
     g.shadowColor = g.fillStyle;
     g.shadowBlur = low ? 14 : 8;
     g.fillRect(0, 470, W * view.timer, 6);
@@ -533,16 +533,16 @@ export function draw(g, view, t) {
   }
 
   // bàn: khung kính, mỗi ô là một hốc bo nhẹ
-  g.fillStyle = 'rgba(8, 9, 11, 0.92)';
+  g.fillStyle = 'rgba(8, 6, 30, 0.92)';
   g.fillRect(0, BOARD_Y, W, ROWS * CELL);
   for (let r = 0; r < ROWS; r++)
     for (let c = 0; c < COLS; c++) {
-      g.fillStyle = (r + c) % 2 ? 'rgba(37, 39, 46, 0.55)' : 'rgba(28, 31, 36, 0.55)';
+      g.fillStyle = (r + c) % 2 ? 'rgba(44, 34, 108, 0.55)' : 'rgba(26, 20, 76, 0.55)';
       g.beginPath();
       g.roundRect(BOARD_X + c * CELL + 2, BOARD_Y + r * CELL + 2, CELL - 4, CELL - 4, 8);
       g.fill();
     }
-  g.fillStyle = 'rgba(179,172,152,0.55)';
+  g.fillStyle = 'rgba(195,185,217,0.55)';
   g.fillRect(0, BOARD_Y - 1, W, 1.5);
   g.fillRect(0, BOARD_Y + ROWS * CELL - 0.5, W, 1.5);
   const held = view.drag && view.drag.path.length ? view.drag.path[view.drag.path.length - 1] : -1;
@@ -641,7 +641,7 @@ export function draw(g, view, t) {
     g.beginPath();
     g.arc(q.x, q.y, 28 + Math.sin(t * 0.01) * 4, 0, Math.PI * 2);
     g.stroke();
-    g.fillStyle = 'rgba(9, 10, 11, 0.85)';
+    g.fillStyle = 'rgba(8, 6, 30, 0.85)';
     g.fillRect(0, 932, W, 28);
     text(g, view.hint.text, W / 2, 946, 15, '#ffe9a0');
   }
@@ -651,7 +651,7 @@ export function draw(g, view, t) {
     const r = (i / COLS) | 0;
     const x = BOARD_X + c * CELL;
     const y = BOARD_Y + r * CELL;
-    g.fillStyle = 'rgba(8, 9, 10, 0.55)';
+    g.fillStyle = 'rgba(8, 6, 30, 0.55)';
     g.fillRect(x + 4, y + 4, CELL - 8, CELL - 8);
     g.strokeStyle = '#ff8a98';
     g.lineWidth = 3;
@@ -754,7 +754,7 @@ function drawIntro(g, view) {
   g.fillStyle = '#0a0b0d';
   g.fillRect(0, 0, W, bh);
   g.fillRect(0, H - bh, W, bh);
-  g.fillStyle = it.danger ? '#ff5a6a' : '#b3ac98';
+  g.fillStyle = it.danger ? '#ff5a6a' : '#c3b9d9';
   g.fillRect(0, bh - 2, W, 2);
   g.fillRect(0, H - bh, W, 2);
   // biển tên giữa khu che
@@ -764,14 +764,14 @@ function drawIntro(g, view) {
     g.save();
     g.globalAlpha = bk;
     const lw = 250 * bk;
-    g.fillStyle = it.danger ? '#ff5a6a' : '#b3ac98';
+    g.fillStyle = it.danger ? '#ff5a6a' : '#c3b9d9';
     g.fillRect(W / 2 - lw, cy - 52, lw * 2, 2);
     g.fillRect(W / 2 - lw, cy + 52, lw * 2, 2);
     if (it.danger) text(g, it.warn, W / 2, cy - 30, 15, '#ff8a96', 'center', '800');
-    else text(g, it.sub, W / 2, cy - 30, 15, '#b3ac98', 'center', '800');
+    else text(g, it.sub, W / 2, cy - 30, 15, '#c3b9d9', 'center', '800');
     g.translate((1 - bk) * -40, 0);
     outlined(g, it.title, W / 2, cy + 8, it.title.length > 16 ? 30 : 38, '#ffffff', it.danger ? '#ff5a6a' : '#ffd24a', SERIF, 6, '700');
-    if (it.danger) text(g, it.sub, W / 2, cy + 38, 13, '#efe7d3', 'center', '700');
+    if (it.danger) text(g, it.sub, W / 2, cy + 38, 13, '#f6edd6', 'center', '700');
     g.restore();
   }
   // "Bắt đầu!"

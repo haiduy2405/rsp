@@ -175,3 +175,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 ## v0.27.0 – Nâng cấp giao diện (mốc A + Triệu hồi)
 - Bảng màu mới rút từ art (đêm tím chàm, vàng đồng, xanh ngọc) trong `:root` của `app.css`; panel kính tím, nút chính vàng đồng, nút phụ tím; nền các màn con là art hub tối đi; chuyển màn có trượt nhẹ.
 - Triệu hồi: tab banner cuộn ngang, thẻ banner có chân dung tướng của văn hóa, thanh tiến độ bảo đảm, tỉ lệ thu gọn (`<details id="rates">`, vẫn đầy đủ), nút rút dính đáy, kết quả dạng lưới 3 cột với hiệu ứng lật thẻ và quầng sáng 5★.
+
+## v0.27.1 – Giao diện: trận đấu và độ đọc
+- Màu canvas trận (`render.js`) đổi sang bảng chàm/vàng cho khớp UI; tiêu đề màn con chừa chỗ cho nút Back; nền màn con tối hơn để chữ rõ.
