@@ -205,7 +205,13 @@ export function draw(g, view, t) {
     g.globalAlpha *= 0.25;
     g.fillRect(cx - 70 + sh, 90, 140, 150);
     g.globalAlpha = dead ? 0.2 : 1;
-    drawOrb(g, e.element, cx + sh, 160, 46 * (1 + 0.12 * (e.hit || 0)));
+    const mi = getImg(`monster:${e.id}`);
+    const sc = 1 + 0.08 * (e.hit || 0);
+    if (mi) {
+      const bob = dead ? 0 : Math.sin(t * 0.003 + i) * 3;
+      const sz = 150 * sc;
+      g.drawImage(mi, cx + sh - sz / 2, 165 - sz / 2 + bob, sz, sz);
+    } else drawOrb(g, e.element, cx + sh, 160, 46 * (1 + 0.12 * (e.hit || 0)));
     if (e.effects?.length && !dead) statusFx(g, e.effects, cx + sh, 160, t);
     if (e.hit) {
       g.globalAlpha = 0.55 * e.hit;

@@ -274,3 +274,67 @@ logo = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 512"><defs>
 <text x="512" y="460" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="40" fill="#d8c8ff" letter-spacing="8">RIFT SPIRE: PANTHEON</text></svg>'''
 render(logo, f'{S}/ui/logo.svg', f'{A}/ui/logo.webp', 1024, 512, 85)
 print('xong')
+
+# ---------- quái ----------
+os.makedirs(os.path.join(A, 'monsters'), exist_ok=True)
+os.makedirs(os.path.join(S, 'monsters'), exist_ok=True)
+
+def eyes(x, y, gap=44, r=16, col='#fff', pupil='#1a1018', angry=False):
+    o = ''
+    for sx in (-1, 1):
+        o += f'<circle cx="{x+sx*gap/2}" cy="{y}" r="{r}" fill="{col}" stroke="#1a1018" stroke-width="5"/><circle cx="{x+sx*gap/2+sx*2}" cy="{y+2}" r="{r*0.5}" fill="{pupil}"/>'
+        if angry: o += f'<path d="M{x+sx*gap/2-sx*r-6} {y-r-6+(0 if sx<0 else 0)} L{x+sx*gap/2+sx*r+6} {y-r+4*(-sx)}" stroke="#1a1018" stroke-width="8" stroke-linecap="round"/>'
+    return o
+
+def mon(kind, e, big):
+    c, dk, lt = EL[e]
+    st = f'stroke="#1a1018" stroke-width="9" stroke-linejoin="round"'
+    if kind == 'jelly':
+        t = ''.join(f'<path d="M{190+i*44} 300 q-14 50 6 90 q14 30 -4 60" fill="none" stroke="{lt}" stroke-width="16" stroke-linecap="round"/>' for i in range(4))
+        return t + f'<path d="M140 300 C120 120 392 120 372 300Z" fill="{c}" {st}/><ellipse cx="256" cy="200" rx="70" ry="30" fill="{lt}" opacity=".35"/>' + eyes(256, 270, 70, 20)
+    if kind == 'crab':
+        return f'<path d="M110 300 q-70 -80 10 -130 q30 40 20 90Z M402 300 q70 -80 -10 -130 q-30 40 -20 90Z" fill="{lt}" {st}/><ellipse cx="256" cy="320" rx="150" ry="100" fill="{c}" {st}/>' + ''.join(f'<path d="M{130+i*40} 400 l-20 50" stroke="#1a1018" stroke-width="10"/><path d="M{382-i*40} 400 l20 50" stroke="#1a1018" stroke-width="10"/>' for i in range(2)) + eyes(256, 290, 90, 20, angry=True)
+    if kind == 'leviathan':
+        return f'<path d="M40 280 C120 120 380 120 470 260 C380 400 120 420 40 280Z" fill="{c}" {st}/><path d="M440 260 L500 190 L490 330Z" fill="{dk}" {st}/><path d="M200 140 L250 60 L300 150Z" fill="{dk}" {st}/><path d="M60 300 q100 50 200 20" fill="none" stroke="#fff" stroke-width="8"/>' + ''.join(f'<path d="M{90+i*22} 292 l8 -22 l8 22Z" fill="#fff"/>' for i in range(6)) + eyes(170, 230, 40, 18, angry=True)
+    if kind == 'serpent':
+        return f'<path d="M90 420 C20 300 220 330 200 250 C180 170 360 200 340 130 C330 90 420 80 420 140 C420 200 300 230 320 280 C340 340 150 350 170 420Z" fill="{c}" {st}/><path d="M340 110 l40 -50 l30 60Z" fill="{lt}" {st}/>' + eyes(380, 126, 36, 12, col='#ffe066', angry=True) + f'<path d="M330 160 l-26 14 M330 160 l-12 24" stroke="#d22" stroke-width="6"/>'
+    if kind == 'bat':
+        return f'<path d="M256 250 C200 120 70 140 30 230 C80 220 110 260 130 320 C170 270 210 300 256 340 C302 300 342 270 382 320 C402 260 432 220 482 230 C442 140 312 120 256 250Z" fill="{dk}" {st}/><ellipse cx="256" cy="290" rx="62" ry="78" fill="{c}" {st}/><path d="M210 230 L196 160 L240 210Z M302 230 L316 160 L272 210Z" fill="{c}" {st}/>' + eyes(256, 270, 50, 15, col='#ffec99', angry=True) + f'<path d="M236 320 l10 18 l10 -18 l10 18 l10 -18" fill="#fff" stroke="#1a1018" stroke-width="4"/>'
+    if kind == 'fiend':
+        horns = f'<path d="M150 190 C100 120 130 60 180 40 C180 100 210 130 230 160Z M362 190 C412 120 382 60 332 40 C332 100 302 130 282 160Z" fill="{lt}" {st}/>'
+        return horns + f'<path d="M60 512 C70 360 150 300 256 300 C362 300 442 360 452 512Z" fill="{dk}" {st}/><ellipse cx="256" cy="230" rx="112" ry="120" fill="{c}" {st}/>' + eyes(256, 215, 76, 20, col='#fff2a0', angry=True) + f'<path d="M206 290 q50 36 100 0" fill="#1a1018"/><path d="M216 290 l10 20 l10 -20 M276 290 l10 20 l10 -20" fill="#fff"/>'
+    if kind == 'wolf':
+        return f'<path d="M100 120 L130 220 L90 300 C110 420 200 460 256 450 C312 460 402 420 422 300 L382 220 L412 120 L320 180 C290 165 222 165 192 180Z" fill="{c}" {st}/><path d="M200 380 L256 440 L312 380 L256 360Z" fill="{lt}" {st}/><path d="M236 400 l8 22 l8 -22 M268 400 l8 22 l8 -22" fill="#fff"/><ellipse cx="256" cy="345" rx="26" ry="18" fill="#1a1018"/>' + eyes(256, 260, 120, 16, col='#ffe066', angry=True)
+    if kind == 'mushroom':
+        return f'<path d="M180 330 L170 450 Q256 490 342 450 L332 330Z" fill="{lt}" {st}/><path d="M50 340 C50 130 462 130 462 340Z" fill="{c}" {st}/>' + ''.join(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{lt}"/>' for x,y,r in ((150,260,26),(256,200,32),(360,270,24),(300,310,16))) + eyes(256, 385, 60, 15, angry=True)
+    if kind == 'golem':
+        return f'<path d="M130 470 L150 300 L100 220 L160 180 L256 250 L352 180 L412 220 L362 300 L382 470Z" fill="{dk}" {st}/><rect x="170" y="150" width="172" height="150" rx="30" fill="{c}" {st}/><path d="M150 160 q-30 -60 10 -100 M256 140 q0 -70 20 -90 M360 160 q30 -60 -10 -100" fill="none" stroke="{lt}" stroke-width="16" stroke-linecap="round"/>' + eyes(256, 220, 76, 17, col='#fff7a0', angry=True)
+    if kind == 'wisp':
+        return f'<path d="M256 40 C330 160 430 220 420 330 C410 430 330 480 256 480 C182 480 102 430 92 330 C82 220 182 160 256 40Z" fill="{c}" {st}/><path d="M256 150 C300 230 350 260 345 330 C340 390 300 420 256 420 C212 420 172 390 167 330 C162 260 212 230 256 150Z" fill="{lt}" opacity=".6"/>' + eyes(256, 330, 70, 20)
+    if kind == 'bird':
+        return f'<path d="M256 150 C340 150 360 250 330 330 C310 400 220 410 190 330 C160 250 180 150 256 150Z" fill="{c}" {st}/><path d="M190 260 C90 200 40 260 30 330 C90 330 130 360 190 340Z M322 260 C422 200 472 260 482 330 C422 330 382 360 322 340Z" fill="{lt}" {st}/><path d="M236 210 L256 250 L276 210Z" fill="#ffb347" {st}/><path d="M236 400 l-20 50 M276 400 l20 50" stroke="#1a1018" stroke-width="10"/>' + eyes(256, 190, 56, 12, angry=True)
+    if kind == 'statue':
+        return f'<circle cx="256" cy="130" r="100" fill="none" stroke="{lt}" stroke-width="14" opacity=".8"/><path d="M110 512 C110 360 170 300 256 300 C342 300 402 360 402 512Z" fill="#cfc9b8" {st}/><ellipse cx="256" cy="200" rx="86" ry="100" fill="#e2dccb" {st}/><rect x="196" y="190" width="40" height="16" fill="#1a1018"/><rect x="276" y="190" width="40" height="16" fill="#1a1018"/><path d="M200 340 L312 340" stroke="{c}" stroke-width="12"/>'
+    if kind == 'ghost':
+        return f'<path d="M110 460 L110 220 C110 70 402 70 402 220 L402 460 L350 410 L300 460 L256 410 L212 460 L162 410Z" fill="{c}" opacity=".92" {st}/>' + eyes(256, 230, 100, 28, col='#1a1018', pupil='#ffec99') + f'<ellipse cx="256" cy="320" rx="30" ry="40" fill="#1a1018"/>'
+    if kind == 'flower':
+        pet = ''.join(f'<ellipse cx="256" cy="130" rx="60" ry="100" fill="{c}" {st} transform="rotate({a} 256 256)"/>' for a in range(0, 360, 60))
+        return f'<path d="M256 330 L256 500" stroke="#2f8a3c" stroke-width="22"/><path d="M256 430 q-80 -10 -110 -60 q70 -10 110 60Z" fill="#4cc46a" {st}/>' + pet + f'<circle cx="256" cy="256" r="86" fill="{lt}" {st}/>' + eyes(256, 250, 60, 15, angry=False) + f'<path d="M226 292 q30 24 60 0" fill="none" stroke="#1a1018" stroke-width="7"/>'
+    if kind == 'hornet':
+        return f'<ellipse cx="170" cy="200" rx="90" ry="50" fill="#fff" opacity=".7" {st}/><ellipse cx="342" cy="200" rx="90" ry="50" fill="#fff" opacity=".7" {st}/><ellipse cx="256" cy="320" rx="90" ry="130" fill="#ffd84a" {st}/><path d="M170 300 h172 M168 350 h176 M180 400 h152" stroke="#1a1018" stroke-width="22"/><path d="M256 450 l-14 50 l28 0Z" fill="#1a1018"/>' + eyes(256, 250, 60, 16, col='#ff7fb0', angry=True)
+    if kind == 'swan':
+        return f'<path d="M120 400 C100 330 190 330 256 360 C340 330 430 340 400 410 C330 470 190 470 120 400Z" fill="#fff" {st}/><path d="M200 380 C140 280 230 250 210 170 C200 110 290 90 310 140" fill="none" stroke="#fff" stroke-width="42" stroke-linecap="round"/><path d="M200 380 C140 280 230 250 210 170 C200 110 290 90 310 140" fill="none" stroke="#1a1018" stroke-width="8" stroke-linecap="round" opacity=".5"/><path d="M310 138 L360 150 L314 164Z" fill="#ff9a4a" {st}/>' + eyes(300, 130, 0, 10, angry=False) + f'<path d="M110 400 q-40 -60 0 -110 M404 400 q40 -60 0 -110" fill="none" stroke="{c}" stroke-width="14"/>'
+    return ''
+
+KIND = {'m_ember':'wisp','m_tide':'jelly','m_shade':'ghost','water_n1':'jelly','water_n2':'crab','water_e1':'leviathan','fire_n1':'serpent','fire_n2':'bat','fire_e1':'fiend','fire_b1':'fiend','wood_n1':'wolf','wood_n2':'mushroom','wood_e1':'golem','light_n1':'wisp','light_n2':'bird','light_e1':'statue','light_b1':'statue','dark_n1':'bat','dark_n2':'ghost','dark_e1':'fiend','heart_n1':'flower','heart_n2':'hornet','heart_e1':'swan','heart_b1':'flower'}
+mons = json.load(open(os.path.join(ROOT, 'www/js/data/monsters.json'), encoding='utf8'))
+mons = mons if isinstance(mons, list) else list(mons.values())
+for m in mons:
+    mid = m['id']; e = m['element']
+    tier = 'boss' if mid.endswith('_b1') else 'elite' if mid.endswith('_e1') else 'normal'
+    c, dk, lt = EL[e]
+    aura = f'<circle cx="256" cy="260" r="240" fill="{lt}" opacity="{0.18 if tier=="elite" else 0.3}"/>' if tier != 'normal' else ''
+    crown = '<path d="M180 30 L210 -10 L256 30 L302 -10 L332 30Z" fill="#ffd84a" stroke="#1a1018" stroke-width="7" transform="translate(0 40)"/>' if tier == 'boss' else ''
+    svg = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">{aura}<ellipse cx="256" cy="492" rx="150" ry="14" fill="#000" opacity=".3"/>{mon(KIND[mid], e, tier)}{crown}</svg>'
+    render(svg, f'{S}/monsters/{mid}.svg', f'{A}/monsters/{mid}.webp', 512, 512, 82)
+print('quái xong')

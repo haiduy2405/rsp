@@ -15,6 +15,7 @@ export function expected() {
     m[`card:${c.id}`] = `assets/characters/${c.id}_card.webp`;
     m[`icon:${c.id}`] = `assets/characters/${c.id}_icon.webp`;
   }
+  for (const mo of JSON.parse(fs.readFileSync(path.join(root, 'js/data/monsters.json'), 'utf8'))) m[`monster:${mo.id}`] = `assets/monsters/${mo.id}.webp`;
   for (let i = 0; i < 6; i++) m[`orb:${i}`] = `assets/orbs/orb${i}.webp`;
   m['bg:hub'] = 'assets/bg/hub.webp';
   m['bg:battle'] = 'assets/bg/battle.webp';
