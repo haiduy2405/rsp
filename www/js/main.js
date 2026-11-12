@@ -335,7 +335,7 @@ function charCard(id, onclick, extra) {
   return h(
     'div',
     { class: 'card btn charrow' + (c ? '' : ' locked'), 'data-char': id, onclick: c ? onclick : null },
-    c ? portrait(id, 64) : h('div', { style: 'width:64px;height:64px;border-radius:12px;border:3px solid #2a2f60;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px' }, '?'),
+    c ? portrait(id, 64) : h('div', { style: 'width:64px;height:64px;border-radius:12px;border:3px solid #6a4529;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px' }, '?'),
     h(
       'div',
       { style: 'flex:1;min-width:0' },

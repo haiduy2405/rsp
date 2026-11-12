@@ -228,3 +228,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.33.1
 - Nút Install/Fullscreen dời xuống giữa màn chính, không che đảo; khu Tim tăng hệ số (mô phỏng ải 7: 70%, trong dải).
+
+## v0.33.2
+- Chi tiết tướng và Đội hình chuyển tông nâu ấm: header bớt ám màu hệ, nhãn Active hổ phách, viền 3★ đồng, ô chọn hổ phách.

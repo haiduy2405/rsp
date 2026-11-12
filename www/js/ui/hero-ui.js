@@ -29,7 +29,7 @@ export function createHeroUI({ h, T, ctx }) {
   function portrait(id, size = 64) {
     const c = ctx.characters[id];
     const im = getImg(`icon:${id}`);
-    const rar = c.rarity === 5 ? '#ffd84a' : c.rarity === 4 ? '#c58bff' : '#4a4f90';
+    const rar = c.rarity === 5 ? '#ffd84a' : c.rarity === 4 ? '#c58bff' : '#a07c52';
     const box = `width:${size}px;height:${size}px;border-radius:12px;border:3px solid ${rar};flex:none;background:${COLORS[c.element]}33;display:flex;align-items:center;justify-content:center;overflow:hidden`;
     const orb = getImg(`orb:${c.element}`);
     const inner = im ? h('img', { src: im.src, alt: '', width: String(size), height: String(size), style: 'width:100%;height:100%;object-fit:cover' }) : orb ? h('img', { src: orb.src, alt: '', style: `width:${size * 0.7}px` }) : h('b', {}, el(c.element));
