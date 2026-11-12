@@ -886,7 +886,7 @@ function effectRows(effects, holder) {
     if (e.stacks > 1) extra.push(t('info.stackN', { n: e.stacks }));
     if (e.pool != null) extra.push(t('info.shieldPool', { n: e.pool }));
     else if (e.value) extra.push(`${pct(e.value)}%`);
-    return h('div', { class: 'muted' }, h('b', {}, t(`effect.${e.key}.name`)), ` (${extra.join(', ')}): `, t(`effect.${e.key}.desc`));
+    return h('div', { class: 'muted fxrow' }, h('img', { class: 'fxico', src: `assets/ui/fx/${e.key}.webp`, alt: '' }), h('div', { style: 'flex:1;min-width:0' }, h('b', {}, t(`effect.${e.key}.name`)), ` (${extra.join(', ')}): `, t(`effect.${e.key}.desc`)));
   });
 }
 // Chạm tướng đã sẵn sàng: hiện thông tin kỹ năng, chỉ dùng khi người chơi bấm Đồng ý.

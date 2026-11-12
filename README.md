@@ -210,3 +210,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Nút CHIẾN ĐẤU ở hub: huy hiệu men đỏ vẽ tay (`ui/icons/battle.webp`), hai kiếm chéo, nhãn nằm trên dải kem, nhấp nhô nhẹ (tắt khi giảm chuyển động); cỡ chữ riêng cho tiếng Việt.
 - Âm ngọc nhỏ lại (chọn/kéo/thả/ghép/combo/xem trước giảm gain còn ~35–50% trong `audio.json#samples`).
 - Âm đánh trúng, trúng đòn, hạ quái và kỹ năng làm lại bằng tổng hợp nhiều lớp (`tools/build-sfx.py`: thân tụt tần, tiếng chát, đuôi trầm; kỹ năng là gió tụ lực, chùm nốt lấp lánh rồi bùng nổ). `hit` có 3 biến thể và `skill` có 2 biến thể chọn ngẫu nhiên (`audio.json#variants`, `audio.js`).
+
+## v0.32.0 — Icon 12 hiệu ứng
+- 12 icon vẽ tay (`www/assets/ui/fx/<key>.webp`, manifest key `fx:<key>`): Bỏng, Độc, Choáng, Đóng băng, Giảm công, Khóa ngọc (tiêu cực, viền đỏ vuông) · Khiên, Hồi máu, Tăng công, Phản đòn, Xuyên giáp, Miễn nhiễm (tích cực, viền xanh tròn).
+- Trong trận chỉ hiện icon + số lượt (Độc thêm ×tầng), không còn chữ. Bấm giữ quái/tướng xem tên + mô tả, kèm icon (cả chi tiết tướng).
+- `game.refresh()` (đồng bộ view từ state) cho test; `tests/e2e/fxshot.cjs` chụp thử badge.

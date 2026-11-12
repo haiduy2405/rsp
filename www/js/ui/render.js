@@ -197,27 +197,41 @@ function text(g, s, x, y, size, color = '#e8ebff', align = 'center', weight = '6
 }
 
 const NEG = new Set(['burn', 'poison', 'stun', 'freeze', 'atkDown', 'lock']);
-// Biểu tượng hiệu ứng: ô chữ viết tắt + số lượt, tiêu cực màu đỏ, tích cực màu xanh (khác nhau cả viền).
+// Biểu tượng hiệu ứng: chỉ icon + số lượt (độc thêm số tầng), không chữ. Tiêu cực viền đỏ, tích cực viền xanh. Chi tiết xem khi bấm giữ.
+const FXS = 26;
 function badges(g, effects, x, y, view, align = 'left') {
-  g.font = `600 11px ${SANS}`;
-  const items = effects.map((e) => {
-    const base = view.t(`effect.${e.key}.short`) + (e.key === 'poison' ? `×${e.stacks}` : '');
-    const label = `${base} ${e.turns > 99 ? '∞' : e.turns}`;
-    return { e, label, w: Math.max(46, Math.ceil(g.measureText(label).width) + 12) }; // ô tự giãn theo chữ, không bị cắt
-  });
-  const total = items.reduce((a, i) => a + i.w + 4, -4);
+  const gap = 4;
+  const total = effects.length * (FXS + gap) - gap;
   let bx = align === 'center' ? x - total / 2 : x;
-  for (const { e, label, w } of items) {
+  for (const e of effects) {
     const neg = NEG.has(e.key);
-    g.fillStyle = neg ? '#6b2a35' : '#1f5a42';
+    g.fillStyle = neg ? 'rgba(80,20,28,0.88)' : 'rgba(16,64,46,0.88)';
     g.strokeStyle = neg ? '#ff8a98' : '#7dffb0';
-    g.lineWidth = neg ? 2 : 1;
+    g.lineWidth = 2;
     g.beginPath();
-    g.roundRect(bx, y, w, 18, neg ? 3 : 9);
+    g.roundRect(bx, y, FXS, FXS, neg ? 5 : 13);
     g.fill();
     g.stroke();
-    text(g, label, bx + w / 2, y + 9, 11, '#ffffff');
-    bx += w + 4;
+    const im = getImg(`fx:${e.key}`);
+    if (im) g.drawImage(im, bx + 2, y + 2, FXS - 4, FXS - 4);
+    else text(g, view.t(`effect.${e.key}.short`).slice(0, 2), bx + FXS / 2, y + FXS / 2, 11, '#ffffff');
+    const n = e.turns > 99 ? '∞' : String(e.turns);
+    g.font = `700 11px ${NUM}`;
+    g.textAlign = 'right';
+    g.textBaseline = 'alphabetic';
+    g.lineJoin = 'round';
+    g.lineWidth = 3;
+    g.strokeStyle = '#1b0f08';
+    g.strokeText(n, bx + FXS + 1, y + FXS + 2);
+    g.fillStyle = '#ffffff';
+    g.fillText(n, bx + FXS + 1, y + FXS + 2);
+    if (e.key === 'poison' && e.stacks > 1) {
+      g.textAlign = 'left';
+      g.strokeText(`×${e.stacks}`, bx - 1, y + 9);
+      g.fillStyle = '#b8ff9a';
+      g.fillText(`×${e.stacks}`, bx - 1, y + 9);
+    }
+    bx += FXS + gap;
   }
 }
 

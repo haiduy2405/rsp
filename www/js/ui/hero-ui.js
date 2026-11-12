@@ -23,7 +23,7 @@ export function createHeroUI({ h, T, ctx }) {
   }
   const leaderText = (l) => T(`leader.${l.template}`, { pct: pct(l.pct || 0), element: l.element != null ? el(l.element) : '', n: l.n });
   const keysOf = (units) => [...new Set(units.filter((u) => u.type === 'applyEffect').map((u) => u.key))];
-  const keywordBlock = (keys) => keys.map((k) => h('div', { class: 'muted' }, h('b', {}, T(`effect.${k}.name`)), ': ', T(`effect.${k}.desc`)));
+  const keywordBlock = (keys) => keys.map((k) => h('div', { class: 'muted fxrow' }, h('img', { class: 'fxico', src: `assets/ui/fx/${k}.webp`, alt: '' }), h('div', { style: 'flex:1;min-width:0' }, h('b', {}, T(`effect.${k}.name`)), ': ', T(`effect.${k}.desc`))));
 
   // Ảnh chân dung vuông: icon nếu có, không thì ngọc hệ.
   function portrait(id, size = 64) {

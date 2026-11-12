@@ -725,6 +725,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   return {
     getDragPath: () => (drag ? drag.path.slice() : null),
     getState: () => state,
+    refresh: sync, // dùng cho test/debug: đồng bộ view từ state
     isBusy: () => busy,
     destroy() {
       alive = false;

@@ -532,3 +532,7 @@ details.card[open] > summary { margin-bottom: 8px; }
 @media (prefers-reduced-motion: reduce) { .dock button.battle { animation: none; } }
 .dock button.battle span { bottom: 24.5%; font-size: 11px; letter-spacing: 0; max-width: 72px; }
 :lang(vi) .dock button.battle span { font-size: 9.5px; }
+
+/* icon hiệu ứng trong chi tiết */
+.fxrow{display:flex;align-items:flex-start;gap:8px}
+.fxrow>.fxico{width:28px;height:28px;flex:none;margin-top:-2px}
