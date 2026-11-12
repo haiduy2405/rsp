@@ -521,5 +521,7 @@
   "profile.pulls": "Lượt triệu hồi",
   "intro.go": "Bắt đầu!",
   "intro.boss": "CẢNH BÁO · TRÙM",
-  "intro.elite": "CẢNH BÁO · TINH ANH"
+  "intro.elite": "CẢNH BÁO · TINH ANH",
+  "skill.ok": "Dùng kỹ năng",
+  "skill.cancel": "Hủy"
 }

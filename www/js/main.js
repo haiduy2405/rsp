@@ -929,6 +929,7 @@ function startBattleUI() {
     fx: audio,
     hint,
     onInspect: showInspect,
+    onSkillAsk: showSkillAsk,
     celebrate,
     onEnd(st) {
       audio.sfx(st.status === 'won' ? 'win' : 'lose');
@@ -951,6 +952,24 @@ function effectRows(effects, holder) {
     return h('div', { class: 'muted' }, h('b', {}, t(`effect.${e.key}.name`)), ` (${extra.join(', ')}): `, t(`effect.${e.key}.desc`));
   });
 }
+// Chạm tướng đã sẵn sàng: hiện thông tin kỹ năng, chỉ dùng khi người chơi bấm Đồng ý.
+function showSkillAsk(idx, confirm) {
+  const st = game?.getState?.();
+  if (!st || $('info')) return;
+  const m = st.members[idx];
+  if (!m) return;
+  const c = ctx.characters[m.id];
+  const keys = keysOf(c.skill.units);
+  const close = () => $('info')?.remove();
+  const body = [
+    h('div', { class: 'charrow' }, portrait(m.id, 72), h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`skill.${m.id}`)), h('div', { class: 'muted' }, t(`char.${m.id}`), ' · ', t('char.cooldown', { n: m.skillMax })))),
+    h('div', { class: 'card' }, c.skill.units.map((u) => h('div', {}, unitText(u)))),
+    keys.length ? h('div', { class: 'card' }, keywordBlock(keys)) : null,
+    h('div', { class: 'row' }, btn(t('skill.ok'), () => { close(); confirm(); }, 'primary', { id: 'skill-ok' }), btn(t('skill.cancel'), close, '', { id: 'skill-cancel' })),
+  ];
+  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox' }, body)));
+}
+
 function showInspect(kind, idx) {
   const st = game?.getState?.();
   if (!st || $('info')) return;

@@ -43,7 +43,7 @@ function findHint(ctx, state) {
   return best?.path ?? null;
 }
 
-export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null }) {
+export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null, onSkillAsk = null }) {
   const g = canvas.getContext('2d');
   let state = initial;
   let busy = false;
@@ -407,7 +407,10 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       }
       return;
     }
-    if (state.members[pr.idx]?.skillCd === 0) run({ type: 'skill', index: pr.idx });
+    if (state.members[pr.idx]?.skillCd === 0) {
+      if (onSkillAsk) onSkillAsk(pr.idx, () => { if (!busy && state.status === 'playing' && state.members[pr.idx]?.skillCd === 0) run({ type: 'skill', index: pr.idx }); });
+      else run({ type: 'skill', index: pr.idx });
+    }
   }
 
   function onDown(ev) {

@@ -521,5 +521,7 @@
   "profile.pulls": "Summons",
   "intro.go": "Fight!",
   "intro.boss": "WARNING · BOSS",
-  "intro.elite": "WARNING · ELITE"
+  "intro.elite": "WARNING · ELITE",
+  "skill.ok": "Use skill",
+  "skill.cancel": "Cancel"
 }
