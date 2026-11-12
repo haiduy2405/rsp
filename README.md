@@ -323,3 +323,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.43.1
 - Màn tải: chạm hoặc nhấn phím bất kỳ để vào game và tự bật toàn màn hình (bỏ qua nếu đã cài app hoặc trình duyệt không hỗ trợ, như iOS Safari).
+
+## v0.43.2
+- Sửa màn nhập tên: nội dung vừa khít chiều ngang, không còn phải kéo sang phải (lưới avatar và ô tên co theo màn hình).

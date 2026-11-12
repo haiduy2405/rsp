@@ -780,16 +780,18 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .ob-line.on { opacity: 1; transform: none; }
 .ob-actions { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 280px; }
 .ob-actions .ghost { background: transparent; border-color: transparent; color: #b99a78; box-shadow: none; }
-.ob-id { display: grid; gap: 12px; padding: 4px 2px 12px; animation: listIn .5s both; }
+.ob-id { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden; gap: 12px; padding: 4px 2px 12px; animation: listIn .5s both; }
+.ob-id > * { min-width: 0; box-sizing: border-box; }
 .ob-aida { position: relative; border: 1px solid var(--line-hi); border-radius: 14px; padding: 10px 14px 12px; background: linear-gradient(160deg, rgba(106, 69, 41, .35), rgba(27, 15, 8, .8)); }
 .ob-aida b { color: var(--gold, #f0b94a); font-size: 12px; letter-spacing: 1.5px; }
 .ob-aida p { margin: 4px 0 0; line-height: 1.45; }
 .ob-me-row { display: flex; gap: 14px; align-items: center; }
-.ob-me { flex: none; width: 84px; height: 84px; border-radius: 50%; box-shadow: 0 0 0 3px var(--ink), 0 0 0 5px var(--line-hi), 0 0 24px rgba(240, 185, 74, .35); }
+.ob-me { flex: none; max-width: 28%; aspect-ratio: 1; width: 84px; height: 84px; border-radius: 50%; box-shadow: 0 0 0 3px var(--ink), 0 0 0 5px var(--line-hi), 0 0 24px rgba(240, 185, 74, .35); }
 .ob-name { flex: 1; display: grid; gap: 4px; font-size: 13px; color: #cdb08c; }
-.ob-name input { font-size: 18px; }
-.ob-avs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; justify-items: center; }
-.ob-avs .avatar { width: 46px; height: 46px; }
+.ob-name { min-width: 0; }
+.ob-name input { font-size: 18px; width: 100%; min-width: 0; box-sizing: border-box; }
+.ob-avs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; justify-items: center; }
+.ob-avs .avatar { width: 100%; max-width: 46px; height: auto; aspect-ratio: 1; }
 .ob-flag { border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; background: rgba(27, 15, 8, .5); }
 .ob-flag summary { cursor: pointer; color: #cdb08c; }
 
