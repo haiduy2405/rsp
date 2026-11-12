@@ -90,9 +90,9 @@ function pickDoor(run) {
   return best;
 }
 
-export function playFullRun(seed, zoneId, team, K, diff = 'easy') {
+export function playFullRun(seed, zoneId, team, K, diff = 'easy', stage = Number(process.env.STAGE || 7)) {
   const rng = mulberry32(seed ^ 0xabcdef);
-  let run = createRun(ctx, { seed, zoneId, team, pityMissed: false, diff, stage: Number(process.env.STAGE || 7) });
+  let run = createRun(ctx, { seed, zoneId, team, pityMissed: false, diff, stage });
   let turns = 0;
   for (let guard = 0; run.phase !== 'end' && guard < 2000; guard++) {
     if (run.phase === 'doors') {
@@ -156,7 +156,49 @@ export function runTargets(teams = 60, runsPer = 2, K = 10, seed0 = 1, diff = 'e
   return out;
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv[2] === '--targets') {
+// Chế độ --curve: người chơi lên cấp dần khi đi qua các ải, nên Level ở ải s của khu z nội suy từ khu z tới khu kế tiếp.
+// Dải thắng cũng nội suy: ải 1 gần như chắc thắng (config.balance.stageWin.first), ải cuối là dải trong balance.targets.
+export function runCurve(teams = 12, runsPer = 2, K = 8, seed0 = 1, diff = 'easy', stages = [1, 4, 7]) {
+  const sim = ctx.config.difficulty[diff].sim;
+  const bal = ctx.config.balance;
+  const total = ctx.config.run.stages;
+  const pr = mulberry32(seed0 * 7919);
+  const shuffle = (a) => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = pr.int(i + 1); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+  const ids = Array.from({ length: teams }, () => shuffle(ctx.characterList).slice(0, 5).map((c) => c.id));
+  const zl = ctx.zoneList;
+  const out = [];
+  zl.forEach((z, zi) => {
+    const base = bal.targets[z.id];
+    const next = bal.targets[(zl[zi + 1] || z).id];
+    for (const st of stages) {
+      const f = (st - 1) / (total - 1);
+      const lvBase = base.level + (next.level - base.level) * ((st - 1) / total);
+      const level = Math.min(ctx.config.progression.levelMax, Math.round(lvBase) + sim.levelBonus);
+      const awaken = level > ctx.config.progression.levelCapForm1 ? 1 : Math.min(1, base.awaken + sim.awakenBonus);
+      const last = base.win.map((x) => x + sim.winShift);
+      const band = [0, 1].map((k) => bal.stageWin.first[k] + (last[k] - bal.stageWin.first[k]) * f);
+      let won = 0, runs = 0, turns = 0;
+      ids.forEach((team, ti) => {
+        for (let r = 0; r < runsPer; r++) {
+          const res = playFullRun(seed0 * 1000 + ti * 10 + r, z.id, team.map((id) => ({ id, level, awaken })), K, diff, st);
+          runs++; won += res.won ? 1 : 0; turns += res.turns;
+        }
+      });
+      const win = won / runs;
+      out.push({ zone: z.id, stage: st, level, awaken, win, band, minutes: (turns / runs) * bal.secondsPerTurn / 60, ok: win >= band[0] - 0.05 && win <= band[1] + 0.05 });
+    }
+  });
+  return out;
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv[2] === '--curve') {
+  const [teams = 12, runsPer = 2, K = 8, seed0 = 1] = process.argv.slice(3).map(Number);
+  const only = process.env.DIFF ? [process.env.DIFF] : ctx.config.difficulty.order;
+  const stages = (process.env.STAGES || '1,4,7').split(',').map(Number);
+  for (const diff of only) for (const r of runCurve(teams, runsPer, K, seed0, diff, stages)) {
+    console.log(`${diff.padEnd(6)} ${r.zone.padEnd(11)} ải${r.stage} Lv${String(r.level).padEnd(2)} A${r.awaken} thắng ${(100 * r.win).toFixed(0).padStart(3)}% (dải ${r.band.map((x) => (100 * x).toFixed(0)).join('-')}%) ${r.ok ? 'OK ' : 'LỆCH'} | ~${r.minutes.toFixed(1)} phút`);
+  }
+} else if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv[2] === '--targets') {
   const [teams = 60, runsPer = 2, K = 10, seed0 = 1] = process.argv.slice(3).map(Number);
   const only = process.env.DIFF ? [process.env.DIFF] : ctx.config.difficulty.order;
   for (const diff of only) for (const r of runTargets(teams, runsPer, K, seed0, diff)) {

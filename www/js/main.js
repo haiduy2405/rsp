@@ -1,6 +1,7 @@
 import { buildCtx, loadRaw } from './core/ctx.js';
 import { hasFreeOffer } from './core/shop.js';
 import { createGuide } from './ui/guide.js';
+import { trackQuest, claimQuest, claimBonus, hasClaimable, ensureQuests, isDone, allClaimed } from './core/quests.js';
 import { createRun, runStep, newRunRecord, debugWinBattle, runLayout } from './core/run.js';
 import { stageOpen, tierOpen, stagesDone, zoneClears } from './core/stage.js';
 import { stageInfo } from './core/stageinfo.js';
@@ -84,6 +85,7 @@ let seedText = '';
 
 // ---- tiện ích DOM
 let atHub = false;
+const track = (kind, n = 1) => { progress = trackQuest(ctx, progress, ui.dayKey(), kind, n); }; // tiến độ nhiệm vụ hằng ngày
 const guide = createGuide($('wrap'));
 const guideStep = () => progress?.onboarding?.guide;
 const guideSet = (step) => { if (step) progress.onboarding.guide = step; else delete progress.onboarding.guide; save(); };
@@ -216,6 +218,7 @@ ${orbs}
 function showHub() {
   run = null;
   record = null;
+  { const before = progress; track('login'); if (progress !== before) save(); }
   const inv = progress.inventory;
   screen(
     hubScene(),
@@ -239,7 +242,7 @@ function showHub() {
       dockBtn('summon', t('hub.summon'), () => ui.showSummon('standard'), 'b-summon', 'sub', progress.summon.freeDay !== ui.dayKey()),
       h('button', { class: 'battle', id: 'b-battle', onclick: () => { if (guideStep() === 'battle') guideSet('zone'); showZones(); }, 'aria-label': t('hub.battle') }, h('img', { src: 'assets/ui/icons/battle.webp', alt: '', draggable: 'false' }), h('span', {}, t('hub.battle'))),
       dockBtn('shop', t('hub.shop'), () => { if (guideStep() === 'shop') guideSet('claim'); ui.showShop(); }, 'b-shop', '', hasFreeOffer(ctx, progress, ui.dayKey())),
-      dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest'),
+      dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest', '', hasClaimable(ctx, progress, ui.dayKey())),
     ),
   );
   $('screen').classList.add('hub');
@@ -484,10 +487,11 @@ function showChar(id, msg, back) {
   const kit = resolveKit(ctx, id, pc.skillLv, formOf(pc.awaken));
   const keys = [...new Set([...keysOf(kit.skill.units), ...(kit.passive?.units ? keysOf(kit.passive.units) : []), ...ctx.duoList.filter((d) => d.a === id || d.b === id).flatMap((d) => keysOf(d.skill.units))])];
   // Thực hiện một hành động nâng cấp (hàm thuần trả {ok, progress}), lưu, vẽ lại với thông báo.
-  const act = (fn, okMsg) => {
+  const act = (fn, okMsg, quest) => {
     const r = fn();
     if (r.ok) {
       progress = r.progress;
+      if (quest) track(quest);
       save();
       showChar(id, okMsg ? okMsg(r) : undefined);
     } else showChar(id, t(`err.${r.reason}`));
@@ -503,11 +507,11 @@ function showChar(id, msg, back) {
       ? h('div', { class: 'muted' }, t('char.maxLevel'))
       : [
           h('div', { class: 'muted' }, t('char.elixir')),
-          [1, 2, 3].map((tier) => h('div', { class: 'fodder-row', 'data-elixir': tier }, itemIcon(`elixir${tier}`, 'sm'), h('span', {}, `${t(`res.elixir.${tier}`)} ×${inv.elixir[tier]} `, h('small', { class: 'muted' }, `+${ctx.config.elixir[tier].exp} EXP`)), btn(t('char.useOne'), () => act(() => useElixir(ctx, progress, id, tier, 1), gained)), btn(t('char.useUpTo'), () => act(() => useElixir(ctx, progress, id, tier, 1e9), gained)))),
+          [1, 2, 3].map((tier) => h('div', { class: 'fodder-row', 'data-elixir': tier }, itemIcon(`elixir${tier}`, 'sm'), h('span', {}, `${t(`res.elixir.${tier}`)} ×${inv.elixir[tier]} `, h('small', { class: 'muted' }, `+${ctx.config.elixir[tier].exp} EXP`)), btn(t('char.useOne'), () => act(() => useElixir(ctx, progress, id, tier, 1), gained, 'level_up')), btn(t('char.useUpTo'), () => act(() => useElixir(ctx, progress, id, tier, 1e9), gained, 'level_up')))),
           fodderKeys.length
             ? fodderKeys.map((k) => {
                 const f = ctx.fodder[k];
-                return h('div', { class: 'fodder-row', 'data-fodder': k }, h('span', {}, `${t(`fodder.${f.element}.${f.star}`)} ${'★'.repeat(f.star)} ×${inv.fodder[k]} `, h('small', { class: 'muted' }, t('char.fodderEach', { n: fodderExp(ctx, id, k) }))), btn(t('char.feed'), () => act(() => feedFodder(ctx, progress, id, k, 1), gained)), btn(t('char.feedAll'), () => act(() => feedFodder(ctx, progress, id, k, 999), gained)));
+                return h('div', { class: 'fodder-row', 'data-fodder': k }, h('span', {}, `${t(`fodder.${f.element}.${f.star}`)} ${'★'.repeat(f.star)} ×${inv.fodder[k]} `, h('small', { class: 'muted' }, t('char.fodderEach', { n: fodderExp(ctx, id, k) }))), btn(t('char.feed'), () => act(() => feedFodder(ctx, progress, id, k, 1), gained, 'level_up')), btn(t('char.feedAll'), () => act(() => feedFodder(ctx, progress, id, k, 999), gained, 'level_up')));
               })
             : h('div', { class: 'muted' }, t('char.noFodder')),
         ],
@@ -524,7 +528,7 @@ function showChar(id, msg, back) {
         'div',
         { class: 'skillup-row', 'data-skillup': kind },
         h('span', {}, `${t(`char.tag.${kind}`)} · ${t('skill.lv', { n: lv, max: maxSkillLevel(ctx, id) })}`, cost ? h('small', { class: 'muted' }, ` ${t('skill.upCost', { count: cost.count, name: offeringName(cost.offering), gold: cost.gold })}`) : null),
-        cost ? btn(t('skill.upBtn'), () => act(() => skillUp(ctx, progress, id, kind), () => t('skill.upDone')), '', { id: `skillup-${kind}` }) : h('small', { class: 'muted' }, t('skill.lvMax')),
+        cost ? btn(t('skill.upBtn'), () => act(() => skillUp(ctx, progress, id, kind), () => t('skill.upDone'), 'skill_up'), '', { id: `skillup-${kind}` }) : h('small', { class: 'muted' }, t('skill.lvMax')),
       );
     }),
   );
@@ -627,13 +631,38 @@ function showTeam(slot, msg, stage) {
 }
 
 // Cửa hàng và Nhiệm vụ: khung chờ, chưa có nội dung (gói ủng hộ ở M6; nhiệm vụ làm sau).
+let questMsg = null;
 function showQuests() {
+  progress = ensureQuests(ctx, progress, ui.dayKey());
+  const day = ui.dayKey();
+  const q = progress.quests;
+  const cfg = ctx.config.quests;
+  const rewardText = (r) => [r.spirit ? `${r.spirit} ${t('res.spirit')}` : null, r.gold ? `${r.gold} ${t('res.gold')}` : null, r.tickets ? `${r.tickets} ${t('res.ticket')}` : null].filter(Boolean).join(' · ');
+  const claim = (fn) => {
+    const r = fn();
+    if (r.ok) { progress = r.progress; save(); audio.sfx('reveal'); questMsg = `+ ${rewardText(r.reward)}`; } else questMsg = t(`err.${r.reason}`);
+    showQuests();
+  };
+  const rows = q.list.map((x) => {
+    const done = isDone(x);
+    return h('div', { class: 'card quest' + (done ? ' done' : '') + (x.claimed ? ' claimed' : ''), 'data-quest': x.id },
+      h('div', { class: 'q-info' }, h('b', {}, t(`quest.${x.kind}`, { n: x.goal })), h('div', { class: 'q-bar' }, h('i', { style: `width:${Math.round((100 * x.count) / x.goal)}%` })), h('small', { class: 'muted' }, `${x.count}/${x.goal} · ${rewardText(x.reward)}`)),
+      x.claimed ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), () => claim(() => claimQuest(ctx, progress, day, x.id)), done ? 'primary' : '', { id: `claim-${x.id}`, ...(done ? {} : { disabled: '' }) }));
+  });
+  const all = allClaimed(progress);
+  const bonus = h('div', { class: 'card quest bonus' + (all && !q.bonusClaimed ? ' done' : '') + (q.bonusClaimed ? ' claimed' : '') },
+    h('div', { class: 'q-info' }, h('b', {}, t('quest.bonus')), h('small', { class: 'muted' }, rewardText(cfg.bonus))),
+    q.bonusClaimed ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), () => claim(() => claimBonus(ctx, progress, day)), all ? 'primary' : '', { id: 'claim-bonus', ...(all ? {} : { disabled: '' }) }));
   screen(
     h('h2', {}, t('hub.quests')),
-    h('div', { class: 'row' }, h('button', { class: 'primary', disabled: '' }, t('quest.daily')), h('button', { disabled: '' }, t('quest.achv'))),
-    h('div', { class: 'card soon' }, h('b', {}, t('soon.title')), h('p', { class: 'muted' }, t('quest.soon'))),
+    h('div', { class: 'row' }, h('button', { class: 'primary', disabled: '' }, t('quest.daily')), h('button', { disabled: '', title: t('soon.title') }, t('quest.achv'))),
+    h('div', { class: 'muted' }, t('quest.resetNote')),
+    questMsg ? h('div', { class: 'notice', id: 'quest-msg' }, questMsg) : null,
+    rows,
+    bonus,
     btn(t('back'), showHub, '', { id: 'back' }),
   );
+  questMsg = null;
 }
 
 
@@ -1312,8 +1341,10 @@ function lootScene({ title, sub, loot, onContinue }) {
   later(1650 + rows.length * 360 + 250, finish);
 }
 
+let lastTrackedResult = null;
 function showResult() {
   const r = run.lastResult;
+  if (r.kind === 'battle' && r !== lastTrackedResult) { lastTrackedResult = r; track('win_battle'); }
   if (r.kind === 'battle' || r.kind === 'chest') {
     const isBoss = r.nodeType === 'boss';
     return lootScene({
@@ -1364,6 +1395,7 @@ function showEnd() {
     const before = progress;
     firstClear = run.result === 'won' && (run.stage ?? 1) > stagesDone(before, run.zoneId, run.diff) ? firstClearStageSpirit(ctx, run.zoneId, run.diff, run.stage ?? 1) : 0;
     progress = applyRunResult(ctx, progress, run);
+    if (run.result === 'won') track('win_stage');
     endLevels = progress.team.filter(Boolean).map((id) => ({ id, from: before.characters[id].level, to: progress.characters[id].level })).filter((x) => x.to > x.from);
     delete progress.activeRun;
     save();
@@ -1431,7 +1463,7 @@ function showInstallHelp() {
 // ---- Màn hình tách module: dùng chung trạng thái qua `app`, gọi chéo qua `app.*` / `ui.*`
 const ui = {};
 const app = {
-  startTutorial: () => startTutorial(), enterHub: showHub, guideStep, guideSet, guidePoint,
+  startTutorial: () => startTutorial(), enterHub: showHub, guideStep, guideSet, guidePoint, trackQuest: track,
   ctx, audio, storage, slots, enterSlot, dicts, h, btn, $, el, chip, portrait, CUR_COL, fodderName, offeringName, pct, save, screen, setLang, showHub,
   t: (...a) => t(...a),
   get lang() { return lang; },

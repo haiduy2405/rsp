@@ -55,7 +55,7 @@ test('ải: ải sau mạnh hơn ải trước (stageScale), ải 7 có Elite r�
     const e = r.battle.enemies[0];
     return e.maxHp / ctx.monsters[e.id].hp;
   };
-  assert.ok(foe(7) > foe(1));
+  assert.ok(foe(6) > foe(1)); // ải 7 (Boss) cố ý dễ hơn ải 6: ải Boss có thêm Elite + Boss nên nhân hệ số riêng
   assert.throws(() => createRun(ctx, { seed: 1, zoneId: 'zone_water', team: [], stage: 8 }));
   assert.throws(() => createRun(ctx, { seed: 1, zoneId: 'zone_water', team: [], stage: 0 }));
 });

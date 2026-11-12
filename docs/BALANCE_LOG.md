@@ -61,3 +61,11 @@ Theo nguyên tắc "buff quái, không nerf người chơi": quái có thêm **�
 - Normal: hp ×1.2→×1.0, atk ×1.35→×1.45. Hard: hp ×1.4→×1.05, atk ×1.65→×1.8. Quái ít máu hơn nhưng đánh đau hơn: trận ngắn lại (~9–12 phút/chuyến, trước đó 12–16) và đội dễ gục hơn thay vì chỉ phải đánh lâu hơn.
 - Thử atk 1.6/2.1 và 1.9/2.7: thắng rớt dưới dải mục tiêu ở các khu cuối (Dark/Heart), nên chọn 1.45/1.8. Còn lệch: Water Normal/Hard dễ, Heart Normal/Hard thấp (Lv50 là trần, cần thêm nguồn sức mạnh thay vì nới quái).
 - EXP/Vàng: xem README v0.20 (Vàng ×10, Đan 3 cỡ, EXP sau trận).
+
+## 2026-11-12 (v0.52.0): đồng bộ sim với game 7 ải
+- **Phát hiện:** sim cũ chỉ đo ải 7 (Boss) ở Level đầu khu và bot không biết bấm Tiêu khi Dừng Thời Gian. Kết quả thật: ải 1–6 thắng ≥ 92% (quá dễ), ải 7 chỉ 4–33% (vách đá), nên README/BALANCE_LOG cũ (60–99%) không còn đúng.
+- **Công cụ:** `node tools/balance-sim.js --curve [đội=12] [lượt=2] [K=8]` (env `DIFF`, `STAGES=1,4,7`). Level ở ải s của khu z nội suy từ khu z tới khu kế tiếp (người chơi lên cấp khi đi). Dải thắng nội suy từ `balance.stageWin.first` (ải 1) tới dải `balance.targets` (ải 7). Bot đã biết bấm Tiêu.
+- **Chỉnh:** `run.stageScale` có mảng `values` theo ải: hp [0.8, 1.0, 1.2, 1.4, 1.55, 1.65, 0.75], atk [0.8, 0.95, 1.1, 1.3, 1.45, 1.55, 0.75] (ải Boss cố ý nhẹ hơn ải 6 vì có thêm Elite + Boss). `run.zoneScale`: hp [1.2, 1.35, 1.35, 1.85, 2.35, 2.7], atk [1.05, 1.3, 1.55, 2.2, 3.2, 3.8].
+- **Kết quả (16 đội × 2, K=8):** Dễ 16/18 ô trong dải (lệch: Mộc ải 7 53% thấp, Quang ải 7 88% cao). Vừa 11/18, Khó 9/18: lệch chủ yếu ở khu Ám/Tim vì đội đã chạm trần Level 50 (cần thêm nguồn sức mạnh, không nên nới quái) và ải 4–6 khu cuối hơi nặng so với ải 7.
+- **Chưa làm:** hiệu chỉnh theo người chơi thật. Sai số mỗi ô khoảng ±10 điểm % (32 lượt). K=30 chỉ nhích thắng ~5 điểm so với K=8, nên chênh kỹ năng bot–người không phải nguyên nhân chính.
+- Ghi chú: hp khu Mộc đặt 1.35 (bằng khu Hỏa) vì test yêu cầu zoneScale không giảm theo khu; số liệu sim ở trên đo với 1.3 nên Mộc ải 7 có thể nhích xuống vài điểm %.

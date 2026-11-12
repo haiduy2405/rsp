@@ -996,5 +996,19 @@
   "guide.hero.keys": "Từ khóa hiệu ứng của tướng. Chạm giữ để xem giải thích.",
   "guide.hero.grow": "Nâng cấp: dùng Thuốc và nguyên liệu để lên cấp.",
   "guide.hero.skillup": "Nâng kỹ năng bằng đồ cúng, mỗi kỹ năng có cấp riêng.",
-  "guide.hero.awaken": "Thức tỉnh: đổi sang dạng mạnh hơn, cần mảnh và đá."
+  "guide.hero.awaken": "Thức tỉnh: đổi sang dạng mạnh hơn, cần mảnh và đá.",
+  "quest.login": "Vào game hôm nay",
+  "quest.win_battle": "Thắng {n} trận",
+  "quest.win_stage": "Thắng {n} ải",
+  "quest.summon": "Triệu hồi {n} lần",
+  "quest.shop_free": "Nhận quà miễn phí ở Cửa hàng",
+  "quest.level_up": "Cho tướng lên cấp (Đan hoặc Tiểu Linh)",
+  "quest.skill_up": "Nâng cấp một kỹ năng",
+  "quest.claim": "Nhận",
+  "quest.claimed": "Đã nhận",
+  "quest.bonus": "Xong tất cả nhiệm vụ",
+  "quest.resetNote": "Làm mới mỗi ngày.",
+  "err.not_ready": "Chưa đủ điều kiện",
+  "err.claimed": "Đã nhận rồi",
+  "err.no_quest": "Không có nhiệm vụ này"
 }

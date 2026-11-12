@@ -113,7 +113,12 @@ const pick = (rng, list) => list[rng.int(list.length)];
 const zoneRaces = (ctx, zoneId) => [...new Set(ctx.zones[zoneId].monsters.normal.map((m) => ctx.monsters[m].race))];
 
 // Hệ số theo ải (1..7): tuyến tính từ ải đầu tới ải boss.
-export const stageFactor = (rc, key, stage) => rc.stageScale[key].from + ((rc.stageScale[key].to - rc.stageScale[key].from) * (stage - 1)) / (rc.stages - 1);
+// Hệ số theo ải: nếu có mảng `values` (mỗi ải một số) thì dùng đúng số đó (cho phép ải Boss dễ hơn ải 6); không thì nội suy from → to.
+export const stageFactor = (rc, key, stage) => {
+  const sc = rc.stageScale[key];
+  if (Array.isArray(sc.values)) return sc.values[Math.min(sc.values.length, stage) - 1];
+  return sc.from + ((sc.to - sc.from) * (stage - 1)) / (rc.stages - 1);
+};
 
 function startBattle(ctx, run, rng, kind, preset) {
   const zone = ctx.zones[run.zoneId];

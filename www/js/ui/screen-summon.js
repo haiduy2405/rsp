@@ -31,6 +31,7 @@ export function install(app) {
       const r = summon(ctx, app.progress, { bannerId, count, free, dayKey: dayKey(), seed: (Math.random() * 4294967296) >>> 0 });
       if (!r.ok) return showSummon(bannerId, null, `err.${r.reason}`);
       app.progress = r.progress;
+      app.trackQuest('summon', count);
       save();
       audio.sfx('summon');
       showSummonResult(bannerId, r.results);

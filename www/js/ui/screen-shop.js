@@ -36,7 +36,7 @@ export function install(app) {
       const label = left <= 0 ? t('shop.soldOut') : free ? t('shop.free') : `${t('shop.buy')} · ${fmt(o.price.amount)} ${t(`res.${o.price.cur}`)}`;
       const buy = () => {
         const r = buyOffer(ctx, app.progress, app.dayKey(), o.id);
-        if (r.ok) { app.progress = r.progress; save(); app.audio.sfx('reveal'); msg = nameOf(o.give); } else msg = t(`err.${r.reason}`);
+        if (r.ok) { app.progress = r.progress; if (free) app.trackQuest('shop_free'); save(); app.audio.sfx('reveal'); msg = nameOf(o.give); } else msg = t(`err.${r.reason}`);
         showShop();
       };
       return h('div', { class: 'card shop-offer', 'data-offer': o.id, style: `--rc:${RARITY_COL[rarityOf(o.give)]}` },

@@ -67,7 +67,7 @@
         { "pool": "boss", "doors": 1 }
       ]
     },
-    "stageScale": { "hp": { "from": 0.8, "to": 1.45 }, "atk": { "from": 0.8, "to": 1.35 } },
+    "stageScale": { "hp": { "from": 0.8, "to": 1.45, "values": [0.8, 1.0, 1.2, 1.4, 1.55, 1.65, 0.75] }, "atk": { "from": 0.8, "to": 1.35, "values": [0.8, 0.95, 1.1, 1.3, 1.45, 1.55, 0.75] } },
     "stageReward": [0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 1.0],
     "pools": {
       "fightA": {
@@ -121,8 +121,8 @@
       }
     },
     "zoneScale": {
-      "hp": [1.35, 1.35, 1.5, 1.85, 2.6, 3.1],
-      "atk": [1.15, 1.3, 1.4, 2.1, 3.4, 4.5]
+      "hp": [1.2, 1.35, 1.35, 1.85, 2.35, 2.7],
+      "atk": [1.05, 1.3, 1.55, 2.2, 3.2, 3.8]
     },
     "kindScale": {
       "boss": { "hp": 1.25, "atk": 1.0 },
@@ -451,8 +451,22 @@
     "nameMax": 20,
     "hometownMax": 24
   },
+  "quests": {
+    "daily": { "fixed": ["login"], "pick": 4 },
+    "bonus": { "spirit": 20, "tickets": 1 },
+    "pool": [
+      { "kind": "login", "goal": 1, "reward": { "spirit": 10 } },
+      { "kind": "win_battle", "goal": 5, "reward": { "spirit": 15 } },
+      { "kind": "win_stage", "goal": 1, "reward": { "spirit": 20 } },
+      { "kind": "summon", "goal": 1, "reward": { "spirit": 15 } },
+      { "kind": "shop_free", "goal": 1, "reward": { "spirit": 10 } },
+      { "kind": "level_up", "goal": 1, "reward": { "spirit": 15 } },
+      { "kind": "skill_up", "goal": 1, "reward": { "spirit": 20 } }
+    ]
+  },
   "balance": {
     "secondsPerTurn": 8,
+    "stageWin": { "first": [0.9, 1.0] },
     "pacing": {
       "form2Runs": { "3": [3, 10], "5": [8, 24] }
     },

@@ -996,5 +996,19 @@
   "guide.hero.keys": "Effect keywords of this hero. Press and hold one to read it.",
   "guide.hero.grow": "Upgrade: spend Elixirs and materials to level up.",
   "guide.hero.skillup": "Raise skills with offerings. Each skill has its own level.",
-  "guide.hero.awaken": "Awaken: change to a stronger form, needs shards and stones."
+  "guide.hero.awaken": "Awaken: change to a stronger form, needs shards and stones.",
+  "quest.login": "Log in today",
+  "quest.win_battle": "Win {n} battles",
+  "quest.win_stage": "Clear {n} stage",
+  "quest.summon": "Summon {n} time",
+  "quest.shop_free": "Claim the free gift in the Shop",
+  "quest.level_up": "Level up a hero (Elixir or Spirits)",
+  "quest.skill_up": "Upgrade a skill",
+  "quest.claim": "Claim",
+  "quest.claimed": "Claimed",
+  "quest.bonus": "All quests done",
+  "quest.resetNote": "Resets every day.",
+  "err.not_ready": "Not ready yet",
+  "err.claimed": "Already claimed",
+  "err.no_quest": "No such quest"
 }

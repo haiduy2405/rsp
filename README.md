@@ -385,3 +385,7 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 ### v0.51.1
 - Thêm `docs/AUDIT_PROMPT.md` (prompt kiểm định tái dùng) và `docs/AUDIT_2026-11-12.md` (kết quả lần chạy đầu).
 - `tools/balance-sim.js`: bot biết bấm Tiêu khi Dừng Thời Gian (trước đó kẹt, mỗi chuyến ~120 phút).
+
+### v0.52.0
+- **Nhiệm vụ hằng ngày** (`core/quests.js`, dữ liệu `config.quests`): 5 nhiệm vụ mỗi ngày (Vào game cố định + 4 trong 6 loại: thắng 5 trận, thắng 1 ải, triệu hồi, nhận quà shop, cho tướng lên cấp, nâng kỹ năng), nhận Linh Thạch, xong hết thì thêm 1 Vé + 20 Linh Thạch. Chấm đỏ ở nút Nhiệm vụ. Trường `progress.quests` tùy chọn nên không đổi version save. Tab Thành tựu vẫn "sắp có". Test: `tests/quests.test.js`, `tests/e2e/quests.cjs`.
+- **Cân bằng đồng bộ với 7 ải:** `balance-sim.js --curve`, `run.stageScale.values` theo ải (ải Boss nhẹ hơn ải 6), chỉnh lại `zoneScale`. Chi tiết và chỗ còn lệch ở `docs/BALANCE_LOG.md`.
