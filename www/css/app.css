@@ -67,7 +67,7 @@ details { width: 100%; font-size: 13px; color: var(--mute); }
 
 /* ----- khung kính với bốn góc vàng ----- */
 .card { position: relative; width: 100%; text-align: left; padding: 14px; border: 1px solid var(--line); border-radius: 3px;
-  background: linear-gradient(180deg, var(--panel-a), var(--panel-b)); box-shadow: inset 0 1px 0 rgba(200, 190, 255, .16), inset 0 0 24px rgba(120, 90, 255, .08), 0 4px 14px rgba(0, 0, 10, .45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  background: linear-gradient(180deg, var(--panel-a), var(--panel-b)); box-shadow: inset 0 1px 0 rgba(200, 190, 255, .16), inset 0 0 24px rgba(120, 90, 255, .08), 0 4px 14px rgba(0, 0, 10, .45); }
 .card::before { content: ''; position: absolute; inset: -1px; pointer-events: none; border-radius: 3px; --c: var(--gold);
   background:
     linear-gradient(var(--c), var(--c)) 0 0 / 14px 2px no-repeat, linear-gradient(var(--c), var(--c)) 0 0 / 2px 14px no-repeat,
@@ -192,7 +192,7 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 .item-row b { font-family: 'Oswald', var(--sans); color: var(--gold-hi); }
 
 .back-wrap { position: sticky; top: 0; z-index: 20; height: 0; width: 100%; overflow: visible; align-self: flex-start; }
-.back-top { position: absolute; left: -4px; top: -4px; width: 46px; height: 46px; min-height: 0; padding: 0; display: grid; place-items: center; clip-path: none; border-radius: 50%; background: rgba(44,26,15, .82); border: 1px solid var(--bone-dim); box-shadow: 0 2px 10px rgba(0, 0, 0, .5); backdrop-filter: blur(6px); color: var(--gold-hi); }
+.back-top { position: absolute; left: -4px; top: -4px; width: 46px; height: 46px; min-height: 0; padding: 0; display: grid; place-items: center; clip-path: none; border-radius: 50%; background: rgba(44,26,15, .82); border: 1px solid var(--bone-dim); box-shadow: 0 2px 10px rgba(0, 0, 0, .5); color: var(--gold-hi); }
 .back-top svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .back-top:active { transform: scale(.92); }
 
@@ -829,3 +829,19 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 @keyframes hubIn { 0% { opacity: 0; transform: scale(1.1); } 100% { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .ob-tower, .tw-eye, .ob-id, .st-tk, .st-go, .cut, .cut-rays, .cut-glow, .cut-hero, .cut-line.on, #coach.on, #screen.hubin { animation: none !important; transition: none !important; } .cut-hero { transform: none; opacity: 1; filter: none; } .cut-line, #coach.on { opacity: 1; } }
 .st-tk > * { width: 44px !important; height: 44px !important; }
+
+/* ===== Hiệu năng 60fps: nhịp phát sáng chuyển từ box-shadow/filter (vẽ lại mỗi khung) sang lớp ::after chỉ đổi opacity (GPU) ===== */
+.sumcard, .gate.stage, #awaken { position: relative; }
+.sumcard.back, .sumcard.flip.rar5, .gate.stage:not(.locked):not(.clear), #awaken.ready, .slot-sel { animation-name: none; }
+.sumcard.flip.rar5 { animation: flipIn .55s cubic-bezier(.2, .9, .2, 1) var(--d, 0ms) both; }
+.gate.stage:not(.locked):not(.clear), .gate.stage.boss:not(.locked) { animation: listIn .38s both; }
+.sumcard.back::after, .sumcard.flip.rar5::after, .gate.stage:not(.locked):not(.clear)::after, #awaken.ready::after, .slot-sel::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; will-change: opacity; animation: fxPulse 1.8s ease-in-out infinite; }
+@keyframes fxPulse { 50% { opacity: 1; } }
+.sumcard.back::after { box-shadow: 0 0 16px rgba(167, 119, 255, .55); animation-duration: 2s; }
+.sumcard.back:nth-child(odd)::after { animation-delay: .5s; }
+.sumcard.flip.rar5::after { box-shadow: 0 0 34px rgba(255, 216, 74, .85); animation-duration: 1.6s; animation-delay: .6s; }
+.gate.stage:not(.locked):not(.clear)::after { box-shadow: 0 0 16px 2px rgba(255, 190, 90, .55); }
+.gate.stage.boss:not(.locked)::after { box-shadow: 0 0 24px 3px rgba(255, 110, 60, .7); animation-duration: 1.6s; }
+#awaken.ready::after { box-shadow: 0 0 0 3px rgba(255, 224, 150, .85), 0 0 34px rgba(255, 190, 90, .9); animation-duration: 1.5s; }
+.slot-sel::after { box-shadow: 0 0 0 2px #ffcf7a, 0 0 28px rgba(255, 190, 90, .85); animation-duration: 1.2s; }
+@media (prefers-reduced-motion: reduce) { .sumcard.back::after, .sumcard.flip.rar5::after, .gate.stage::after, #awaken.ready::after, .slot-sel::after { animation: none; } }

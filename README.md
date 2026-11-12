@@ -301,3 +301,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Quà tân thủ: 10 lượt triệu hồi miễn phí, chắc chắn 1×4★ + 9×3★, không 5★, không động pity (`starterSummon`, `config.summon.starter`). Muốn reroll tướng 4★: tạo slot lưu mới.
 - Cutscene dùng chung một khuôn cho mọi tướng 4★ (thay chân dung/tên), rồi hiệu ứng vào màn chính. Hiệu ứng chỉ dùng transform/opacity cho mượt 60 fps.
 - Save v12 (bỏ callsign/culture/firstDone, thêm `onboarding.starterDone`; save cũ coi như đã nhận).
+
+## v0.41.1 — Tối ưu 60 fps
+- Gợi ý nước đi tính theo lát ~4ms (`findHintAsync`), không còn khựng đầu trận (trước ~45ms/lần trên máy thường).
+- Nhịp phát sáng (thẻ triệu hồi, ải, nút Thức tỉnh, ô đội hình) chuyển sang lớp `::after` chỉ đổi opacity; bỏ `backdrop-filter`; chữ viền trong canvas không dùng `shadowBlur`.
+- Đo bằng `tests/e2e/perf60.cjs` (giảm tốc CPU 4x): p99 mỗi khung ~7ms, không còn long task trong lúc chơi.

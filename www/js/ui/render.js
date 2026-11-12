@@ -161,10 +161,16 @@ function outlined(g, str, x, y, size, top, bottom, family, lw = 5, weight = '700
   g.miterLimit = 2;
   g.lineWidth = lw;
   g.strokeStyle = 'rgba(28,16,9, 0.95)';
-  g.shadowColor = bottom;
-  g.shadowBlur = size * 0.35;
+  // viền sáng giả bằng nét mờ rộng hơn (shadowBlur trên chữ rất tốn CPU khi có nhiều số bay)
+  const w0 = g.globalAlpha;
+  g.globalAlpha = w0 * 0.35;
+  g.strokeStyle = bottom;
+  g.lineWidth = lw + size * 0.18;
   g.strokeText(str, x, y);
-  g.shadowBlur = 0;
+  g.globalAlpha = w0;
+  g.lineWidth = lw;
+  g.strokeStyle = 'rgba(28,16,9, 0.95)';
+  g.strokeText(str, x, y);
   const gr = g.createLinearGradient(0, y - size * 0.5, 0, y + size * 0.5);
   gr.addColorStop(0, top);
   gr.addColorStop(0.55, top);

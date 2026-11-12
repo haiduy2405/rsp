@@ -2,7 +2,7 @@
 import { applyPath } from '../core/move.js';
 import { areAdjacent } from '../core/board.js';
 import { step as coreStep } from '../core/battle.js';
-import { findHint } from './hint.js';
+import { findHintAsync } from './hint.js';
 import { W, H, CELL, cellAt, cellCenter, draw } from './render.js';
 
 const sleep = (ms, fn) =>
@@ -83,8 +83,8 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     fx.sfx('whoosh');
   }
   if (hint) {
-    const hp = findHint(ctx, state);
-    if (hp) view.hint = { path: hp.path, text: t('tut.hint', { n: hp.combos }) };
+    const s0 = state;
+    findHintAsync(ctx, s0).then((hp) => { if (hp && alive && state === s0 && !view.hint) view.hint = { path: hp.path, text: t('tut.hint', { n: hp.combos }) }; });
   }
 
   const TALLY = { x: W / 2 + 90, y: 340 }; // nơi vẽ tổng sát thương (khớp render.js)
