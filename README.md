@@ -163,3 +163,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.25.1 — art thật cho 27/27 quái
 - Toàn bộ 27 quái (512×512) dùng art thật, sinh bằng ChatGPT cùng phong cách viền mực đậm + tô phẳng. Còn lại: nền hub/battle và logo.
+
+## v0.25.2 – Art nền và logo
+- Thay `bg/battle.webp` (đang dùng trong trận), `bg/hub.webp` và `ui/logo.webp` bằng art thật. Hub (cảnh SVG có ngọc tương tác) và logo chưa được nối vào UI; ảnh đã nằm sẵn trong manifest.
