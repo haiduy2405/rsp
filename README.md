@@ -178,3 +178,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.27.1 – Giao diện: trận đấu và độ đọc
 - Màu canvas trận (`render.js`) đổi sang bảng chàm/vàng cho khớp UI; tiêu đề màn con chừa chỗ cho nút Back; nền màn con tối hơn để chữ rõ.
+
+## v0.27.2 – Mượt hơn khi khởi động
+- Ảnh thẻ tướng giảm còn 768×1152 (3,5 MB thay vì 4,6 MB) và được tải nền sau khi vào game (`assets.js`), không chặn màn tải; chi tiết tướng dùng chân dung tạm cho tới khi ảnh thẻ về. Giảm RAM giải mã trên máy yếu.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Nhập ảnh tướng chụp từ Gemini: art-import.py <ảnh> <id>. Cắt watermark, ép 2:3, ra card 1024x1536 + icon 512 (webp)."""
+"""Nhập ảnh tướng chụp từ Gemini: art-import.py <ảnh> <id>. Cắt watermark, ép 2:3, ra card 768x1152 + icon 512 (webp)."""
 import sys
 from PIL import Image
 src, cid = sys.argv[1], sys.argv[2]
@@ -10,7 +10,7 @@ w, h = im.size
 tw = int(h * 2 / 3)                        # ép 2:3, giữ giữa
 x0 = max(0, (w - tw) // 2)
 im = im.crop((x0, 0, x0 + min(tw, w), h))
-card = im.resize((1024, 1536), Image.LANCZOS)
+card = im.resize((768, 1152), Image.LANCZOS)
 card.save(f'www/assets/characters/{cid}_card.webp', quality=82, method=6)
 s = im.size[0]
 k = int(s * 0.7)

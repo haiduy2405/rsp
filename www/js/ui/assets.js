@@ -20,7 +20,10 @@ export async function preloadAssets(onProgress = () => {}) {
   } catch {
     return { loaded: 0, total: 0 };
   }
-  const entries = Object.entries(manifest.images ?? {});
+  const all = Object.entries(manifest.images ?? {});
+  // Ảnh thẻ lớn chỉ cần ở màn chi tiết tướng: tải nền sau khi vào được game, để khởi động nhanh và đỡ tốn RAM máy yếu.
+  const entries = all.filter(([k]) => !k.startsWith('card:'));
+  const deferred = all.filter(([k]) => k.startsWith('card:'));
   let done = 0;
   let loaded = 0;
   onProgress(0, entries.length);
@@ -37,5 +40,12 @@ export async function preloadAssets(onProgress = () => {}) {
     }
   };
   await Promise.all([worker(), worker(), worker(), worker()]);
+  (async () => {
+    for (const [k, src] of deferred) {
+      await new Promise((r) => setTimeout(r, 120));
+      const im = await loadImage(src);
+      if (im) images.set(k, im);
+    }
+  })();
   return { loaded, total: entries.length };
 }
