@@ -111,8 +111,10 @@ export function install(app) {
       void f.offsetWidth;
       f.classList.add('go');
       audio.sfx('fanfare');
+      // Dựng màn chính NGAY dưới lớp cutscene (còn đục), rồi mới mờ cutscene: không lộ màn triệu hồi cũ, không có nhịp trống.
+      enterHubFx();
       root.classList.add('out');
-      setTimeout(() => { root.remove(); enterHubFx(); }, reduced() ? 50 : 700);
+      setTimeout(() => root.remove(), reduced() ? 50 : 750);
     };
     root.addEventListener('click', next);
     next();

@@ -2,6 +2,7 @@
 import { $, h, btn } from './dom.js';
 import { itemIcon } from './icons.js';
 import { getImg } from './assets.js';
+import { playFireworks } from './fireworks.js';
 import { summon, buyTickets, redeemCharacter, effectiveRates } from '../core/summon.js';
 
 export function install(app) {
@@ -91,10 +92,11 @@ export function install(app) {
 
   function showSummonResult(bannerId, results, onDone = null) {
     const shown = new Set();
+    const single = results.length === 1;
     const cards = results.map((r, i) =>
       h(
         'div',
-        { class: 'card btn sumcard back', 'data-i': i, onclick: (e) => reveal(i, e.currentTarget) },
+        { class: 'card btn sumcard back wait', 'data-i': i, onclick: (e) => reveal(i, e.currentTarget) },
         h('div', { class: 'sigil' }, '✦'),
         h('div', { class: 'muted' }, t('summon.tapReveal')),
       ),
@@ -114,24 +116,31 @@ export function install(app) {
       }
       el.replaceChildren(
         ...[
-          portrait(r.id, 60),
-          h('h3', {}, t(`char.${r.id}`), ' ', h('small', {}, '★'.repeat(r.rarity))),
-          h('small', {}, r.isNew ? t('summon.new') : t('summon.dup', { n: r.generic, s: r.rarity })),
+          portrait(r.id, single ? 90 : 44),
+          h('h3', {}, t(`char.${r.id}`)),
+          h('small', {}, '★'.repeat(r.rarity)),
+          h('small', {}, r.isNew ? t('summon.new') : single ? t('summon.dup', { n: r.generic, s: r.rarity }) : `+${r.generic} ✦`),
         ].filter(Boolean),
       );
-      el.style.display = 'flex';
-      el.style.flexDirection = 'column';
-      el.style.alignItems = 'center';
-      el.style.gap = '6px';
     };
     const reveal = (i, el) => {
       if (!shown.has(i)) paint(i, el);
     };
-    screen(
+    const wrap = h('div', { class: `sm-res anim${single ? ' one' : ''}` },
       h('h2', {}, t('summon.title')),
       h('div', { class: 'sumgrid' }, cards),
       h('div', { class: 'row' }, btn(t('summon.reveal'), () => cards.forEach((el, i) => reveal(i, el)), '', { id: 'reveal-all' }), btn(t('summon.done'), () => (onDone ? onDone() : showSummon(bannerId)), 'primary', { id: 'sum-done' })),
     );
+    screen(wrap);
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const fw = playFireworks(wrap, results.map((r, i) => ({ rarity: r.rarity, el: cards[i] })), {
+      big: single,
+      reduced,
+      sfx: (n) => audio.sfx(n),
+      onPop: (i) => cards[i].classList.remove('wait'),
+      onDone: () => wrap.classList.remove('anim'),
+    });
+    wrap.addEventListener('pointerdown', () => { if (wrap.classList.contains('anim')) fw.skip(); });
   }
 
   function showHistory() {

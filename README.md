@@ -326,3 +326,9 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.43.2
 - Sửa màn nhập tên: nội dung vừa khít chiều ngang, không còn phải kéo sang phải (lưới avatar và ô tên co theo màn hình).
+
+## v0.44.0 — Pháo hoa triệu hồi
+- Triệu hồi x10: 10 viên pháo bay lên nổ đúng chỗ từng thẻ (màu theo độ hiếm) rồi thẻ hiện ra; x1: một viên pháo duy nhất. Chạm để bỏ qua hiệu ứng.
+- Màn kết quả vừa một màn hình (lưới 5x2), nút Lật hết/Xong luôn thấy.
+- Cutscene tướng 4★: dựng màn chính ngay dưới lớp cutscene rồi mới mờ đi, hết nháy.
+- Nút gợi ý/tạm dừng trong trận cùng hàng với Lượt/Tầng (không cộng vùng an toàn).
