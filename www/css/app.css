@@ -942,3 +942,4 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .row.pulls .primary .alt-cost { color: #3a210e; opacity: .85; }
 .row.pulls .free { position: relative; }
 .row.pulls .free .red-dot { top: -4px; right: -4px; left: auto; }
+.lp-orb::before { content: ''; position: absolute; left: 50%; top: -16px; width: 4px; height: 18px; margin-left: -2px; border-radius: 2px; background: #6a3f1a; box-shadow: 0 -4px 0 2px #ffd24a, 0 -6px 10px 4px rgba(255, 160, 60, .9); z-index: 1; }

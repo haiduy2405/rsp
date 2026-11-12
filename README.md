@@ -372,3 +372,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ### v0.50.1
 - Chấm đỏ ở nút "Miễn phí hôm nay" trong màn Triệu hồi.
+
+### v0.50.2
+- Chữ hướng dẫn triệu hồi: "Đặt pháo vào ống pháo để bắn pháo!"; viên pháo có ngòi cháy.
