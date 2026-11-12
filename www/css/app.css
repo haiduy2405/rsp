@@ -518,3 +518,7 @@ details.card[open] > summary { margin-bottom: 8px; }
 @keyframes freePulse { 50% { transform: scale(1.04); } }
 @media (prefers-reduced-motion: reduce) { .sm-circle, .row.pulls button.free { animation: none; } }
 .res .ricon.icon-sm { width: 20px; height: 20px; }
+
+.back-top { background: none; border: 0; box-shadow: none; }
+.back-top img { width: 46px; height: 46px; display: block; pointer-events: none; filter: drop-shadow(0 2px 0 rgba(28, 16, 9, .6)); }
+.row.pulls button span { font-size: 12px; }

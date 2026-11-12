@@ -202,3 +202,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 ## v0.30.0 – Icon vẽ tay và giao diện Triệu hồi mới
 - Icon mới theo phong cách vẽ tay (sinh bằng ChatGPT, tách nền bằng `tools/art-import-icons.py`): 6 viên ngọc hệ/icon khu (`assets/orbs`), 6 icon nút (`assets/ui/icons`: đội hình, triệu hồi, cửa hàng, nhiệm vụ, trợ giúp, cài đặt), 15 icon tiền tệ/vật phẩm (`assets/ui/items`). Nút dock, pill tiền tệ, shop, hòm đồ, triệu hồi đều dùng ảnh; khóa nào chưa có art vẫn dùng SVG cũ (`IMG_KEYS` trong `icons.js`).
 - Triệu hồi: ví vé/Linh Thạch dạng viên thuốc, thẻ tab banner bo tròn, sân khấu banner có vòng phép xoay chậm, ba thẻ tướng đại diện xòe hình quạt, ruy băng tên banner, thanh bảo đảm 5★ có mốc, hàng mua vé có icon, thanh rút dính đáy với icon vé và nút "miễn phí hôm nay" nhấp nháy nhẹ. Giữ nguyên các id để test.
+
+## v0.30.1 – Nốt icon còn lại
+- Thêm 6 icon vẽ tay (bộ sưu tập, từ điển, cốt truyện, hòm đồ, manh mối, quay lại); nút quay lại góc trái trên dùng icon mới. Chữ nút rút ở Triệu hồi nhỏ lại cho đỡ chật.

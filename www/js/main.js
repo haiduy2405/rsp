@@ -81,7 +81,7 @@ const screen = (...kids) => {
   const bottom = el.querySelector('#back:not(.primary)');
   if (bottom) {
     const b = h('button', { class: 'back-top', id: 'back-top', 'aria-label': t('back'), onclick: () => bottom.click() });
-    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6L3 12l6 6"/><path d="M3 12h11a6 6 0 0 1 6 6v1"/></svg>';
+    b.innerHTML = '<img src="assets/ui/icons/back.webp" alt="" draggable="false">';
     el.prepend(h('div', { class: 'back-wrap' }, b));
   }
   el.classList.remove('hub', 'mapscreen');
@@ -128,7 +128,7 @@ const ICONS = {
   help: '<circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6.9c0 1.9-2.8 2.3-2.8 4"/><path d="M12 17.6v.2"/>',
   clues: '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/>',
 };
-const ART_ICONS = new Set(['team', 'summon', 'shop', 'quests', 'help', 'settings']);
+const ART_ICONS = new Set(['team', 'summon', 'shop', 'quests', 'help', 'settings', 'collection', 'glossary', 'story', 'items', 'clues']);
 function dockBtn(icon, label, onclick, id, cls = '') {
   const b = h('button', { onclick, id, class: cls, 'aria-label': label, title: label });
   b.innerHTML = ART_ICONS.has(icon) ? `<img src="assets/ui/icons/${icon}.webp" alt="" draggable="false">` : `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[icon]}</svg>`;
