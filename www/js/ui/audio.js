@@ -10,6 +10,9 @@ export function createAudio(cfg, settings) {
   let step = 0;
   let nextTime = 0;
   let noiseBuf = null;
+  let fileMode = false; // đang phát nhạc từ file (không chạy bộ xếp lịch synth)
+  const musicBufs = new Map(); // bài file đã giải mã (giữ tối đa 3 để đỡ tốn RAM)
+  const musicFail = new Set(); // bài tải lỗi → dùng bản tự sinh
   let outBus = null; // bus riêng của bài đang phát (mờ dần khi đổi bài)
 
   const Ctor = typeof window !== 'undefined' ? window.AudioContext || window.webkitAudioContext : null;
@@ -45,7 +48,7 @@ export function createAudio(cfg, settings) {
       loadSamples();
     }
     if (ac.state === 'suspended' && !document.hidden) ac.resume();
-    if (track && !timer) schedule();
+    if (track && !timer) begin();
   }
 
   function tone(bus, t0, f0, f1, dur, wave, gain) {
@@ -272,7 +275,7 @@ export function createAudio(cfg, settings) {
   function schedule() {
     clearTimeout(timer);
     timer = null;
-    if (!ac || !track || ac.state !== 'running') return;
+    if (!ac || !track || fileMode || ac.state !== 'running') return;
     ensureReverb();
     if (!outBus) switchBus();
     const tr = cfg.tracks[track];
@@ -296,6 +299,7 @@ export function createAudio(cfg, settings) {
       old.gain.cancelScheduledValues(now);
       old.gain.setValueAtTime(old.gain.value, now);
       old.gain.linearRampToValueAtTime(0.0001, now + 0.5);
+      try { old._src?.stop(now + 0.8); } catch { /* đã dừng */ }
       setTimeout(() => old.disconnect(), 3000);
     }
     if (!track) return;
@@ -305,15 +309,54 @@ export function createAudio(cfg, settings) {
     outBus.connect(musicBus);
   }
 
+  // Nhạc từ file (data/audio.json -> music): tải + giải mã khi cần, lặp liền mạch; lỗi thì dùng bài tự sinh cùng tên.
+  async function loadMusic(name) {
+    if (musicBufs.has(name)) return musicBufs.get(name);
+    const r = await fetch(cfg.music[name].url);
+    if (!r.ok) throw new Error('music ' + r.status);
+    const buf = await ac.decodeAudioData(await r.arrayBuffer());
+    musicBufs.set(name, buf);
+    while (musicBufs.size > 3) musicBufs.delete(musicBufs.keys().next().value);
+    return buf;
+  }
+  function begin() {
+    if (!ac || !track) return;
+    if (!outBus) switchBus();
+    const name = track;
+    const bus = outBus;
+    if (cfg.music?.[name] && !musicFail.has(name)) {
+      fileMode = true;
+      loadMusic(name).then((buf) => {
+        if (track !== name || outBus !== bus || !bus) return; // đã đổi bài trong lúc tải
+        const src = ac.createBufferSource();
+        const g = ac.createGain();
+        src.buffer = buf;
+        src.loop = true;
+        g.gain.value = cfg.music[name].gain ?? 1;
+        src.connect(g);
+        g.connect(bus);
+        src.start();
+        bus._src = src;
+      }).catch(() => {
+        musicFail.add(name);
+        if (track === name) { fileMode = false; schedule(); }
+      });
+    } else {
+      fileMode = false;
+      schedule();
+    }
+  }
+
   function playMusic(name) {
     if (name === track) return;
-    track = name && cfg.tracks[name] ? name : null;
+    track = name && (cfg.tracks[name] || cfg.music?.[name]) ? name : null;
     step = 0;
     nextTime = 0;
+    fileMode = false;
     clearTimeout(timer);
     timer = null;
     if (ac) switchBus();
-    if (track && ac) schedule();
+    if (track && ac) begin();
   }
 
   function vibrate(ms) {

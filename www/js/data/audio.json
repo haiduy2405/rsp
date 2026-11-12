@@ -3318,5 +3318,115 @@
       "skill",
       "skill2"
     ]
+  },
+  "music": {
+    "hub": {
+      "url": "assets/music/town1.mp3",
+      "gain": 1
+    },
+    "title": {
+      "url": "assets/music/expl2.mp3",
+      "gain": 1
+    },
+    "tutorial": {
+      "url": "assets/music/expl1.mp3",
+      "gain": 1
+    },
+    "camp": {
+      "url": "assets/music/town2.mp3",
+      "gain": 1
+    },
+    "shop": {
+      "url": "assets/music/town4.mp3",
+      "gain": 1
+    },
+    "summon": {
+      "url": "assets/music/evil5.mp3",
+      "gain": 1
+    },
+    "mystery": {
+      "url": "assets/music/expl5.mp3",
+      "gain": 1
+    },
+    "map_water": {
+      "url": "assets/music/expl6.mp3",
+      "gain": 1
+    },
+    "map_fire": {
+      "url": "assets/music/expl3.mp3",
+      "gain": 1
+    },
+    "map_wood": {
+      "url": "assets/music/expl4.mp3",
+      "gain": 1
+    },
+    "map_light": {
+      "url": "assets/music/town3.mp3",
+      "gain": 1
+    },
+    "map_dark": {
+      "url": "assets/music/evil2.mp3",
+      "gain": 1
+    },
+    "map_heart": {
+      "url": "assets/music/town2.mp3",
+      "gain": 1
+    },
+    "battle_water": {
+      "url": "assets/music/act1.mp3",
+      "gain": 1
+    },
+    "battle_fire": {
+      "url": "assets/music/act2.mp3",
+      "gain": 1
+    },
+    "battle_wood": {
+      "url": "assets/music/act3.mp3",
+      "gain": 1
+    },
+    "battle_light": {
+      "url": "assets/music/act1.mp3",
+      "gain": 1
+    },
+    "battle_dark": {
+      "url": "assets/music/act2.mp3",
+      "gain": 1
+    },
+    "battle_heart": {
+      "url": "assets/music/act3.mp3",
+      "gain": 1
+    },
+    "boss_water": {
+      "url": "assets/music/evil1.mp3",
+      "gain": 1
+    },
+    "boss_fire": {
+      "url": "assets/music/evil3.mp3",
+      "gain": 1
+    },
+    "boss_wood": {
+      "url": "assets/music/evil4.mp3",
+      "gain": 1
+    },
+    "boss_light": {
+      "url": "assets/music/evil1.mp3",
+      "gain": 1
+    },
+    "boss_dark": {
+      "url": "assets/music/evil3.mp3",
+      "gain": 1
+    },
+    "boss_heart": {
+      "url": "assets/music/evil4.mp3",
+      "gain": 1
+    },
+    "battle": {
+      "url": "assets/music/act2.mp3",
+      "gain": 1
+    },
+    "boss": {
+      "url": "assets/music/evil3.mp3",
+      "gain": 1
+    }
   }
 }

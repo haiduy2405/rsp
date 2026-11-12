@@ -33,3 +33,11 @@ test('mọi mẫu âm thanh có file và âm kỹ năng đủ 6 hệ', () => {
   for (const e of ['water', 'fire', 'wood', 'light', 'dark', 'heart']) assert.ok(cfg.samples[`skill_${e}`], e);
   for (const k of ['levelup', 'bossIn', 'debuff', 'reflect', 'revive', 'enhance']) assert.ok(cfg.samples[k], k);
 });
+
+test('nhạc file: mọi mục music trỏ tới file có thật và tên bài hợp lệ', () => {
+  assert.ok(cfg.music && Object.keys(cfg.music).length >= 20);
+  for (const [name, m] of Object.entries(cfg.music)) {
+    assert.ok(existsSync(`www/${m.url}`), name);
+    assert.ok(cfg.tracks[name], `${name} cần bản tự sinh dự phòng`);
+  }
+});

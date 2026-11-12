@@ -438,3 +438,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ### v0.59.1
 - Ngọc nâng cấp đồng bộ phong cách với ngọc thường: giữ khung vàng có cánh, thay ruột bóng loáng (AI khác) bằng chính ngọc thường (viền nâu đậm, tô phẳng) trên nền tròn cùng tông hệ. Script `tools/orb-unify.py` (đọc bản orbNe gốc từ thư mục chỉ định, mặc định `/tmp/orbs_bak`).
+
+### v0.60.0
+- **Nhạc nền thật (CC0):** 18 bài của Juhani Junkala (JRPG Music Pack #1 Exploration, #2 Towns, #3 Evil, #5 Action; CC0, không bắt buộc ghi nguồn nhưng xin cảm ơn tác giả: juhanijunkala.com), nén mp3 56 kbps lặp liền mạch vào `www/assets/music/` (10.7 MB). Bảng ghép tên bài trong game → file nằm ở `data/audio.json` mục `music` (sinh bởi `tools/build-music.py <thư mục ogg>`; ogg gốc không nằm trong repo).
+- Ghép: màn chính=Home Town, hướng dẫn=Grasslands, đội hình=Where Time Stands Still, shop=Bazaar, triệu hồi=Whispers From Beyond, sự kiện=Sneaking Around; map vùng Thủy/Hỏa/Mộc/Quang/Ám/Tâm = Tropical Island / Tha'el Mines / Prairie Nights / Sunshine Coast / Catacombs / Where Time Stands Still; trận = Action 1-3 xoay theo vùng; boss = Evil 1/3/4. Ước, thắng, thua vẫn dùng bản tự sinh.
+- `ui/audio.js`: phát file qua AudioBuffer lặp, tải khi cần (giữ tối đa 3 bài trong RAM), chuyển bài mờ dần; bài file tải lỗi (offline chưa tải) tự rơi về bài tự sinh cùng tên. "Tải dữ liệu offline" nay nặng hơn (~17 MB).
