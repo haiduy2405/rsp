@@ -21,8 +21,12 @@ import * as offline from './ui/offline.js';
 import { VERSION, BUILD, BUILD_DATE } from './version.js';
 import { createFxLayer } from './ui/fxlayer.js';
 import { createAudio } from './ui/audio.js';
+import { $, h, btn } from './ui/dom.js';
+import { itemIcon, rewardIcon, REWARD_ICON } from './ui/icons.js';
+import { install as installItems } from './ui/screen-items.js';
+import { install as installSummon } from './ui/screen-summon.js';
+import { install as installProfile } from './ui/screen-profile.js';
 
-const $ = (id) => document.getElementById(id);
 let fxl = null;
 const celebrate = () => (fxl ||= createFxLayer($('fx'))).celebrate();
 const load = (f) => fetch(`js/${f}`).then((r) => r.json());
@@ -59,17 +63,6 @@ let game = null;
 let seedText = '';
 
 // ---- tiện ích DOM
-function h(tag, props = {}, ...kids) {
-  const el = document.createElement(tag);
-  for (const [k, v] of Object.entries(props)) {
-    if (k === 'class') el.className = v;
-    else if (k.startsWith('on')) el[k] = v;
-    else el.setAttribute(k, v);
-  }
-  for (const k of kids.flat()) if (k != null && k !== false) el.append(k);
-  return el;
-}
-const btn = (label, onclick, cls = '', extra = {}) => h('button', { class: cls, onclick, ...extra }, label);
 let atHub = false;
 const screen = (...kids) => {
   $('info')?.remove();
@@ -139,7 +132,7 @@ function dockBtn(icon, label, onclick, id, cls = '') {
   return b;
 }
 const CUR_COL = { gold: '#ffd24a', spirit: '#b58bff', ticket: '#ff9a4a', shard: '#ff9acb' };
-const curPill = (k, v, id) => h('button', { class: 'cur-pill', ...(id ? { id } : {}), onclick: () => showItems(), 'aria-label': t(`res.${k}`) }, h('i', { style: `background:${CUR_COL[k]}` }), h('b', {}, new Intl.NumberFormat(lang).format(v)));
+const curPill = (k, v, id) => h('button', { class: 'cur-pill', ...(id ? { id } : {}), onclick: () => ui.showItems(), 'aria-label': t(`res.${k}`) }, h('i', { style: `background:${CUR_COL[k]}` }), h('b', {}, new Intl.NumberFormat(lang).format(v)));
 const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } : {}) }, label, h('b', {}, String(value)));
 
 // Cảnh chính: Tòa Tháp giữa các đảo nổi. Mỗi khu mở là một viên ngọc phát sáng trên đảo (chạm để vào khu).
@@ -207,10 +200,10 @@ function showHub() {
     h(
       'div',
       { class: 'hub-top' },
-      h('div', { class: 'avatar', id: 'b-profile', role: 'button', tabindex: '0', 'aria-label': t('profile.title'), style: 'cursor:pointer', onclick: () => showProfile() }, avatarNode(progress.player)),
-      h('div', { class: 'who', id: 'b-profile-name', style: 'cursor:pointer', onclick: () => showProfile() }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, progress.player.callsign)),
-      dockBtn('help', t('hub.help'), () => showGlossary(), 'b-help', 'help-btn'),
-      dockBtn('settings', t('hub.settings'), () => showSettings(), 'b-set', 'help-btn'),
+      h('div', { class: 'avatar', id: 'b-profile', role: 'button', tabindex: '0', 'aria-label': t('profile.title'), style: 'cursor:pointer', onclick: () => ui.showProfile() }, avatarNode(progress.player)),
+      h('div', { class: 'who', id: 'b-profile-name', style: 'cursor:pointer', onclick: () => ui.showProfile() }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, progress.player.callsign)),
+      dockBtn('help', t('hub.help'), () => ui.showGlossary(), 'b-help', 'help-btn'),
+      dockBtn('settings', t('hub.settings'), () => ui.showSettings(), 'b-set', 'help-btn'),
     ),
     h('div', { class: 'cur', id: 'cur' }, curPill('gold', inv.gold), curPill('spirit', inv.spirit, 'spirit'), curPill('ticket', inv.tickets, 'tickets')),
     notice ? h('div', { class: 'notice hub-notice' }, t(notice)) : null,
@@ -221,7 +214,7 @@ function showHub() {
       'nav',
       { class: 'dock' },
       dockBtn('team', t('hub.team'), () => showTeam(), 'b-team'),
-      dockBtn('summon', t('hub.summon'), () => showSummon('standard'), 'b-summon', 'sub'),
+      dockBtn('summon', t('hub.summon'), () => ui.showSummon('standard'), 'b-summon', 'sub'),
       h('button', { class: 'battle', id: 'b-battle', onclick: () => showZones(), 'aria-label': t('hub.battle') }, h('span', {}, t('hub.battle'))),
       dockBtn('shop', t('hub.shop'), () => showHubShop(), 'b-shop'),
       dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest'),
@@ -230,49 +223,6 @@ function showHub() {
   $('screen').classList.add('hub');
   atHub = true;
   notice = null;
-}
-
-// Hồ sơ người chơi: đổi tên, mã hiệu, quê hương, ngoại hình; xem thống kê.
-let profDraft = null;
-function showProfile(msg) {
-  const o = ctx.config.onboarding;
-  if (!profDraft) profDraft = { ...progress.player };
-  const d = profDraft;
-  const st = progress.stats;
-  const clears = Object.keys(progress.clears).reduce((a, z) => a + zoneClears(progress, z), 0);
-  const stat = (label, v) => h('div', { class: 'card item-row' }, h('span', {}, label), h('b', {}, new Intl.NumberFormat(lang).format(v)));
-  const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (d.avatar === i && !d.photo ? ' sel' : ''), 'data-avatar': i, onclick: () => { d.avatar = i; d.photo = null; showProfile(); } }, avatarNode({ avatar: i })));
-  const save1 = () => {
-    const r = updateProfile(ctx, progress, d);
-    if (!r.ok) return showProfile(t(`ob.bad.${r.reason}`, { max: r.reason === 'bad_callsign' ? o.callsignMax : o.nameMax }) );
-    progress = r.progress;
-    save();
-    profDraft = null;
-    audio.sfx('rare');
-    showProfile(t('profile.saved'));
-  };
-  const keep = (e, k) => { d[k] = e.target.value; };
-  const dirty = d.name !== progress.player.name || d.callsign !== progress.player.callsign || (d.hometown || '') !== (progress.player.hometown || '') || d.avatar !== progress.player.avatar || (d.photo || null) !== (progress.player.photo || null);
-  screen(
-    h('h2', {}, t('profile.title')),
-    h('div', { class: 'prof-head' }, h('div', { class: 'avatar big' }, avatarNode(d))),
-    msg ? h('div', { class: 'notice' }, msg) : null,
-    h('div', { class: 'row' }, av),
-    photoPicker(d, () => showProfile(), 'pf'),
-    h('label', {}, t('ob.name'), h('input', { id: 'pf-name', maxlength: String(o.nameMax), value: d.name, oninput: (e) => keep(e, 'name') })),
-    h('label', {}, t('ob.callsign'), h('input', { id: 'pf-callsign', maxlength: String(o.callsignMax), value: d.callsign, oninput: (e) => keep(e, 'callsign') })),
-    h('label', {}, t('ob.hometown'), h('input', { id: 'pf-hometown', maxlength: String(o.hometownMax), value: d.hometown || '', oninput: (e) => keep(e, 'hometown') })),
-    d.culture ? h('div', { class: 'muted' }, `${t('profile.token')}: ${t(`ob.token.${d.culture}`)}`) : null,
-    btn(t('profile.save'), save1, 'primary', { id: 'pf-save' }),
-    h('h3', {}, t('profile.stats')),
-    stat(t('profile.runs'), st.runs),
-    stat(t('profile.wins'), st.wins),
-    stat(t('profile.clears'), clears),
-    stat(t('profile.owned'), Object.keys(progress.characters).length),
-    stat(t('profile.pulls'), progress.summon.pulls),
-    btn(t('back'), () => { profDraft = null; showHub(); }, '', { id: 'back' }),
-  );
-  void dirty;
 }
 
 function resumeChip() {
@@ -380,7 +330,7 @@ function setLang(l) {
   t = createT(dicts[lang], en);
   document.documentElement.lang = lang;
   document.title = t('game.title');
-  showSettings();
+  ui.showSettings();
 }
 
 // ---- mô tả kỹ năng từ dữ liệu (không viết cứng từng nhân vật)
@@ -589,84 +539,12 @@ function showTeam(slot, msg, stage) {
   );
 }
 
-// Chọn ảnh làm avatar: thu về 128px JPEG rồi lưu trong bản nháp `draft.photo`.
-function photoPicker(draft, redraw, pre) {
-  const input = h('input', { type: 'file', accept: 'image/*', id: `${pre}-photo-input`, style: 'display:none', onchange: async (e) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    try {
-      draft.photo = await photoFromFile(f);
-      redraw();
-    } catch {
-      input.parentElement.append(h('div', { class: 'notice' }, t('ob.bad.bad_image')));
-    }
-  } });
-  return h('div', { class: 'row' }, input, btn(t('ob.photo'), () => input.click(), '', { id: `${pre}-photo` }), draft.photo ? btn(t('ob.photoClear'), () => { draft.photo = null; redraw(); }, '', { id: `${pre}-photo-clear` }) : null);
-}
-
-// Hòm đồ: lưới ô icon (độ hiếm quyết định màu nền), chạm một ô để xem chi tiết.
-const RARITY_COL = ['#6b6f7d', '#6b6f7d', '#4fae7b', '#4f8fe0', '#a066e8', '#e0a64a'];
-let itemsTab = 'all';
-let itemsSel = null;
-function inventoryEntries() {
-  const inv = progress.inventory;
-  const list = [];
-  const add = (e) => e.count > 0 && list.push(e);
-  add({ key: 'ticket', tab: 'mats', name: t('res.ticket'), count: inv.tickets, rarity: 4, icon: 'ticket', desc: t('items.desc.ticket') });
-  for (const tier of [1, 2, 3]) add({ key: `elixir${tier}`, tab: 'elixir', name: t(`res.elixir.${tier}`), count: inv.elixir[tier], rarity: tier + 1, icon: `elixir${tier}`, desc: t('elixir.desc', { n: ctx.config.elixir[tier].exp }) });
-  add({ key: 'shard', tab: 'mats', name: t('res.shard'), count: inv.shards, rarity: 4, icon: 'shard', desc: t('items.desc.shard') });
-  for (let e = 0; e < 6; e++) {
-    add({ key: `stoneN${e}`, tab: 'mats', name: `${t('res.stone')} ${t('stone.normal')} · ${el(e)}`, count: inv.stones[e].normal, rarity: 3, icon: 'stoneN', tint: COLORS[e], desc: t('items.desc.stone') });
-    add({ key: `stoneR${e}`, tab: 'mats', name: `${t('res.stone')} ${t('stone.rare')} · ${el(e)}`, count: inv.stones[e].rare, rarity: 4, icon: 'stoneR', tint: COLORS[e], desc: t('items.desc.stone') });
-  }
-  for (const k of Object.keys(inv.offerings).sort()) add({ key: `off_${k}`, tab: 'mats', name: offeringName(k), count: inv.offerings[k], rarity: Number(k.split('_')[1]) + 1, icon: 'offering', desc: t('items.desc.offering') });
-  for (const k of Object.keys(inv.fodder).sort()) add({ key: `fod_${k}`, tab: 'fodder', name: fodderName(k), count: inv.fodder[k], rarity: ctx.fodder[k].star + 1, icon: 'fodder', desc: t('items.desc.fodder'), fodder: k });
-  return list;
-}
-function showItems() {
-  const inv = progress.inventory;
-  const fmt = (n) => new Intl.NumberFormat(lang).format(n);
-  const all = inventoryEntries();
-  const shown = itemsTab === 'all' ? all : all.filter((e) => e.tab === itemsTab);
-  const sel = shown.find((e) => e.key === itemsSel) || null;
-  const tile = (e) => {
-    const b = h('button', { class: `slot${sel?.key === e.key ? ' sel' : ''}`, 'data-item': e.key, style: `--rc:${RARITY_COL[e.rarity]}`, 'aria-label': e.name, onclick: () => { itemsSel = e.key; showItems(); } }, itemIcon(e.icon, 'lg', e.tint), h('b', {}, fmt(e.count)));
-    return b;
-  };
-  const detail = sel
-    ? h('div', { class: 'card item-detail', id: 'item-detail', style: `--rc:${RARITY_COL[sel.rarity]}` }, h('div', { class: 'row' }, itemIcon(sel.icon, 'lg', sel.tint), h('div', {}, h('b', {}, sel.name), h('div', { class: 'muted' }, t('items.owned', { n: fmt(sel.count) })))), h('div', { class: 'muted' }, sel.desc),
-        sel.fodder ? h('div', { class: 'row' }, btn(`${t('fodder.sell')} (${ctx.fodder[sel.fodder].sell} ${t('res.gold')})`, () => sell(sel.fodder, 1)), btn(t('fodder.sellAll'), () => sell(sel.fodder, 999))) : null)
-    : h('div', { class: 'muted', id: 'item-detail' }, t('items.pick'));
-  function sell(k, n) {
-    const r = sellFodder(ctx, progress, k, n);
-    if (r.ok) { progress = r.progress; save(); showItems(); }
-  }
-  screen(
-    h('h2', {}, t('hub.items')),
-    h('div', { class: 'row' }, h('div', { class: 'res', id: 'inv-gold' }, h('i', { class: 'dot', style: `background:${CUR_COL.gold}` }), t('res.gold'), h('b', {}, fmt(inv.gold))), h('div', { class: 'res', id: 'inv-spirit' }, h('i', { class: 'dot', style: `background:${CUR_COL.spirit}` }), t('res.spirit'), h('b', {}, fmt(inv.spirit)))),
-    h('div', { class: 'row tabs' }, ['all', 'elixir', 'mats', 'fodder'].map((k) => btn(t(k === 'all' ? 'items.all' : `items.tab.${k}`), () => { itemsTab = k; itemsSel = null; showItems(); }, k === itemsTab ? 'primary' : '', { 'data-tab': k }))),
-    detail,
-    shown.length ? h('div', { class: 'item-grid', id: 'item-grid' }, shown.map(tile)) : h('div', { class: 'muted' }, t('items.empty')),
-    btn(t('back'), showHub, '', { id: 'back' }),
-  );
-}
-
-function showGlossary() {
-  screen(
-    h('h2', {}, t('hub.help')),
-    h('div', { class: 'card' }, h('b', {}, t('help.how')), [1, 2, 3, 4, 5].map((n) => h('p', { class: 'muted' }, t(`help.t${n}`), ' '))),
-    h('h3', {}, t('hub.glossary')),
-    KEYS.map((k) => h('div', { class: 'card' }, h('b', {}, t(`effect.${k}.name`), ' ', h('small', {}, t(`effect.${k}.short`))), h('div', { class: 'muted' }, t(`effect.${k}.desc`)))),
-    btn(t('back'), showHub, '', { id: 'back' }),
-  );
-}
-
 // Cửa hàng và Nhiệm vụ: khung chờ, chưa có nội dung (gói ủng hộ ở M6; nhiệm vụ làm sau).
 function showHubShop() {
   screen(
     h('h2', {}, t('hub.shop')),
     h('div', { class: 'card soon' }, h('b', {}, t('soon.title')), h('p', { class: 'muted' }, t('shop.soon'))),
-    btn(t('hub.items'), showItems, '', { id: 'shop-items' }),
+    btn(t('hub.items'), ui.showItems, '', { id: 'shop-items' }),
     btn(t('back'), showHub, '', { id: 'back' }),
   );
 }
@@ -680,314 +558,7 @@ function showQuests() {
 }
 
 
-// ---- Triệu hồi, onboarding, nhật ký, cài đặt
-const dayKey = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
-const fmtPct = (v) => (v * 100).toFixed(2).replace(/\.?0+$/, '');
-const rarityCls = (r) => `rar${r}`;
-const confirmBox = (text, yes, no, yesLabel = t('summon.yes')) =>
-  h('div', { class: 'card', id: 'confirm' }, h('p', {}, text), h('div', { class: 'row' }, btn(yesLabel, yes, 'primary', { id: 'confirm-yes' }), btn(t('summon.no'), no, '', { id: 'confirm-no' })));
-
-function showSummon(bannerId, pending = null, msg = null) {
-  const cfg = ctx.config.summon;
-  const banner = ctx.banners[bannerId];
-  const sm = progress.summon;
-  const eff = effectiveRates(ctx.config);
-  const freeAvail = sm.freeDay !== dayKey();
-  const rateUp = banner.culture
-    ? t('summon.rateUp', { culture: t(`culture.${banner.culture}`), pct: Math.round(banner.rateUp * 100) })
-    : t('summon.noRateUp');
-  const doSummon = (count, free) => {
-    const r = summon(ctx, progress, { bannerId, count, free, dayKey: dayKey(), seed: (Math.random() * 4294967296) >>> 0 });
-    if (!r.ok) return showSummon(bannerId, null, `err.${r.reason}`);
-    progress = r.progress;
-    save();
-    audio.sfx('summon');
-    showSummonResult(bannerId, r.results);
-  };
-  const ask = (count) => {
-    const cost = cfg.ticketsPerPull * count;
-    showSummon(bannerId, { count, cost });
-  };
-  screen(
-    h('h2', {}, t('summon.title')),
-    h('div', { class: 'row' }, h('div', { class: 'res', id: 'tickets' }, itemIcon('ticket', 'sm'), t('summon.tickets', { n: progress.inventory.tickets })), h('div', { class: 'res', id: 'spirit' }, t('summon.spirit', { n: progress.inventory.spirit }))),
-    h('div', { class: 'row' }, cfg.ticketPacks.map((pk, i) => btn(t('summon.buy', { t: pk.tickets, s: pk.spirit }), () => {
-      const r = buyTickets(ctx, progress, i);
-      if (r.ok) { progress = r.progress; save(); audio.sfx('reveal'); showSummon(bannerId, null, null); } else showSummon(bannerId, null, `err.${r.reason}`);
-    }, '', { id: `buy-${i}` }))),
-    msg ? h('div', { class: 'notice' }, t(msg)) : null,
-    h('div', { class: 'row' }, ctx.bannerList.map((b) => btn(t(`banner.${b.id}.name`), () => showSummon(b.id), b.id === bannerId ? 'primary' : '', { 'data-banner': b.id }))),
-    h('div', { class: 'card' }, h('b', {}, t(`banner.${bannerId}.name`)), h('div', { class: 'muted' }, t(`banner.${bannerId}.desc`)), h('div', { class: 'muted' }, rateUp)),
-    // Tỉ lệ và bảo đảm luôn hiện ngay, không cần mở thêm
-    h(
-      'div',
-      { class: 'card', id: 'rates' },
-      h('b', {}, t('summon.rates')),
-      h('div', {}, t('summon.baseRates', { r5: fmtPct(cfg.rates['5']), r4: fmtPct(cfg.rates['4']), r3: fmtPct(cfg.rates['3']) })),
-      h('div', {}, t('summon.effRates', { r5: fmtPct(eff[5]), r4: fmtPct(eff[4]), r3: fmtPct(eff[3]) })),
-      h('div', { class: 'muted' }, t('summon.pity5', { max: cfg.pity5, n: sm.pity5 })),
-      h('div', { class: 'muted' }, t('summon.pity4', { max: cfg.guarantee4Every, n: sm.pity4 })),
-      sm.firstDone ? null : h('div', { class: 'muted' }, t('summon.tokenNote')),
-    ),
-    pending
-      ? confirmBox(t('summon.confirm', { cost: pending.cost, count: pending.count, banner: t(`banner.${bannerId}.name`), left: progress.inventory.tickets - pending.cost }), () => doSummon(pending.count, false), () => showSummon(bannerId))
-      : h(
-          'div',
-          { class: 'row' },
-          freeAvail ? btn(t('summon.free'), () => doSummon(1, true), 'primary', { id: 'pull-free' }) : h('div', { class: 'muted' }, t('summon.freeUsed')),
-          btn(t('summon.x1', { cost: cfg.ticketsPerPull }), () => ask(1), '', { id: 'pull-1' }),
-          btn(t('summon.x10', { cost: cfg.ticketsPerPull * cfg.multiCount }), () => ask(cfg.multiCount), '', { id: 'pull-10' }),
-        ),
-    h('div', { class: 'row' }, btn(t('summon.history'), showHistory, '', { id: 'b-history' }), btn(t('summon.redeem'), () => showRedeem(), '', { id: 'b-redeem' })),
-    btn(t('back'), showHub, '', { id: 'back' }),
-  );
-}
-
-function showSummonResult(bannerId, results) {
-  const shown = new Set();
-  const cards = results.map((r, i) =>
-    h(
-      'div',
-      { class: 'card btn sumcard', 'data-i': i, onclick: (e) => reveal(i, e.currentTarget) },
-      h('div', { class: 'muted' }, t('summon.tapReveal')),
-    ),
-  );
-  const paint = (i, el) => {
-    const r = results[i];
-    shown.add(i);
-    audio.sfx(r.rarity >= 4 ? 'rare' : 'reveal');
-    el.className = `card sumcard flip ${rarityCls(r.rarity)}`;
-    if (r.rarity >= 4) {
-      const f = $('flash');
-      f.classList.remove('go');
-      void f.offsetWidth;
-      f.classList.add('go');
-      audio.vibrate(r.rarity === 5 ? [60, 40, 90] : 40);
-    }
-    el.replaceChildren(
-      ...[
-        portrait(r.id, 96),
-        h('h3', {}, t(`char.${r.id}`), ' ', h('small', {}, '★'.repeat(r.rarity))),
-        h('small', {}, r.isNew ? t('summon.new') : t('summon.dup', { n: r.shards })),
-        r.forced ? h('div', { class: 'muted' }, t('summon.forced')) : null,
-      ].filter(Boolean),
-    );
-    el.style.display = 'flex';
-    el.style.flexDirection = 'column';
-    el.style.alignItems = 'center';
-    el.style.gap = '6px';
-  };
-  const reveal = (i, el) => {
-    if (!shown.has(i)) paint(i, el);
-  };
-  screen(
-    h('h2', {}, t('summon.title')),
-    cards,
-    h('div', { class: 'row' }, btn(t('summon.reveal'), () => cards.forEach((el, i) => reveal(i, el)), '', { id: 'reveal-all' }), btn(t('summon.done'), () => showSummon(bannerId), 'primary', { id: 'sum-done' })),
-  );
-}
-
-function showHistory() {
-  const hist = progress.summon.history.slice().reverse();
-  screen(
-    h('h2', {}, t('summon.history')),
-    hist.length ? hist.map((x) => h('div', { class: 'card' }, t('summon.historyRow', { n: x.n, rarity: x.rarity, name: t(`char.${x.id}`), banner: t(`banner.${x.banner}.name`) }))) : h('div', { class: 'muted' }, t('summon.historyEmpty')),
-    btn(t('back'), () => showSummon('standard'), '', { id: 'back' }),
-  );
-}
-
-function showRedeem(pick = null, msg = null) {
-  const cost = ctx.config.summon.redeemShards;
-  const missing = ctx.characterList.filter((c) => !c.reserve && !progress.characters[c.id]).sort((a, b) => b.rarity - a.rarity);
-  screen(
-    h('h2', {}, t('summon.redeem')),
-    h('p', { class: 'muted' }, t('summon.redeemInfo', { cost, n: progress.inventory.shards })),
-    msg ? h('div', { class: 'notice' }, msg) : null,
-    pick
-      ? confirmBox(t('summon.redeemConfirm', { cost, name: t(`char.${pick}`) }), () => {
-          const r = redeemCharacter(ctx, progress, pick);
-          if (!r.ok) return showRedeem(null, t(`err.${r.reason === 'not_enough_shards' ? 'not_enough_shards' : r.reason}`));
-          progress = r.progress;
-          save();
-          showRedeem(null, t('summon.redeemDone', { name: t(`char.${pick}`) }));
-        }, () => showRedeem())
-      : null,
-    missing.length ? missing.map((c) => h('div', { class: 'card btn', 'data-char': c.id, onclick: () => showRedeem(c.id) }, h('h3', {}, t(`char.${c.id}`), ' ', chip(c.id), ' ', h('small', {}, '★'.repeat(c.rarity))))) : h('div', { class: 'muted' }, t('summon.redeemNone')),
-    btn(t('back'), () => showSummon('standard'), '', { id: 'back' }),
-  );
-}
-
-function showStory() {
-  const open = new Set(storyUnlocked(ctx, progress));
-  screen(
-    h('h2', {}, t('story.title')),
-    h('div', { class: 'muted' }, t('story.entries', { n: open.size, total: ctx.storyList.length })),
-    ctx.storyList.map((s) =>
-      open.has(s.id)
-        ? h('div', { class: 'card', 'data-story': s.id }, h('b', {}, t(`story.${s.id}.title`)), h('p', {}, t(`story.${s.id}.body`)))
-        : h('div', { class: 'card locked' }, h('b', {}, '???'), h('div', { class: 'muted' }, t('story.locked', { zone: t(`zone.${s.after}`) }))),
-    ),
-    btn(t('back'), showSettings, '', { id: 'back' }),
-  );
-}
-
-// Khối "Dữ liệu offline" trong Cài đặt: trạng thái, tải/cập nhật, xóa.
-function offlineSection() {
-  const box = h('div', { class: 'card offline', id: 'offline' }, h('b', {}, t('offline.title')));
-  if (!offline.offlineSupported()) {
-    box.append(h('p', { class: 'muted' }, t('offline.unsupported')));
-    return box;
-  }
-  const status = h('p', { class: 'muted', id: 'off-status' }, '…');
-  const bar = h('i', { id: 'off-bar', style: 'width:0%' });
-  const track = h('div', { class: 'hpbar', hidden: '' }, bar);
-  const go = btn(t('offline.download'), async () => {
-    go.disabled = true;
-    track.hidden = false;
-    try {
-      await offline.downloadOffline((d, n) => {
-        bar.style.width = `${(d / n) * 100}%`;
-        status.textContent = t('offline.progress', { done: d, total: n });
-      });
-      refresh(t('offline.done'));
-    } catch {
-      refresh(t('offline.fail'));
-    }
-    track.hidden = true;
-    go.disabled = false;
-  }, '', { id: 'off-go' });
-  const clear = btn(t('offline.clear'), async () => {
-    await offline.clearOffline();
-    refresh(t('offline.cleared'));
-  }, '', { id: 'off-clear' });
-  async function refresh(msg) {
-    try {
-      const st = await offline.offlineStatus();
-      const size = offline.formatMB(st.bytes);
-      const full = st.have === st.total;
-      status.textContent = msg ?? (full ? t('offline.full', { size }) : st.have ? t('offline.status', { have: st.have, total: st.total, size }) : t('offline.none'));
-      go.textContent = t(st.have ? 'offline.update' : 'offline.download');
-      clear.hidden = !st.have;
-    } catch {
-      status.textContent = t('offline.fail');
-    }
-  }
-  box.append(h('p', { class: 'muted' }, t('offline.note')), status, track, go, clear);
-  refresh();
-  return box;
-}
-
-// Âm lượng + bật/tắt nhạc, hiệu ứng, rung: dùng chung cho Cài đặt và bảng Tạm dừng.
-function audioControls() {
-  return [
-    h('label', {}, h('span', { id: 'vol-l' }, t('set.volume', { n: progress.settings.volume })), h('input', { id: 'vol', type: 'range', min: '0', max: '100', value: String(progress.settings.volume), oninput: (e) => {
-      progress.settings.volume = Number(e.target.value);
-      $('vol-l').textContent = t('set.volume', { n: progress.settings.volume });
-      audio.applyGains();
-    }, onchange: () => save() })),
-    ...[['music', 'set.music'], ['sfx', 'set.sfx'], ['haptic', 'set.haptic']].map(([k, label]) =>
-      h('label', { style: 'flex-direction:row;gap:10px' }, h('input', { type: 'checkbox', id: `opt-${k}`, ...(progress.settings[k] !== false ? { checked: '' } : {}), onchange: (e) => {
-        progress.settings[k] = e.target.checked;
-        audio.applyGains();
-        save();
-        if (k === 'haptic' && e.target.checked) audio.vibrate(30);
-      } }), t(label))),
-  ];
-}
-
-function showSettings(msg = null, confirmDelete = false) {
-  const exportBox = h('textarea', { readonly: '', id: 'export-box' });
-  const importBox = h('textarea', { placeholder: '…', id: 'import-box' });
-  screen(
-    h('h2', {}, t('set.title')),
-    msg ? h('div', { class: 'notice' }, msg) : null,
-    btn(t('story.title'), showStory, '', { id: 'set-story' }),
-    h('label', {}, t('hub.lang'), h('select', { id: 'lang', onchange: (e) => setLang(e.target.value) }, h('option', { value: 'vi' }, 'Tiếng Việt'), h('option', { value: 'en' }, 'English'))),
-    ...audioControls(),
-    h('p', { class: 'muted' }, t('set.volumeNote')),
-    offlineSection(),
-    btn(t('hub.export'), () => (exportBox.value = storage.exportText(progress)), '', { id: 'export' }),
-    exportBox,
-    importBox,
-    btn(t('hub.import'), () => {
-      try {
-        progress = storage.importText(importBox.value.trim());
-        save();
-        showSettings(t('hub.import.ok'));
-      } catch {
-        showSettings(t('hub.import.bad'));
-      }
-    }, '', { id: 'import' }),
-    confirmDelete
-      ? confirmBox(t('set.deleteConfirm'), () => {
-          storage.clear();
-          progress = newProgress(ctx);
-          showOnboarding();
-        }, () => showSettings(), t('set.deleteYes'))
-      : btn(t('set.delete'), () => showSettings(null, true), '', { id: 'delete' }),
-    btn(t('back'), showHub, '', { id: 'back' }),
-  );
-  $('lang').value = lang;
-}
-
-// Onboarding: mở đầu -> quê hương -> Tín Vật -> ngoại hình -> tên -> lượt triệu hồi đầu.
-const ob = { hometown: '', culture: null, avatar: 0, photo: null, name: '', callsign: '' };
 let obTimers = [];
-function showOnboarding(step = 1, err = null) {
-  obTimers.forEach(clearTimeout);
-  obTimers = [];
-  const o = ctx.config.onboarding;
-  const next = (n) => () => showOnboarding(n);
-  if (step === 1) {
-    const lines = ['ob.alarm1', 'ob.alarm2', 'ob.alarm3'].map((k) => h('p', { class: 'ob-line', style: 'opacity:0;transition:opacity 1s' }, t(k)));
-    screen(h('h1', {}, t('game.title')), lines, btn(t('ob.next'), next(2), 'primary', { id: 'ob-next' }), btn(t('ob.skip'), next(2), '', { id: 'ob-skip' }));
-    lines.forEach((l, i) => obTimers.push(setTimeout(() => (l.style.opacity = '1'), 300 + i * 2500)));
-  } else if (step === 2) {
-    screen(
-      h('div', { class: 'card' }, h('p', {}, t('ob.aida'))),
-      h('label', {}, t('ob.hometown'), h('input', { id: 'ob-hometown', maxlength: String(o.hometownMax), value: ob.hometown, oninput: (e) => (ob.hometown = e.target.value) })),
-      h('p', { class: 'muted' }, t('ob.hometownHint')),
-      btn(t('ob.next'), next(3), 'primary', { id: 'ob-next' }),
-    );
-  } else if (step === 3) {
-    screen(
-      h('div', { class: 'card' }, h('p', {}, t('ob.token'))),
-      o && ctx.config.summon.cultures.map((c) => h('div', { class: 'card btn' + (ob.culture === c ? ' sel' : ''), 'data-culture': c, onclick: () => { ob.culture = c; showOnboarding(3); } }, h('b', {}, t(`ob.token.${c}`)))),
-      btn(t('ob.next'), next(4), 'primary', { id: 'ob-next', ...(ob.culture ? {} : { disabled: '' }) }),
-    );
-  } else if (step === 4) {
-    const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (ob.avatar === i && !ob.photo ? ' sel' : ''), 'data-avatar': i, onclick: () => { ob.avatar = i; ob.photo = null; showOnboarding(4); } }, avatarNode({ avatar: i })));
-    screen(h('div', { class: 'card' }, h('p', {}, t('ob.avatar'))), h('div', { class: 'row' }, av), photoPicker(ob, () => showOnboarding(4), 'ob'), btn(t('ob.next'), next(5), 'primary', { id: 'ob-next' }));
-  } else if (step === 5) {
-    screen(
-      err ? h('div', { class: 'notice' }, err) : null,
-      h('label', {}, t('ob.name'), h('input', { id: 'ob-name', maxlength: String(o.nameMax), value: ob.name, oninput: (e) => (ob.name = e.target.value) })),
-      h('label', {}, t('ob.callsign'), h('input', { id: 'ob-callsign', maxlength: String(o.callsignMax), value: ob.callsign, oninput: (e) => (ob.callsign = e.target.value) })),
-      btn(t('ob.start'), () => {
-        const r = finishOnboarding(ctx, progress, { name: ob.name, callsign: ob.callsign, hometown: ob.hometown, avatar: ob.avatar, photo: ob.photo, culture: ob.culture });
-        if (!r.ok) {
-          const key = `ob.bad.${r.reason}`;
-          return showOnboarding(5, dicts[lang][key] ? t(key, { max: r.reason === 'bad_name' ? o.nameMax : o.callsignMax }) : t('ob.bad.other'));
-        }
-        progress = r.progress;
-        const s = summon(ctx, progress, { bannerId: 'standard', count: 1, free: true, dayKey: dayKey(), seed: (Math.random() * 4294967296) >>> 0 });
-        progress = s.progress;
-        save();
-        showFirstSummon(s.results[0]);
-      }, 'primary', { id: 'ob-start' }),
-    );
-  }
-}
-
-function showFirstSummon(r) {
-  screen(
-    h('div', { class: 'card' }, h('p', {}, t('ob.firstSummon'))),
-    h('div', { class: `card sumcard ${rarityCls(r.rarity)}`, 'data-first': r.id }, h('h3', {}, t(`char.${r.id}`), ' ', chip(r.id), ' ', h('small', {}, '★'.repeat(r.rarity))), h('small', {}, t('summon.forced'))),
-    h('p', { class: 'muted' }, t('ob.welcome', { n: ctx.config.summon.welcomeTickets })),
-    btn(t('ob.toHub'), showHub, 'primary', { id: 'ob-hub' }),
-  );
-}
-
 // ---- chuyến leo tháp
 function pickSeed() {
   const raw = seedText.trim();
@@ -1015,7 +586,7 @@ function activeRunInfo() {
 function askAbandon(stage) {
   screen(
     h('h2', {}, t('run.resume')),
-    confirmBox(t('run.abandonAsk'), () => startRun(stage), () => showTeam(undefined, undefined, stage), t('run.abandon')),
+    ui.confirmBox(t('run.abandonAsk'), () => startRun(stage), () => showTeam(undefined, undefined, stage), t('run.abandon')),
     btn(t('run.resume'), resumeRun, '', { id: 'ask-resume' }),
   );
 }
@@ -1333,8 +904,8 @@ function showPause(confirmQuit = false) {
     h('h3', {}, t('pause.title')),
     run?.relics?.length && confirmQuit !== true ? h('div', { class: 'relic-strip' }, run.relics.map((id) => h('span', { class: 'rchip', style: `border-color:${RELIC_COL[ctx.relics[id].rarity]}`, title: modLines(id).join(' · ') }, relicName(id)))) : null,
     confirmQuit === true
-      ? confirmBox(t('pause.quitAsk'), quit, () => { close(); showPause(); }, t('pause.quit'))
-      : [...audioControls(), btn(t('pause.resume'), close, 'primary', { id: 'pause-resume' }), btn(t('pause.quit'), () => { close(); showPause(true); }, '', { id: 'pause-quit' })],
+      ? ui.confirmBox(t('pause.quitAsk'), quit, () => { close(); showPause(); }, t('pause.quit'))
+      : [...ui.audioControls(), btn(t('pause.resume'), close, 'primary', { id: 'pause-resume' }), btn(t('pause.quit'), () => { close(); showPause(true); }, '', { id: 'pause-quit' })],
   ].flat();
   $('wrap').appendChild(h('div', { id: 'info' }, h('div', { class: 'infobox' }, body)));
 }
@@ -1404,32 +975,6 @@ function showInspect(kind, idx) {
   $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox' }, body, btn(t('info.close'), close, 'primary', { id: 'info-close' }))));
 }
 
-// ---- Cảnh thưởng: rương rung, mở nắp, đồ bay ra từng món có số đếm tăng và âm thanh
-const REWARD_ICON = {
-  gold: '<circle cx="12" cy="12" r="9" fill="#e2b75a" stroke="#8a6a2a" stroke-width="1.5"/><circle cx="12" cy="12" r="5.5" fill="none" stroke="#fff0bd" stroke-width="1.5"/>',
-  elixir1: '<path d="M12 3c3 3.800 5.600 6.600 5.600 9.800a5.600 5.600 0 0 1-11.200 0C6.400 9.600 9 6.800 12 3z" fill="#6bd5ff" stroke="#1f6f9a" stroke-width="1.4"/><ellipse cx="9.800" cy="12.500" rx="1.200" ry="2.200" fill="#fff" opacity=".6"/>',
-  elixir2: '<path d="M9.500 3h5v4.500l4.200 8.300a2.800 2.800 0 0 1-2.500 4.200H7.800a2.800 2.800 0 0 1-2.500-4.200l4.200-8.300z" fill="#9a8cff" stroke="#443a9a" stroke-width="1.400" stroke-linejoin="round"/><path d="M7 15h10" stroke="#e8e4ff" stroke-width="1.400" opacity=".8"/><rect x="9" y="2" width="6" height="2.200" rx="1" fill="#d9b36a" stroke="#6f5320" stroke-width="1"/>',
-  elixir3: '<circle cx="12" cy="14" r="7.500" fill="#ffd24a" stroke="#8a6a2a" stroke-width="1.500"/><rect x="9.500" y="2.500" width="5" height="4" rx="1" fill="#d9b36a" stroke="#6f5320" stroke-width="1.200"/><path d="M12 8.500l1.500 3.200 3.500.4-2.600 2.400.7 3.500L12 16.200 8.900 18l.7-3.500L7 12.100l3.500-.4z" fill="#fff7d6" stroke="#8a6a2a" stroke-width=".8" stroke-linejoin="round"/>',
-  ticket: '<path d="M2.500 7h19v3.200a2 2 0 0 0 0 3.600V17h-19v-3.200a2 2 0 0 0 0-3.600z" fill="#ff9a4a" stroke="#8a3f10" stroke-width="1.400" stroke-linejoin="round"/><path d="M9 7.500v9" stroke="#ffe3c4" stroke-width="1.200" stroke-dasharray="1.600 1.600"/><path d="M15 9.200l.9 1.800 2 .3-1.450 1.400.35 2L15 13.700l-1.800.9.350-2L12.100 11.300l2-.3z" fill="#fff0d0"/>',
-  spirit: '<path d="M12 2.500l7.500 6.500-7.500 12.500L4.500 9z" fill="#6bd5ff" stroke="#1f6f9a" stroke-width="1.4" stroke-linejoin="round"/><path d="M4.500 9h15M12 2.500L9 9l3 12.500L15 9z" fill="none" stroke="#e6f8ff" stroke-width="1" opacity=".8"/>',
-  shard: '<path d="M7 3.500l8.500 2L19 14l-6.500 6.500L5 14z" fill="#ff7fb0" stroke="#a83a6a" stroke-width="1.400" stroke-linejoin="round"/><path d="M7 3.500L12.500 12 19 14" fill="none" stroke="#ffe0ee" stroke-width="1" opacity=".8"/>',
-  fodder: '<ellipse cx="12" cy="13" rx="7.500" ry="6.500" fill="#8fd69a" stroke="#2f7a45" stroke-width="1.400"/><circle cx="9.500" cy="11.500" r="1.200" fill="#1c3a26"/><circle cx="14.500" cy="11.500" r="1.200" fill="#1c3a26"/>',
-  offering: '<rect x="4.500" y="9" width="15" height="11" rx="1.500" fill="#ffb86b" stroke="#8a4a1a" stroke-width="1.400"/><path d="M4.500 13h15M12 9v11M12 9c-1-4-5-4-5-1.500S11 9 12 9zm0 0c1-4 5-4 5-1.500S13 9 12 9z" fill="none" stroke="#fff0d0" stroke-width="1.200"/>',
-  stoneN: '<path d="M12 3l7.500 4.300v8.400L12 20l-7.500-4.300V7.300z" fill="#7d8fd8" stroke="#3a4690" stroke-width="1.400" stroke-linejoin="round"/>',
-  stoneR: '<path d="M12 3l7.500 4.300v8.400L12 20l-7.500-4.300V7.300z" fill="#ffd24a" stroke="#8a6a2a" stroke-width="1.400" stroke-linejoin="round"/><path d="M12 3v17M4.500 7.300L19.500 15.700M19.500 7.300L4.500 15.700" stroke="#fff7d6" stroke-width=".8" opacity=".7"/>',
-};
-// Icon vật phẩm dùng chung (Hòm đồ, màn tướng, triệu hồi): size 'sm' | 'lg'.
-function itemIcon(k, size = 'sm', tint) {
-  const e = h('span', { class: `ricon icon-${size}` });
-  const body = tint && (k === 'stoneN' || k === 'stoneR') ? REWARD_ICON[k].replace(/fill="#(7d8fd8|ffd24a)"/, `fill="${tint}"`) : REWARD_ICON[k];
-  e.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
-  return e;
-}
-const rewardIcon = (k) => {
-  const e = h('span', { class: 'ricon' });
-  e.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${REWARD_ICON[k]}</svg>`;
-  return e;
-};
 function lootRows(l) {
   const rows = [];
   if (l.gold) rows.push({ k: 'gold', label: t('res.gold'), n: l.gold });
@@ -1629,6 +1174,23 @@ function showInstallHelp() {
     btn(t('back'), showHub, '', { id: 'back' }),
   );
 }
+// ---- Màn hình tách module: dùng chung trạng thái qua `app`, gọi chéo qua `app.*` / `ui.*`
+const ui = {};
+const app = {
+  ctx, audio, storage, dicts, h, btn, $, el, chip, portrait, CUR_COL, fodderName, offeringName, pct, save, screen, setLang, showHub,
+  t: (...a) => t(...a),
+  get lang() { return lang; },
+  set lang(v) { lang = v; },
+  get obTimers() { return obTimers; },
+  set obTimers(v) { obTimers = v; },
+  get progress() { return progress; },
+  set progress(v) { progress = v; },
+};
+Object.assign(ui, installItems(app));
+Object.assign(ui, installSummon(app));
+Object.assign(ui, installProfile(app));
+Object.assign(app, ui);
+
 if ('serviceWorker' in navigator && !DEBUG && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 
 if (DEBUG) {
@@ -1681,4 +1243,4 @@ await preloadAssets((d, n) => loading.setProgress(n ? (d / n) * 0.95 : 0));
 if (!DEBUG) await new Promise((r) => setTimeout(r, Math.max(0, 1400 - (performance.now() - bootStart)))); // đủ lâu để đọc 1 mẹo
 await loading.ready();
 if (progress.onboarding.done) showHub();
-else showOnboarding();
+else ui.showOnboarding();

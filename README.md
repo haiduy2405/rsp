@@ -148,3 +148,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 ## Linh Thạch chỉ từ lần clear đầu (v0.23)
 - Loot thường không còn rớt Linh Thạch. Mỗi ải (khu × độ khó) tặng Linh Thạch một lần ở lần clear đầu (`config.firstClear`: Dễ 60 / Thường 100 / Khó 150, +10%/khu). Hiện trong thông tin ải và màn kết thúc.
 - Nguồn Linh Thạch khác (nhiệm vụ ngày, mốc tiến trình, sự kiện, gói ủng hộ) sẽ thêm ở bản online.
+
+## Tách main.js (v0.23.1)
+- `ui/dom.js` (h, btn, $), `ui/icons.js` (icon vật phẩm), `ui/screen-items.js` (Hòm đồ, bách khoa), `ui/screen-summon.js` (triệu hồi), `ui/screen-profile.js` (hồ sơ, cài đặt, onboarding). Mỗi màn là `install(app)`; trạng thái dùng chung (progress, lang…) đi qua đối tượng `app`, màn gọi chéo qua `app.*`. main.js còn ~1250 dòng (chuyến leo, chọn đội, màn tướng).
