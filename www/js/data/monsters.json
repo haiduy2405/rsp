@@ -2,6 +2,7 @@
   {
     "id": "m_ember",
     "element": 1,
+    "race": "linh",
     "hp": 2200,
     "atk": 220,
     "attackEvery": 2
@@ -9,6 +10,7 @@
   {
     "id": "m_tide",
     "element": 0,
+    "race": "linh",
     "hp": 3200,
     "atk": 260,
     "attackEvery": 3
@@ -16,6 +18,7 @@
   {
     "id": "m_shade",
     "element": 4,
+    "race": "linh",
     "hp": 4500,
     "atk": 320,
     "attackEvery": 3
@@ -23,6 +26,7 @@
   {
     "id": "water_n1",
     "element": 0,
+    "race": "thu",
     "hp": 1600,
     "atk": 170,
     "attackEvery": 3,
@@ -31,6 +35,7 @@
   {
     "id": "water_n2",
     "element": 0,
+    "race": "thu",
     "hp": 1600,
     "atk": 130,
     "attackEvery": 2,
@@ -39,6 +44,7 @@
   {
     "id": "water_e1",
     "element": 0,
+    "race": "long",
     "hp": 4200,
     "atk": 290,
     "attackEvery": 3,
@@ -54,6 +60,7 @@
   {
     "id": "water_b1",
     "element": 0,
+    "race": "long",
     "hp": 9000,
     "atk": 370,
     "attackEvery": 3,
@@ -74,6 +81,7 @@
   {
     "id": "fire_n1",
     "element": 1,
+    "race": "long",
     "hp": 1700,
     "atk": 180,
     "attackEvery": 3,
@@ -82,6 +90,7 @@
   {
     "id": "fire_n2",
     "element": 1,
+    "race": "thu",
     "hp": 1700,
     "atk": 140,
     "attackEvery": 2,
@@ -90,6 +99,7 @@
   {
     "id": "fire_e1",
     "element": 1,
+    "race": "linh",
     "hp": 4300,
     "atk": 300,
     "attackEvery": 3,
@@ -105,6 +115,7 @@
   {
     "id": "fire_b1",
     "element": 1,
+    "race": "than",
     "hp": 9600,
     "atk": 390,
     "attackEvery": 3,
@@ -125,6 +136,7 @@
   {
     "id": "wood_n1",
     "element": 2,
+    "race": "thu",
     "hp": 1800,
     "atk": 190,
     "attackEvery": 3,
@@ -133,6 +145,7 @@
   {
     "id": "wood_n2",
     "element": 2,
+    "race": "linh",
     "hp": 1800,
     "atk": 150,
     "attackEvery": 2,
@@ -141,6 +154,7 @@
   {
     "id": "wood_e1",
     "element": 2,
+    "race": "linh",
     "hp": 4400,
     "atk": 310,
     "attackEvery": 3,
@@ -156,6 +170,7 @@
   {
     "id": "wood_b1",
     "element": 2,
+    "race": "than",
     "hp": 9400,
     "atk": 380,
     "attackEvery": 3,
@@ -176,6 +191,7 @@
   {
     "id": "light_n1",
     "element": 3,
+    "race": "linh",
     "hp": 1900,
     "atk": 200,
     "attackEvery": 3,
@@ -184,6 +200,7 @@
   {
     "id": "light_n2",
     "element": 3,
+    "race": "thu",
     "hp": 1900,
     "atk": 160,
     "attackEvery": 2,
@@ -192,6 +209,7 @@
   {
     "id": "light_e1",
     "element": 3,
+    "race": "than",
     "hp": 4500,
     "atk": 320,
     "attackEvery": 3,
@@ -207,6 +225,7 @@
   {
     "id": "light_b1",
     "element": 3,
+    "race": "than",
     "hp": 9800,
     "atk": 410,
     "attackEvery": 3,
@@ -227,6 +246,7 @@
   {
     "id": "dark_n1",
     "element": 4,
+    "race": "thu",
     "hp": 2000,
     "atk": 210,
     "attackEvery": 3,
@@ -235,6 +255,7 @@
   {
     "id": "dark_n2",
     "element": 4,
+    "race": "nhan",
     "hp": 2000,
     "atk": 170,
     "attackEvery": 2,
@@ -243,6 +264,7 @@
   {
     "id": "dark_e1",
     "element": 4,
+    "race": "linh",
     "hp": 4600,
     "atk": 330,
     "attackEvery": 3,
@@ -258,6 +280,7 @@
   {
     "id": "dark_b1",
     "element": 4,
+    "race": "long",
     "hp": 9900,
     "atk": 400,
     "attackEvery": 3,
@@ -278,6 +301,7 @@
   {
     "id": "heart_n1",
     "element": 2,
+    "race": "linh",
     "hp": 2100,
     "atk": 220,
     "attackEvery": 3,
@@ -286,6 +310,7 @@
   {
     "id": "heart_n2",
     "element": 2,
+    "race": "thu",
     "hp": 2100,
     "atk": 180,
     "attackEvery": 2,
@@ -294,6 +319,7 @@
   {
     "id": "heart_e1",
     "element": 2,
+    "race": "nhan",
     "hp": 4700,
     "atk": 340,
     "attackEvery": 3,
@@ -309,6 +335,7 @@
   {
     "id": "heart_b1",
     "element": 2,
+    "race": "than",
     "hp": 10000,
     "atk": 430,
     "attackEvery": 3,

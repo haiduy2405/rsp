@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { validate, characterSchema, duoSchema } from '../www/js/core/schema.js';
 import { statsFor, skillCooldown } from '../www/js/core/stats.js';
 import { createBattle, step } from '../www/js/core/battle.js';
-import { buildCtx } from '../www/js/core/ctx.js';
+import { buildCtx, DATA_FILES } from '../www/js/core/ctx.js';
 import { DEFAULT_TEAM } from '../www/js/core/progress.js';
 import { readJson } from './helpers.js';
 
@@ -16,7 +16,7 @@ const en = JSON.parse(fs.readFileSync(path.join(root, 'www/js/i18n/en.json'), 'u
 const chars = readJson('characters.json');
 const duos = readJson('duos.json');
 const config = readJson('config.json');
-const ctx = buildCtx({ config, characters: chars, monsters: readJson('monsters.json'), zones: readJson('zones.json'), events: readJson('events.json'), duos });
+const ctx = buildCtx(Object.fromEntries(DATA_FILES.map((k) => [k, readJson(`${k}.json`)])));
 
 const ROSTER = {
   0: { 5: ['thuy_tinh'], 4: ['ran'], 3: ['thetis', 'coc_kien_troi'] },
@@ -127,4 +127,18 @@ test('đội khởi đầu là 5 nhân vật 3★ đủ 5 hệ khác nhau', () =
   assert.equal(DEFAULT_TEAM.length, 5);
   for (const id of DEFAULT_TEAM) assert.equal(ctx.characters[id].rarity, 3);
   assert.equal(new Set(DEFAULT_TEAM.map((id) => ctx.characters[id].element)).size, 5);
+});
+
+test('Tộc: mọi tướng và quái có tộc hợp lệ, mỗi tộc có tên VI/EN, Tiểu Linh đủ 6 hệ x 2 sao', () => {
+  const races = new Set(config.races);
+  assert.equal(races.size, 5);
+  for (const c of chars) assert.ok(races.has(c.race), c.id);
+  for (const m of Object.values(ctx.monsters)) assert.ok(races.has(m.race), m.id);
+  for (const r of races) assert.ok(chars.some((c) => c.race === r), `tộc ${r} chưa có tướng`);
+  for (const [l, d] of Object.entries({ vi, en })) {
+    for (const r of races) assert.ok(d[`race.${r}`], `${l} race.${r}`);
+    for (const f of ctx.fodderList) assert.ok(d[`fodder.${f.element}.${f.star}`], `${l} fodder ${f.id}`);
+  }
+  assert.equal(ctx.fodderList.length, 12);
+  for (const f of ctx.fodderList) assert.ok(f.exp > 0 && f.sell > 0 && f.star >= 1 && f.star <= 2, f.id);
 });

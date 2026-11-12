@@ -72,6 +72,22 @@ test('battle: sát thương combo tăng theo n và nhóm 4 ngọc được nhân
   assert.equal(dmg[1].raw, Math.round(150 * 1.25 * 1.5 * (1 + ctx.config.combo.step) * 0.5));
 });
 
+test('battle: nhóm từ 5 ngọc đánh toàn bộ quái, nhóm nhỏ hơn chỉ đánh một mục tiêu', () => {
+  const run = (len) => {
+    const cells = Array.from({ length: N }, (_, i) => (((i % 6) + ((i / 6) | 0)) % 2 === 0 ? 4 : 5));
+    for (let i = 0; i < len; i++) cells[i] = 1;
+    const s = createBattle(ctx, { seed: 5, team: ['demo_hoa'], enemies: ['m_ember', 'm_tide', 'm_shade'] });
+    s.board = { cells, enh: new Array(N).fill(0) };
+    const r = step(ctx, s, { type: 'move', path: [0, 1] });
+    return r.events.filter((e) => e.type === 'step').flatMap((e) => e.hits).filter((h) => h.kind === 'damage');
+  };
+  assert.equal(ctx.config.group.aoeSize, 5);
+  assert.equal(new Set(run(4).map((h) => h.enemy)).size, 1, '4 ngọc: một mục tiêu');
+  const aoe = run(5);
+  assert.deepEqual([...new Set(aoe.map((h) => h.enemy))].sort(), [0, 1, 2], '5 ngọc: cả 3 quái');
+  assert.equal(aoe.length, 3);
+});
+
 test('battle: quái đánh sau N lượt và có thể thua', () => {
   let s = createBattle(ctx, { seed: 6, team: ['demo_tim'], enemies: ['m_ember'] });
   s = { ...s, hp: 100 };

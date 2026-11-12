@@ -96,7 +96,7 @@ export function redeemCharacter(ctx, progress, id) {
   if (progress.inventory.shards < cost) return fail('not_enough_shards');
   const p = structuredClone(progress);
   p.inventory.shards -= cost;
-  p.characters[id] = { level: 1, awaken: 0 };
+  p.characters[id] = { level: 1, awaken: 0, exp: 0 };
   return { ok: true, progress: p, cost };
 }
 

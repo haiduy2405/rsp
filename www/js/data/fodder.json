@@ -1,0 +1,86 @@
+[
+  {
+    "id": "fod_0_1",
+    "element": 0,
+    "star": 1,
+    "exp": 120,
+    "sell": 25
+  },
+  {
+    "id": "fod_0_2",
+    "element": 0,
+    "star": 2,
+    "exp": 500,
+    "sell": 100
+  },
+  {
+    "id": "fod_1_1",
+    "element": 1,
+    "star": 1,
+    "exp": 120,
+    "sell": 25
+  },
+  {
+    "id": "fod_1_2",
+    "element": 1,
+    "star": 2,
+    "exp": 500,
+    "sell": 100
+  },
+  {
+    "id": "fod_2_1",
+    "element": 2,
+    "star": 1,
+    "exp": 120,
+    "sell": 25
+  },
+  {
+    "id": "fod_2_2",
+    "element": 2,
+    "star": 2,
+    "exp": 500,
+    "sell": 100
+  },
+  {
+    "id": "fod_3_1",
+    "element": 3,
+    "star": 1,
+    "exp": 120,
+    "sell": 25
+  },
+  {
+    "id": "fod_3_2",
+    "element": 3,
+    "star": 2,
+    "exp": 500,
+    "sell": 100
+  },
+  {
+    "id": "fod_4_1",
+    "element": 4,
+    "star": 1,
+    "exp": 120,
+    "sell": 25
+  },
+  {
+    "id": "fod_4_2",
+    "element": 4,
+    "star": 2,
+    "exp": 500,
+    "sell": 100
+  },
+  {
+    "id": "fod_5_1",
+    "element": 5,
+    "star": 1,
+    "exp": 120,
+    "sell": 25
+  },
+  {
+    "id": "fod_5_2",
+    "element": 5,
+    "star": 2,
+    "exp": 500,
+    "sell": 100
+  }
+]

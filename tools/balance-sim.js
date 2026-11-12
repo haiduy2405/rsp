@@ -3,17 +3,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildCtx } from '../www/js/core/ctx.js';
+import { buildCtx, DATA_FILES } from '../www/js/core/ctx.js';
 import { mulberry32 } from '../www/js/core/rng.js';
 import { step } from '../www/js/core/battle.js';
 import { createRun, runStep } from '../www/js/core/run.js';
 
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'www', 'js', 'data');
 const rd = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
-export const ctx = buildCtx({
-  config: rd('config.json'), characters: rd('characters.json'), monsters: rd('monsters.json'),
-  zones: rd('zones.json'), events: rd('events.json'), duos: rd('duos.json'),
-});
+export const ctx = buildCtx(Object.fromEntries(DATA_FILES.map((k) => [k, rd(`${k}.json`)])));
 
 function randomPath(rng, locked) {
   for (let tries = 0; tries < 20; tries++) {

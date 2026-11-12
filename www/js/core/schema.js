@@ -84,7 +84,7 @@ export const configSchema = {
     combo: { type: 'object', required: ['step'], properties: { step: { type: 'number', min: 0 } } },
     group: {
       type: 'object',
-      required: ['sizeBonus', 'fourOrbBoost', 'enhancedBonus'],
+      required: ['sizeBonus', 'fourOrbBoost', 'enhancedBonus', 'aoeSize'],
     },
     elementMult: { type: 'object', required: ['strong', 'weak'] },
     heal: { type: 'object', required: ['base'] },

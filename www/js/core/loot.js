@@ -1,6 +1,13 @@
 // Loot: số lượng và tỉ lệ nằm trong config.loot. Mọi ngẫu nhiên qua rng truyền vào.
 export function emptyLoot() {
-  return { gold: 0, essence: 0, spirit: 0, shards: 0, stones: { normal: 0, rare: 0 } };
+  return { gold: 0, essence: 0, spirit: 0, shards: 0, stones: { normal: 0, rare: 0 }, fodder: {} };
+}
+
+// Cộng hai bảng đếm { khóa: số } (không sửa đầu vào).
+export function mergeCounts(a = {}, b = {}) {
+  const out = { ...a };
+  for (const [k, n] of Object.entries(b)) out[k] = (out[k] || 0) + n;
+  return out;
 }
 
 export function addLoot(a, b) {
@@ -10,6 +17,7 @@ export function addLoot(a, b) {
     spirit: a.spirit + b.spirit,
     shards: a.shards + b.shards,
     stones: { normal: a.stones.normal + b.stones.normal, rare: a.stones.rare + b.stones.rare },
+    fodder: mergeCounts(a.fodder, b.fodder),
   };
 }
 
@@ -17,7 +25,7 @@ const between = (rng, [lo, hi]) => lo + rng.int(hi - lo + 1);
 
 // kind: 'normal' | 'elite' | 'boss' | 'chest' | 'completion'. Thứ tự gọi rng cố định.
 // diff: độ khó. Khó hơn thì Vàng/Tinh Hoa nhiều hơn (difficulty.gold) và mọi tỉ lệ rớt cao hơn (difficulty.drop, tối đa 100%).
-export function rollLoot(ctx, kind, rng, diff = 'easy') {
+export function rollLoot(ctx, kind, rng, diff = 'easy', element = 0) {
   const spec = ctx.config.loot[kind];
   const d = ctx.config.difficulty[diff];
   const chance = (c) => Math.min(1, c * d.drop);
@@ -30,5 +38,11 @@ export function rollLoot(ctx, kind, rng, diff = 'easy') {
   }
   if (spec.shard && rng.next() < chance(spec.shard.chance)) out.shards = between(rng, spec.shard.count);
   if (spec.spirit && rng.next() < chance(spec.spirit.chance)) out.spirit = between(rng, spec.spirit.count);
+  // Tiểu Linh (quái cùi) của hệ khu vực: 1★ hay gặp, 2★ hiếm hơn và hiếm hơn nữa ở độ khó thấp.
+  if (spec.fodder && rng.next() < chance(spec.fodder.chance)) {
+    const n = between(rng, spec.fodder.count);
+    const star = rng.next() < chance(spec.fodder.star2Chance) ? 2 : 1;
+    out.fodder[`${element}_${star}`] = n;
+  }
   return out;
 }

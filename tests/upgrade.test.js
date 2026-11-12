@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { newProgress, isValidProgress } from '../www/js/core/progress.js';
-import { levelCost, levelUp, awakenCost, awaken, grantCharacter, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, placeInSlot, clearTeam, autoTeam, charPower } from '../www/js/core/upgrade.js';
+import { expToNext, expToMax, useCakes, feedFodder, sellFodder, fodderExp, awakenCost, awaken, grantCharacter, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, placeInSlot, clearTeam, autoTeam, charPower } from '../www/js/core/upgrade.js';
 import { migrate } from '../www/js/save/migrate.js';
 import { createRun, playRun, newRunRecord, runStep } from '../www/js/core/run.js';
 import { statsFor } from '../www/js/core/stats.js';
@@ -17,22 +17,53 @@ const rich = () => {
   return p;
 };
 
-test('Level: chi phí tăng theo cấp và độ hiếm, trần ở levelMax, trừ Tinh Hoa', () => {
-  assert.ok(levelCost(ctx, 'thetis', 2) > levelCost(ctx, 'thetis', 1));
-  assert.ok(levelCost(ctx, 'thuy_tinh', 1) > levelCost(ctx, 'thetis', 1));
-  assert.equal(levelCost(ctx, 'thetis', ctx.config.progression.levelMax), null);
+test('EXP: cần nhiều hơn theo cấp và độ hiếm, trần ở levelMax, Bánh EXP không dùng thừa', () => {
+  const max = ctx.config.progression.levelMax;
+  assert.equal(max, 50);
+  assert.ok(expToNext(ctx, 'thetis', 2) > expToNext(ctx, 'thetis', 1));
+  assert.ok(expToNext(ctx, 'thuy_tinh', 1) > expToNext(ctx, 'thetis', 1));
+  assert.equal(expToNext(ctx, 'thetis', max), null);
   const p = rich();
-  const c = levelCost(ctx, 'thetis', 1);
-  const r = levelUp(ctx, p, 'thetis');
+  const need = expToNext(ctx, 'thetis', 1);
+  const r = useCakes(ctx, p, 'thetis', need + 5);
   assert.equal(r.progress.characters.thetis.level, 2);
-  assert.equal(r.progress.inventory.essence, p.inventory.essence - c);
+  assert.equal(r.progress.characters.thetis.exp, 5);
+  assert.equal(r.progress.inventory.essence, p.inventory.essence - need - 5);
   assert.equal(p.characters.thetis.level, 1); // không sửa progress gốc
-  assert.equal(levelUp(ctx, newProgress(ctx), 'thetis').reason, 'not_enough_essence');
-  assert.equal(levelUp(ctx, p, 'zeus').reason, 'not_owned');
-  let q = p;
-  for (let i = 1; i < ctx.config.progression.levelMax; i++) q = levelUp(ctx, q, 'thetis').progress;
-  assert.equal(q.characters.thetis.level, ctx.config.progression.levelMax);
-  assert.equal(levelUp(ctx, q, 'thetis').reason, 'max_level');
+  assert.equal(useCakes(ctx, newProgress(ctx), 'thetis', 10).reason, 'not_enough_essence');
+  assert.equal(useCakes(ctx, p, 'zeus', 10).reason, 'not_owned');
+  // dùng vô hạn Bánh: dừng đúng ở cấp tối đa, không tốn thừa
+  p.inventory.essence = 10 ** 6;
+  const total = expToMax(ctx, 'thetis', p.characters.thetis);
+  const q = useCakes(ctx, p, 'thetis', 10 ** 9);
+  assert.equal(q.progress.characters.thetis.level, max);
+  assert.equal(q.progress.characters.thetis.exp, 0);
+  assert.equal(q.used, total);
+  assert.equal(useCakes(ctx, q.progress, 'thetis', 10).reason, 'max_level');
+});
+
+test('Tiểu Linh: cho ăn lấy EXP (cùng hệ được thêm), bán lấy Vàng, không ăn thừa', () => {
+  const p = rich();
+  p.inventory.fodder = { '0_1': 5, '1_2': 3 };
+  const same = fodderExp(ctx, 'thetis', '0_1'); // Thetis hệ Thủy (0)
+  const other = fodderExp(ctx, 'thetis', '1_2');
+  assert.equal(same, Math.round(ctx.fodder['0_1'].exp * ctx.config.exp.fodderSameElement));
+  assert.equal(other, ctx.fodder['1_2'].exp);
+  const r = feedFodder(ctx, p, 'thetis', '0_1', 2);
+  assert.equal(r.progress.inventory.fodder['0_1'], 3);
+  assert.equal(r.gained, same * 2);
+  assert.equal(feedFodder(ctx, p, 'thetis', '0_1', 99).used, 5, 'không ăn quá số đang có');
+  assert.equal(feedFodder(ctx, p, 'thetis', '3_1', 1).reason, 'no_fodder');
+  assert.equal(feedFodder(ctx, p, 'thetis', 'x', 1).reason, 'unknown_fodder');
+  const sold = sellFodder(ctx, p, '1_2', 3);
+  assert.equal(sold.gold, ctx.fodder['1_2'].sell * 3);
+  assert.equal(sold.progress.inventory.gold, p.inventory.gold + sold.gold);
+  assert.equal(sold.progress.inventory.fodder['1_2'], undefined, 'hết thì xóa khóa');
+  assert.equal(sellFodder(ctx, p, '1_2', 4).sold, 3);
+  // đã tối đa cấp thì không ăn nữa
+  const m = structuredClone(p);
+  m.characters.thetis = { level: ctx.config.progression.levelMax, awaken: 0, exp: 0 };
+  assert.equal(feedFodder(ctx, m, 'thetis', '0_1', 1).reason, 'max_level');
 });
 
 test('Thức tỉnh: bậc 1-3 dùng Tinh Thạch Thường, bậc 4-5 dùng Hiếm, đúng hệ, đủ 3 thứ phí', () => {
@@ -86,7 +117,7 @@ test('nhân vật trùng tự đổi thành Mảnh Linh Hồn theo độ hiếm;
   assert.equal(dup.progress.inventory.shards, ctx.config.upgrade.duplicateShards[3]);
   const fresh = grantCharacter(ctx, p, 'hel');
   assert.equal(fresh.duplicate, false);
-  assert.deepEqual(fresh.progress.characters.hel, { level: 1, awaken: 0 });
+  assert.deepEqual(fresh.progress.characters.hel, { level: 1, awaken: 0, exp: 0 });
   const dup5 = grantCharacter(ctx, fresh.progress, 'hel');
   assert.equal(dup5.shards, ctx.config.upgrade.duplicateShards[5]);
   assert.equal(grantCharacter(ctx, p, 'nobody').ok, false);
@@ -117,7 +148,7 @@ test('save: migrate v2 lên v3 chuyển đội mẫu cũ sang đội khởi đ�
 
 test('chuyến leo tháp dùng chỉ số theo Level/Thức tỉnh và vẫn xác định theo replay', () => {
   let p = rich();
-  for (let i = 0; i < 10; i++) p = levelUp(ctx, p, 'thetis').progress;
+  p = useCakes(ctx, p, 'thetis', 5000).progress;
   p = awaken(ctx, p, 'thetis').progress;
   const team = teamRoster(p);
   const lowRun = createRun(ctx, { seed: 4, zoneId: 'zone_water', team: teamRoster(newProgress(ctx)) });

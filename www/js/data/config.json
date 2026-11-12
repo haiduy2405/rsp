@@ -11,6 +11,13 @@
     "dark",
     "heart"
   ],
+  "races": [
+    "than",
+    "nhan",
+    "thu",
+    "long",
+    "linh"
+  ],
   "advantage": {
     "0": [
       1
@@ -38,7 +45,8 @@
   "group": {
     "sizeBonus": 0.25,
     "fourOrbBoost": 1.5,
-    "enhancedBonus": 0.25
+    "enhancedBonus": 0.25,
+    "aoeSize": 5
   },
   "heal": {
     "base": 1.0
@@ -156,6 +164,14 @@
           5,
           15
         ]
+      },
+      "fodder": {
+        "chance": 0.5,
+        "star2Chance": 0.1,
+        "count": [
+          1,
+          2
+        ]
       }
     },
     "elite": {
@@ -187,6 +203,14 @@
         "count": [
           10,
           25
+        ]
+      },
+      "fodder": {
+        "chance": 0.8,
+        "star2Chance": 0.3,
+        "count": [
+          1,
+          3
         ]
       }
     },
@@ -220,6 +244,14 @@
           15,
           40
         ]
+      },
+      "fodder": {
+        "chance": 1.0,
+        "star2Chance": 0.5,
+        "count": [
+          2,
+          3
+        ]
       }
     },
     "chest": {
@@ -251,6 +283,14 @@
         "count": [
           10,
           30
+        ]
+      },
+      "fodder": {
+        "chance": 0.5,
+        "star2Chance": 0.15,
+        "count": [
+          1,
+          2
         ]
       }
     },
@@ -292,8 +332,8 @@
     "awakenRareStones": 2
   },
   "progression": {
-    "levelMax": 30,
-    "levelGrowth": 0.015,
+    "levelMax": 50,
+    "levelGrowth": 0.00875,
     "minCooldown": 2,
     "awaken": [
       {
@@ -420,7 +460,7 @@
         ]
       },
       "zone_fire": {
-        "level": 5,
+        "level": 8,
         "awaken": 0,
         "win": [
           0.7,
@@ -428,7 +468,7 @@
         ]
       },
       "zone_wood": {
-        "level": 10,
+        "level": 16,
         "awaken": 1,
         "win": [
           0.65,
@@ -436,7 +476,7 @@
         ]
       },
       "zone_light": {
-        "level": 15,
+        "level": 25,
         "awaken": 2,
         "win": [
           0.6,
@@ -444,7 +484,7 @@
         ]
       },
       "zone_dark": {
-        "level": 20,
+        "level": 34,
         "awaken": 3,
         "win": [
           0.55,
@@ -452,7 +492,7 @@
         ]
       },
       "zone_heart": {
-        "level": 30,
+        "level": 50,
         "awaken": 5,
         "win": [
           0.5,
@@ -484,7 +524,7 @@
       "gold": 1.5,
       "drop": 1.5,
       "sim": {
-        "levelBonus": 4,
+        "levelBonus": 7,
         "awakenBonus": 1,
         "winShift": -0.1
       }
@@ -495,10 +535,20 @@
       "gold": 2.2,
       "drop": 2.2,
       "sim": {
-        "levelBonus": 8,
+        "levelBonus": 14,
         "awakenBonus": 1,
         "winShift": -0.2
       }
     }
+  },
+  "exp": {
+    "base": 40,
+    "growth": 0.1,
+    "rarityMult": {
+      "3": 1,
+      "4": 1.3,
+      "5": 1.6
+    },
+    "fodderSameElement": 1.5
   }
 }

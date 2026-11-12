@@ -303,12 +303,15 @@ export function step(ctx, state, action) {
         const total = s.members.reduce((a, m) => a + m.heal, 0);
         healTeam(s, Math.round(total * ctx.config.heal.base * gf * cm), hits, 'orb');
       } else {
+        // Nhóm từ aoeSize ngọc trở lên: tướng đánh toàn bộ quái còn sống (mỗi quái tính khắc hệ riêng), còn lại đánh mục tiêu hiện tại.
+        const aoe = g.size >= ctx.config.group.aoeSize;
         for (const m of s.members) {
           if (m.element !== g.type) continue;
-          const idx = firstAlive(s);
-          if (idx < 0) break;
-          const mult = elementMultiplier(m.element, s.enemies[idx].element, ctx.config);
-          hitEnemy(s, idx, Math.round(m.atk * teamAtk * gf * cm * mult), hits, m.id, m.element);
+          const targets = aoe ? aliveIdx(s) : [firstAlive(s)].filter((i) => i >= 0);
+          for (const idx of targets) {
+            const mult = elementMultiplier(m.element, s.enemies[idx].element, ctx.config);
+            hitEnemy(s, idx, Math.round(m.atk * teamAtk * gf * cm * mult), hits, m.id, m.element);
+          }
         }
       }
     }

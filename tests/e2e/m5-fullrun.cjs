@@ -31,7 +31,7 @@ const { chromium } = require('playwright');
       if (!best) { await p.waitForTimeout(500); continue; }
       const box = await p.locator('#cv').boundingBox();
       const pt = (c) => ({ x: box.x + ((c % 6) + 0.5) * box.width / 6, y: box.y + (480 + (Math.floor(c / 6) + 0.5) * 90) / 960 * box.height });
-      if (best.skill >= 0) { const sx = box.x + (12 + best.skill * 104 + 49) / 540 * box.width, sy = box.y + 420 / 960 * box.height; await p.mouse.click(sx, sy); await p.waitForTimeout(1200); continue; }
+      if (best.skill >= 0) { const sx = box.x + (12 + best.skill * 104 + 49) / 540 * box.width, sy = box.y + 420 / 960 * box.height; await p.mouse.click(sx, sy); await p.waitForTimeout(300); await click('#skill-ok'); await p.waitForTimeout(1200); continue; } // chạm tướng chỉ mở khung xác nhận, bấm OK mới dùng
       const a = pt(best.path[0]), c = pt(best.path[1]);
       await p.mouse.move(a.x, a.y); await p.mouse.down(); await p.mouse.move(c.x, c.y, { steps: 8 }); await p.mouse.up(); moves++;
       await p.waitForTimeout(1300);

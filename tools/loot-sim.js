@@ -3,17 +3,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildCtx } from '../www/js/core/ctx.js';
+import { buildCtx, DATA_FILES } from '../www/js/core/ctx.js';
 import { mulberry32 } from '../www/js/core/rng.js';
 import { createRun, runStep, debugWinBattle } from '../www/js/core/run.js';
 import { DEFAULT_TEAM } from '../www/js/core/progress.js';
 
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'www', 'js', 'data');
 const rd = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
-const ctx = buildCtx({
-  config: rd('config.json'), characters: rd('characters.json'), monsters: rd('monsters.json'),
-  zones: rd('zones.json'), events: rd('events.json'),
-});
+const ctx = buildCtx(Object.fromEntries(DATA_FILES.map((k) => [k, rd(`${k}.json`)])));
 
 export function simulateRun(ctx, seed, zoneId, pityMissed, diff = 'easy') {
   const pick = mulberry32(seed ^ 0x9e3779b9);

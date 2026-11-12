@@ -1,9 +1,9 @@
-import { buildCtx } from './core/ctx.js';
+import { buildCtx, loadRaw } from './core/ctx.js';
 import { createRun, runStep, newRunRecord, debugWinBattle } from './core/run.js';
 import { stageOpen, clearsOf, zoneClears } from './core/stage.js';
 import { applyRunResult } from './core/progress.js';
 import { createStorage, browserAdapter } from './save/storage.js';
-import { grantCharacter, levelCost, levelUp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
+import { grantCharacter, expToMax, useCakes, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
 import { KEYS } from './core/effects.js';
 import { summon, redeemCharacter, effectiveRates } from './core/summon.js';
@@ -13,6 +13,7 @@ import { createT, detectLang } from './i18n/index.js';
 import { startGame } from './ui/game.js';
 import { preloadAssets, getImg } from './ui/assets.js';
 import { createLoading } from './ui/loading.js';
+import { createHeroUI, COLORS } from './ui/hero-ui.js';
 import * as offline from './ui/offline.js';
 import { VERSION, BUILD, BUILD_DATE } from './version.js';
 import { createFxLayer } from './ui/fxlayer.js';
@@ -22,20 +23,8 @@ const $ = (id) => document.getElementById(id);
 let fxl = null;
 const celebrate = () => (fxl ||= createFxLayer($('fx'))).celebrate();
 const load = (f) => fetch(`js/${f}`).then((r) => r.json());
-const [config, characters, monsters, zones, events, duos, banners, story, audioCfg, vi, en] = await Promise.all([
-  load('data/config.json'),
-  load('data/characters.json'),
-  load('data/monsters.json'),
-  load('data/zones.json'),
-  load('data/events.json'),
-  load('data/duos.json'),
-  load('data/banners.json'),
-  load('data/story.json'),
-  load('data/audio.json'),
-  load('i18n/vi.json'),
-  load('i18n/en.json'),
-]);
-const ctx = buildCtx({ config, characters, monsters, zones, events, duos, banners, story });
+const [raw, audioCfg, vi, en] = await Promise.all([loadRaw(load), load('data/audio.json'), load('i18n/vi.json'), load('i18n/en.json')]);
+const ctx = buildCtx(raw);
 const dicts = { vi, en };
 const storage = createStorage(browserAdapter(), ctx);
 const DEBUG = new URLSearchParams(location.search).has('debug');
@@ -79,6 +68,7 @@ const btn = (label, onclick, cls = '', extra = {}) => h('button', { class: cls, 
 let atHub = false;
 const screen = (...kids) => {
   $('info')?.remove();
+  $('pause-btn')?.remove();
   $('screen').onpointerdown = null;
   atHub = false;
   audio.playMusic('hub');
@@ -102,12 +92,14 @@ const screen = (...kids) => {
 const save = () => {
   if (!storage.save(progress)) notice = 'hub.saveFail';
 };
+const fodderName = (key) => `${t('fodder.' + key.replace('_', '.'))} ${'★'.repeat(ctx.fodder[key].star)}`;
 const lootLine = (l) => {
   const parts = [];
   if (l.gold) parts.push(`${t('res.gold')} ${l.gold >= 0 ? '+' : ''}${l.gold}`);
   if (l.essence) parts.push(`${t('res.essence')} +${l.essence}`);
   if (l.spirit) parts.push(`${t('res.spirit')} +${l.spirit}`);
   if (l.shards) parts.push(`${t('res.shard')} +${l.shards}`);
+  for (const [k, n] of Object.entries(l.fodder || {})) parts.push(`${fodderName(k)} +${n}`);
   if (l.stones?.normal) parts.push(`${t('res.stone')} ${t('stone.normal')} +${l.stones.normal}`);
   if (l.stones?.rare) parts.push(`${t('res.stone')} ${t('stone.rare')} +${l.stones.rare}`);
   return parts.length ? parts.join(' · ') : t('result.nothing');
@@ -338,37 +330,8 @@ function setLang(l) {
 
 // ---- mô tả kỹ năng từ dữ liệu (không viết cứng từng nhân vật)
 const pct = (v) => Math.round(v * 100);
-const el = (n) => t(`element.${n}`);
-const COLORS = ['#3b9cff', '#ff5a3c', '#4cc46a', '#ffd84a', '#9a5cff', '#ff7fb0'];
-function unitText(u) {
-  if (u.type === 'damage') {
-    const target = t(`target.${u.target}`);
-    return u.element != null ? t('unit.damage.el', { mult: u.mult, target, element: el(u.element) }) : t('unit.damage', { mult: u.mult, target });
-  }
-  if (u.type === 'heal') return t('unit.heal', { pct: pct(u.pctMax) });
-  if (u.type === 'convert') return t('unit.convert', { count: u.count, element: el(u.to) });
-  const val = u.value ? `, ${pct(u.value)}%` : '';
-  return t('unit.apply', { effect: t(`effect.${u.key}.name`), target: t(`target.${u.target}`), turns: u.turns, value: val });
-}
-const leaderText = (l) => t(`leader.${l.template}`, { pct: pct(l.pct || 0), element: l.element != null ? el(l.element) : '', n: l.n });
-const keysOf = (units) => [...new Set(units.filter((u) => u.type === 'applyEffect').map((u) => u.key))];
-const chip = (id) => {
-  const e = ctx.characters[id].element;
-  const im = getImg(`icon:${id}`);
-  const c = h('span', { class: 'chip', style: `background:${COLORS[e]}` }, el(e));
-  return im ? h('span', {}, h('img', { src: im.src, alt: '', width: '36', height: '36', style: 'border-radius:8px;vertical-align:middle;margin-right:4px' }), c) : c;
-};
-// Ảnh chân dung vuông: icon nếu có, không thì ngọc hệ.
-function portrait(id, size = 64) {
-  const c = ctx.characters[id];
-  const im = getImg(`icon:${id}`);
-  const rar = c.rarity === 5 ? '#ffd84a' : c.rarity === 4 ? '#c58bff' : '#4a4f90';
-  const box = `width:${size}px;height:${size}px;border-radius:12px;border:3px solid ${rar};flex:none;background:${COLORS[c.element]}33;display:flex;align-items:center;justify-content:center;overflow:hidden`;
-  const inner = im ? h('img', { src: im.src, alt: '', width: String(size), height: String(size), style: 'width:100%;height:100%;object-fit:cover' }) : getImg(`orb:${c.element}`) ? h('img', { src: getImg(`orb:${c.element}`).src, alt: '', style: `width:${size * 0.7}px` }) : h('b', {}, el(c.element));
-  return h('div', { style: box }, inner);
-}
-
-const stars = (id) => '★'.repeat(ctx.characters[id].rarity);
+const heroUI = createHeroUI({ h, T: (...args) => t(...args), ctx });
+const { el, stars, chip, unitText, leaderText, keysOf, keywordBlock, portrait } = heroUI;
 const owned = () => ctx.characterList.filter((c) => progress.characters[c.id]);
 
 function charCard(id, onclick, extra) {
@@ -395,10 +358,6 @@ function showCollection() {
     list.map((c) => charCard(c.id, () => showChar(c.id, undefined, showCollection))),
     btn(t('back'), () => showTeam(), '', { id: 'back' }),
   );
-}
-
-function keywordBlock(keys) {
-  return keys.map((k) => h('div', { class: 'muted' }, h('b', {}, t(`effect.${k}.name`)), ': ', t(`effect.${k}.desc`)));
 }
 
 let charBack = null;
@@ -432,33 +391,52 @@ function showChar(id, msg, back) {
   const c = ctx.characters[id];
   const pc = progress.characters[id];
   const st = statsFor(ctx, id, pc.level, pc.awaken);
-  const lvCost = levelCost(ctx, id, pc.level);
   const aw = awakenCost(ctx, id, pc.awaken + 1);
-  const duos = ctx.duoList.filter((d) => d.a === id || d.b === id);
-  const keys = [...new Set([...keysOf(c.skill.units), ...duos.flatMap((d) => keysOf(d.skill.units))])];
-  const act = (fn) => {
+  const inv = progress.inventory;
+  const keys = [...new Set([...keysOf(c.skill.units), ...ctx.duoList.filter((d) => d.a === id || d.b === id).flatMap((d) => keysOf(d.skill.units))])];
+  // Thực hiện một hành động nâng cấp (hàm thuần trả {ok, progress}), lưu, vẽ lại với thông báo.
+  const act = (fn, okMsg) => {
     const r = fn();
     if (r.ok) {
       progress = r.progress;
       save();
-      showChar(id);
-    } else showChar(id, `err.${r.reason}`);
+      showChar(id, okMsg ? okMsg(r) : undefined);
+    } else showChar(id, t(`err.${r.reason}`));
   };
+  const need = expToMax(ctx, id, pc);
+  const gained = (r) => t('char.gained', { n: r.gained ?? r.used }) + (r.levels ? ` · ${t('char.levelsUp', { n: r.levels })}` : '');
+  const fodderKeys = Object.keys(inv.fodder).sort();
+  const grow = h(
+    'div',
+    { class: 'hp-grow' },
+    h('b', {}, t('char.grow')),
+    need <= 0
+      ? h('div', { class: 'muted' }, t('char.maxLevel'))
+      : [
+          h('div', { class: 'muted' }, `${t('char.cakes')}: ${inv.essence}`),
+          h('div', { class: 'row' }, [100, 1000].map((n) => btn(t('char.useCakes', { n }), () => act(() => useCakes(ctx, progress, id, n), gained), '', { 'data-cakes': n })), btn(t('char.useCakesMax'), () => act(() => useCakes(ctx, progress, id, 1e9), gained), '', { id: 'cakes-max' })),
+          fodderKeys.length
+            ? fodderKeys.map((k) => {
+                const f = ctx.fodder[k];
+                return h('div', { class: 'fodder-row', 'data-fodder': k }, h('span', {}, `${t(`fodder.${f.element}.${f.star}`)} ${'★'.repeat(f.star)} ×${inv.fodder[k]} `, h('small', { class: 'muted' }, t('char.fodderEach', { n: fodderExp(ctx, id, k) }))), btn(t('char.feed'), () => act(() => feedFodder(ctx, progress, id, k, 1), gained)), btn(t('char.feedAll'), () => act(() => feedFodder(ctx, progress, id, k, 999), gained)));
+              })
+            : h('div', { class: 'muted' }, t('char.noFodder')),
+        ],
+  );
   screen(
-    getImg(`card:${id}`) ? h('img', { src: getImg(`card:${id}`).src, alt: t(`char.${id}`), style: 'width:60%;max-width:240px;border-radius:14px' }) : null,
-    h('h2', {}, t(`char.${id}`), ' ', chip(id), ' ', h('span', { class: 'stars' }, stars(id))),
-    msg ? h('div', { class: 'notice' }, t(msg)) : null,
-    h('div', { class: 'row' }, h('span', { class: 'res' }, t('char.level', { n: pc.level, max: ctx.config.progression.levelMax })), h('span', { class: 'res' }, t('char.awaken', { n: pc.awaken }))),
-    h('div', { class: 'row' }, h('span', { class: 'res' }, `${t('stat.hp')} ${st.hp}`), h('span', { class: 'res' }, `${t('stat.atk')} ${st.atk}`), h('span', { class: 'res' }, `${t('stat.heal')} ${st.heal}`)),
-    h('div', { class: 'card' }, h('b', {}, `${t('char.skill')}: ${t(`skill.${id}`)}`), h('div', { class: 'muted' }, t('char.cooldown', { n: skillCooldown(ctx, id, pc.awaken) })), c.skill.units.map((u) => h('div', {}, unitText(u)))),
-    h('div', { class: 'card' }, h('b', {}, t('char.leader')), h('div', {}, leaderText(c.leader))),
-    h('div', { class: 'card' }, h('b', {}, t('char.duo')), duos.length ? duos.map((d) => { const other = d.a === id ? d.b : d.a; return h('div', {}, h('b', {}, t(`duo.${d.id}`)), ` · ${t('char.duoWith', { name: t(`char.${other}`) })}`, d.skill.units.map((u) => h('div', { class: 'muted' }, unitText(u)))); }) : h('div', { class: 'muted' }, t('char.noDuo'))),
+    heroUI.header(id),
+    msg ? h('div', { class: 'notice' }, msg) : null,
+    heroUI.statGrid(st, id),
+    heroUI.levelBar(id, pc),
+    heroUI.activeBox(id, { cooldown: skillCooldown(ctx, id, pc.awaken) }),
+    heroUI.leaderBox(id),
+    heroUI.duoBox(id),
     keys.length ? h('div', { class: 'card' }, keywordBlock(keys)) : null,
-    lvCost === null ? h('div', { class: 'muted' }, t('char.maxLevel')) : btn(t('char.levelUp', { cost: lvCost }), () => act(() => levelUp(ctx, progress, id)), '', { id: 'lvup' }),
-    aw
+    grow,
+    h('div', { class: 'hp-grow' }, h('div', { class: 'muted' }, t('char.awaken', { n: pc.awaken })), aw
       ? [h('div', { class: 'muted' }, t('char.awakenCost', { shards: aw.shards, stones: aw.stones, kind: t(`stone.${aw.stone}`), element: el(aw.element), gold: aw.gold })), btn(t('char.awakenBtn'), () => act(() => awaken(ctx, progress, id)), '', { id: 'awaken' })]
-      : h('div', { class: 'muted' }, t('char.maxAwaken')),
-    h('div', { class: 'muted' }, `${t('res.essence')} ${progress.inventory.essence} · ${t('res.shard')} ${progress.inventory.shards} · ${t('res.gold')} ${progress.inventory.gold} · ${t('res.stone')} ${el(c.element)}: ${progress.inventory.stones[c.element].normal}/${progress.inventory.stones[c.element].rare}`),
+      : h('div', { class: 'muted' }, t('char.maxAwaken'))),
+    h('div', { class: 'muted' }, `${t('res.shard')} ${inv.shards} · ${t('res.gold')} ${inv.gold} · ${t('res.stone')} ${el(c.element)}: ${inv.stones[c.element].normal}/${inv.stones[c.element].rare}`),
     btn(t('back'), goBack, '', { id: 'back' }),
   );
 }
@@ -548,6 +526,16 @@ function showItems() {
     row(t('res.spirit'), inv.spirit, CUR_COL.spirit),
     row(t('res.essence'), inv.essence, CUR_COL.essence),
     row(t('res.shard'), inv.shards, CUR_COL.shard),
+    h('h3', {}, t('items.fodder')),
+    Object.keys(inv.fodder).length
+      ? Object.keys(inv.fodder).sort().map((k) => {
+          const sell = (n) => {
+            const r = sellFodder(ctx, progress, k, n);
+            if (r.ok) { progress = r.progress; save(); showItems(); }
+          };
+          return h('div', { class: 'card fodder-row', 'data-fodder': k }, h('span', {}, `${fodderName(k)} ×${inv.fodder[k]} `, h('small', { class: 'muted' }, `${ctx.fodder[k].sell} ${t('res.gold')}`)), btn(t('fodder.sell'), () => sell(1)), btn(t('fodder.sellAll'), () => sell(999)));
+        })
+      : h('div', { class: 'muted' }, t('char.noFodder')),
     h('h3', {}, t('items.stones')),
     [0, 1, 2, 3, 4, 5].map((e) => row(`${el(e)} · ${t('stone.normal')} / ${t('stone.rare')}`, `${inv.stones[e].normal} / ${inv.stones[e].rare}`, COLORS[e])),
     btn(t('back'), showHub, '', { id: 'back' }),
@@ -776,14 +764,9 @@ function offlineSection() {
   return box;
 }
 
-function showSettings(msg = null, confirmDelete = false) {
-  const exportBox = h('textarea', { readonly: '', id: 'export-box' });
-  const importBox = h('textarea', { placeholder: '…', id: 'import-box' });
-  screen(
-    h('h2', {}, t('set.title')),
-    msg ? h('div', { class: 'notice' }, msg) : null,
-    btn(t('story.title'), showStory, '', { id: 'set-story' }),
-    h('label', {}, t('hub.lang'), h('select', { id: 'lang', onchange: (e) => setLang(e.target.value) }, h('option', { value: 'vi' }, 'Tiếng Việt'), h('option', { value: 'en' }, 'English'))),
+// Âm lượng + bật/tắt nhạc, hiệu ứng, rung: dùng chung cho Cài đặt và bảng Tạm dừng.
+function audioControls() {
+  return [
     h('label', {}, h('span', { id: 'vol-l' }, t('set.volume', { n: progress.settings.volume })), h('input', { id: 'vol', type: 'range', min: '0', max: '100', value: String(progress.settings.volume), oninput: (e) => {
       progress.settings.volume = Number(e.target.value);
       $('vol-l').textContent = t('set.volume', { n: progress.settings.volume });
@@ -796,6 +779,18 @@ function showSettings(msg = null, confirmDelete = false) {
         save();
         if (k === 'haptic' && e.target.checked) audio.vibrate(30);
       } }), t(label))),
+  ];
+}
+
+function showSettings(msg = null, confirmDelete = false) {
+  const exportBox = h('textarea', { readonly: '', id: 'export-box' });
+  const importBox = h('textarea', { placeholder: '…', id: 'import-box' });
+  screen(
+    h('h2', {}, t('set.title')),
+    msg ? h('div', { class: 'notice' }, msg) : null,
+    btn(t('story.title'), showStory, '', { id: 'set-story' }),
+    h('label', {}, t('hub.lang'), h('select', { id: 'lang', onchange: (e) => setLang(e.target.value) }, h('option', { value: 'vi' }, 'Tiếng Việt'), h('option', { value: 'en' }, 'English'))),
+    ...audioControls(),
     h('p', { class: 'muted' }, t('set.volumeNote')),
     offlineSection(),
     btn(t('hub.export'), () => (exportBox.value = storage.exportText(progress)), '', { id: 'export' }),
@@ -939,8 +934,10 @@ function startRun({ zoneId, diff }) {
   render();
 }
 
+let doorsSnap = null; // trạng thái ngay trước khi chọn cửa: thoát giữa trận thì quay về đây
 let runPath = []; // các cửa đã đi: { floor, doors, pick } — chỉ để vẽ bản đồ
 function act(action) {
+  if (action.type === 'door' && run.phase === 'doors') doorsSnap = { run: structuredClone(run), record: structuredClone(record), path: runPath.slice() };
   const r = runStep(ctx, run, action);
   if (r.events[0]?.type === 'invalid') return;
   if (action.type === 'door' && run.phase === 'doors') runPath.push({ floor: run.floor, doors: run.doors.slice(), pick: action.index });
@@ -1146,8 +1143,33 @@ function startBattleUI() {
     },
   });
   window.__game = game;
+  $('pause-btn')?.remove();
+  const pb = h('button', { id: 'pause-btn', 'aria-label': t('pause.title'), onclick: () => showPause() });
+  pb.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>';
+  $('wrap').appendChild(pb);
 }
 let pending = null;
+
+// Tạm dừng giữa trận: chỉnh âm thanh hoặc thoát. Thoát bỏ trận đang đánh dở, giữ tiến trình các cửa đã xong.
+function showPause(confirmQuit = false) {
+  if ($('info')) return;
+  const close = () => $('info')?.remove();
+  const quit = () => {
+    if (doorsSnap) progress.activeRun = structuredClone(doorsSnap);
+    else delete progress.activeRun;
+    save();
+    notice = doorsSnap ? 'run.quitSaved' : null;
+    audio.sfx('back');
+    showHub();
+  };
+  const body = [
+    h('h3', {}, t('pause.title')),
+    confirmQuit === true
+      ? confirmBox(t('pause.quitAsk'), quit, () => { close(); showPause(); }, t('pause.quit'))
+      : [...audioControls(), btn(t('pause.resume'), close, 'primary', { id: 'pause-resume' }), btn(t('pause.quit'), () => { close(); showPause(true); }, '', { id: 'pause-quit' })],
+  ].flat();
+  $('wrap').appendChild(h('div', { id: 'info' }, h('div', { class: 'infobox' }, body)));
+}
 
 // Bảng chi tiết khi nhấn giữ tướng/quái trong trận.
 function effectRows(effects, holder) {
@@ -1186,14 +1208,14 @@ function showInspect(kind, idx) {
     const m = st.members[idx];
     if (!m) return;
     const c = ctx.characters[m.id];
-    const duos = ctx.duoList.filter((d) => d.a === m.id || d.b === m.id);
     body = [
-      h('div', { class: 'charrow' }, portrait(m.id, 72), h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`char.${m.id}`), ' ', h('small', {}, stars(m.id))), h('div', {}, h('span', { class: 'chip', style: `background:${COLORS[m.element]}` }, el(m.element)), ' ', h('small', {}, `${t('char.level', { n: m.level, max: ctx.config.progression.levelMax })} · ${t('char.awaken', { n: m.awaken })}`)))),
-      h('div', { class: 'row' }, h('span', { class: 'res' }, `${t('stat.hp')} ${m.hp}`), h('span', { class: 'res' }, `${t('stat.atk')} ${m.atk}`), h('span', { class: 'res' }, `${t('stat.heal')} ${m.heal}`)),
+      heroUI.header(m.id),
+      heroUI.statGrid(m, m.id),
+      heroUI.levelBar(m.id, { level: m.level, exp: 0 }),
       h('div', { class: 'muted' }, t('info.teamHp', { hp: Math.round(st.hp), max: st.maxHp })),
-      h('div', { class: 'card' }, h('b', {}, `${t('char.skill')}: ${t(`skill.${m.id}`)}`), h('div', { class: 'muted' }, m.skillCd === 0 ? t('info.skillReady') : t('info.skillWait', { n: m.skillCd }), ` · ${t('char.cooldown', { n: m.skillMax })}`), c.skill.units.map((u) => h('div', {}, unitText(u)))),
-      idx === 0 && c.leader ? h('div', { class: 'card' }, h('b', {}, t('char.leader')), h('div', {}, leaderText(c.leader))) : null,
-      duos.length ? h('div', { class: 'card' }, h('b', {}, t('char.duo')), duos.map((d) => h('div', {}, h('b', {}, t(`duo.${d.id}`)), ` · ${t('char.duoWith', { name: t(`char.${d.a === m.id ? d.b : d.a}`) })}`))) : null,
+      heroUI.activeBox(m.id, { cooldown: m.skillMax, status: m.skillCd === 0 ? t('info.skillReady') : t('info.skillWait', { n: m.skillCd }) }),
+      idx === 0 && c.leader ? heroUI.leaderBox(m.id) : null,
+      heroUI.duoBox(m.id, false),
       h('div', { class: 'card' }, h('b', {}, t('info.teamEffects')), effectRows(st.team.effects)),
     ];
   } else {
@@ -1219,6 +1241,7 @@ const REWARD_ICON = {
   essence: '<path d="M12 2.5c3.4 4.2 6.4 7.2 6.4 10.8a6.4 6.4 0 0 1-12.8 0C5.6 9.700 8.600 6.700 12 2.500z" fill="#b58bff" stroke="#5a3aa8" stroke-width="1.4"/><ellipse cx="9.800" cy="12" rx="1.400" ry="2.400" fill="#fff" opacity=".6"/>',
   spirit: '<path d="M12 2.500l7.500 6.500-7.500 12.500L4.500 9z" fill="#6bd5ff" stroke="#1f6f9a" stroke-width="1.4" stroke-linejoin="round"/><path d="M4.500 9h15M12 2.500L9 9l3 12.500L15 9z" fill="none" stroke="#e6f8ff" stroke-width="1" opacity=".8"/>',
   shard: '<path d="M7 3.500l8.500 2L19 14l-6.500 6.500L5 14z" fill="#ff7fb0" stroke="#a83a6a" stroke-width="1.400" stroke-linejoin="round"/><path d="M7 3.500L12.500 12 19 14" fill="none" stroke="#ffe0ee" stroke-width="1" opacity=".8"/>',
+  fodder: '<ellipse cx="12" cy="13" rx="7.500" ry="6.500" fill="#8fd69a" stroke="#2f7a45" stroke-width="1.400"/><circle cx="9.500" cy="11.500" r="1.200" fill="#1c3a26"/><circle cx="14.500" cy="11.500" r="1.200" fill="#1c3a26"/>',
   stoneN: '<path d="M12 3l7.500 4.300v8.400L12 20l-7.500-4.300V7.300z" fill="#7d8fd8" stroke="#3a4690" stroke-width="1.400" stroke-linejoin="round"/>',
   stoneR: '<path d="M12 3l7.500 4.300v8.400L12 20l-7.500-4.300V7.300z" fill="#ffd24a" stroke="#8a6a2a" stroke-width="1.400" stroke-linejoin="round"/><path d="M12 3v17M4.500 7.300L19.500 15.700M19.500 7.300L4.500 15.700" stroke="#fff7d6" stroke-width=".8" opacity=".7"/>',
 };
@@ -1231,6 +1254,7 @@ function lootRows(l) {
   const rows = [];
   if (l.gold) rows.push({ k: 'gold', label: t('res.gold'), n: l.gold });
   if (l.essence) rows.push({ k: 'essence', label: t('res.essence'), n: l.essence });
+  for (const [k, n] of Object.entries(l.fodder || {})) rows.push({ k: 'fodder', label: fodderName(k), n, rare: ctx.fodder[k].star === 2 });
   if (l.shards) rows.push({ k: 'shard', label: t('res.shard'), n: l.shards, rare: true });
   if (l.spirit) rows.push({ k: 'spirit', label: t('res.spirit'), n: l.spirit, rare: true });
   if (l.stones?.normal) rows.push({ k: 'stoneN', label: `${t('res.stone')} ${t('stone.normal')}`, n: l.stones.normal });

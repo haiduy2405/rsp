@@ -4,6 +4,7 @@
 // v3: thêm characters (level, awaken).
 // v4: thêm player, onboarding, summon, settings; xem core/progress.js.
 // v5: clears theo độ khó { zoneId: { easy, normal, hard } }.
+// v6: EXP (characters[id].exp), Tiểu Linh (inventory.fodder).
 import { SAVE_VERSION, DEFAULT_TEAM } from '../core/progress.js';
 
 const steps = {
@@ -57,6 +58,10 @@ const steps = {
     const clears = {};
     for (const [zone, n] of Object.entries(data.clears || {})) clears[zone] = { easy: n };
     return { ...data, version: 5, clears };
+  },
+  5(data) {
+    const characters = Object.fromEntries(Object.entries(data.characters).map(([id, c]) => [id, { ...c, exp: 0 }]));
+    return { ...data, version: 6, characters, inventory: { ...data.inventory, fodder: {} } };
   },
 };
 

@@ -2,6 +2,7 @@
   {
     "id": "thuy_tinh",
     "element": 0,
+    "race": "long",
     "rarity": 5,
     "role": "dps",
     "hp": 743,
@@ -35,6 +36,7 @@
   {
     "id": "ran",
     "element": 0,
+    "race": "long",
     "rarity": 4,
     "role": "support",
     "hp": 840,
@@ -68,6 +70,7 @@
   {
     "id": "thetis",
     "element": 0,
+    "race": "than",
     "rarity": 3,
     "role": "tank",
     "hp": 981,
@@ -96,6 +99,7 @@
   {
     "id": "coc_kien_troi",
     "element": 0,
+    "race": "thu",
     "rarity": 3,
     "role": "dps",
     "hp": 471,
@@ -128,6 +132,7 @@
   {
     "id": "thanh_giong",
     "element": 1,
+    "race": "nhan",
     "rarity": 5,
     "role": "dps",
     "hp": 743,
@@ -161,6 +166,7 @@
   {
     "id": "hephaestus",
     "element": 1,
+    "race": "than",
     "rarity": 4,
     "role": "tank",
     "hp": 1249,
@@ -196,6 +202,7 @@
   {
     "id": "surtr",
     "element": 1,
+    "race": "long",
     "rarity": 4,
     "role": "dps",
     "hp": 600,
@@ -229,6 +236,7 @@
   {
     "id": "bennu",
     "element": 1,
+    "race": "thu",
     "rarity": 3,
     "role": "healer",
     "hp": 660,
@@ -260,6 +268,7 @@
   {
     "id": "son_tinh",
     "element": 2,
+    "race": "than",
     "rarity": 5,
     "role": "tank",
     "hp": 1546,
@@ -293,6 +302,7 @@
   {
     "id": "mai_an_tiem",
     "element": 2,
+    "race": "nhan",
     "rarity": 4,
     "role": "healer",
     "hp": 840,
@@ -322,6 +332,7 @@
   {
     "id": "artemis",
     "element": 2,
+    "race": "than",
     "rarity": 4,
     "role": "dps",
     "hp": 600,
@@ -355,6 +366,7 @@
   {
     "id": "atalanta",
     "element": 2,
+    "race": "nhan",
     "rarity": 3,
     "role": "dps",
     "hp": 471,
@@ -387,6 +399,7 @@
   {
     "id": "apollo",
     "element": 3,
+    "race": "than",
     "rarity": 5,
     "role": "support",
     "hp": 1041,
@@ -424,6 +437,7 @@
   {
     "id": "ra",
     "element": 3,
+    "race": "than",
     "rarity": 4,
     "role": "dps",
     "hp": 600,
@@ -457,6 +471,7 @@
   {
     "id": "eos",
     "element": 3,
+    "race": "linh",
     "rarity": 3,
     "role": "support",
     "hp": 660,
@@ -489,6 +504,7 @@
   {
     "id": "heimdall",
     "element": 3,
+    "race": "than",
     "rarity": 3,
     "role": "tank",
     "hp": 981,
@@ -524,6 +540,7 @@
   {
     "id": "hel",
     "element": 4,
+    "race": "linh",
     "rarity": 5,
     "role": "dps",
     "hp": 743,
@@ -557,6 +574,7 @@
   {
     "id": "loki",
     "element": 4,
+    "race": "linh",
     "rarity": 4,
     "role": "support",
     "hp": 840,
@@ -589,6 +607,7 @@
   {
     "id": "nyx",
     "element": 4,
+    "race": "linh",
     "rarity": 3,
     "role": "support",
     "hp": 660,
@@ -617,6 +636,7 @@
   {
     "id": "fenrir",
     "element": 4,
+    "race": "thu",
     "rarity": 3,
     "role": "dps",
     "hp": 471,
@@ -650,6 +670,7 @@
   {
     "id": "co_tam",
     "element": 5,
+    "race": "nhan",
     "rarity": 5,
     "role": "healer",
     "hp": 1041,
@@ -688,6 +709,7 @@
   {
     "id": "freyja",
     "element": 5,
+    "race": "linh",
     "rarity": 4,
     "role": "healer",
     "hp": 840,
@@ -717,6 +739,7 @@
   {
     "id": "eir",
     "element": 5,
+    "race": "linh",
     "rarity": 3,
     "role": "healer",
     "hp": 660,
@@ -742,6 +765,7 @@
   {
     "id": "orpheus",
     "element": 5,
+    "race": "nhan",
     "rarity": 3,
     "role": "support",
     "hp": 660,

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { indexById, buildCtx } from '../www/js/core/ctx.js';
+import { indexById, buildCtx, DATA_FILES } from '../www/js/core/ctx.js';
 
 const dataDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'www', 'js', 'data');
 export const readJson = (f) => JSON.parse(fs.readFileSync(path.join(dataDir, f), 'utf8'));
@@ -9,16 +9,9 @@ export const readJson = (f) => JSON.parse(fs.readFileSync(path.join(dataDir, f),
 const demo = JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'demo_characters.json'), 'utf8'));
 
 export function loadCtx() {
-  return buildCtx({
-    config: readJson('config.json'),
-    characters: [...demo, ...readJson('characters.json')],
-    duos: readJson('duos.json'),
-    banners: readJson('banners.json'),
-    story: readJson('story.json'),
-    monsters: readJson('monsters.json'),
-    zones: readJson('zones.json'),
-    events: readJson('events.json'),
-  });
+  const raw = Object.fromEntries(DATA_FILES.map((k) => [k, readJson(`${k}.json`)]));
+  raw.characters = [...demo, ...raw.characters];
+  return buildCtx(raw);
 }
 export { indexById };
 

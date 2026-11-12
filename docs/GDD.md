@@ -124,10 +124,10 @@ Khu mở khóa theo thứ tự trong bảng. Tên và cảnh nền từng khu đ
 
 ### Loot và chơi lại
 
-- **Chắc chắn**: Vàng và Tinh Hoa sau mỗi ải; ải cuối rớt thêm.
+- **Chắc chắn**: Vàng và Bánh EXP sau mỗi ải; ải cuối rớt thêm.
 - **Ngẫu nhiên**: Tinh Thạch của khu (số lượng ngẫu nhiên, có loại Thường và loại Hiếm), Mảnh Linh Hồn (hiếm), một ít Linh Thạch.
 - Cửa Elite, Rương và ải cuối có tỉ lệ rớt đồ hiếm cao hơn.
-- **Mục tiêu cân bằng**: một bậc Thức tỉnh cần lượng Tinh Thạch tương đương 1 đến 2 chuyến ở đúng khu, không cần chơi lại nhiều hơn.
+- **Mục tiêu cân bằng**: lên Form cần lượng Tinh Thạch và Lễ Vật tương đương nhiều chuyến ở độ khó Vừa/Khó (đây là vòng lặp farm của giai đoạn Mid).
 - **Bảo hiểm xui** (đề xuất): nếu chuyến trước không rớt Tinh Thạch Hiếm của khu, chuyến kế tiếp ở khu đó chắc chắn rớt.
 
 Mùa sau thêm khu mới nhưng không thêm loại vật liệu mới. Khu cũ vẫn là nơi farm, để tránh phình hệ thống.
@@ -197,7 +197,7 @@ Sáu luật cứng, không phá, để game vẫn gọn sau nhiều năm:
 1. **Ngân sách chỉ số theo độ hiếm**: 3★, 4★ và 5★ có tổng chỉ số tối đa cố định. Nhân vật mới không được vượt.
 2. **Nhân vật mới là sidegrade**: có vai trò hoặc combo mới, không phải bản mạnh hơn của nhân vật cũ.
 3. **Tối đa 12 từ khóa hiệu ứng**. Nhân vật mới chỉ tái dùng, không đẻ hiệu ứng mới.
-4. **Chỉ một trục tiến hóa**: Level + Thức tỉnh (gồm cả nâng kỹ năng; dùng Mảnh Linh Hồn và Tinh Thạch). Không rune, không trang bị, không nhiều tầng tiến hóa.
+4. **Hai trục tiến hóa của nhân vật**: Level (và Form qua Thức tỉnh) và Cấp kỹ năng (xem "Tiến hóa nhân vật v2"). Không rune, không trang bị. Form là số hữu hạn theo dữ liệu (v1 có 2 form).
 5. **Leader skill dùng khuôn mẫu cố định** (ví dụ "+X% công cho hệ Y"), không tự do chế.
 6. **Mở rộng bằng ****khu vực mới**** và event**, không bằng việc đẩy chỉ số lên.
 
@@ -244,7 +244,7 @@ Giá 3 gói ủng hộ đã chốt; số lượng quà cụ thể cân bằng �
 
 ## Vật phẩm và tiền tệ
 
-Luật 4 vẫn giữ: **không trang bị, không rune**. Vật phẩm không bao giờ tăng chỉ số vĩnh viễn; sức mạnh chỉ đến từ nhân vật, Level và Thức tỉnh. Danh sách vật phẩm giữ ngắn, dưới 10 loại ở v1. Mọi con số dưới đây là **đề xuất**, cân bằng ở M5 đến M6.
+Luật 4 vẫn giữ: **không trang bị, không rune**. Vật phẩm không bao giờ tăng chỉ số vĩnh viễn; sức mạnh chỉ đến từ nhân vật, Level, Form và cấp kỹ năng. Danh sách vật phẩm giữ ngắn, dưới 10 loại ở v1. Mọi con số dưới đây là **đề xuất**, cân bằng ở M5 đến M6.
 
 ### Tiền tệ và nguyên liệu
 
@@ -252,24 +252,34 @@ Luật 4 vẫn giữ: **không trang bị, không rune**. Vật phẩm không ba
 |---|---|---|
 | Vàng | Mua đồ ở Shop trong tháp, trả phí Thức tỉnh | Thắng trận, rương |
 | Linh Thạch | Triệu hồi (đề xuất 100 Linh Thạch = 1 lượt) | Lượt miễn phí mỗi ngày, qua ải, nhiệm vụ, gói ủng hộ |
-| Mảnh Linh Hồn | Thức tỉnh; đủ 200 thì đổi 1 nhân vật tự chọn | Nhân vật trùng tự đổi thành mảnh; rớt hiếm ở khu vực |
-| Tinh Thạch (6 loại theo hệ, có Thường và Hiếm) | Thức tỉnh nhân vật cùng hệ | Khu vực cùng hệ |
-| Tinh Hoa | Lên Level | Thắng trận, rương |
+| Mảnh Linh Hồn | Thức tỉnh (lên Form); đủ 200 thì đổi 1 nhân vật tự chọn | Nhân vật trùng tự đổi thành mảnh; rớt hiếm ở khu vực |
+| Tinh Thạch (6 loại theo hệ, có Thường và Hiếm) | Thức tỉnh (lên Form) nhân vật cùng hệ | Khu vực cùng hệ |
+| Bánh EXP | Lên Level (1 Bánh = 1 EXP) | Thắng trận, rương |
+| Tiểu Linh (1★, 2★ theo hệ) | Cho ăn lấy EXP, hoặc bán lấy Vàng | Quái trong ải |
+| Lễ Vật (theo Tộc, bậc 1 đến 3) | Nâng cấp kỹ năng | Khu có quái cùng tộc, độ khó cao rớt bậc cao |
 
 Đã chốt: bản trùng tự động thành Mảnh Linh Hồn, và Thức tỉnh tốn mảnh. Số mảnh theo độ hiếm cân bằng ở M5.
 
-### Thức tỉnh và nâng kỹ năng
+### Tiến hóa nhân vật v2 (chốt 2026-11-12)
 
-Thức tỉnh là **trục tiến hóa duy nhất ngoài Level** (luật 4), gồm 5 bậc. Nâng kỹ năng nằm trong Thức tỉnh, không phải một hệ thống riêng. Ngân sách chỉ số ở luật 1 tính tại bậc Thức tỉnh tối đa.
+**Level 1 đến 50 (Form 1), Form 2 nâng trần lên 60.** Lên Level tốn **EXP**, nguồn EXP có hai loại:
+- **Bánh EXP** (đổi tên từ Tinh Hoa): rớt từ mọi trận, rương, hoàn thành ải. 1 Bánh = 1 EXP.
+- **Tiểu Linh** (quái cùi 1★ và 2★ theo hệ, 12 loại): rớt từ quái trong ải. Cho tướng ăn để lấy EXP (cùng hệ được thêm 50%), hoặc bán lấy Vàng. Độ khó cao rớt 2★ nhiều hơn.
 
-| Bậc | Hiệu quả | Tốn |
-|---|---|---|
-| 1 và 2 | Tăng chỉ số | Mảnh Linh Hồn, Tinh Thạch Thường cùng hệ, Vàng |
-| 3 | Giảm hồi chiêu kỹ năng chủ động | Mảnh Linh Hồn, Tinh Thạch Thường cùng hệ, Vàng |
-| 4 | Tăng chỉ số | Mảnh Linh Hồn, Tinh Thạch Hiếm cùng hệ, Vàng |
-| 5 | Giảm hồi chiêu thêm một lần, đổi khung thẻ | Mảnh Linh Hồn, Tinh Thạch Hiếm cùng hệ, Vàng |
+**Form (Thức tỉnh):** chỉ khi tướng đạt Level tối đa của form hiện tại. Sang form mới là một bản thiết kế riêng: art, tên, chỉ số gốc cao hơn, bộ kỹ năng riêng (chủ động, bị động, đội trưởng), trần Level cao hơn. Giữ nguyên Level và giữ cấp kỹ năng theo từng ô. Tốn nhiều nguyên liệu khó kiếm (Mảnh Linh Hồn, Tinh Thạch Hiếm cùng hệ, Vàng, Lễ Vật bậc cao). Dữ liệu cho phép thêm form 3, 4... sau này.
 
-Số lượng từng bậc cân bằng ở M5, theo mục tiêu mỗi bậc cần khoảng 1 đến 2 chuyến ở đúng khu.
+**Cấp kỹ năng (kiểu Summoners War):** mỗi tướng có 3 ô kỹ năng: chủ động, bị động, đội trưởng. Mỗi ô có số cấp theo độ hiếm: 3★ có 3 cấp, 4★ có 4 cấp, 5★ có 5 cấp. Mỗi cấp mạnh hơn chút (hệ số chung trong `config.skillUp`, cấp cuối giảm hồi chiêu của kỹ năng chủ động). Tốn **Lễ Vật** theo Tộc của tướng, bậc 1 đến 3 (Dễ rớt bậc 1, Vừa bậc 2, Khó bậc 3), đây là lý do quay lại farm từng khu và từng độ khó.
+
+**Tộc:** Thần, Nhân, Thú, Long, Linh. Tộc dùng cho kỹ năng đội trưởng và Duo nhắm theo tộc, Cộng hưởng tộc (đội 3 hoặc 5 tướng cùng tộc được thưởng nhỏ), và loại Lễ Vật. Quái cũng có Tộc, mỗi khu có 1 đến 2 tộc nên rớt đúng loại Lễ Vật tương ứng.
+
+**Ba giai đoạn người chơi:**
+| Giai đoạn | Việc chính |
+|---|---|
+| Newbie | Tướng yếu: farm EXP, lên cấp kỹ năng, xây đội đầu tiên. Chủ yếu khu 1 đến 3, độ khó Dễ. |
+| Mid | Có 1 đến 2 đội chính. Lùng khu PVE cao hơn và độ khó Vừa/Khó để săn nguyên liệu cao (Lễ Vật bậc 2, Tinh Thạch Hiếm), Vàng nhiều hơn. Thức tỉnh Form 2 các tướng chủ lực. |
+| Late | Nhiều đội, nhiều nguyên liệu. Chơi nội dung khó nhất (độ khó Khó ở khu cuối, nội dung về sau). |
+
+Cân bằng theo giai đoạn: bảng sức mạnh mục tiêu mỗi giai đoạn trong `docs/BALANCE_LOG.md`; số liệu trong `config.json` (`progression`, `upgrade`, `skillUp`, `balance`).
 
 ### Vật phẩm dùng trong chuyến
 

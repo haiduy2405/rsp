@@ -92,3 +92,11 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 - Chưa có năng lượng/stamina. Khi làm: thêm chi phí theo độ khó vào `config.difficulty` (Dễ ít, Khó nhiều) và trừ lúc `startRun` trong `main.js`.
 - Save v5: `clears` theo độ khó `{ zoneId: { easy, normal, hard } }` (migrate v4 → v5 tự động).
 - Cân bằng: `DIFF=hard node tools/balance-sim.js --targets` (đội mạnh hơn theo `difficulty.*.sim`).
+
+## Hệ tướng v2, bước 1 (v0.12)
+- **Tộc**: Thần / Nhân / Thú / Long / Linh (`race` trong characters.json, monsters.json; danh sách ở `config.races`).
+- **Cấp 1–50**: EXP bằng Bánh EXP (Tinh Hoa cũ) hoặc cho ăn Tiểu Linh 1–2★ (`data/fodder.json`, rớt từ ải theo hệ khu và độ khó; cùng hệ ×1.5 EXP). Tiểu Linh bán được lấy Vàng ở màn Vật phẩm.
+- **AOE**: xoay nhóm ngọc từ 5 viên (`config.group.aoeSize`) thì tướng đó đánh toàn bộ quái.
+- **Thẻ tướng** kiểu ToS (`ui/hero-ui.js`): HP, ATK, Hồi, Tộc, hệ; dùng ở Bộ sưu tập và bảng thông tin trong trận.
+- **Tạm dừng** trong trận: chỉnh âm thanh hoặc thoát. Thoát bỏ trận dở, giữ tiến trình các cửa đã xong (chơi lại từ lúc chọn cửa). Test: `tests/e2e/pause.cjs`.
+- Lưu ý: save đã reset theo v6; thức tỉnh cũ vẫn tạm giữ cho tới v0.14 (Form 2).

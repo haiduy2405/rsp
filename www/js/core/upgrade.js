@@ -1,26 +1,84 @@
 import { statsFor } from './stats.js';
-// Nâng cấp nhân vật: Level (Tinh Hoa), Thức tỉnh (Mảnh Linh Hồn + Tinh Thạch cùng hệ + Vàng), nhận nhân vật, đổi đội.
+// Nâng cấp nhân vật: Level (EXP từ Bánh EXP và Tiểu Linh), Thức tỉnh (Mảnh Linh Hồn + Tinh Thạch cùng hệ + Vàng), nhận nhân vật, đổi đội.
 // Mọi hàm thuần: nhận progress, trả { ok, progress?, reason?, ... }. Số liệu ở config.upgrade.
 
 const fail = (reason) => ({ ok: false, reason });
 
-export function levelCost(ctx, id, level) {
+// EXP cần để lên cấp kế (từ `level` lên `level + 1`). null nếu đã tối đa.
+export function expToNext(ctx, id, level) {
   const c = ctx.characters[id];
   if (!c || level >= ctx.config.progression.levelMax) return null;
-  const u = ctx.config.upgrade.level;
-  return Math.round(u.baseEssence * (1 + u.growth * (level - 1)) * u.rarityMult[c.rarity]);
+  const u = ctx.config.exp;
+  return Math.round(u.base * (1 + u.growth * (level - 1)) * u.rarityMult[c.rarity]);
 }
 
-export function levelUp(ctx, progress, id) {
+// EXP còn thiếu để đạt cấp tối đa (tính cả EXP đang tích).
+export function expToMax(ctx, id, ch) {
+  let total = -ch.exp;
+  for (let l = ch.level; l < ctx.config.progression.levelMax; l++) total += expToNext(ctx, id, l);
+  return total;
+}
+
+// Cộng EXP, tự lên cấp; phần dư khi đã tối đa bị bỏ. Trả progress mới và số cấp tăng.
+function grantExp(ctx, ch, id, amount) {
+  const before = ch.level;
+  ch.exp += amount;
+  for (let need = expToNext(ctx, id, ch.level); need !== null && ch.exp >= need; need = expToNext(ctx, id, ch.level)) {
+    ch.exp -= need;
+    ch.level += 1;
+  }
+  if (ch.level >= ctx.config.progression.levelMax) ch.exp = 0;
+  return ch.level - before;
+}
+
+// Dùng Bánh EXP (1 Bánh = 1 EXP); không dùng quá số cần để đạt cấp tối đa.
+export function useCakes(ctx, progress, id, amount) {
   const ch = progress.characters[id];
   if (!ch) return fail('not_owned');
-  const cost = levelCost(ctx, id, ch.level);
-  if (cost === null) return fail('max_level');
-  if (progress.inventory.essence < cost) return fail('not_enough_essence');
+  const need = expToMax(ctx, id, ch);
+  if (need <= 0) return fail('max_level');
+  const n = Math.min(amount, need, progress.inventory.essence);
+  if (n <= 0) return fail('not_enough_essence');
   const p = structuredClone(progress);
-  p.inventory.essence -= cost;
-  p.characters[id].level += 1;
-  return { ok: true, progress: p, cost };
+  p.inventory.essence -= n;
+  const levels = grantExp(ctx, p.characters[id], id, n);
+  return { ok: true, progress: p, used: n, levels };
+}
+
+// Cho tướng ăn Tiểu Linh `key` ('hệ_sao') x count. Cùng hệ với tướng được thêm % EXP.
+export function fodderExp(ctx, id, key) {
+  const f = ctx.fodder[key];
+  const same = f.element === ctx.characters[id].element;
+  return Math.round(f.exp * (same ? ctx.config.exp.fodderSameElement : 1));
+}
+
+export function feedFodder(ctx, progress, id, key, count = 1) {
+  const ch = progress.characters[id];
+  if (!ch) return fail('not_owned');
+  if (!ctx.fodder[key]) return fail('unknown_fodder');
+  if (expToMax(ctx, id, ch) <= 0) return fail('max_level');
+  const have = progress.inventory.fodder[key] || 0;
+  const per = fodderExp(ctx, id, key);
+  // Không ăn thừa: chỉ dùng số con cần để chạm cấp tối đa.
+  const n = Math.min(count, have, Math.ceil(expToMax(ctx, id, ch) / per));
+  if (n <= 0) return fail('no_fodder');
+  const p = structuredClone(progress);
+  p.inventory.fodder[key] -= n;
+  if (p.inventory.fodder[key] === 0) delete p.inventory.fodder[key];
+  const levels = grantExp(ctx, p.characters[id], id, per * n);
+  return { ok: true, progress: p, used: n, gained: per * n, levels };
+}
+
+export function sellFodder(ctx, progress, key, count = 1) {
+  const f = ctx.fodder[key];
+  if (!f) return fail('unknown_fodder');
+  const n = Math.min(count, progress.inventory.fodder[key] || 0);
+  if (n <= 0) return fail('no_fodder');
+  const p = structuredClone(progress);
+  p.inventory.fodder[key] -= n;
+  if (p.inventory.fodder[key] === 0) delete p.inventory.fodder[key];
+  p.inventory.gold += f.sell * n;
+  return { ok: true, progress: p, sold: n, gold: f.sell * n };
 }
 
 // stage: 1..5 (bậc sắp đạt). Trả null nếu đã tối đa.
@@ -59,7 +117,7 @@ export function grantCharacter(ctx, progress, id) {
     p.inventory.shards += shards;
     return { ok: true, progress: p, duplicate: true, shards };
   }
-  p.characters[id] = { level: 1, awaken: 0 };
+  p.characters[id] = { level: 1, awaken: 0, exp: 0 };
   return { ok: true, progress: p, duplicate: false, shards: 0 };
 }
 
@@ -170,4 +228,4 @@ export function autoTeam(ctx, progress) {
 }
 
 // Đội chuẩn bị vào trận: [{id, level, awaken}].
-export const teamRoster = (progress) => progress.team.filter((id) => id !== null).map((id) => ({ id, ...progress.characters[id] }));
+export const teamRoster = (progress) => progress.team.filter((id) => id !== null).map((id) => ({ id, level: progress.characters[id].level, awaken: progress.characters[id].awaken }));
