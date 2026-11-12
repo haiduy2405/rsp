@@ -181,3 +181,7 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.27.2 – Mượt hơn khi khởi động
 - Ảnh thẻ tướng giảm còn 768×1152 (3,5 MB thay vì 4,6 MB) và được tải nền sau khi vào game (`assets.js`), không chặn màn tải; chi tiết tướng dùng chân dung tạm cho tới khi ảnh thẻ về. Giảm RAM giải mã trên máy yếu.
+
+## v0.28.0 – Art vẽ tay phẳng cho toàn bộ game
+- Làm lại 24 tướng, 27 quái, nền hub, nền trận và logo theo phong cách minh họa phẳng vẽ tay (viền nâu đậm, mảng màu ấm, hạt giấy), bỏ vẻ "AI bóng loáng". Công cụ nhập: `tools/art-import2.py` (tướng, 2 tướng/ảnh), `tools/art-import-mon.py` (quái, lưới 3×2, tự tách nền kem), nền/logo cắt bằng cùng bộ hàm.
+- UI đổi sang bảng nâu đất / kem giấy / vàng đồng khớp art (`:root` trong `app.css`, màu canvas `render.js`); ngọc khu trên hub đặt lại theo các đảo của nền mới.
