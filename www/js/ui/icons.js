@@ -20,8 +20,15 @@ export const REWARD_ICON = {
 };
 
 // Icon vật phẩm dùng chung (Hòm đồ, màn tướng, triệu hồi): size 'sm' | 'lg'.
+// Icon vẽ tay (webp) cho các khóa có art; khóa còn lại dùng SVG cũ.
+export const IMG_KEYS = new Set(['gold', 'spirit', 'ticket', 'soul', 'shard', 'stoneN', 'stoneR', 'fragment', 'generic', 'elixir1', 'elixir2', 'elixir3', 'fodder', 'offering']);
+const imgIcon = (e, k, tint) => {
+  e.innerHTML = `<img src="assets/ui/items/${k}.webp" alt="" draggable="false">${tint ? `<i class="tintdot" style="background:${tint}"></i>` : ''}`;
+  return e;
+};
 export function itemIcon(k, size = 'sm', tint) {
   const e = h('span', { class: `ricon icon-${size}` });
+  if (IMG_KEYS.has(k)) return imgIcon(e, k, tint && (k === 'stoneN' || k === 'stoneR' || k === 'fragment') ? tint : null);
   const body = tint && (k === 'stoneN' || k === 'stoneR' || k === 'fragment') ? REWARD_ICON[k].replace(/fill="#(7d8fd8|ffd24a|c0c0c0)"/, `fill="${tint}"`) : REWARD_ICON[k];
   e.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
   return e;
@@ -29,6 +36,7 @@ export function itemIcon(k, size = 'sm', tint) {
 
 export const rewardIcon = (k) => {
   const e = h('span', { class: 'ricon' });
+  if (IMG_KEYS.has(k)) return imgIcon(e, k, null);
   e.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${REWARD_ICON[k]}</svg>`;
   return e;
 };

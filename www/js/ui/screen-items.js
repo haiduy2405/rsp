@@ -91,7 +91,7 @@ export function install(app) {
       : h('div', { class: 'muted', id: 'item-detail' }, t('items.pick'));
     screen(
       h('h2', {}, t('hub.items')),
-      h('div', { class: 'row' }, h('div', { class: 'res', id: 'inv-gold' }, h('i', { class: 'dot', style: `background:${CUR_COL.gold}` }), t('res.gold'), h('b', {}, fmt(inv.gold))), h('div', { class: 'res', id: 'inv-spirit' }, h('i', { class: 'dot', style: `background:${CUR_COL.spirit}` }), t('res.spirit'), h('b', {}, fmt(inv.spirit)))),
+      h('div', { class: 'row' }, h('div', { class: 'res', id: 'inv-gold' }, itemIcon('gold', 'sm'), t('res.gold'), h('b', {}, fmt(inv.gold))), h('div', { class: 'res', id: 'inv-spirit' }, itemIcon('spirit', 'sm'), t('res.spirit'), h('b', {}, fmt(inv.spirit)))),
       h('div', { class: 'row tabs' }, ['all', 'elixir', 'mats', 'frag', 'fodder'].map((k) => btn(t(k === 'all' ? 'items.all' : `items.tab.${k}`), () => { itemsTab = k; itemsSel = null; showItems(); }, k === itemsTab ? 'primary' : '', { 'data-tab': k }))),
       itemsMsg ? h('div', { class: 'notice', id: 'items-msg' }, itemsMsg) : null,
       detail,

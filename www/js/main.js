@@ -128,13 +128,14 @@ const ICONS = {
   help: '<circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6.9c0 1.9-2.8 2.3-2.8 4"/><path d="M12 17.6v.2"/>',
   clues: '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/>',
 };
+const ART_ICONS = new Set(['team', 'summon', 'shop', 'quests', 'help', 'settings']);
 function dockBtn(icon, label, onclick, id, cls = '') {
   const b = h('button', { onclick, id, class: cls, 'aria-label': label, title: label });
-  b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[icon]}</svg>`;
+  b.innerHTML = ART_ICONS.has(icon) ? `<img src="assets/ui/icons/${icon}.webp" alt="" draggable="false">` : `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[icon]}</svg>`;
   return b;
 }
 const CUR_COL = { gold: '#ffd24a', spirit: '#b58bff', ticket: '#ff9a4a', shard: '#ff9acb' };
-const curPill = (k, v, id) => h('button', { class: 'cur-pill', ...(id ? { id } : {}), onclick: () => ui.showItems(), 'aria-label': t(`res.${k}`) }, h('i', { style: `background:${CUR_COL[k]}` }), h('b', {}, new Intl.NumberFormat(lang).format(v)));
+const curPill = (k, v, id) => h('button', { class: 'cur-pill', ...(id ? { id } : {}), onclick: () => ui.showItems(), 'aria-label': t(`res.${k}`) }, h('img', { src: `assets/ui/items/${k}.webp`, alt: '', draggable: 'false' }), h('b', {}, new Intl.NumberFormat(lang).format(v)));
 const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } : {}) }, label, h('b', {}, String(value)));
 
 // Cảnh chính: Tòa Tháp giữa các đảo nổi. Mỗi khu mở là một viên ngọc phát sáng trên đảo (chạm để vào khu).

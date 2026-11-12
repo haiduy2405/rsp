@@ -471,3 +471,50 @@ details.card[open] > summary { margin-bottom: 8px; }
 @keyframes pop { from { opacity: 0; transform: translateX(-50%) scale(.4); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
 @keyframes ring { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(1.35); } }
 @media (prefers-reduced-motion: reduce) { .end-title, .endhero, .endhero i, .endhero.up::after, .endloot { animation: none; } }
+
+/* ----- icon vẽ tay: dock, tiền tệ, vật phẩm ----- */
+.dock button img { width: 38px; height: 38px; object-fit: contain; display: block; pointer-events: none; filter: drop-shadow(0 2px 0 rgba(28, 16, 9, .55)); }
+.dock button.sub img { width: 40px; height: 40px; }
+.dock button.sub { background: rgba(42, 24, 16, .92); border-color: var(--line-hi); box-shadow: 0 0 0 3px rgba(28, 16, 9, .8); }
+.help-btn img { width: 26px; height: 26px; }
+.cur-pill img { width: 20px; height: 20px; object-fit: contain; order: 2; margin-right: -2px; }
+.ricon { position: relative; }
+.ricon img { width: 100%; height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 1px 0 rgba(28, 16, 9, .5)); }
+.ricon .tintdot { position: absolute; right: -2px; bottom: -2px; width: 34%; height: 34%; min-width: 9px; min-height: 9px; border-radius: 50%; border: 2px solid #3a2416; }
+.ricon:not([class*="icon-"]) { width: 34px; height: 34px; display: inline-flex; }
+
+/* ===== Triệu hồi: sân khấu banner, ví, thanh bảo đảm, thanh rút dính đáy ===== */
+.sm-wallet { display: flex; gap: 8px; width: 100%; }
+.sm-cur { flex: 1; display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: rgba(28, 16, 9, .72); border: 1px solid var(--line-hi); font-size: 13px; font-weight: 700; color: var(--bone); }
+.sm-cur .ricon.icon-sm { width: 24px; height: 24px; }
+.banner-tabs button { border-radius: 999px; }
+.sm-stage { position: relative; width: 100%; padding: 14px 12px 14px; border-radius: 12px; border: 2px solid var(--line-hi); overflow: hidden; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  background: radial-gradient(90% 70% at 50% 38%, #f6c98a 0%, #d98b4f 55%, #7a3f12 100%); box-shadow: inset 0 0 0 3px rgba(28, 16, 9, .35), 0 6px 0 rgba(28, 16, 9, .5); }
+.sm-circle { position: absolute; left: 50%; top: 18px; width: 250px; height: 250px; margin-left: -125px; border-radius: 50%; border: 3px solid rgba(28, 16, 9, .5); background: repeating-conic-gradient(from 0deg, rgba(28, 16, 9, .16) 0 10deg, transparent 10deg 20deg); animation: spinSlow 60s linear infinite; pointer-events: none; }
+.sm-circle::after { content: ''; position: absolute; inset: 30px; border-radius: 50%; border: 3px dashed rgba(28, 16, 9, .45); }
+@keyframes spinSlow { to { transform: rotate(360deg); } }
+.sm-fan { position: relative; z-index: 1; display: flex; justify-content: center; align-items: flex-end; height: 196px; width: 100%; }
+.fan-card { position: absolute; bottom: 0; width: 118px; border-radius: 10px; border: 3px solid #3a2416; overflow: hidden; background: #3a2416; box-shadow: 0 6px 0 rgba(28, 16, 9, .5); }
+.fan-card img { width: 100%; display: block; aspect-ratio: 3 / 4; object-fit: cover; }
+.fan-card b { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 0; font-size: 11px; color: var(--gold-hi); background: rgba(28, 16, 9, .78); letter-spacing: .05em; }
+.fan-card.r5 { border-color: var(--gold); }
+.fan-card.pos0 { transform: translateX(-84px) rotate(-8deg) scale(.88); }
+.fan-card.pos1 { transform: translateY(-6px) scale(1.12); z-index: 2; }
+.fan-card.pos2 { transform: translateX(84px) rotate(8deg) scale(.88); }
+.sm-ribbon { position: relative; z-index: 2; margin-top: -4px; padding: 6px 22px; font-family: var(--serif); font-weight: 800; font-size: 17px; color: #fbefd5; background: #8a3a1a; border: 2px solid #3a2416; border-radius: 4px; box-shadow: 0 3px 0 rgba(28, 16, 9, .55); clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 50%, 100% 100%, 0 100%, 10px 50%); }
+.sm-desc { z-index: 1; font-size: 13px; color: #2a1503; font-weight: 600; }
+.sm-stage .rateup { z-index: 1; color: #fbefd5; background: rgba(28, 16, 9, .6); border-radius: 8px; padding: 5px 10px; font-size: 12px; }
+.pity-row { display: flex; align-items: center; gap: 8px; width: 100%; }
+.pity-row .pity-bar { flex: 1; height: 12px; border-radius: 6px; border: 2px solid var(--line-hi); background: rgba(28, 16, 9, .7); }
+.pity-bar i { background: linear-gradient(180deg, var(--amber-hi), var(--amber)); box-shadow: none; border-radius: 4px; }
+.pity-end { font-weight: 800; font-size: 13px; color: var(--gold-hi); }
+.row.packs { gap: 8px; }
+.row.packs .pack { display: flex; align-items: center; gap: 8px; justify-content: center; text-align: left; font-size: 12px; line-height: 1.25; }
+.row.packs .pack .ricon { width: 26px; height: 26px; flex: none; display: inline-flex; }
+.row.pulls { gap: 8px; align-items: stretch; }
+.row.pulls button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 52px; line-height: 1.15; }
+.row.pulls button .ricon { width: 24px; height: 24px; flex: none; display: inline-flex; }
+.row.pulls button.free { flex: none; animation: freePulse 1.6s ease-in-out infinite; }
+@keyframes freePulse { 50% { transform: scale(1.04); } }
+@media (prefers-reduced-motion: reduce) { .sm-circle, .row.pulls button.free { animation: none; } }
+.res .ricon.icon-sm { width: 20px; height: 20px; }

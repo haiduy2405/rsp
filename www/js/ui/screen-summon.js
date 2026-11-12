@@ -1,6 +1,7 @@
 // Màn hình: summon (tách khỏi main.js). Trạng thái dùng chung đi qua `app`.
 import { $, h, btn } from './dom.js';
 import { itemIcon } from './icons.js';
+import { getImg } from './assets.js';
 import { summon, buyTickets, redeemCharacter, effectiveRates } from '../core/summon.js';
 
 export function install(app) {
@@ -37,27 +38,35 @@ export function install(app) {
       const cost = cfg.ticketsPerPull * count;
       showSummon(bannerId, { count, cost });
     };
+    // Tướng đại diện của banner: văn hóa của banner, hoặc mỗi văn hóa một tướng cao sao nhất cho banner thường.
+    const pool = ctx.characterList.filter((c) => !c.reserve && (!banner.culture || c.culture === banner.culture));
+    const seenCul = new Set();
+    const stars = pool.slice().sort((x, y) => y.rarity - x.rarity || (x.id < y.id ? -1 : 1)).filter((c) => (banner.culture ? true : !seenCul.has(c.culture) && seenCul.add(c.culture))).slice(0, 3);
+    const fan = [stars[1], stars[0], stars[2]].filter(Boolean);
+    const fanCard = (c, i) => {
+      const art = getImg(`card:${c.id}`);
+      return h('div', { class: `fan-card r${c.rarity} pos${fan.length === 3 ? i : i + 1}` }, art ? h('img', { src: art.src, alt: '', draggable: 'false' }) : portrait(c.id, 96), h('b', {}, '★'.repeat(c.rarity)));
+    };
+    const pityPct = Math.min(100, (sm.pity5 / cfg.pity5) * 100);
     screen(
       h('h2', {}, t('summon.title')),
-      h('div', { class: 'row' }, h('div', { class: 'res', id: 'tickets' }, itemIcon('ticket', 'sm'), t('summon.tickets', { n: app.progress.inventory.tickets })), h('div', { class: 'res', id: 'spirit' }, t('summon.spirit', { n: app.progress.inventory.spirit }))),
-      h('div', { class: 'row packs' }, cfg.ticketPacks.map((pk, i) => btn(t('summon.buy', { t: pk.tickets, s: pk.spirit }), () => {
-        const r = buyTickets(ctx, app.progress, i);
-        if (r.ok) { app.progress = r.progress; save(); audio.sfx('reveal'); showSummon(bannerId, null, null); } else showSummon(bannerId, null, `err.${r.reason}`);
-      }, '', { id: `buy-${i}` }))),
+      h('div', { class: 'sm-wallet' },
+        h('div', { class: 'sm-cur', id: 'tickets' }, itemIcon('ticket', 'sm'), h('span', {}, t('summon.tickets', { n: app.progress.inventory.tickets }))),
+        h('div', { class: 'sm-cur', id: 'spirit' }, itemIcon('spirit', 'sm'), h('span', {}, t('summon.spirit', { n: app.progress.inventory.spirit })))),
       msg ? h('div', { class: 'notice' }, t(msg)) : null,
       h('div', { class: 'banner-tabs' }, ctx.bannerList.map((b) => btn(t(`banner.${b.id}.name`), () => showSummon(b.id), b.id === bannerId ? 'primary' : '', { 'data-banner': b.id }))),
-      h(
-        'div',
-        { class: 'card banner-art' },
-        h('h3', {}, t(`banner.${bannerId}.name`)),
-        banner.culture
-          ? h('div', { class: 'banner-heroes' }, ctx.characterList.filter((c) => c.culture === banner.culture && !c.reserve).sort((x, y) => y.rarity - x.rarity).slice(0, 5).map((c) => h('div', { class: `bh r${c.rarity}` }, portrait(c.id, 58))))
-          : null,
-        h('div', { class: 'muted' }, t(`banner.${bannerId}.desc`)),
-        h('div', { class: 'rateup' }, rateUp),
-      ),
-      // Tiến độ bảo đảm gọn một thanh; tỉ lệ đầy đủ nằm ngay dưới, mở một chạm
-      h('div', { class: 'pity' }, h('div', { class: 'pity-bar' }, h('i', { style: `width:${Math.min(100, (sm.pity5 / cfg.pity5) * 100)}%` })), h('small', {}, t('summon.pity5', { max: cfg.pity5, n: sm.pity5 }))),
+      h('div', { class: 'sm-stage' },
+        h('div', { class: 'sm-circle', 'aria-hidden': 'true' }),
+        h('div', { class: 'sm-fan' }, fan.map(fanCard)),
+        h('div', { class: 'sm-ribbon' }, t(`banner.${bannerId}.name`)),
+        h('div', { class: 'sm-desc' }, t(`banner.${bannerId}.desc`)),
+        h('div', { class: 'rateup' }, rateUp)),
+      // Tiến độ bảo đảm 5★ một thanh; tỉ lệ đầy đủ nằm ngay dưới, mở một chạm
+      h('div', { class: 'pity' }, h('div', { class: 'pity-row' }, h('div', { class: 'pity-bar' }, h('i', { style: `width:${pityPct}%` })), h('span', { class: 'pity-end' }, '5★')), h('small', {}, t('summon.pity5', { max: cfg.pity5, n: sm.pity5 }))),
+      h('div', { class: 'row packs' }, cfg.ticketPacks.map((pk, i) => h('button', { class: 'pack', id: `buy-${i}`, onclick: () => {
+        const r = buyTickets(ctx, app.progress, i);
+        if (r.ok) { app.progress = r.progress; save(); audio.sfx('reveal'); showSummon(bannerId, null, null); } else showSummon(bannerId, null, `err.${r.reason}`);
+      } }, itemIcon('ticket', 'sm'), h('span', {}, t('summon.buy', { t: pk.tickets, s: pk.spirit }))))),
       h(
         'details',
         { class: 'card', id: 'rates' },
@@ -67,17 +76,17 @@ export function install(app) {
         h('div', { class: 'muted' }, t('summon.pity4', { max: cfg.guarantee4Every, n: sm.pity4 })),
         sm.firstDone ? null : h('div', { class: 'muted' }, t('summon.tokenNote')),
       ),
+      h('div', { class: 'row' }, btn(t('summon.history'), showHistory, '', { id: 'b-history' }), btn(t('summon.redeem'), () => showRedeem(), '', { id: 'b-redeem' })),
+      btn(t('back'), showHub, '', { id: 'back' }),
       pending
         ? confirmBox(t('summon.confirm', { cost: pending.cost, count: pending.count, banner: t(`banner.${bannerId}.name`), left: app.progress.inventory.tickets - pending.cost }), () => doSummon(pending.count, false), () => showSummon(bannerId))
         : h(
             'div',
             { class: 'row pulls' },
-            freeAvail ? btn(t('summon.free'), () => doSummon(1, true), 'primary', { id: 'pull-free' }) : h('div', { class: 'muted' }, t('summon.freeUsed')),
-            btn(t('summon.x1', { cost: cfg.ticketsPerPull }), () => ask(1), '', { id: 'pull-1' }),
-            btn(t('summon.x10', { cost: cfg.ticketsPerPull * cfg.multiCount }), () => ask(cfg.multiCount), 'primary', { id: 'pull-10' }),
+            freeAvail ? btn(t('summon.free'), () => doSummon(1, true), 'primary free', { id: 'pull-free' }) : h('div', { class: 'muted' }, t('summon.freeUsed')),
+            h('button', { id: 'pull-1', onclick: () => ask(1) }, itemIcon('ticket', 'sm'), h('span', {}, t('summon.x1', { cost: cfg.ticketsPerPull }))),
+            h('button', { class: 'primary', id: 'pull-10', onclick: () => ask(cfg.multiCount) }, itemIcon('ticket', 'sm'), h('span', {}, t('summon.x10', { cost: cfg.ticketsPerPull * cfg.multiCount }))),
           ),
-      h('div', { class: 'row' }, btn(t('summon.history'), showHistory, '', { id: 'b-history' }), btn(t('summon.redeem'), () => showRedeem(), '', { id: 'b-redeem' })),
-      btn(t('back'), showHub, '', { id: 'back' }),
     );
   }
 

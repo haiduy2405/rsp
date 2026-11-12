@@ -45,7 +45,7 @@ export function install(app) {
     });
     screen(
       h('h2', {}, t('shop.daily')),
-      h('div', { class: 'row' }, h('div', { class: 'res', id: 'shop-gold' }, h('i', { class: 'dot', style: `background:${CUR_COL.gold}` }), t('res.gold'), h('b', {}, fmt(p.inventory.gold))), h('div', { class: 'res', id: 'shop-spirit' }, h('i', { class: 'dot', style: `background:${CUR_COL.spirit}` }), t('res.spirit'), h('b', {}, fmt(p.inventory.spirit)))),
+      h('div', { class: 'row' }, h('div', { class: 'res', id: 'shop-gold' }, itemIcon('gold', 'sm'), t('res.gold'), h('b', {}, fmt(p.inventory.gold))), h('div', { class: 'res', id: 'shop-spirit' }, itemIcon('spirit', 'sm'), t('res.spirit'), h('b', {}, fmt(p.inventory.spirit)))),
       h('div', { class: 'muted' }, t('shop.resetNote')),
       msg ? h('div', { class: 'notice', id: 'shop-msg' }, msg) : null,
       cards,
