@@ -167,6 +167,768 @@
         "palbdh"
       ]
     },
+    "title": {
+      "bpm": 72,
+      "root": 50,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        8,
+        11
+      ],
+      "swing": 0.0,
+      "chords": [
+        0,
+        5,
+        3,
+        4,
+        0,
+        5,
+        6,
+        4
+      ],
+      "padWave": "sawtooth",
+      "padGain": 0.09,
+      "padCut": 1100,
+      "reverb": 0.65,
+      "arp": {
+        "wave": "sine",
+        "gain": 0.12,
+        "cut": 2600,
+        "pattern": "0...1...2...1...",
+        "len": 3.0,
+        "partials": [
+          [
+            1,
+            1
+          ],
+          [
+            2.0,
+            0.2
+          ]
+        ]
+      },
+      "lead": {
+        "wave": "triangle",
+        "gain": 0.3,
+        "cut": 3000,
+        "vib": 12,
+        "maxLen": 8,
+        "attack": 0.05,
+        "partials": [
+          [
+            1,
+            1
+          ],
+          [
+            2.0,
+            0.25
+          ]
+        ],
+        "octave": 12,
+        "bars": [
+          "4.......4...5...",
+          "5...........6...",
+          "7.......7...6...",
+          "6...5.......4...",
+          "4.......4...5...",
+          "5...........4...",
+          "6.......6...5...",
+          "7..............."
+        ]
+      },
+      "harm": {
+        "wave": "sine",
+        "gain": 0.1,
+        "below": 2
+      },
+      "bass": {
+        "wave": "triangle",
+        "gain": 0.38,
+        "pattern": "0...............",
+        "cut": 600
+      },
+      "drums": {
+        "kick": "x.......x.......",
+        "snare": "",
+        "hat": "",
+        "shaker": ""
+      },
+      "fill": false,
+      "form": [
+        "pa",
+        "palb",
+        "palbd",
+        "palbdh",
+        "palbd",
+        "palbdh",
+        "palbdh",
+        "palbd"
+      ],
+      "padAttack": 0.9
+    },
+    "summon": {
+      "bpm": 68,
+      "root": 47,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        8,
+        11
+      ],
+      "swing": 0.0,
+      "chords": [
+        0,
+        0,
+        5,
+        4,
+        0,
+        5,
+        3,
+        4
+      ],
+      "padWave": "triangle",
+      "padGain": 0.11,
+      "padCut": 1600,
+      "reverb": 0.8,
+      "arp": {
+        "wave": "sine",
+        "gain": 0.12,
+        "cut": 4200,
+        "pattern": "0123012301230123",
+        "len": 1.8,
+        "partials": [
+          [
+            1,
+            1
+          ],
+          [
+            2.0,
+            0.4
+          ]
+        ]
+      },
+      "lead": {
+        "wave": "sine",
+        "gain": 0.26,
+        "cut": 3600,
+        "vib": 16,
+        "maxLen": 8,
+        "attack": 0.08,
+        "partials": [
+          [
+            1,
+            1
+          ],
+          [
+            2.0,
+            0.3
+          ],
+          [
+            3.0,
+            0.1
+          ]
+        ],
+        "octave": 12,
+        "bars": [
+          "7.......7.......",
+          "7...........9...",
+          "9.......9.......",
+          "8.......8...a...",
+          "b.......b.......",
+          "c...........d...",
+          "c.......c.......",
+          "7..............."
+        ]
+      },
+      "harm": {
+        "wave": "triangle",
+        "gain": 0.08,
+        "below": 2
+      },
+      "bass": {
+        "wave": "sine",
+        "gain": 0.4,
+        "pattern": "0...............",
+        "cut": 500
+      },
+      "drums": {
+        "kick": "",
+        "snare": "",
+        "hat": "",
+        "shaker": ""
+      },
+      "fill": false,
+      "form": [
+        "pa",
+        "pal",
+        "palb",
+        "palbh",
+        "palb",
+        "palbh",
+        "palbh",
+        "palb"
+      ],
+      "padAttack": 1.2
+    },
+    "wish": {
+      "bpm": 78,
+      "root": 60,
+      "scale": [
+        0,
+        2,
+        4,
+        6,
+        7,
+        9,
+        11
+      ],
+      "swing": 0.0,
+      "chords": [
+        0,
+        1,
+        0,
+        4,
+        5,
+        1,
+        0,
+        4
+      ],
+      "padWave": "triangle",
+      "padGain": 0.08,
+      "padCut": 2200,
+      "reverb": 0.75,
+      "arp": {
+        "wave": "sine",
+        "gain": 0.15,
+        "cut": 5200,
+        "pattern": "0.12.3.20.12.3.2",
+        "len": 1.4,
+        "sustain": 0.2,
+        "partials": [
+          [
+            1,
+            1
+          ],
+          [
+            2.0,
+            0.5
+          ],
+          [
+            3.0,
+            0.2
+          ]
+        ]
+      },
+      "lead": {
+        "wave": "sine",
+        "gain": 0.24,
+        "cut": 4200,
+        "vib": 6,
+        "maxLen": 6,
+        "attack": 0.02,
+        "sustain": 0.4,
+        "partials": [
+          [
+            1,
+            1
+          ],
+          [
+            2.0,
+            0.5
+          ],
+          [
+            4.0,
+            0.2
+          ]
+        ],
+        "octave": 12,
+        "bars": [
+          "7.......7.......",
+          "8...........9...",
+          "9.......9.......",
+          "8...7.......6...",
+          "7.......9.......",
+          "a...........9...",
+          "9.......9.......",
+          "7..............."
+        ]
+      },
+      "harm": {
+        "wave": "sine",
+        "gain": 0.07,
+        "below": 2
+      },
+      "bass": {
+        "wave": "triangle",
+        "gain": 0.3,
+        "pattern": "0.......0.......",
+        "cut": 600
+      },
+      "drums": {
+        "kick": "",
+        "snare": "",
+        "hat": "",
+        "shaker": "..x...x...x...x."
+      },
+      "fill": false,
+      "form": [
+        "pa",
+        "pal",
+        "palb",
+        "palbh",
+        "palb",
+        "palbh",
+        "palbh",
+        "palb"
+      ],
+      "padAttack": 0.8
+    },
+    "shop": {
+      "bpm": 108,
+      "root": 55,
+      "scale": [
+        0,
+        2,
+        4,
+        5,
+        7,
+        9,
+        11
+      ],
+      "swing": 0.0,
+      "chords": [
+        0,
+        3,
+        4,
+        0,
+        0,
+        3,
+        4,
+        0
+      ],
+      "padWave": "triangle",
+      "padGain": 0.07,
+      "padCut": 1500,
+      "reverb": 0.25,
+      "arp": {
+        "wave": "square",
+        "gain": 0.06,
+        "cut": 2400,
+        "pattern": "0.1.2.1.0.1.2.3.",
+        "len": 1.2,
+        "sustain": 0.2
+      },
+      "lead": {
+        "wave": "triangle",
+        "gain": 0.34,
+        "cut": 3400,
+        "sustain": 0.25,
+        "maxLen": 2,
+        "vib": 0,
+        "octave": 12,
+        "bars": [
+          "4..5..6.7..7.8..",
+          "7..8.7..7..6..6.",
+          "6..5..6.6..4.6..",
+          "7.7..6..7.6..6.6",
+          "7..8..8.9..9.a..",
+          "a..b.c..c..c..c.",
+          "b..a..b.b..a.b..",
+          "4..............."
+        ]
+      },
+      "harm": {
+        "wave": "triangle",
+        "gain": 0.1,
+        "below": 2
+      },
+      "bass": {
+        "wave": "triangle",
+        "gain": 0.38,
+        "pattern": "0...5...0...5...",
+        "cut": 700
+      },
+      "drums": {
+        "kick": "x.......x.......",
+        "snare": "....x.......x...",
+        "hat": "x.x.x.x.x.x.x.x.",
+        "shaker": ""
+      },
+      "fill": false,
+      "form": [
+        "pabd",
+        "palbd",
+        "palbdh",
+        "palbdh",
+        "palbd",
+        "palbdh",
+        "palbdh",
+        "palbd"
+      ]
+    },
+    "camp": {
+      "bpm": 90,
+      "root": 52,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        9,
+        10
+      ],
+      "swing": 0.0,
+      "chords": [
+        0,
+        3,
+        5,
+        3,
+        0,
+        3,
+        4,
+        0
+      ],
+      "padWave": "sawtooth",
+      "padGain": 0.065,
+      "padCut": 1100,
+      "reverb": 0.45,
+      "arp": {
+        "wave": "triangle",
+        "gain": 0.12,
+        "cut": 2600,
+        "pattern": "0.1.2.1.3.2.1.2.",
+        "len": 2.0,
+        "sustain": 0.35
+      },
+      "lead": {
+        "wave": "triangle",
+        "gain": 0.28,
+        "cut": 2800,
+        "sustain": 0.5,
+        "maxLen": 4,
+        "vib": 8,
+        "octave": 12,
+        "bars": [
+          "4.6.4...4.....4.",
+          "5...6...5.5.4...",
+          "5.4.5...5.....4.",
+          "5...5.4.5...4...",
+          "4.4.4...4.....4.",
+          "5...6...7.9.8...",
+          "8.7.7...8.....8.",
+          "7..............."
+        ]
+      },
+      "harm": {
+        "wave": "sine",
+        "gain": 0.08,
+        "below": 2
+      },
+      "bass": {
+        "wave": "triangle",
+        "gain": 0.34,
+        "pattern": "0.......0.....0.",
+        "cut": 650
+      },
+      "drums": {
+        "kick": "",
+        "snare": "",
+        "hat": "....x.......x...",
+        "shaker": "x.x.x.x.x.x.x.x."
+      },
+      "fill": false,
+      "form": [
+        "pa",
+        "palb",
+        "palbd",
+        "palbdh",
+        "palbd",
+        "palbdh",
+        "palbdh",
+        "palbd"
+      ],
+      "padAttack": 0.6
+    },
+    "mystery": {
+      "bpm": 80,
+      "root": 50,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        8,
+        10
+      ],
+      "swing": 0.0,
+      "chords": [
+        0,
+        5,
+        0,
+        1,
+        0,
+        5,
+        3,
+        1
+      ],
+      "padWave": "sawtooth",
+      "padGain": 0.08,
+      "padCut": 800,
+      "reverb": 0.7,
+      "arp": {
+        "wave": "triangle",
+        "gain": 0.1,
+        "cut": 2200,
+        "pattern": "0.....2.....1...",
+        "len": 3.0,
+        "sustain": 0.3
+      },
+      "lead": {
+        "wave": "sine",
+        "gain": 0.27,
+        "cut": 2400,
+        "vib": 14,
+        "maxLen": 6,
+        "attack": 0.04,
+        "partials": [
+          [
+            1,
+            1
+          ],
+          [
+            2.76,
+            0.12
+          ]
+        ],
+        "octave": 12,
+        "bars": [
+          "4.5...4.....5...",
+          "5.....5...6.5...",
+          "4.3...3.....3...",
+          "3.....3.3.....4.",
+          "4.6...6.....7...",
+          "7.....9...9.a...",
+          "a.9...a.....8...",
+          "7..............."
+        ]
+      },
+      "harm": {
+        "wave": "triangle",
+        "gain": 0.06,
+        "below": 3
+      },
+      "bass": {
+        "wave": "sine",
+        "gain": 0.4,
+        "pattern": "0.......0.......",
+        "cut": 500
+      },
+      "drums": {
+        "kick": "",
+        "snare": "",
+        "hat": "",
+        "shaker": ""
+      },
+      "fill": false,
+      "form": [
+        "pa",
+        "pal",
+        "palb",
+        "palbh",
+        "palb",
+        "palbh",
+        "palbh",
+        "palb"
+      ],
+      "padAttack": 1.0
+    },
+    "victory": {
+      "bpm": 122,
+      "root": 55,
+      "scale": [
+        0,
+        2,
+        4,
+        5,
+        7,
+        9,
+        11
+      ],
+      "swing": 0.0,
+      "chords": [
+        0,
+        3,
+        4,
+        0,
+        5,
+        3,
+        4,
+        0
+      ],
+      "padWave": "sawtooth",
+      "padGain": 0.08,
+      "padCut": 1700,
+      "reverb": 0.4,
+      "arp": {
+        "wave": "triangle",
+        "gain": 0.11,
+        "cut": 3400,
+        "pattern": "0.12.3.20.12.3.2",
+        "len": 1.6,
+        "sustain": 0.3
+      },
+      "lead": {
+        "wave": "sawtooth",
+        "gain": 0.17,
+        "cut": 3000,
+        "vib": 6,
+        "maxLen": 3,
+        "attack": 0.02,
+        "octave": 12,
+        "bars": [
+          "7.8...7.7...7.6.",
+          "5...5.7.7.8...7.",
+          "6.5...5.6...5.7.",
+          "7.5.5.5.7...5...",
+          "5.6...5.5...7.8.",
+          "a...a.8.a.b...b.",
+          "b.a...8.8...9.8.",
+          "5..............."
+        ]
+      },
+      "harm": {
+        "wave": "square",
+        "gain": 0.05,
+        "cut": 1800,
+        "below": 2
+      },
+      "bass": {
+        "wave": "sawtooth",
+        "gain": 0.3,
+        "pattern": "0...0...0...0..5",
+        "cut": 600
+      },
+      "drums": {
+        "kick": "x...x...x...x...",
+        "snare": "....x.......x.x.",
+        "hat": "..x...x...x...x.",
+        "shaker": ""
+      },
+      "fill": true,
+      "form": [
+        "pabd",
+        "palbd",
+        "palbdh",
+        "palbdh",
+        "palbd",
+        "palbdh",
+        "palbdh",
+        "palbdh"
+      ]
+    },
+    "defeat": {
+      "bpm": 58,
+      "root": 50,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        8,
+        10
+      ],
+      "swing": 0.0,
+      "chords": [
+        0,
+        5,
+        3,
+        4,
+        0,
+        5,
+        3,
+        0
+      ],
+      "padWave": "triangle",
+      "padGain": 0.1,
+      "padCut": 900,
+      "reverb": 0.7,
+      "arp": {
+        "wave": "sine",
+        "gain": 0.09,
+        "cut": 2000,
+        "pattern": "0.......2.......",
+        "len": 3.5,
+        "sustain": 0.3
+      },
+      "lead": {
+        "wave": "sine",
+        "gain": 0.28,
+        "cut": 2200,
+        "vib": 12,
+        "maxLen": 8,
+        "attack": 0.06,
+        "partials": [
+          [
+            1,
+            1
+          ],
+          [
+            2.0,
+            0.15
+          ]
+        ],
+        "octave": 12,
+        "bars": [
+          "4.......4.......",
+          "5...6.......7...",
+          "7.......7.......",
+          "8.......8...7...",
+          "7.......9.......",
+          "9...a.......9...",
+          "a.......a.......",
+          "3..............."
+        ]
+      },
+      "harm": {
+        "wave": "triangle",
+        "gain": 0.07,
+        "below": 2
+      },
+      "bass": {
+        "wave": "sine",
+        "gain": 0.38,
+        "pattern": "0...............",
+        "cut": 450
+      },
+      "drums": {
+        "kick": "",
+        "snare": "",
+        "hat": "",
+        "shaker": ""
+      },
+      "fill": false,
+      "form": [
+        "pa",
+        "pal",
+        "palb",
+        "palbh",
+        "palb",
+        "palbh",
+        "palbh",
+        "palb"
+      ],
+      "padAttack": 1.0
+    },
     "battle": {
       "bpm": 136,
       "root": 52,
@@ -2483,6 +3245,66 @@
     "sting": {
       "url": "assets/audio/sting.mp3",
       "gain": 0.7,
+      "rate": 1
+    },
+    "skill_water": {
+      "url": "assets/audio/skill_water.mp3",
+      "gain": 0.9,
+      "rate": 1
+    },
+    "skill_fire": {
+      "url": "assets/audio/skill_fire.mp3",
+      "gain": 0.9,
+      "rate": 1
+    },
+    "skill_wood": {
+      "url": "assets/audio/skill_wood.mp3",
+      "gain": 0.9,
+      "rate": 1
+    },
+    "skill_light": {
+      "url": "assets/audio/skill_light.mp3",
+      "gain": 0.9,
+      "rate": 1
+    },
+    "skill_dark": {
+      "url": "assets/audio/skill_dark.mp3",
+      "gain": 0.95,
+      "rate": 1
+    },
+    "skill_heart": {
+      "url": "assets/audio/skill_heart.mp3",
+      "gain": 0.9,
+      "rate": 1
+    },
+    "levelup": {
+      "url": "assets/audio/levelup.mp3",
+      "gain": 0.85,
+      "rate": 1
+    },
+    "enhance": {
+      "url": "assets/audio/enhance.mp3",
+      "gain": 0.8,
+      "rate": 1
+    },
+    "bossIn": {
+      "url": "assets/audio/bossIn.mp3",
+      "gain": 0.9,
+      "rate": 1
+    },
+    "debuff": {
+      "url": "assets/audio/debuff.mp3",
+      "gain": 0.6,
+      "rate": 1
+    },
+    "reflect": {
+      "url": "assets/audio/reflect.mp3",
+      "gain": 0.8,
+      "rate": 1
+    },
+    "revive": {
+      "url": "assets/audio/revive.mp3",
+      "gain": 0.85,
       "rate": 1
     }
   },

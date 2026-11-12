@@ -98,6 +98,8 @@ const guide = createGuide($('wrap'));
 const guideStep = () => progress?.onboarding?.guide;
 const guideSet = (step) => { if (step) progress.onboarding.guide = step; else delete progress.onboarding.guide; save(); };
 const guidePoint = (target, key, delay) => guide.point(target, t(key), delay);
+let sceneTrack = null; // bài nhạc cho màn sắp dựng (đặt NGAY TRƯỚC screen(...); gọi lại cùng màn thì nhạc không bị khởi động lại)
+const music = (name) => { sceneTrack = name; };
 const screen = (...kids) => {
   $('info')?.remove();
   $('pause-btn')?.remove();
@@ -106,7 +108,8 @@ const screen = (...kids) => {
   $('tour-ui')?.remove();
   $('screen').onpointerdown = null;
   atHub = false;
-  audio.playMusic('hub');
+  audio.playMusic(sceneTrack || 'hub');
+  sceneTrack = null;
   $('screen').style.backgroundImage = '';
   game?.destroy();
   game = null;
@@ -305,9 +308,8 @@ function showStages(zoneId, tier) {
     return card;
   });
   const gst = ['zone', 'stage', 'team'].includes(guideStep());
-  const zoneAudio = () => audio.playMusic(zoneTrack('map', zoneId));
+  music(zoneTrack('map', zoneId));
   screen(h('h2', {}, t(`zone.${zoneId}`)), tabs, h('div', { class: 'muted tier-note' }, t('diff.reward', { gold: df.gold, drop: df.drop })), h('div', { class: 'stagelist' }, cards), h('div', { class: 'muted hold-hint' }, t('stage.hold')), btn(t('back'), showZones, '', { id: 'back' }));
-  zoneAudio();
   if (gst) { guideSet('stage'); guidePoint(`#screen [data-stage="${done + 1 > total ? 1 : done + 1}"]`, 'guide.stage'); }
 }
 
@@ -421,6 +423,7 @@ function charCard(id, onclick, extra) {
 
 function showCollection() {
   const list = ctx.characterList.slice().sort((a, b) => a.element - b.element || b.rarity - a.rarity);
+  music('camp');
   screen(
     h('h2', {}, `${t('hub.collection')} ${owned().length}/${list.length}`),
     list.map((c) => charCard(c.id, () => showChar(c.id, undefined, showCollection))),
@@ -505,6 +508,7 @@ function showChar(id, msg, back) {
     if (r.ok) {
       progress = r.progress;
       if (quest) track(quest);
+      if (quest === 'level_up') audio.sfx('levelup');
       save();
       showChar(id, okMsg ? okMsg(r) : undefined);
     } else showChar(id, t(`err.${r.reason}`));
@@ -545,6 +549,7 @@ function showChar(id, msg, back) {
       );
     }),
   );
+  music('camp');
   screen(
     heroUI.header(id),
     msg ? h('div', { class: 'notice' }, msg) : null,
@@ -622,6 +627,7 @@ function showTeam(slot, msg, stage) {
   }));
   const needLeader = team[0] === null;
   const sorted = owned().slice().sort((a, b) => b.rarity - a.rarity || a.element - b.element || progress.characters[b.id].level - progress.characters[a.id].level || (a.id < b.id ? -1 : 1));
+  music('camp');
   screen(
     h('h2', {}, stage ? t('team.prep', { zone: `${t(`zone.${stage.zoneId}`)} · ${t(`diff.${stage.diff}`)} · ${t('stage.num', { n: stage.stage })}` }) : t('hub.team')),
     tabs,
@@ -683,6 +689,7 @@ function showQuests() {
   });
   const dot = (on) => (on ? h('i', { class: 'red-dot' }) : null);
   const dailyDot = hasClaimable(ctx, progress, day), achvDot = hasAchvClaimable(ctx, progress);
+  music('camp');
   screen(
     h('h2', {}, t('hub.quests')),
     h('div', { class: 'row' },
@@ -1002,6 +1009,7 @@ function showDoors() {
     nd.addEventListener('click', go);
     nd.addEventListener('keydown', (e) => e.key === 'Enter' && go());
   });
+  music(zoneTrack('map', run.zoneId));
   screen(
     mapHeader(),
     map,
@@ -1013,7 +1021,6 @@ function showDoors() {
     btn(t('run.leave'), leaveRun, 'ghost', { id: 'leave-run' }),
   );
   $('screen').classList.add('mapscreen');
-  audio.playMusic(zoneTrack('map', run.zoneId));
   if (guideStep() === 'doors') { guideSet(null); showRules(); }
   // cuộn bản đồ tới tầng đang chọn (kéo cuộn để xem phần còn lại)
   const svg = map.querySelector('svg');
@@ -1142,6 +1149,7 @@ function startTutorial(retry = false) {
 function startBattleUI() {
   const hint = progress.settings.hint !== false; // gợi ý đường kéo cho nước đi ĐẦU TIÊN của mỗi trận (người chơi tắt được bằng nút bóng đèn)
   audio.playMusic(zoneTrack(run.node === 'boss' ? 'boss' : 'battle', run.zoneId));
+  if (run.node === 'boss') audio.sfx('bossIn');
   $('screen').classList.remove('show');
   game?.destroy();
   game = startGame({
@@ -1397,6 +1405,7 @@ function showResult() {
 function showEvent() {
   const key = `ev.${run.event.id}`;
   const ev = ctx.events[run.event.id];
+  music('mystery');
   screen(
     floorTitle(),
     hpBar(),
@@ -1407,6 +1416,7 @@ function showEvent() {
 }
 
 function showShop() {
+  music('shop');
   screen(
     h('h2', {}, t('shop.title')),
     h('div', { class: 'muted' }, t('shop.gold', { n: run.loot.gold })),
@@ -1435,6 +1445,7 @@ function showEnd() {
     window.__lastRecord = record;
   }
   const won = run.result === 'won';
+  music(run.result === 'won' ? 'victory' : 'defeat');
   screen(
     h('h1', { class: 'end-title ' + (won ? 'won' : 'lost') }, t(won ? 'end.won' : 'end.lost')),
     floorTitle(),
@@ -1496,7 +1507,7 @@ function showInstallHelp() {
 const ui = {};
 const app = {
   startTutorial: () => startTutorial(), enterHub: showHub, guideStep, guideSet, guidePoint, trackQuest: track,
-  ctx, audio, storage, slots, enterSlot, dicts, h, btn, $, el, chip, portrait, CUR_COL, fodderName, offeringName, pct, save, screen, setLang, showHub,
+  ctx, audio, music, storage, slots, enterSlot, dicts, h, btn, $, el, chip, portrait, CUR_COL, fodderName, offeringName, pct, save, screen, setLang, showHub,
   t: (...a) => t(...a),
   get lang() { return lang; },
   set lang(v) { lang = v; },

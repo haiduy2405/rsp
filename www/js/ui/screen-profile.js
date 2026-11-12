@@ -9,7 +9,7 @@ import { flagPicker } from './flags.js';
 import { TOWER } from './tower-art.js';
 
 export function install(app) {
-  const { audio, ctx, dicts, save, screen, setLang, showHub, storage, t } = app;
+  const { audio, ctx, dicts, music, save, screen, setLang, showHub, storage, t } = app;
 
   // Hồ sơ người chơi: đổi tên, mã hiệu, quê hương, ngoại hình; xem thống kê.
   let profDraft = null;
@@ -194,6 +194,7 @@ export function install(app) {
       const lines = ['ob.alarm1', 'ob.alarm2', 'ob.alarm3'].map((k) => h('p', { class: 'ob-line' }, t(k)));
       const tower = h('div', { class: 'ob-tower' });
       tower.innerHTML = TOWER;
+      music('title');
       screen(
         h('div', { class: 'ob-story' }, tower, h('h1', {}, t('game.title')), h('div', { class: 'ob-lines' }, lines),
           h('div', { class: 'ob-actions' }, btn(t('ob.next'), () => showOnboarding(2), 'primary', { id: 'ob-next' }), btn(t('ob.skip'), () => showOnboarding(2), 'ghost', { id: 'ob-skip' }))),
@@ -202,6 +203,7 @@ export function install(app) {
     } else {
       const preview = h('div', { class: 'avatar big ob-me' }, avatarNode(ob));
       const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (ob.avatar === i && !ob.photo ? ' sel' : ''), 'data-avatar': i, onclick: () => { ob.avatar = i; ob.photo = null; showOnboarding(2, err); } }, avatarNode({ avatar: i })));
+      music('title');
       screen(
         h('div', { class: 'ob-id' },
           h('div', { class: 'ob-aida' }, h('b', {}, 'AIDA'), h('p', {}, t('ob.aida'))),

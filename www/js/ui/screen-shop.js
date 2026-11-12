@@ -5,7 +5,7 @@ import { ensureShop, buyOffer, leftStock } from '../core/shop.js';
 import { COLORS } from './hero-ui.js';
 
 export function install(app) {
-  const { el, CUR_COL, ctx, offeringName, save, screen, showHub, t } = app;
+  const { el, CUR_COL, ctx, music, offeringName, save, screen, showHub, t } = app;
   let msg = null;
 
   const RARITY_COL = ['#6b6f7d', '#6b6f7d', '#4fae7b', '#4f8fe0', '#a066e8', '#e0a64a'];
@@ -43,6 +43,7 @@ export function install(app) {
         itemIcon(icon, 'lg', tint), h('div', { class: 'so-info' }, h('b', {}, nameOf(o.give)), h('small', { class: 'muted' }, t('shop.left', { n: Math.max(0, left) }))),
         btn(label, buy, !free || left <= 0 ? '' : 'primary', { id: `buy-${o.id}`, ...(left <= 0 ? { disabled: '' } : {}) }));
     });
+    music('shop');
     screen(
       h('h2', {}, t('shop.daily')),
       h('div', { class: 'row' }, h('div', { class: 'res', id: 'shop-gold' }, itemIcon('gold', 'sm'), t('res.gold'), h('b', {}, fmt(p.inventory.gold))), h('div', { class: 'res', id: 'shop-spirit' }, itemIcon('spirit', 'sm'), t('res.spirit'), h('b', {}, fmt(p.inventory.spirit)))),

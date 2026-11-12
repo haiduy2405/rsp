@@ -7,7 +7,7 @@ const TIER_COL = ['#7a6a52', '#4f8fe0', '#a066e8', '#e0a64a']; // phổ thông, 
 const ICON = { gold: 'gold', spirit: 'spirit', ticket: 'ticket', soulTicket: 'soul', generic: 'generic', hero: 'fragment' };
 
 export function install(app) {
-  const { ctx, save, screen, showHub, t } = app;
+  const { ctx, music, save, screen, showHub, t } = app;
   const slices = ctx.config.wish.slices;
   const total = slices.reduce((a, s) => a + s.weight, 0);
   const tierOf = (s) => (s.weight >= 15 ? 0 : s.weight >= 7 ? 1 : s.weight >= 3.5 ? 2 : 3);
@@ -42,6 +42,7 @@ export function install(app) {
     }, used ? '' : 'primary', { id: 'wish-go', ...(used ? { disabled: '' } : {}) });
     const back = btn(t('back'), showHub, '', { id: 'back' });
     const legend = [...slices].sort((a, b) => b.weight - a.weight).map((s) => h('div', { class: 'wl-row' }, itemIcon(ICON[s.give.kind], 'sm'), h('span', {}, full(s.give)), h('b', {}, `${Math.round((1000 * s.weight) / total) / 10}%`)));
+    music('wish');
     screen(
       h('h2', {}, t('hub.wish')),
       h('div', { class: 'wheel-wrap' }, wheel, pointer),

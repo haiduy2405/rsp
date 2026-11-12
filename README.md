@@ -430,3 +430,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ### v0.58.1
 - Màn hướng dẫn có bài riêng `tutorial` (sáng, nhịp vừa, ít trống) thay vì dùng chung bài đánh thường. Trận trong tháp đã dùng `battle_*`/`boss_*` theo vùng từ v0.58.0.
+
+### v0.59.0
+- **Nhạc theo màn:** thêm 8 bài: `title` (tạo nhân vật), `summon` (triệu hồi/lịch sử/đổi mảnh), `wish` (ước), `shop`, `camp` (đội hình, tướng, bộ sưu tập, nhiệm vụ), `mystery` (sự kiện), `victory`, `defeat` (màn kết trận). Tổng 30 bài, sinh bởi `tools/gen-music.py`. Đặt bài bằng `music('tên')` NGAY TRƯỚC `screen(...)` nên dựng lại cùng màn không làm nhạc khởi động lại.
+- **SFX mới (`tools/build-sfx2.py`, tổng hợp bằng numpy):** kỹ năng riêng cho 6 hệ (`skill_water/fire/wood/light/dark/heart`, Duo vẫn `skill2`), lên cấp (`levelup`), ngọc nâng cấp (`enhance`, thay bản synth), boss xuất hiện (`bossIn`), bị hiệu ứng xấu (`debuff`), phản đòn (`reflect`), hồi sinh (`revive`, bỏ fanfare chồng).
+- Test `tests/audio.test.js`: mọi bài đủ trường, nốt trong thang, mọi tên bài gọi trong code tồn tại, mọi mẫu có file.

@@ -203,10 +203,83 @@ def tutorial():
                 form=["palb", "palbd", "palbdh", "palbdh"])
 
 
+# Bài cho các màn ngoài trận. Mỗi bài: thang âm, tiết tấu lead, tempo, âm sắc, trống.
+SCENES = {
+    "title": dict(root=50, scale="harmin", bpm=72, chords=[0, 5, 3, 4, 0, 5, 6, 4], rhy="calm", lo=4, hi=12, seed=101,
+                  lead=dict(wave="triangle", gain=0.30, cut=3000, vib=12, maxLen=8, attack=0.05, partials=[[1, 1], [2.0, 0.25]]),
+                  harm=dict(wave="sine", gain=0.10, below=2), padWave="sawtooth", padGain=0.09, padCut=1100, padAttack=0.9, reverb=0.65,
+                  arp=dict(wave="sine", gain=0.12, cut=2600, pattern="0...1...2...1...", len=3.0, partials=[[1, 1], [2.0, 0.2]]),
+                  bass=dict(wave="triangle", gain=0.38, pattern="0...............", cut=600),
+                  drums=dict(kick="x.......x.......", snare="", hat="", shaker=""), fill=False,
+                  form=["pa", "palb", "palbd", "palbdh", "palbd", "palbdh", "palbdh", "palbd"]),
+    "summon": dict(root=47, scale="harmin", bpm=68, chords=[0, 0, 5, 4, 0, 5, 3, 4], rhy="calm", lo=5, hi=13, seed=113,
+                   lead=dict(wave="sine", gain=0.26, cut=3600, vib=16, maxLen=8, attack=0.08, partials=[[1, 1], [2.0, 0.3], [3.0, 0.1]]),
+                   harm=dict(wave="triangle", gain=0.08, below=2), padWave="triangle", padGain=0.11, padCut=1600, padAttack=1.2, reverb=0.8,
+                   arp=dict(wave="sine", gain=0.12, cut=4200, pattern="0123012301230123", len=1.8, partials=[[1, 1], [2.0, 0.4]]),
+                   bass=dict(wave="sine", gain=0.4, pattern="0...............", cut=500),
+                   drums=dict(kick="", snare="", hat="", shaker=""), fill=False,
+                   form=["pa", "pal", "palb", "palbh", "palb", "palbh", "palbh", "palb"]),
+    "wish": dict(root=60, scale="lydian", bpm=78, chords=[0, 1, 0, 4, 5, 1, 0, 4], rhy="calm", lo=6, hi=14, seed=127,
+                 lead=dict(wave="sine", gain=0.24, cut=4200, vib=6, maxLen=6, attack=0.02, sustain=0.4, partials=[[1, 1], [2.0, 0.5], [4.0, 0.2]]),
+                 harm=dict(wave="sine", gain=0.07, below=2), padWave="triangle", padGain=0.08, padCut=2200, padAttack=0.8, reverb=0.75,
+                 arp=dict(wave="sine", gain=0.15, cut=5200, pattern="0.12.3.20.12.3.2", len=1.4, sustain=0.2, partials=[[1, 1], [2.0, 0.5], [3.0, 0.2]]),
+                 bass=dict(wave="triangle", gain=0.3, pattern="0.......0.......", cut=600),
+                 drums=dict(kick="", snare="", hat="", shaker="..x...x...x...x."), fill=False,
+                 form=["pa", "pal", "palb", "palbh", "palb", "palbh", "palbh", "palb"]),
+    "shop": dict(root=55, scale="ionian", bpm=108, chords=[0, 3, 4, 0, 0, 3, 4, 0], rhy="folk", lo=4, hi=12, seed=139,
+                 lead=dict(wave="triangle", gain=0.34, cut=3400, sustain=0.25, maxLen=2, vib=0),
+                 harm=dict(wave="triangle", gain=0.1, below=2), padWave="triangle", padGain=0.07, padCut=1500, reverb=0.25,
+                 arp=dict(wave="square", gain=0.06, cut=2400, pattern="0.1.2.1.0.1.2.3.", len=1.2, sustain=0.2),
+                 bass=dict(wave="triangle", gain=0.38, pattern="0...5...0...5...", cut=700),
+                 drums=dict(kick="x.......x.......", snare="....x.......x...", hat="x.x.x.x.x.x.x.x.", shaker=""), fill=False,
+                 form=["pabd", "palbd", "palbdh", "palbdh", "palbd", "palbdh", "palbdh", "palbd"]),
+    "camp": dict(root=52, scale="dorian", bpm=90, chords=[0, 3, 5, 3, 0, 3, 4, 0], rhy="flow", lo=4, hi=11, seed=151,
+                 lead=dict(wave="triangle", gain=0.28, cut=2800, sustain=0.5, maxLen=4, vib=8),
+                 harm=dict(wave="sine", gain=0.08, below=2), padWave="sawtooth", padGain=0.065, padCut=1100, padAttack=0.6, reverb=0.45,
+                 arp=dict(wave="triangle", gain=0.12, cut=2600, pattern="0.1.2.1.3.2.1.2.", len=2.0, sustain=0.35),
+                 bass=dict(wave="triangle", gain=0.34, pattern="0.......0.....0.", cut=650),
+                 drums=dict(kick="", snare="", hat="....x.......x...", shaker="x.x.x.x.x.x.x.x."), fill=False,
+                 form=["pa", "palb", "palbd", "palbdh", "palbd", "palbdh", "palbdh", "palbd"]),
+    "mystery": dict(root=50, scale="aeolian", bpm=80, chords=[0, 5, 0, 1, 0, 5, 3, 1], rhy="dark", lo=3, hi=11, seed=163,
+                    lead=dict(wave="sine", gain=0.27, cut=2400, vib=14, maxLen=6, attack=0.04, partials=[[1, 1], [2.76, 0.12]]),
+                    harm=dict(wave="triangle", gain=0.06, below=3), padWave="sawtooth", padGain=0.08, padCut=800, padAttack=1.0, reverb=0.7,
+                    arp=dict(wave="triangle", gain=0.1, cut=2200, pattern="0.....2.....1...", len=3.0, sustain=0.3),
+                    bass=dict(wave="sine", gain=0.4, pattern="0.......0.......", cut=500),
+                    drums=dict(kick="", snare="", hat="", shaker=""), fill=False,
+                    form=["pa", "pal", "palb", "palbh", "palb", "palbh", "palbh", "palb"]),
+    "victory": dict(root=55, scale="ionian", bpm=122, chords=[0, 3, 4, 0, 5, 3, 4, 0], rhy="bright", lo=5, hi=13, seed=173,
+                    lead=dict(wave="sawtooth", gain=0.17, cut=3000, vib=6, maxLen=3, attack=0.02),
+                    harm=dict(wave="square", gain=0.05, cut=1800, below=2), padWave="sawtooth", padGain=0.08, padCut=1700, reverb=0.4,
+                    arp=dict(wave="triangle", gain=0.11, cut=3400, pattern="0.12.3.20.12.3.2", len=1.6, sustain=0.3),
+                    bass=dict(wave="sawtooth", gain=0.3, pattern="0...0...0...0..5", cut=600),
+                    drums=dict(kick="x...x...x...x...", snare="....x.......x.x.", hat="..x...x...x...x.", shaker=""), fill=True,
+                    form=["pabd", "palbd", "palbdh", "palbdh", "palbd", "palbdh", "palbdh", "palbdh"]),
+    "defeat": dict(root=50, scale="aeolian", bpm=58, chords=[0, 5, 3, 4, 0, 5, 3, 0], rhy="calm", lo=3, hi=10, seed=181,
+                   lead=dict(wave="sine", gain=0.28, cut=2200, vib=12, maxLen=8, attack=0.06, partials=[[1, 1], [2.0, 0.15]]),
+                   harm=dict(wave="triangle", gain=0.07, below=2), padWave="triangle", padGain=0.1, padCut=900, padAttack=1.0, reverb=0.7,
+                   arp=dict(wave="sine", gain=0.09, cut=2000, pattern="0.......2.......", len=3.5, sustain=0.3),
+                   bass=dict(wave="sine", gain=0.38, pattern="0...............", cut=450),
+                   drums=dict(kick="", snare="", hat="", shaker=""), fill=False,
+                   form=["pa", "pal", "palb", "palbh", "palb", "palbh", "palbh", "palb"]),
+}
+
+
+def scene(name):
+    c = SCENES[name]
+    bars = make_lead(dict(chords=c["chords"]), c["rhy"], c["seed"], c["lo"], c["hi"])
+    tr = dict(bpm=c["bpm"], root=c["root"], scale=SCALES[c["scale"]], swing=0.0, chords=c["chords"],
+              padWave=c["padWave"], padGain=c["padGain"], padCut=c["padCut"], reverb=c["reverb"],
+              arp=c["arp"], lead=dict(**c["lead"], octave=12, bars=bars), harm=c["harm"], bass=c["bass"], drums=c["drums"],
+              fill=c["fill"], form=c["form"])
+    if "padAttack" in c:
+        tr["padAttack"] = c["padAttack"]
+    return tr
+
+
 def main():
     cfg = json.loads(FILE.read_text(encoding="utf-8"))
     tracks = {k: v for k, v in cfg["tracks"].items() if k in ("battle", "boss")}  # giữ bản cũ làm dự phòng
-    tracks = {"hub": hub(), "tutorial": tutorial(), **tracks}
+    tracks = {"hub": hub(), "tutorial": tutorial(), **{n: scene(n) for n in SCENES}, **tracks}
     for zone in ZONES:
         tracks[f"map_{zone}"] = build(zone, "map")
         tracks[f"battle_{zone}"] = build(zone, "battle")

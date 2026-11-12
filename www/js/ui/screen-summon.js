@@ -6,7 +6,7 @@ import { playFireworks } from './fireworks.js';
 import { summon, buyTickets, redeemCharacter, effectiveRates } from '../core/summon.js';
 
 export function install(app) {
-  const { chip, portrait, audio, ctx, pct, save, screen, showHub, t } = app;
+  const { chip, portrait, audio, ctx, music, pct, save, screen, showHub, t } = app;
 
   // ---- Triệu hồi, onboarding, nhật ký, cài đặt
   const dayKey = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
@@ -56,6 +56,7 @@ export function install(app) {
     // Giá: số vé, hoặc số Linh Thạch nếu thiếu vé (hai biểu tượng, không chữ).
     const costLine = (tickets, spirit) => h('span', { class: 'pl-cost' }, itemIcon('ticket', 'sm'), String(tickets), h('i', { class: 'pl-sep' }, '/'), itemIcon('spirit', 'sm'), String(spirit));
     const pityPct = Math.min(100, (sm.pity5 / cfg.pity5) * 100);
+    music('summon');
     screen(
       h('h2', {}, t('summon.title')),
       h('div', { class: 'sm-wallet' },
@@ -227,6 +228,7 @@ export function install(app) {
       h('div', { class: 'sumgrid' }, cards),
       h('div', { class: 'row' }, btn(t('summon.reveal'), () => cards.forEach((el, i) => reveal(i, el)), '', { id: 'reveal-all' }), btn(t('summon.done'), () => (onDone ? onDone() : showSummon(bannerId)), 'primary', { id: 'sum-done' })),
     );
+    music('summon');
     screen(wrap);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     // Người chơi tự bắn pháo: kéo viên ngọc vào ống pháo (hoặc chạm viên ngọc). Chưa làm thì khói bay + bàn tay chỉ dẫn lặp.
@@ -244,6 +246,7 @@ export function install(app) {
 
   function showHistory() {
     const hist = app.progress.summon.history.slice().reverse();
+    music('summon');
     screen(
       h('h2', {}, t('summon.history')),
       hist.length ? hist.map((x) => h('div', { class: 'card' }, t('summon.historyRow', { n: x.n, rarity: x.rarity, name: t(`char.${x.id}`), banner: t(`banner.${x.banner}.name`) }))) : h('div', { class: 'muted' }, t('summon.historyEmpty')),
@@ -254,6 +257,7 @@ export function install(app) {
   function showRedeem(pick = null, msg = null) {
     const cost = ctx.config.summon.redeemShards;
     const missing = ctx.characterList.filter((c) => !c.reserve && !app.progress.characters[c.id]).sort((a, b) => b.rarity - a.rarity);
+    music('summon');
     screen(
       h('h2', {}, t('summon.redeem')),
       h('p', { class: 'muted' }, t('summon.redeemInfo', { cost, n: app.progress.inventory.shards })),

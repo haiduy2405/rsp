@@ -20,6 +20,7 @@ const easeOut = (k) => 1 - (1 - k) * (1 - k);
 // stepper(state, action) -> { state, events }: do bên ngoài cung cấp (chuyến leo tháp ghi lại hành động).
 // onEnd(finalState) gọi sau khi hoạt ảnh kết thúc và trận đã phân thắng thua.
 const DIAG_ASSIST = 0.38; // tỉ lệ ô: lệch ngang và dọc đều vượt ngưỡng này thì tính là bước chéo
+const SKILL_SFX = ['water', 'fire', 'wood', 'light', 'dark', 'heart']; // chỉ số hệ → hậu tố tên âm kỹ năng
 const NOFX = { sfx() {}, vibrate() {} };
 
 
@@ -370,7 +371,8 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         view.fallT = 1;
         await sleep(ANIM.afterFall);
       } else if (e.type === 'skill' || e.type === 'duo' || e.type === 'passive') {
-        fx.sfx('skill');
+        // Kỹ năng đúng hệ của tướng tung ra (Duo dùng tiếng kép riêng); thiếu mẫu thì rơi về tiếng chung.
+        fx.sfx(e.type === 'duo' ? 'skill2' : `skill_${SKILL_SFX[state.members[e.member]?.element] ?? 'heart'}`);
         for (const who of e.type === 'duo' ? [e.slot, e.slot + 1] : [e.member]) {
           const m = state.members[who];
           if (m) view.rings.push({ x: 12 + who * 104 + 49, y: 416, col: m.element, age: 0, life: 600 });
@@ -393,13 +395,16 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         }
         await sleep(350);
         view.shake = null;
+      } else if (e.type === 'effect') {
+        if (e.applied) fx.sfx('debuff');
       } else if (e.type === 'reflect') {
+        fx.sfx('reflect');
         if (e.to === 'enemy') {
           view.enemies[e.enemy].hp = Math.max(0, view.enemies[e.enemy].hp - e.amount);
           floater(`-${e.amount}`, enemyX(e.enemy), 150, '#ff9f6b');
         }
       } else if (e.type === 'revive') {
-        fx.sfx('fanfare');
+        fx.sfx('revive');
         view.whiteFlash = 0.6;
         view.hp = e.hp;
         floater(t('battle.revive'), W / 2, 300, '#ffd24a', 40, 'dmg', 1400);
