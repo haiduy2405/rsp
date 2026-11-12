@@ -279,6 +279,7 @@ function showZones() {
         { class: 'info' },
         h('div', { class: 'name' }, t(`zone.${z.id}`)),
         h('small', {}, open ? t('zone.clears', { n: zoneClears(progress, z.id) }) : t('zone.locked')),
+        open ? h('div', { class: 'diffdots' }, ctx.config.difficulty.order.map((d) => h('span', { class: clearsOf(progress, z.id, d) > 0 ? 'on' : '' }, t(`diff.${d}`)))) : null,
         open ? h('div', { class: 'muted' }, `${t('stone.normal')}: ${st.normal} · ${t('stone.rare')}: ${st.rare}`) : null,
       ),
     );
@@ -324,6 +325,7 @@ function charCard(id, onclick, extra) {
       { style: 'flex:1;min-width:0' },
       h('h3', {}, t(`char.${id}`), ' ', h('small', {}, '★'.repeat(def.rarity))),
       h('div', {}, h('span', { class: 'chip', style: `background:${COLORS[def.element]}` }, el(def.element)), ' ', h('small', {}, c ? `${t('char.level', { n: c.level, max: levelCap(ctx, c.awaken) })} · ${t('char.form', { n: formOf(c.awaken) })}` : '???')),
+      c ? (() => { const st = statsFor(ctx, id, c.level, c.awaken); return h('div', { class: 'mini-stats' }, h('span', {}, t('stat.hp'), ' ', h('b', {}, String(st.hp))), h('span', {}, t('stat.atk'), ' ', h('b', {}, String(st.atk)))); })() : null,
       extra,
     ),
   );
@@ -1086,9 +1088,10 @@ function showEnd() {
   }
   const won = run.result === 'won';
   screen(
-    h('h1', {}, t(won ? 'end.won' : 'end.lost')),
+    h('h1', { class: 'end-title ' + (won ? 'won' : 'lost') }, t(won ? 'end.won' : 'end.lost')),
     floorTitle(),
-    h('div', { class: 'card' }, h('b', {}, t('end.loot')), h('p', {}, lootLine(run.loot))),
+    h('div', { class: 'endteam' }, progress.team.filter(Boolean).map((id, i) => { const lv = endLevels.find((x) => x.id === id); return h('div', { class: 'endhero' + (lv ? ' up' : '') + (won ? '' : ' down'), style: `--d:${(0.15 + i * 0.12).toFixed(2)}s` }, portrait(id, 56), lv ? h('i', {}, `Lv ${lv.to}`) : null); })),
+    h('div', { class: 'card endloot' }, h('b', {}, t('end.loot')), h('p', {}, lootLine(run.loot))),
     firstClear ? h('div', { class: 'card notice', id: 'end-first' }, t('end.firstClear', { n: firstClear })) : null,
     run.heroExp ? h('div', { class: 'card', id: 'end-exp' }, h('b', {}, t('result.heroExp', { n: run.heroExp })), endLevels.map((x) => h('div', { class: 'muted' }, t('result.levelUp', { name: t(`char.${x.id}`), lv: x.to })))) : null,
     won ? h('div', { class: 'muted' }, t('end.completion')) : h('div', { class: 'notice' }, t('end.noCompletion')),

@@ -192,3 +192,9 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.28.3 – Màu trận đấu theo art mới
 - Bàn ngọc, thẻ tướng và chấm kỹ năng đổi từ chàm sang nâu đất; bỏ lớp khử bão hòa/phủ tối của nền trận cũ vì nền mới đã ấm sẵn.
+
+## v0.29.0 – Giao diện: thẻ tướng, thẻ khu, màn kết quả
+- Bộ sưu tập: mỗi thẻ tướng hiện HP/ATK (tính bằng `statsFor`, không viết cứng).
+- Chọn khu: thẻ khu đổi nền nâu ấm và có ba nhãn Dễ/Thường/Khó, sáng vàng khi độ khó đó đã qua.
+- Kết quả chuyến: tiêu đề "đóng dấu", đội hình hiện lần lượt, huy hiệu cấp mới bật lên kèm vòng sáng cho tướng lên cấp, khung loot trượt vào; tắt hết khi hệ thống bật giảm chuyển động.
+- Chi tiết tướng: khung đầu đổi nền sang nâu ấm theo màu hệ.
