@@ -104,7 +104,9 @@ export function createAudio(cfg, settings) {
 
   function sfx(name, rateMul = 1) {
     if (!ac || settings.sfx === false || ac.state !== 'running') return;
-    if (sample(name, rateMul)) return;
+    const vs = cfg.variants?.[name];
+    // Âm có vài biến thể thì chọn ngẫu nhiên để đỡ lặp (UI, không ảnh hưởng lõi).
+    if (sample(vs ? vs[Math.floor(Math.random() * vs.length)] : name, rateMul)) return;
     const def = cfg.sfx[name];
     if (!def) return;
     const t0 = ac.currentTime + 0.005;

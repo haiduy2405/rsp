@@ -522,3 +522,13 @@ details.card[open] > summary { margin-bottom: 8px; }
 .back-top { background: none; border: 0; box-shadow: none; }
 .back-top img { width: 46px; height: 46px; display: block; pointer-events: none; filter: drop-shadow(0 2px 0 rgba(28, 16, 9, .6)); }
 .row.pulls button span { font-size: 12px; }
+
+/* ===== Nút CHIẾN ĐẤU: huy hiệu men đỏ vẽ tay, nhãn nằm trên dải kem ===== */
+.dock button.battle { position: relative; width: 124px; height: 124px; margin: -58px auto -6px; border: 0; border-radius: 0; background: none; box-shadow: none; animation: battleFloat 3.2s ease-in-out infinite; }
+.dock button.battle img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 6px 0 rgba(28, 16, 9, .55)); }
+.dock button.battle span { position: absolute; left: 50%; bottom: 21%; transform: translateX(-50%); max-width: 80px; font-family: var(--serif); font-size: 13px; font-weight: 900; letter-spacing: .03em; line-height: 1; color: #5a2410; text-shadow: none; white-space: nowrap; }
+.dock button.battle:active { transform: scale(.94); animation: none; }
+@keyframes battleFloat { 50% { transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .dock button.battle { animation: none; } }
+.dock button.battle span { bottom: 24.5%; font-size: 11px; letter-spacing: 0; max-width: 72px; }
+:lang(vi) .dock button.battle span { font-size: 9.5px; }

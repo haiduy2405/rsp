@@ -570,47 +570,47 @@
  "samples": {
   "pick": {
    "url": "assets/audio/pick.mp3",
-   "gain": 0.8,
+   "gain": 0.3,
    "rate": 1
   },
   "move": {
    "url": "assets/audio/move.mp3",
-   "gain": 0.5,
+   "gain": 0.16,
    "rate": 1
   },
   "move2": {
    "url": "assets/audio/move2.mp3",
-   "gain": 0.5,
+   "gain": 0.16,
    "rate": 1.122
   },
   "move3": {
    "url": "assets/audio/move3.mp3",
-   "gain": 0.5,
+   "gain": 0.16,
    "rate": 1.26
   },
   "drop": {
    "url": "assets/audio/drop.mp3",
-   "gain": 0.7,
+   "gain": 0.28,
    "rate": 1
   },
   "match": {
    "url": "assets/audio/match.mp3",
-   "gain": 0.8,
+   "gain": 0.34,
    "rate": 1
   },
   "preview": {
    "url": "assets/audio/preview.mp3",
-   "gain": 0.7,
+   "gain": 0.3,
    "rate": 1
   },
   "combo": {
    "url": "assets/audio/combo.mp3",
-   "gain": 0.8,
+   "gain": 0.4,
    "rate": 1
   },
   "hit": {
    "url": "assets/audio/hit.mp3",
-   "gain": 0.9,
+   "gain": 0.95,
    "rate": 1
   },
   "hurt": {
@@ -625,12 +625,12 @@
   },
   "skill": {
    "url": "assets/audio/skill.mp3",
-   "gain": 0.8,
+   "gain": 0.9,
    "rate": 1
   },
   "kill": {
    "url": "assets/audio/kill.mp3",
-   "gain": 0.9,
+   "gain": 0.95,
    "rate": 1
   },
   "finale": {
@@ -702,6 +702,32 @@
    "url": "assets/audio/chestOpen.mp3",
    "gain": 0.9,
    "rate": 1
+  },
+  "hit2": {
+   "url": "assets/audio/hit2.mp3",
+   "gain": 0.9,
+   "rate": 1
+  },
+  "hit3": {
+   "url": "assets/audio/hit3.mp3",
+   "gain": 0.9,
+   "rate": 1
+  },
+  "skill2": {
+   "url": "assets/audio/skill2.mp3",
+   "gain": 0.9,
+   "rate": 1
   }
+ },
+ "variants": {
+  "hit": [
+   "hit",
+   "hit2",
+   "hit3"
+  ],
+  "skill": [
+   "skill",
+   "skill2"
+  ]
  }
 }

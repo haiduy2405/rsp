@@ -189,7 +189,7 @@ function showHub() {
       { class: 'dock' },
       dockBtn('team', t('hub.team'), () => showTeam(), 'b-team'),
       dockBtn('summon', t('hub.summon'), () => ui.showSummon('standard'), 'b-summon', 'sub'),
-      h('button', { class: 'battle', id: 'b-battle', onclick: () => showZones(), 'aria-label': t('hub.battle') }, h('span', {}, t('hub.battle'))),
+      h('button', { class: 'battle', id: 'b-battle', onclick: () => showZones(), 'aria-label': t('hub.battle') }, h('img', { src: 'assets/ui/icons/battle.webp', alt: '', draggable: 'false' }), h('span', {}, t('hub.battle'))),
       dockBtn('shop', t('hub.shop'), () => ui.showShop(), 'b-shop'),
       dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest'),
     ),

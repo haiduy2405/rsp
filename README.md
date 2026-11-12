@@ -205,3 +205,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.30.1 – Nốt icon còn lại
 - Thêm 6 icon vẽ tay (bộ sưu tập, từ điển, cốt truyện, hòm đồ, manh mối, quay lại); nút quay lại góc trái trên dùng icon mới. Chữ nút rút ở Triệu hồi nhỏ lại cho đỡ chật.
+
+## v0.31.0 – Nút Chiến đấu mới và âm thanh trận
+- Nút CHIẾN ĐẤU ở hub: huy hiệu men đỏ vẽ tay (`ui/icons/battle.webp`), hai kiếm chéo, nhãn nằm trên dải kem, nhấp nhô nhẹ (tắt khi giảm chuyển động); cỡ chữ riêng cho tiếng Việt.
+- Âm ngọc nhỏ lại (chọn/kéo/thả/ghép/combo/xem trước giảm gain còn ~35–50% trong `audio.json#samples`).
+- Âm đánh trúng, trúng đòn, hạ quái và kỹ năng làm lại bằng tổng hợp nhiều lớp (`tools/build-sfx.py`: thân tụt tần, tiếng chát, đuôi trầm; kỹ năng là gió tụ lực, chùm nốt lấp lánh rồi bùng nổ). `hit` có 3 biến thể và `skill` có 2 biến thể chọn ngẫu nhiên (`audio.json#variants`, `audio.js`).
