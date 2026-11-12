@@ -41,7 +41,8 @@ test('độ khó: quái mạnh dần, rớt nhiều dần', () => {
   const hpOf = (d) => {
     let r = createRun(ctx, { seed: 3, zoneId: 'zone_water', team: ['thetis', 'bennu', 'atalanta', 'eos', 'eir'].map((id) => ({ id, level: 1, awaken: 0 })), diff: d });
     r = runStep(ctx, r, { type: 'door', index: 0 }).run;
-    return r.battle.enemies[0].maxHp / ctx.monsters[r.battle.enemies[0].id].hp;
+    const e = r.battle.enemies[0];
+    return (e.maxHp / ctx.monsters[e.id].hp) * (e.atk / ctx.monsters[e.id].atk); // độ khó tăng chủ yếu ở sát thương quái (dễ chết), ít ở máu
   };
   assert.ok(hpOf(NORMAL) > hpOf(EASY) && hpOf(HARD) > hpOf(NORMAL));
   const avg = (d) => {

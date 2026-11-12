@@ -56,3 +56,8 @@ Theo nguyên tắc "buff quái, không nerf người chơi": quái có thêm **�
 - Form 1 bị chặn ở Level 30 (`progression.levelCapForm1`), Form 2 mở tới 50, nên Thức tỉnh là cột mốc rõ ràng thay cho 5 bậc nhỏ.
 - Sim: Level > 30 bắt buộc Form 2; `awakenBonus` Vừa/Khó về 0 (bonus Level đã đủ). Khu Quang/Tim chỉnh hp: [1.35,1.35,1.5,1.85,2.3,2.4], atk [1.15,1.3,1.4,2.1,3.1,3.5].
 - Còn lệch: Thủy Vừa/Khó vẫn dễ (98/83%), Quang Vừa hơi dễ (75%), Tim Khó thấp (23%) và Tim mất ~23 phút/chuyến. Cần dữ liệu chơi thật trước khi chỉnh tiếp.
+
+## v0.22: độ khó thiên về sát thương (dễ chết)
+- Normal: hp ×1.2→×1.0, atk ×1.35→×1.45. Hard: hp ×1.4→×1.05, atk ×1.65→×1.8. Quái ít máu hơn nhưng đánh đau hơn: trận ngắn lại (~9–12 phút/chuyến, trước đó 12–16) và đội dễ gục hơn thay vì chỉ phải đánh lâu hơn.
+- Thử atk 1.6/2.1 và 1.9/2.7: thắng rớt dưới dải mục tiêu ở các khu cuối (Dark/Heart), nên chọn 1.45/1.8. Còn lệch: Water Normal/Hard dễ, Heart Normal/Hard thấp (Lv50 là trần, cần thêm nguồn sức mạnh thay vì nới quái).
+- EXP/Vàng: xem README v0.20 (Vàng ×10, Đan 3 cỡ, EXP sau trận).
