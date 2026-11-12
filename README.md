@@ -288,3 +288,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.40.1
 - Gợi ý đường kéo: chỉ cho nước đi ĐẦU TIÊN của mỗi trận (mọi trận, mọi ải), không còn gợi ý các nước sau. Kéo hụt/không hợp lệ thì gợi ý hiện lại cho tới khi có nước đi hợp lệ đầu tiên.
+
+## v0.40.2
+- Slow-motion kết thúc trận chỉ bắt đầu từ đúng đòn làm quái CUỐI CÙNG chết; các đòn trước (kể cả giết quái khác trong cùng lượt) chạy tốc độ thường.

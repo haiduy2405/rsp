@@ -102,7 +102,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   const dmgSize = (a, maxHp) => 34 + Math.min(1, (a / Math.max(1, maxHp)) * 3) * 34;
 
   // Mỗi đòn: quả cầu bay từ nhân vật tới quái, tới nơi mới trừ máu + số nổi + rung quái.
-  function applyHits(hits, stagger = 90, finalKill = false) {
+  function applyHits(hits, stagger = 90, finalKill = false, onFinal = null) {
     let k = 0;
     const stack = {};
     const life = finalKill ? 300 : 260;
@@ -125,7 +125,12 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
             view.camShake = Math.max(view.camShake || 0, 6);
           }
           if (h.thawed) floater(t('effect.freeze.name'), ex, 210, '#9ad0ff', 20);
-          if (before > 0 && en.hp <= 0) killEnemy(h.enemy, finalKill);
+          if (before > 0 && en.hp <= 0) {
+            // chỉ đòn làm quái CUỐI CÙNG chết mới là đòn kết liễu (slow-motion bắt đầu từ đây)
+            const last = finalKill && view.enemies.every((e2) => e2.hp <= 0);
+            killEnemy(h.enemy, last);
+            if (last) onFinal?.();
+          }
         } });
         k++;
       } else if (h.kind === 'reflect') {
@@ -139,7 +144,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     }
     return k ? (k - 1) * stagger + life : 0; // thời gian cần chờ
   }
-  // Quái chết: nổ hạt theo hệ, rung, và nếu là quái cuối thì dừng hình ngắn trước khi chuyển slow-motion.
+  // Quái chết: nổ hạt theo hệ, rung; đòn làm quái cuối chết thì dừng hình ngắn rồi chuyển slow-motion (từ đúng đòn đó).
   function killEnemy(i, finalKill) {
     const en = view.enemies[i];
     en.deadAge = 0;
@@ -288,13 +293,20 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     }
     // Đòn kết liễu quái cuối: chuyển slow-motion, dừng hình khi trúng, rồi pháo hoa.
     async function finalBlow(hits) {
-      fx.sfx('whoosh');
-      view.slow = 0.25;
-      const wait = applyHits(hits, ANIM.stagger * 1.4, true);
-      await sleep((wait + 150) / view.slow);
-      await sleep(750);
-      await sleep(520, (k) => (view.slow = 0.25 + 0.75 * easeOut(k)));
-      view.slow = 1;
+      let slowed = false;
+      const wait = applyHits(hits, ANIM.stagger * 1.4, true, () => {
+        slowed = true;
+        fx.sfx('whoosh');
+        view.slow = 0.25;
+      });
+      // các đòn trước đòn kết liễu chạy tốc độ thường
+      await sleep(wait + 150);
+      for (let g = 0; g < 90 && !slowed && alive; g++) await sleep(16);
+      if (slowed) {
+        await sleep(750);
+        await sleep(520, (k) => (view.slow = 0.25 + 0.75 * easeOut(k)));
+        view.slow = 1;
+      }
       await victoryBurst();
     }
     async function victoryBurst() {
@@ -729,6 +741,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   requestAnimationFrame(frame);
 
   return {
+    getView: () => view, // test/debug
     getHint: () => (view.hint ? view.hint.path.slice() : null),
     getDragPath: () => (drag ? drag.path.slice() : null),
     getState: () => state,
