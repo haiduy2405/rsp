@@ -42,6 +42,8 @@ let t = createT(dicts[lang], en);
 const loaded = storage.load();
 let progress = loaded.progress;
 let notice = loaded.recovered ? 'hub.recovered' : null;
+// Nạp trước phông cho canvas (DOM chỉ nạp khi dùng tới).
+for (const f of ['650 20px Fraunces', '600 14px "Be Vietnam Pro"', '700 20px Oswald']) document.fonts?.load(f, 'Aáảạ');
 const audio = createAudio(audioCfg, {
   get volume() { return progress.settings.volume; },
   get music() { return progress.settings.music; },
@@ -151,8 +153,8 @@ function hubScene() {
     const y0 = y1 - 50;
     const w1 = 66 - i * 6;
     const w0 = 66 - (i + 1) * 6;
-    tiers += `<path d="M${200 - w1} ${y1} L${200 - w0} ${y0} L${200 + w0} ${y0} L${200 + w1} ${y1}Z" fill="url(#tw)" stroke="#07081c" stroke-width="1.5"/>`;
-    tiers += `<ellipse cx="200" cy="${y0}" rx="${w0 + 9}" ry="5" fill="#2a2f6a" stroke="#e2b75a" stroke-width="1.4"/>`;
+    tiers += `<path d="M${200 - w1} ${y1} L${200 - w0} ${y0} L${200 + w0} ${y0} L${200 + w1} ${y1}Z" fill="url(#tw)" stroke="#05060a" stroke-width="1.5"/>`;
+    tiers += `<ellipse cx="200" cy="${y0}" rx="${w0 + 9}" ry="5" fill="#262a38" stroke="#b3ac98" stroke-width="1.4"/>`;
     for (const dx of [-0.45, 0, 0.45]) tiers += `<rect x="${200 + dx * w0 - 3}" y="${y0 + 14}" width="6" height="14" rx="3" fill="#ffd98a" class="win" style="animation-delay:${(i * 0.37 + dx).toFixed(2)}s"/>`;
   }
   let isl = '';
@@ -160,7 +162,7 @@ function hubScene() {
     const [x, y] = pos[i % pos.length];
     const open = progress.unlocked.includes(z.id);
     const col = COLORS[z.element];
-    isl += `<g class="isl" style="animation-delay:${(i * 0.7).toFixed(1)}s"><ellipse cx="${x}" cy="${y + 34}" rx="38" ry="9" fill="#3b4aa0"/><path d="M${x - 38} ${y + 34} Q${x} ${y + 92} ${x + 38} ${y + 34}Z" fill="url(#rk)"/><ellipse cx="${x}" cy="${y + 33}" rx="38" ry="8" fill="#4d62c9" opacity=".7"/></g>`;
+    isl += `<g class="isl" style="animation-delay:${(i * 0.7).toFixed(1)}s"><ellipse cx="${x}" cy="${y + 34}" rx="38" ry="9" fill="#3b4151"/><path d="M${x - 38} ${y + 34} Q${x} ${y + 92} ${x + 38} ${y + 34}Z" fill="url(#rk)"/><ellipse cx="${x}" cy="${y + 33}" rx="38" ry="8" fill="#5b6478" opacity=".7"/></g>`;
     return `<g class="zorb${open ? ' open' : ''}" ${open ? `data-zone="${z.id}" role="button" tabindex="0" aria-label="${t(`zone.${z.id}`)}"` : ''} style="animation-delay:${(i * 0.7).toFixed(1)}s;--c:${col}"><circle cx="${x}" cy="${y}" r="${open ? 22 : 17}" fill="${col}" opacity="${open ? 0.28 : 0.1}" class="halo"/><circle cx="${x}" cy="${y}" r="${open ? 14 : 11}" fill="${open ? col : '#5b6090'}" stroke="#fff" stroke-opacity="${open ? 0.9 : 0.35}" stroke-width="2"/>${open ? `<circle cx="${x - 4}" cy="${y - 5}" r="4" fill="#fff" opacity=".7"/>` : `<path d="M${x - 4} ${y + 1}h8v6h-8zM${x - 2.5} ${y + 1}v-3a2.5 2.5 0 0 1 5 0v3" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.5"/>`}</g>`;
   }).join('');
   const cloud = (x, y, r, o) => `<g opacity="${o}"><ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.3}"/><ellipse cx="${x - r * 0.5}" cy="${y + 4}" rx="${r * 0.6}" ry="${r * 0.22}"/><ellipse cx="${x + r * 0.55}" cy="${y + 3}" rx="${r * 0.65}" ry="${r * 0.24}"/></g>`;
@@ -168,22 +170,22 @@ function hubScene() {
   for (let i = 0; i < 46; i++) stars += `<circle cx="${(i * 137.5) % 400}" cy="${(i * 71.3) % 300}" r="${0.6 + (i % 3) * 0.5}" fill="#fff" opacity="${0.25 + (i % 5) * 0.12}"/>`;
   const svg = `<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="${NS}" aria-hidden="true">
 <defs>
-<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070824"/><stop offset=".45" stop-color="#1b1a5a"/><stop offset=".75" stop-color="#3b2d86"/><stop offset="1" stop-color="#1f5a8f"/></linearGradient>
-<linearGradient id="tw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#15183f"/><stop offset=".5" stop-color="#3a3f8f"/><stop offset="1" stop-color="#171a45"/></linearGradient>
-<linearGradient id="rk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3680"/><stop offset="1" stop-color="#0d1038"/></linearGradient>
-<linearGradient id="bm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffe9ad" stop-opacity=".75"/><stop offset="1" stop-color="#ffe9ad" stop-opacity="0"/></linearGradient>
-<radialGradient id="gl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd98a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05060b"/><stop offset=".45" stop-color="#11141f"/><stop offset=".78" stop-color="#2b1b27"/><stop offset="1" stop-color="#6a2f2a"/></linearGradient>
+<linearGradient id="tw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0f1118"/><stop offset=".5" stop-color="#3b3f4e"/><stop offset="1" stop-color="#121420"/></linearGradient>
+<linearGradient id="rk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#343947"/><stop offset="1" stop-color="#0a0c12"/></linearGradient>
+<linearGradient id="bm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff8a70" stop-opacity=".7"/><stop offset="1" stop-color="#ff8a70" stop-opacity="0"/></linearGradient>
+<radialGradient id="gl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff7b6a" stop-opacity=".5"/><stop offset="1" stop-color="#ff7b6a" stop-opacity="0"/></radialGradient>
 </defs>
 <rect width="400" height="800" fill="url(#sky)"/>${stars}
 <circle cx="200" cy="260" r="190" fill="url(#gl)" class="breathe"/>
-<g fill="#aab6ff" opacity=".35" class="cl cl1">${cloud(80, 640, 110, 0.5)}${cloud(330, 610, 120, 0.45)}</g>
+<g fill="#8d93aa" opacity=".3" class="cl cl1">${cloud(80, 640, 110, 0.5)}${cloud(330, 610, 120, 0.45)}</g>
 <rect x="188" y="-20" width="24" height="270" fill="url(#bm)" class="beam"/>
 ${isl}
-<g class="isl main"><ellipse cx="200" cy="582" rx="108" ry="19" fill="#3b4aa0"/><path d="M92 582 Q200 700 308 582Z" fill="url(#rk)"/><ellipse cx="200" cy="580" rx="108" ry="16" fill="#5a70d8" opacity=".6"/></g>
+<g class="isl main"><ellipse cx="200" cy="582" rx="108" ry="19" fill="#3b4151"/><path d="M92 582 Q200 700 308 582Z" fill="url(#rk)"/><ellipse cx="200" cy="580" rx="108" ry="16" fill="#6a7388" opacity=".6"/></g>
 ${tiers}
-<path d="M200 190 L226 238 L174 238Z" fill="#2a2f6a" stroke="#e2b75a" stroke-width="1.6"/>
-<g class="crystal"><path d="M200 120 L214 156 L200 186 L186 156Z" fill="#ffe9ad" stroke="#fff" stroke-width="1.5"/><path d="M200 120 L200 186" stroke="#e2b75a" stroke-width="1"/></g>
-<g fill="#cdd6ff" class="cl cl2">${cloud(60, 700, 130, 0.5)}${cloud(350, 690, 140, 0.42)}${cloud(200, 730, 160, 0.5)}</g>
+<path d="M200 190 L226 238 L174 238Z" fill="#262a38" stroke="#b3ac98" stroke-width="1.6"/>
+<g class="crystal"><path d="M200 120 L214 156 L200 186 L186 156Z" fill="#ff7b6a" stroke="#fff4ea" stroke-width="1.5"/><path d="M200 120 L200 186" stroke="#d4413a" stroke-width="1"/></g>
+<g fill="#a7adc4" class="cl cl2">${cloud(60, 700, 130, 0.5)}${cloud(350, 690, 140, 0.42)}${cloud(200, 730, 160, 0.5)}</g>
 ${orbs}
 </svg>`;
   const box = h('div', { class: 'hub-scene' + (DEBUG ? ' static' : '') });
@@ -1089,7 +1091,7 @@ function runMapSVG() {
   // đường tới các cửa đang chọn (sáng nhẹ)
   const curRow = rows.find((x) => x.cur);
   if (curRow) curRow.xs.forEach((x, i) => (gold += link(last, [x, curRow.y], 'lk now')));
-  let nodes = `<g class="nd start"><circle cx="${start.x}" cy="${start.y}" r="15" fill="#15183f" stroke="#e2b75a" stroke-width="2"/><path d="M${start.x - 6} ${start.y + 7}v-8a6 6 0 0 1 12 0v8z" fill="none" stroke="#e2b75a" stroke-width="1.8"/></g>`;
+  let nodes = `<g class="nd start"><circle cx="${start.x}" cy="${start.y}" r="15" fill="#191b20" stroke="#e2b75a" stroke-width="2"/><path d="M${start.x - 6} ${start.y + 7}v-8a6 6 0 0 1 12 0v8z" fill="none" stroke="#e2b75a" stroke-width="1.8"/></g>`;
   const label = (x, y, k, strong) => `<text x="${x}" y="${y}" text-anchor="middle" class="nl${strong ? ' strong' : ''}">${k === '?' || k === 'f?' ? '' : t(`door.${k}`)}</text>`;
   for (const row of rows) {
     row.kinds.forEach((k, i) => {
@@ -1097,7 +1099,7 @@ function runMapSVG() {
       const big = k === 'boss' || (row.r === n - 1);
       const rad = big ? 30 : 23;
       if (k === '?' || k === 'f?') {
-        nodes += `<g class="nd ghost"><circle cx="${x}" cy="${y}" r="${rad - 3}" fill="#101338" stroke="#4a5090" stroke-width="1.6" stroke-dasharray="3 4"/>${k === 'f?' ? `<g transform="translate(${x - 9} ${y - 9}) scale(.75)" fill="none" stroke="#7d86d0" stroke-width="2" stroke-linecap="round">${NODE.normal.icon}</g>` : `<text x="${x}" y="${y + 6}" text-anchor="middle" class="q">?</text>`}</g>`;
+        nodes += `<g class="nd ghost"><circle cx="${x}" cy="${y}" r="${rad - 3}" fill="#16181c" stroke="#606570" stroke-width="1.6" stroke-dasharray="3 4"/>${k === 'f?' ? `<g transform="translate(${x - 9} ${y - 9}) scale(.75)" fill="none" stroke="#8f95a2" stroke-width="2" stroke-linecap="round">${NODE.normal.icon}</g>` : `<text x="${x}" y="${y + 6}" text-anchor="middle" class="q">?</text>`}</g>`;
         return;
       }
       const d = NODE[k];
@@ -1105,7 +1107,7 @@ function runMapSVG() {
       const skipped = row.past && row.pick !== i;
       const cls = 'nd' + (row.cur ? ' cur' : '') + (taken ? ' taken' : '') + (skipped ? ' skipped' : '') + (big ? ' big' : '');
       const attr = row.cur ? ` data-door="${i}" role="button" tabindex="0" aria-label="${t(`door.${k}`)}"` : '';
-      nodes += `<g class="${cls}"${attr} style="--c:${d.col}">${row.cur ? `<circle class="pulse" cx="${x}" cy="${y}" r="${rad + 8}" fill="${d.col}"/>` : ''}<circle cx="${x}" cy="${y}" r="${rad}" fill="#0c0f33" stroke="${taken || row.cur ? d.ring : d.col}" stroke-width="${row.cur ? 3 : 2}"/><circle cx="${x}" cy="${y}" r="${rad - 5}" fill="${d.col}" opacity="${skipped ? 0.1 : taken ? 0.55 : 0.3}"/><g transform="translate(${x - 12 * (rad / 23)} ${y - 12 * (rad / 23)}) scale(${rad / 23})" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="${skipped ? 0.35 : 1}">${d.icon}</g>${row.cur || big ? label(x, y + rad + 17, k, row.cur) : ''}</g>`;
+      nodes += `<g class="${cls}"${attr} style="--c:${d.col}">${row.cur ? `<circle class="pulse" cx="${x}" cy="${y}" r="${rad + 8}" fill="${d.col}"/>` : ''}<circle cx="${x}" cy="${y}" r="${rad}" fill="#14151a" stroke="${taken || row.cur ? d.ring : d.col}" stroke-width="${row.cur ? 3 : 2}"/><circle cx="${x}" cy="${y}" r="${rad - 5}" fill="${d.col}" opacity="${skipped ? 0.1 : taken ? 0.55 : 0.3}"/><g transform="translate(${x - 12 * (rad / 23)} ${y - 12 * (rad / 23)}) scale(${rad / 23})" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="${skipped ? 0.35 : 1}">${d.icon}</g>${row.cur || big ? label(x, y + rad + 17, k, row.cur) : ''}</g>`;
     });
   }
   if (curRow || true) {
@@ -1115,10 +1117,10 @@ function runMapSVG() {
   let stars = '';
   for (let i = 0; i < 40; i++) stars += `<circle cx="${(i * 97.3) % 400}" cy="${(i * 53.7) % 600}" r="${0.6 + (i % 3) * 0.4}" fill="#fff" opacity="${0.15 + (i % 4) * 0.1}"/>`;
   let cols = '';
-  for (const x of [26, 374]) cols += `<g opacity=".5"><rect x="${x - 14}" y="40" width="28" height="560" fill="url(#col)"/>${[110, 230, 350, 470].map((y) => `<rect x="${x - 18}" y="${y}" width="36" height="8" fill="#2a2f6a" stroke="#e2b75a" stroke-opacity=".5"/>`).join('')}</g>`;
+  for (const x of [26, 374]) cols += `<g opacity=".5"><rect x="${x - 14}" y="40" width="28" height="560" fill="url(#col)"/>${[110, 230, 350, 470].map((y) => `<rect x="${x - 18}" y="${y}" width="36" height="8" fill="#444853" stroke="#e2b75a" stroke-opacity=".5"/>`).join('')}</g>`;
   return `<svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" aria-hidden="false">
-<defs><linearGradient id="col" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0a0c2b"/><stop offset=".5" stop-color="#23286a"/><stop offset="1" stop-color="#0a0c2b"/></linearGradient>
-<radialGradient id="rg" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#3a3f9a" stop-opacity=".55"/><stop offset="1" stop-color="#3a3f9a" stop-opacity="0"/></radialGradient></defs>
+<defs><linearGradient id="col" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#111216"/><stop offset=".5" stop-color="#424753"/><stop offset="1" stop-color="#111216"/></linearGradient>
+<radialGradient id="rg" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#626878" stop-opacity=".55"/><stop offset="1" stop-color="#626878" stop-opacity="0"/></radialGradient></defs>
 <rect width="400" height="600" fill="url(#rg)"/>${stars}${cols}${faint}${gold}${nodes}</svg>`;
 }
 

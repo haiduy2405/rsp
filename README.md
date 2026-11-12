@@ -131,3 +131,6 @@ Sau khi xoay ngọc: mỗi tướng nảy số sát thương của mình ngay tr
 - **Nhóm 4 ngọc**: nhân ×1.5 (hiện chữ + vòng sóng). **Nhóm 5+ ngọc**: sinh Ngọc Nâng Cấp (hiệu ứng hút hạt, ngọc nảy ra, vòng vàng + tia xoay); mỗi Ngọc Nâng Cấp nằm trong nhóm sau này cộng +25% sát thương/hồi (`group.enhancedBonus`).
 - **Giữ vào độ khó** (chọn ải) hoặc chuột phải: bảng thông tin quái, đặc tính, bảng rớt và tỉ lệ (`core/stageinfo.js`).
 - **Nhạc nền viết lại** (`ui/audio.js` + `data/audio.json`): hợp âm, pad vang, rải nốt, giai điệu 4 ô nhịp, bè trầm, trống; ba bài hub/battle/boss. Kiểm bằng `tests/e2e/music.cjs`.
+
+## Giao diện mới (v0.19)
+Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính (nút BATTLE, Primary), vàng chỉ cho tiền tệ và độ hiếm. Tiêu đề dùng phông Fraunces (có tiếng Việt, tự host), thân chữ Be Vietnam Pro. Hub, bản đồ ải, HUD trận và nền trận đã phối lại. Kế hoạch art/nhạc thật: `docs/ART_PLAN.md`.
