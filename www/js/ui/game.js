@@ -360,6 +360,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
 
   return {
     getState: () => state,
+    isBusy: () => busy,
     destroy() {
       alive = false;
       canvas.removeEventListener('pointerdown', onDown);

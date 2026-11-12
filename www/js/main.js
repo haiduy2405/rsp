@@ -671,6 +671,7 @@ function startBattleUI() {
       const r = runStep(ctx, run, { type: 'battle', action });
       if (r.events[0]?.type === 'invalid') return { state, events: r.events };
       record.actions.push({ type: 'battle', action });
+      run = r.run; // phải cập nhật ngay, nếu không mọi nước đi đều bắt đầu lại từ trạng thái đầu trận
       pending = r.run;
       return { state: r.run.battle, events: r.events };
     },
