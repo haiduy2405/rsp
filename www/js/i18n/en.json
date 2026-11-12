@@ -471,5 +471,18 @@
   "app.install": "Install app",
   "app.fullscreen": "Fullscreen",
   "app.helpIOS": "On iPhone/iPad: open in Safari, tap Share, then 'Add to Home Screen'. Launch from that icon for fullscreen.",
-  "app.helpOther": "Your browser can't install directly. Open the browser menu (three dots) and choose 'Install app' or 'Add to Home screen'. Launch from that icon for fullscreen."
+  "app.helpOther": "Your browser can't install directly. Open the browser menu (three dots) and choose 'Install app' or 'Add to Home screen'. Launch from that icon for fullscreen.",
+  "battle.comboWord": "combo",
+  "hub.credit": "Made by duyluma",
+  "hub.version": "Version {v} · build {b} · {d}",
+  "result.victory": "Victory",
+  "result.victoryBoss": "Boss defeated",
+  "team.preset": "Team {n}",
+  "team.prep": "Prepare: {zone}",
+  "team.makeLeader": "Make {name} leader",
+  "team.go": "Start battle",
+  "team.pickFor": "Pick a character for: {n}",
+  "hub.items": "Items",
+  "items.currency": "Currency",
+  "items.stones": "Stones by element"
 }

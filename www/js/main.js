@@ -2,7 +2,7 @@ import { buildCtx } from './core/ctx.js';
 import { createRun, runStep, newRunRecord, debugWinBattle } from './core/run.js';
 import { applyRunResult } from './core/progress.js';
 import { createStorage, browserAdapter } from './save/storage.js';
-import { grantCharacter, levelCost, levelUp, awakenCost, awaken, setTeam, teamRoster } from './core/upgrade.js';
+import { grantCharacter, levelCost, levelUp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
 import { KEYS } from './core/effects.js';
 import { summon, redeemCharacter, effectiveRates } from './core/summon.js';
@@ -11,9 +11,13 @@ import { newProgress } from './core/progress.js';
 import { createT, detectLang } from './i18n/index.js';
 import { startGame } from './ui/game.js';
 import { preloadAssets, getImg } from './ui/assets.js';
+import { VERSION, BUILD, BUILD_DATE } from './version.js';
+import { createFxLayer } from './ui/fxlayer.js';
 import { createAudio } from './ui/audio.js';
 
 const $ = (id) => document.getElementById(id);
+let fxl = null;
+const celebrate = () => (fxl ||= createFxLayer($('fx'))).celebrate();
 const load = (f) => fetch(`js/${f}`).then((r) => r.json());
 const [config, characters, monsters, zones, events, duos, banners, story, audioCfg, vi, en] = await Promise.all([
   load('data/config.json'),
@@ -72,6 +76,7 @@ const btn = (label, onclick, cls = '', extra = {}) => h('button', { class: cls, 
 let atHub = false;
 const screen = (...kids) => {
   $('info')?.remove();
+  $('screen').onpointerdown = null;
   atHub = false;
   audio.playMusic('hub');
   $('screen').style.backgroundImage = '';
@@ -101,6 +106,25 @@ const hpBar = () => [
 ];
 
 // ---- Cupola (hub)
+const ICONS = {
+  collection: '<rect x="5" y="4" width="11" height="15" rx="2"/><path d="M9 21h8a2 2 0 0 0 2-2V8"/>',
+  team: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c.5-3.2 2.7-5 5.5-5s5 1.8 5.5 5"/><path d="M15.5 14.2c2.6-.3 4.5 1.2 5 4.3"/>',
+  glossary: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/>',
+  summon: '<path d="M12 3l2.2 6.2L21 12l-6.8 2.8L12 21l-2.2-6.2L3 12l6.8-2.8z"/>',
+  story: '<path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6z"/><path d="M6 3v18"/><path d="M10 8h5M10 12h4"/>',
+  items: '<path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/>',
+  settings: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+};
+function dockBtn(icon, label, onclick, id, main = false) {
+  const b = h('button', { onclick, id, class: main ? 'main' : '', 'aria-label': label });
+  b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[icon]}</svg>`;
+  b.append(h('span', {}, label));
+  return b;
+}
+const CUR_COL = { gold: '#ffd24a', spirit: '#b58bff', essence: '#6bd5ff', shard: '#ff9acb' };
+const curPill = (k, v, id) => h('button', { class: 'cur-pill', ...(id ? { id } : {}), onclick: () => showItems(), 'aria-label': t(`res.${k}`) }, h('i', { style: `background:${CUR_COL[k]}` }), h('b', {}, new Intl.NumberFormat(lang).format(v)));
+const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } : {}) }, label, h('b', {}, String(value)));
+
 function showHub() {
   run = null;
   record = null;
@@ -110,50 +134,28 @@ function showHub() {
     const st = inv.stones[z.element];
     return h(
       'div',
-      { class: 'card btn charrow' + (open ? '' : ' locked'), 'data-zone': z.id, style: `border-left:6px solid ${COLORS[z.element]}`, onclick: open ? () => startRun(z.id) : null },
-      getImg(`orb:${z.element}`) ? h('img', { src: getImg(`orb:${z.element}`).src, alt: '', style: 'width:48px;height:48px;flex:none' }) : null,
+      { class: 'card btn gate' + (open ? '' : ' locked'), 'data-zone': z.id, style: `--el:${COLORS[z.element]}`, onclick: open ? () => showTeam(0, undefined, z.id) : null },
+      getImg(`orb:${z.element}`) ? h('img', { src: getImg(`orb:${z.element}`).src, alt: '' }) : null,
       h(
         'div',
-        { style: 'flex:1' },
-        h('h3', {}, t(`zone.${z.id}`)),
+        { class: 'info' },
+        h('div', { class: 'name' }, t(`zone.${z.id}`)),
         h('small', {}, open ? `${t(`zone.final.${z.final}`)} · ${t('zone.clears', { n: progress.clears[z.id] || 0 })}` : t('zone.locked')),
         open ? h('div', { class: 'muted' }, `${t('stone.normal')}: ${st.normal} · ${t('stone.rare')}: ${st.rare}`) : null,
       ),
     );
   });
   screen(
-    h('h1', {}, t('hub.title')),
     h(
       'div',
-      { class: 'card charrow', style: 'align-items:center' },
-      h('div', { class: 'avatar', style: `background:${COLORS[progress.player.avatar % 6]};flex:none;cursor:default` }, (progress.player.name || '?')[0].toUpperCase()),
-      h('div', { style: 'flex:1' }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, `${progress.player.callsign} · ${t('hub.sub')}`)),
+      { class: 'hub-top' },
+      h('div', { class: 'avatar', style: `background:${COLORS[progress.player.avatar % 6]}` }, (progress.player.name || '?')[0].toUpperCase()),
+      h('div', { class: 'who' }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, `${progress.player.callsign} · ${t('hub.sub')}`)),
+      h('div', { class: 'cur', id: 'cur' }, curPill('gold', inv.gold), curPill('spirit', inv.spirit, 'spirit'), curPill('essence', inv.essence)),
     ),
     notice ? h('div', { class: 'notice' }, t(notice)) : null,
     installRow(),
-    h(
-      'div',
-      { class: 'row' },
-      h('span', { class: 'res' }, `${t('res.gold')}: ${inv.gold}`),
-      h('span', { class: 'res' }, `${t('res.essence')}: ${inv.essence}`),
-      h('span', { class: 'res', id: 'spirit' }, `${t('res.spirit')}: ${inv.spirit}`),
-      h('span', { class: 'res' }, `${t('res.shard')}: ${inv.shards}`),
-    ),
-    h(
-      'div',
-      { class: 'row' },
-      btn(t('hub.collection'), () => showCollection(), '', { id: 'b-col' }),
-      btn(t('hub.team'), () => showTeam(0), '', { id: 'b-team' }),
-      btn(t('hub.glossary'), () => showGlossary(), '', { id: 'b-glos' }),
-    ),
-    h(
-      'div',
-      { class: 'row' },
-      btn(t('hub.summon'), () => showSummon('standard'), 'primary', { id: 'b-summon' }),
-      btn(t('hub.story'), () => showStory(), '', { id: 'b-story' }),
-      btn(t('hub.settings'), () => showSettings(), '', { id: 'b-set' }),
-    ),
-    h('h3', {}, t('hub.zones')),
+    h('h2', { class: 'sect' }, t('hub.zones')),
     zoneCards,
     h(
       'details',
@@ -162,9 +164,20 @@ function showHub() {
       h('label', {}, t('hub.seed'), h('input', { id: 'seed', inputmode: 'numeric', value: seedText, oninput: (e) => (seedText = e.target.value) })),
       h('p', { class: 'muted' }, t('hub.progress')),
     ),
+    h('div', { class: 'credit' }, h('b', {}, t('hub.credit')), h('span', {}, t('hub.version', { v: VERSION, b: BUILD, d: BUILD_DATE }))),
+    h(
+      'nav',
+      { class: 'dock' },
+      dockBtn('team', t('hub.team'), () => showTeam(0), 'b-team'),
+      dockBtn('collection', t('hub.collection'), () => showCollection(), 'b-col'),
+      dockBtn('items', t('hub.items'), () => showItems(), 'b-items'),
+      dockBtn('glossary', t('hub.glossary'), () => showGlossary(), 'b-glos'),
+      dockBtn('summon', t('hub.summon'), () => showSummon('standard'), 'b-summon', true),
+      dockBtn('story', t('hub.story'), () => showStory(), 'b-story'),
+      dockBtn('settings', t('hub.settings'), () => showSettings(), 'b-set'),
+    ),
   );
-  if (getImg('bg:hub')) $('screen').style.backgroundImage = `linear-gradient(rgba(8,9,22,.86),rgba(8,9,22,.86)),url(${getImg('bg:hub').src})`;
-  if ($('screen')) $('screen').style.backgroundSize = 'cover';
+  if (getImg('bg:hub')) $('screen').style.backgroundImage = `linear-gradient(180deg,rgba(6,7,26,.5),rgba(6,7,26,.9) 55%),url(${getImg('bg:hub').src})`;
   atHub = true;
   notice = null;
 }
@@ -265,7 +278,7 @@ function showChar(id, msg) {
   };
   screen(
     getImg(`card:${id}`) ? h('img', { src: getImg(`card:${id}`).src, alt: t(`char.${id}`), style: 'width:60%;max-width:240px;border-radius:14px' }) : null,
-    h('h2', {}, t(`char.${id}`), ' ', chip(id), ' ', stars(id)),
+    h('h2', {}, t(`char.${id}`), ' ', chip(id), ' ', h('span', { class: 'stars' }, stars(id))),
     msg ? h('div', { class: 'notice' }, t(msg)) : null,
     h('div', { class: 'row' }, h('span', { class: 'res' }, t('char.level', { n: pc.level, max: ctx.config.progression.levelMax })), h('span', { class: 'res' }, t('char.awaken', { n: pc.awaken }))),
     h('div', { class: 'row' }, h('span', { class: 'res' }, `${t('stat.hp')} ${st.hp}`), h('span', { class: 'res' }, `${t('stat.atk')} ${st.atk}`), h('span', { class: 'res' }, `${t('stat.heal')} ${st.heal}`)),
@@ -282,33 +295,63 @@ function showChar(id, msg) {
   );
 }
 
-function showTeam(slot, msg) {
+// Màn đội hình: dùng cả ở menu (Đội hình) lẫn trước khi vào trận (zoneId có giá trị).
+function showTeam(slot, msg, zoneId) {
   const team = progress.team;
   const duos = [];
   for (let i = 0; i + 1 < 5; i++) {
     const d = ctx.duoByPair[`${team[i]}|${team[i + 1]}`];
     if (d) duos.push(d);
   }
+  const apply = (r) => {
+    if (r.ok) {
+      progress = r.progress;
+      save();
+    }
+  };
   const pick = (id) => {
     const t2 = team.slice();
     const at = t2.indexOf(id);
     if (at >= 0) [t2[at], t2[slot]] = [t2[slot], t2[at]];
     else t2[slot] = id;
-    const r = setTeam(progress, t2);
-    if (r.ok) {
-      progress = r.progress;
-      save();
-    }
-    showTeam(slot);
+    apply(setTeam(progress, t2));
+    showTeam(slot, undefined, zoneId);
   };
+  const cur = progress.preset ?? 0;
+  const tabs = h('div', { class: 'row' }, presetsOf(progress).map((_, i) => h('button', { class: 'btn' + (i === cur ? ' primary' : ''), 'data-preset': i, onclick: () => { apply(selectPreset(progress, i)); showTeam(0, undefined, zoneId); } }, t('team.preset', { n: i + 1 }))));
+  const slots = h('div', { class: 'row', style: 'align-items:flex-end' }, team.map((id, i) => {
+    const lead = i === 0;
+    const sel = i === slot;
+    return h('div', { class: 'card btn', style: `width:${lead ? 96 : 84}px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px;${lead ? 'padding-bottom:14px;border-color:#ffd24a;box-shadow:0 0 14px #ffd24a88;' : ''}${sel ? 'outline:2px solid #7dffa0;' : ''}`, 'data-slot': i, onclick: () => showTeam(i, undefined, zoneId) }, h('small', { style: lead ? 'color:#ffd24a;font-weight:800' : '' }, lead ? '♛ ' + t('team.leader') : t('team.slot', { n: i + 1 })), portrait(id, lead ? 72 : 60), h('small', {}, t(`char.${id}`)));
+  }));
   screen(
-    h('h2', {}, t('hub.team')),
+    h('h2', {}, zoneId ? t('team.prep', { zone: t(`zone.${zoneId}`) }) : t('hub.team')),
+    tabs,
     h('p', { class: 'muted' }, t('team.hint')),
-    h('div', { class: 'row' }, team.map((id, i) => h('div', { class: 'card btn', style: `width:88px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px;${i === slot ? 'border-color:#ffd84a;box-shadow:0 0 10px #ffd84a66;' : ''}`, 'data-slot': i, onclick: () => showTeam(i) }, h('small', {}, i === 0 ? t('team.leader') : t('team.slot', { n: i + 1 })), portrait(id, 64), h('small', {}, t(`char.${id}`))))),
+    slots,
+    slot > 0 ? btn(t('team.makeLeader', { name: t(`char.${team[slot]}`) }), () => { apply(makeLeader(progress, slot)); showTeam(0, undefined, zoneId); }, '', { id: 'make-leader' }) : null,
     h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(ctx.characters[team[0]].leader)}`),
     h('div', { class: 'muted' }, duos.length ? `${t('team.duoActive')}: ${duos.map((d) => t(`duo.${d.id}`)).join(', ')}` : t('team.noDuo')),
-    h('h3', {}, t('team.pick')),
+    zoneId ? btn(t('team.go'), () => startRun(zoneId), 'primary', { id: 'team-go' }) : null,
+    h('h3', {}, t('team.pickFor', { n: slot === 0 ? t('team.leader') : t('team.slot', { n: slot + 1 }) })),
     owned().map((c) => charCard(c.id, () => pick(c.id))),
+    btn(t('back'), showHub, '', { id: 'back' }),
+  );
+}
+
+// Kho: toàn bộ tài nguyên đang có.
+function showItems() {
+  const inv = progress.inventory;
+  const row = (label, value, col) => h('div', { class: 'card item-row' }, h('i', { style: `background:${col}` }), h('span', {}, label), h('b', {}, new Intl.NumberFormat(lang).format(value)));
+  screen(
+    h('h2', {}, t('hub.items')),
+    h('h3', {}, t('items.currency')),
+    row(t('res.gold'), inv.gold, CUR_COL.gold),
+    row(t('res.spirit'), inv.spirit, CUR_COL.spirit),
+    row(t('res.essence'), inv.essence, CUR_COL.essence),
+    row(t('res.shard'), inv.shards, CUR_COL.shard),
+    h('h3', {}, t('items.stones')),
+    [0, 1, 2, 3, 4, 5].map((e) => row(`${el(e)} · ${t('stone.normal')} / ${t('stone.rare')}`, `${inv.stones[e].normal} / ${inv.stones[e].rare}`, COLORS[e])),
     btn(t('back'), showHub, '', { id: 'back' }),
   );
 }
@@ -680,6 +723,7 @@ function startBattleUI() {
     fx: audio,
     hint,
     onInspect: showInspect,
+    celebrate,
     onEnd(st) {
       audio.sfx(st.status === 'won' ? 'win' : 'lose');
       run = pending;
@@ -736,15 +780,120 @@ function showInspect(kind, idx) {
   $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox' }, body, btn(t('info.close'), close, 'primary', { id: 'info-close' }))));
 }
 
+// ---- Cảnh thưởng: rương rung, mở nắp, đồ bay ra từng món có số đếm tăng và âm thanh
+const REWARD_ICON = {
+  gold: '<circle cx="12" cy="12" r="9" fill="#e2b75a" stroke="#8a6a2a" stroke-width="1.5"/><circle cx="12" cy="12" r="5.5" fill="none" stroke="#fff0bd" stroke-width="1.5"/>',
+  essence: '<path d="M12 2.5c3.4 4.2 6.4 7.2 6.4 10.8a6.4 6.4 0 0 1-12.8 0C5.6 9.700 8.600 6.700 12 2.500z" fill="#b58bff" stroke="#5a3aa8" stroke-width="1.4"/><ellipse cx="9.800" cy="12" rx="1.400" ry="2.400" fill="#fff" opacity=".6"/>',
+  spirit: '<path d="M12 2.500l7.500 6.500-7.500 12.500L4.500 9z" fill="#6bd5ff" stroke="#1f6f9a" stroke-width="1.4" stroke-linejoin="round"/><path d="M4.500 9h15M12 2.500L9 9l3 12.500L15 9z" fill="none" stroke="#e6f8ff" stroke-width="1" opacity=".8"/>',
+  shard: '<path d="M7 3.500l8.500 2L19 14l-6.500 6.500L5 14z" fill="#ff7fb0" stroke="#a83a6a" stroke-width="1.400" stroke-linejoin="round"/><path d="M7 3.500L12.500 12 19 14" fill="none" stroke="#ffe0ee" stroke-width="1" opacity=".8"/>',
+  stoneN: '<path d="M12 3l7.500 4.300v8.400L12 20l-7.500-4.300V7.300z" fill="#7d8fd8" stroke="#3a4690" stroke-width="1.400" stroke-linejoin="round"/>',
+  stoneR: '<path d="M12 3l7.500 4.300v8.400L12 20l-7.500-4.300V7.300z" fill="#ffd24a" stroke="#8a6a2a" stroke-width="1.400" stroke-linejoin="round"/><path d="M12 3v17M4.500 7.300L19.500 15.700M19.500 7.300L4.500 15.700" stroke="#fff7d6" stroke-width=".8" opacity=".7"/>',
+};
+const rewardIcon = (k) => {
+  const e = h('span', { class: 'ricon' });
+  e.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${REWARD_ICON[k]}</svg>`;
+  return e;
+};
+function lootRows(l) {
+  const rows = [];
+  if (l.gold) rows.push({ k: 'gold', label: t('res.gold'), n: l.gold });
+  if (l.essence) rows.push({ k: 'essence', label: t('res.essence'), n: l.essence });
+  if (l.shards) rows.push({ k: 'shard', label: t('res.shard'), n: l.shards, rare: true });
+  if (l.spirit) rows.push({ k: 'spirit', label: t('res.spirit'), n: l.spirit, rare: true });
+  if (l.stones?.normal) rows.push({ k: 'stoneN', label: `${t('res.stone')} ${t('stone.normal')}`, n: l.stones.normal });
+  if (l.stones?.rare) rows.push({ k: 'stoneR', label: `${t('res.stone')} ${t('stone.rare')}`, n: l.stones.rare, rare: true });
+  return rows;
+}
+const CHEST_SVG = `<svg viewBox="0 0 200 170" aria-hidden="true">
+  <ellipse cx="100" cy="158" rx="78" ry="9" fill="#000" opacity=".35"/>
+  <g class="chest-lid"><path d="M30 84C30 26 170 26 170 84Z" fill="#7a4822" stroke="#2a160a" stroke-width="5" stroke-linejoin="round"/><path d="M30 84C34 52 62 40 100 40" fill="none" stroke="#a8692f" stroke-width="5" opacity=".7"/><rect x="44" y="40" width="13" height="44" fill="#e2b75a" stroke="#2a160a" stroke-width="3.5"/><rect x="143" y="40" width="13" height="44" fill="#e2b75a" stroke="#2a160a" stroke-width="3.5"/></g>
+  <g class="chest-body"><rect x="30" y="82" width="140" height="68" rx="7" fill="#64391a" stroke="#2a160a" stroke-width="5"/><path d="M34 106H166M34 128H166" stroke="#2a160a" stroke-width="3" opacity=".5"/><rect x="44" y="82" width="13" height="68" fill="#e2b75a" stroke="#2a160a" stroke-width="3.5"/><rect x="143" y="82" width="13" height="68" fill="#e2b75a" stroke="#2a160a" stroke-width="3.5"/><rect x="88" y="78" width="24" height="34" rx="5" fill="#ffd24a" stroke="#2a160a" stroke-width="4"/><circle cx="100" cy="94" r="4.500" fill="#2a160a"/></g>
+</svg>`;
+
+function lootScene({ title, sub, loot, onContinue }) {
+  const rows = lootRows(loot);
+  const skipEl = { fn: null };
+  const timers = [];
+  const later = (ms, f) => timers.push(setTimeout(f, ms));
+  const chest = h('div', { class: 'chest' });
+  chest.innerHTML = CHEST_SVG;
+  const rays = h('div', { class: 'rays' });
+  const list = h('div', { class: 'loot-list' });
+  const cont = btn(t('result.continue'), () => { timers.forEach(clearTimeout); onContinue(); }, 'primary', { id: 'continue', class: 'primary cont-hidden' });
+  const stage = h('div', { class: 'loot-stage' }, rays, chest);
+  const root = [h('div', { class: 'victory-title' }, title), sub, rows.length ? stage : null, list, cont];
+  screen(...root.filter(Boolean));
+  const wrapRect = () => $('wrap').getBoundingClientRect();
+  const chestPos = () => { const r = chest.getBoundingClientRect(); const w = wrapRect(); return { x: r.left - w.left + r.width / 2, y: r.top - w.top + r.height * 0.35 }; };
+  const spark = (n, col) => { const p = chestPos(); (fxl ||= createFxLayer($('fx'))).sparkle(p.x, p.y, n, col); };
+  const showRow = (row, i) => {
+    const el = h('div', { class: 'reward' + (row.rare ? ' rare' : '') }, rewardIcon(row.k), h('span', { class: 'rlabel' }, row.label), h('b', { class: 'rnum' }, '+0'));
+    list.append(el);
+    audio.sfx(row.rare ? 'rare' : i % 2 ? 'coin2' : 'coin');
+    audio.vibrate(row.rare ? 30 : 12);
+    const num = el.querySelector('.rnum');
+    const t0 = performance.now();
+    const dur = 520;
+    const tick = () => {
+      const k = Math.min(1, (performance.now() - t0) / dur);
+      num.textContent = `+${Math.round(row.n * (1 - Math.pow(1 - k, 3)))}`;
+      if (k < 1) requestAnimationFrame(tick);
+    };
+    tick();
+    if (row.rare) spark(22, '#fff0bd');
+  };
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    cont.classList.remove('cont-hidden');
+  };
+  skipEl.fn = () => {
+    // chạm để xem ngay toàn bộ
+    timers.forEach(clearTimeout);
+    stage.classList.add('open', 'skipped');
+    list.replaceChildren();
+    rows.forEach((row) => {
+      const el = h('div', { class: 'reward instant' + (row.rare ? ' rare' : '') }, rewardIcon(row.k), h('span', { class: 'rlabel' }, row.label), h('b', { class: 'rnum' }, `+${row.n}`));
+      list.append(el);
+    });
+    finish();
+  };
+  $('screen').onpointerdown = (e) => { if (!done && !e.target.closest('button')) skipEl.fn(); };
+  if (!rows.length) {
+    list.append(h('div', { class: 'muted' }, t('result.nothing')));
+    finish();
+    return;
+  }
+  // dòng thời gian
+  later(450, () => { audio.sfx('chestShake'); stage.classList.add('shake'); });
+  later(1250, () => {
+    stage.classList.remove('shake');
+    stage.classList.add('open');
+    audio.sfx('chestOpen');
+    audio.vibrate(40);
+    spark(36);
+  });
+  rows.forEach((row, i) => later(1650 + i * 360, () => showRow(row, i)));
+  later(1650 + rows.length * 360 + 250, finish);
+}
+
 function showResult() {
   const r = run.lastResult;
+  if (r.kind === 'battle' || r.kind === 'chest') {
+    const isBoss = r.nodeType === 'boss';
+    return lootScene({
+      title: r.kind === 'chest' ? t('result.chest') : t(isBoss ? 'result.victoryBoss' : 'result.victory'),
+      sub: h('div', { class: 'muted' }, `${t(`zone.${run.zoneId}`)} · ${t('run.floor', { n: run.floor + 1, total: run.floors })}`),
+      loot: r.loot,
+      onContinue: () => act({ type: 'continue' }),
+    });
+  }
   let body;
   if (r.kind === 'event') {
     const key = `ev.${r.eventId}`;
     body = h('div', { class: 'card' }, h('b', {}, t(`${key}.title`)), h('p', {}, t(`${key}.o${r.choice}_${r.outcome}`)));
-  } else if (r.kind === 'rest') body = h('div', { class: 'card' }, h('b', {}, t('result.rest', { n: r.heal })));
-  else if (r.kind === 'chest') body = h('div', { class: 'card' }, h('b', {}, t('result.chest')), h('p', {}, `${t('result.gain')}: ${lootLine(r.loot)}`));
-  else body = h('div', { class: 'card' }, h('b', {}, t('result.battle')), h('p', {}, `${t('result.gain')}: ${lootLine(r.loot)}`));
+  } else body = h('div', { class: 'card' }, h('b', {}, t('result.rest', { n: r.heal })));
   screen(floorTitle(), hpBar(), body, h('div', { class: 'muted' }, `${t('end.loot')}: ${lootLine(run.loot)}`), btn(t('result.continue'), () => act({ type: 'continue' }), 'primary', { id: 'continue' }));
 }
 

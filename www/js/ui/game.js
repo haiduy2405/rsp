@@ -43,7 +43,7 @@ function findHint(ctx, state) {
   return best?.path ?? null;
 }
 
-export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null }) {
+export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null }) {
   const g = canvas.getContext('2d');
   let state = initial;
   let busy = false;
@@ -83,7 +83,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   function sync() {
     view.turn = state.turn;
     view.board = structuredClone(state.board);
-    view.enemies = state.enemies.map((e) => ({ ...e }));
+    view.enemies = state.enemies.map((e) => ({ ...e, deadAge: e.hp <= 0 ? 9999 : undefined }));
     view.members = state.members.map((m) => ({ ...m }));
     view.hp = state.hp;
     view.maxHp = state.maxHp;
@@ -99,43 +99,74 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   }
 
   const enemyX = (i) => (W / state.enemies.length) * i + W / state.enemies.length / 2;
-  const floater = (s, x, y, color, size = 26) => view.floaters.push({ s, x: Math.max(70, Math.min(W - 70, x)), y, color, size, age: 0, life: 1000 });
+  const floater = (s, x, y, color, size = 26, kind = 'text', life = 1000) => view.floaters.push({ s, x: Math.max(70, Math.min(W - 70, x)), y, color, size, kind, age: 0, life });
+  const nf = new Intl.NumberFormat(typeof document !== 'undefined' ? document.documentElement.lang || 'vi' : 'vi');
+  const fmt = (n) => nf.format(n);
+  const LIGHT = ['#9fd2ff', '#ffb098', '#a6f0b4', '#fff0a0', '#d2b0ff', '#ffc0da']; // màu số theo hệ
 
   const memberPos = (id) => {
     const i = Math.max(0, state.members.findIndex((m) => m.id === id));
-    return { x: 12 + i * 104 + 49, y: 388 + 28, el: state.members[i]?.element ?? 3 };
+    return { x: 12 + i * 104 + 49, y: 394 + 26, el: state.members[i]?.element ?? 3 };
   };
-  const dmgSize = (a) => Math.min(54, 28 + Math.log10(Math.max(10, a)) * 6);
+  // cỡ số theo tỉ lệ máu quái bị mất: đòn nhỏ vẫn đọc được, đòn lớn nổi bật nhưng không tràn màn
+  const dmgSize = (a, maxHp) => 34 + Math.min(1, (a / Math.max(1, maxHp)) * 3) * 34;
 
   // Mỗi đòn: quả cầu bay từ nhân vật tới quái, tới nơi mới trừ máu + số nổi + rung quái.
-  function applyHits(hits, stagger = 90) {
+  function applyHits(hits, stagger = 90, finalKill = false) {
     let k = 0;
+    const stack = {};
+    const life = finalKill ? 300 : 260;
     for (const h of hits) {
       if (h.kind === 'damage') {
         const src = memberPos(h.from);
         const ex = enemyX(h.enemy);
-        view.shots.push({ x0: src.x, y0: src.y, x1: ex, y1: 160, col: src.el, delay: k * stagger, life: 260, age: 0, done: false, onHit: () => {
+        const n = (stack[h.enemy] = (stack[h.enemy] || 0) + 1) - 1;
+        view.shots.push({ x0: src.x, y0: src.y, x1: ex, y1: 160, col: src.el, delay: k * stagger, life, age: 0, done: false, onHit: () => {
           fx.sfx('hit');
           const en = view.enemies[h.enemy];
+          const before = en.hp;
           en.hp -= h.amount;
           en.hit = 1;
-          floater(h.amount === 0 && h.absorbed ? t('battle.blocked') : `-${h.amount}`, ex + ((k % 3) - 1) * 26, 150 - (k % 2) * 22, '#ffd84a', dmgSize(h.amount));
-          if (h.thawed) floater(t('effect.freeze.name'), ex, 200, '#9ad0ff', 20);
+          const big = h.amount / Math.max(1, en.maxHp) >= 0.3;
+          const lbl = h.amount === 0 && h.absorbed ? t('battle.blocked') : fmt(h.amount);
+          floater(lbl, ex + ((n % 3) - 1) * 40, 128 - Math.min(3, n) * 26, LIGHT[src.el] || '#ffd84a', h.amount === 0 ? 24 : dmgSize(h.amount, en.maxHp), 'dmg', 1100);
+          if (big) {
+            view.rings.push({ x: ex, y: 160, col: src.el, age: 0, life: 420 });
+            view.camShake = Math.max(view.camShake || 0, 6);
+          }
+          if (h.thawed) floater(t('effect.freeze.name'), ex, 210, '#9ad0ff', 20);
+          if (before > 0 && en.hp <= 0) killEnemy(h.enemy, finalKill);
         } });
         k++;
       } else if (h.kind === 'reflect') {
         view.hp = Math.max(0, view.hp - h.amount);
-        floater(`-${h.amount}`, W / 2, 350, '#ff9f6b');
+        floater(`-${fmt(h.amount)}`, W / 2, 350, '#ff9f6b', 34, 'dmg');
       } else if (h.amount > 0) {
         fx.sfx('heal');
         view.hp = Math.min(view.maxHp, view.hp + h.amount);
-        floater(`+${h.amount}`, W / 2, 350, '#7dffa0', 30);
+        floater(`+${fmt(h.amount)}`, W / 2, 352, '#7dffa0', 38, 'dmg');
       }
     }
-    return k ? k * stagger + 260 : 0; // thời gian cần chờ
+    return k ? (k - 1) * stagger + life : 0; // thời gian cần chờ
+  }
+  // Quái chết: nổ hạt theo hệ, rung, và nếu là quái cuối thì dừng hình ngắn trước khi chuyển slow-motion.
+  function killEnemy(i, finalKill) {
+    const en = view.enemies[i];
+    en.deadAge = 0;
+    const ex = enemyX(i);
+    for (let q = 0; q < (finalKill ? 44 : 24); q++) {
+      const a = (q / (finalKill ? 44 : 24)) * Math.PI * 2;
+      const sp = 0.1 + Math.random() * (finalKill ? 0.34 : 0.22);
+      view.particles.push({ x: ex, y: 165, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.06, col: en.element, age: 0, life: 700 + Math.random() * 400 });
+    }
+    view.whiteFlash = finalKill ? 0.9 : 0.45;
+    view.camShake = finalKill ? 14 : 8;
+    fx.sfx('kill');
+    fx.vibrate?.(finalKill ? 70 : 35);
+    if (finalKill) view.freeze = 160;
   }
   // Nhịp hoạt ảnh (ms): người chơi được "chiêm ngưỡng" từng combo rồi mới thấy đòn đánh.
-  const ANIM = { groupHold: 420, groupPop: 200, fall: 560, afterFall: 220, finale: 800, preShot: 200, stagger: 170, postShot: 350 };
+  const ANIM = { preview: 900, previewNext: 450, groupHold: 320, groupPop: 200, fall: 560, afterFall: 220, finale: 800, preShot: 200, stagger: 170, postShot: 350 };
   const tally = (add) => {
     const ty = (view.tally ||= { shown: 0, target: 0, pulse: 0 });
     ty.target = add == null ? 0 : ty.target + add;
@@ -162,8 +193,10 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     if (heal > 0) res.push({ kind: 'heal', amount: heal });
     return res.concat(out);
   };
-  async function animate(events) {
+  let celebrated = false;
+  async function animate(events, finalKill = false) {
     let pendingHits = [];
+    let isFirstStep = true;
     let sawStep = false;
     async function flush() {
       if (!sawStep) return;
@@ -182,9 +215,30 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       const hits = splitHits(pendingHits);
       pendingHits = [];
       tally(null);
-      const wait = applyHits(hits, ANIM.stagger);
-      await sleep(wait + ANIM.postShot);
+      if (finalKill) await finalBlow(hits);
+      else {
+        const wait = applyHits(hits, ANIM.stagger);
+        await sleep(wait + ANIM.postShot);
+      }
       view.combo = 0;
+    }
+    // Đòn kết liễu quái cuối: chuyển slow-motion, dừng hình khi trúng, rồi pháo hoa.
+    async function finalBlow(hits) {
+      fx.sfx('whoosh');
+      view.slow = 0.25;
+      const wait = applyHits(hits, ANIM.stagger * 1.4, true);
+      await sleep((wait + 150) / view.slow);
+      await sleep(750);
+      await sleep(520, (k) => (view.slow = 0.25 + 0.75 * easeOut(k)));
+      view.slow = 1;
+      await victoryBurst();
+    }
+    async function victoryBurst() {
+      if (celebrated) return;
+      celebrated = true;
+      fx.sfx('fanfare');
+      celebrate?.();
+      await sleep(1700);
     }
     for (const e of events) {
       if (!alive) return;
@@ -197,6 +251,11 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         pendingHits.push(...e.hits);
         const ng = st.groups.length;
         let given = 0;
+        // xem lại thành quả: sáng đồng thời mọi nhóm vừa ghép được, rồi mới nổ từng nhóm
+        view.hl = new Set(st.groups.flatMap((x) => x.cells));
+        fx.sfx(isFirstStep ? 'preview' : 'match');
+        await sleep(isFirstStep ? ANIM.preview : ANIM.previewNext);
+        isFirstStep = false;
         for (let gi = 0; gi < ng; gi++) {
           const g = st.groups[gi];
           const xs = g.cells.map((c) => cellCenter(c));
@@ -204,7 +263,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
           const cy = xs.reduce((a, q) => a + q.y, 0) / xs.length;
           view.hl = new Set(g.cells);
           view.combo = e.comboStart + gi;
-          fx.sfx(view.combo > 1 ? 'combo' : 'match');
+          fx.sfx(view.combo > 1 ? 'combo' : 'match', 1 + Math.min(8, view.combo - 1) * 0.06);
           fx.vibrate(10);
           floater(t('battle.combo', { n: view.combo }), cx, cy, '#ffffff', 22 + Math.min(14, view.combo));
           if (g.type !== 5 && !state.members.some((m) => m.element === g.type)) floater(t('battle.noAttacker'), cx, cy + 26, '#ff9aa8', 16);
@@ -283,7 +342,14 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.tally = { shown: 0, target: 0, pulse: 0 };
     const hadStep = r.events.some((e) => e.type === 'step');
     if (action.type === 'move' && !hadStep) floater(t('battle.noCombo'), W / 2, 700, '#c8ccff', 30);
-    await animate(r.events);
+    celebrated = false;
+    await animate(r.events, r.state.status === 'won');
+    if (r.state.status === 'won' && !celebrated && alive) {
+      celebrated = true;
+      fx.sfx('fanfare');
+      celebrate?.();
+      await sleep(1500);
+    }
     state = r.state;
     sync();
     view.combo = 0;
@@ -340,19 +406,19 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     const p0 = pos(ev);
     if (state.status !== 'playing' || busy) {
       // đang bận: chỉ cho xem chi tiết
-      if (p0.y >= 388 && p0.y <= 466) { const i = Math.floor((p0.x - 12) / 104); if (i >= 0 && i < state.members.length) startPress('member', i, p0, ev); }
+      if (p0.y >= 384 && p0.y <= 466) { const i = Math.floor((p0.x - 12) / 104); if (i >= 0 && i < state.members.length) startPress('member', i, p0, ev); }
       else if (p0.y >= 80 && p0.y <= 330 && state.enemies.length) startPress('enemy', Math.min(state.enemies.length - 1, Math.floor(p0.x / (W / state.enemies.length))), p0, ev);
       return;
     }
     const p = p0;
     for (const d of state.duos) {
       const cx = 12 + (d.slot + 1) * 104 - 3;
-      if (Math.abs(p.x - cx) <= 30 && p.y >= 377 && p.y <= 399) {
+      if (Math.abs(p.x - cx) <= 30 && p.y >= 380 && p.y <= 406) {
         if (d.cd === 0) run({ type: 'duo', index: d.slot });
         return;
       }
     }
-    if (p.y >= 388 && p.y <= 466) {
+    if (p.y >= 384 && p.y <= 466) {
       const idx = Math.floor((p.x - 12) / 104);
       if (idx >= 0 && idx < state.members.length) startPress('member', idx, p, ev);
       return;
@@ -483,14 +549,16 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   let last = performance.now();
   function frame(now) {
     if (!alive) return;
-    const dt = now - last;
+    const real = now - last;
     last = now;
+    let dt = real;
+    if (view.freeze > 0) { view.freeze -= real; dt = 0; } else dt = real * (view.slow ?? 1);
     if (drag && drag.t0) {
       const k = 1 - (now - drag.t0) / dragMs;
       view.timer = Math.max(0, k);
       if (k <= 0) release();
     }
-    if (view.tally) { const ty = view.tally; ty.shown += (ty.target - ty.shown) * Math.min(1, dt / 120); if (Math.abs(ty.target - ty.shown) < 1) ty.shown = ty.target; ty.pulse = Math.max(0, ty.pulse - dt / 500); }
+    if (view.tally) { const ty = view.tally; ty.shown += (ty.target - ty.shown) * Math.min(1, real / 120); if (Math.abs(ty.target - ty.shown) < 1) ty.shown = ty.target; ty.pulse = Math.max(0, ty.pulse - dt / 500); }
     if (view.lockFlash) view.lockFlash = Math.max(0, view.lockFlash - dt / 400);
     if (view.slides) for (const k in view.slides) { view.slides[k].age += dt; if (view.slides[k].age > 180) delete view.slides[k]; }
     for (const f of view.floaters) f.age += dt;
@@ -515,8 +583,15 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.shots = view.shots.filter((sh) => !sh.done);
     for (const en of view.enemies) {
       en.hit = Math.max(0, (en.hit || 0) - dt / 260);
-      en.hpShow = en.hpShow == null ? en.hp : en.hpShow + (en.hp - en.hpShow) * Math.min(1, dt / 120);
+      en.hpShow = en.hpShow == null ? en.hp : en.hpShow + (en.hp - en.hpShow) * Math.min(1, real / 120);
+      if (en.deadAge !== undefined && en.deadAge < 9999) en.deadAge += dt;
     }
+    // máy quay: vignette + phóng nhẹ khi slow-motion, rung và chớp trắng khi trúng nặng
+    const sl = (view.slow ?? 1) < 1;
+    view.vig = (view.vig || 0) + ((sl ? 1 : 0) - (view.vig || 0)) * Math.min(1, real / 160);
+    view.zoom = (view.zoom || 1) + ((sl ? 1.06 : 1) - (view.zoom || 1)) * Math.min(1, real / 220);
+    view.camShake = Math.max(0, (view.camShake || 0) - real / 30);
+    view.whiteFlash = Math.max(0, (view.whiteFlash || 0) - real / 330);
     draw(g, view, now);
     requestAnimationFrame(frame);
   }

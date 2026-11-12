@@ -73,3 +73,10 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 - Nhấn giữ tướng/quái (450ms) trong trận: bảng chi tiết (chỉ số, kỹ năng, hiệu ứng đang có). Chạm nhanh vào tướng vẫn là dùng kỹ năng.
 - Art quái procedural (24), `tools/gen-art.py`.
 - e2e mới: flows, monkey, m5-inspect, m5-circle.
+
+## Polish đợt 4
+- Khóa mục tiêu: chạm quái = cả đội dồn đòn (action `target`, không tốn lượt); đi chéo được (`allowDiagonal`, đã cân lại).
+- Nhịp thưởng: kéo xong → highlight mọi cụm ngọc vừa tạo → nổ từng combo (số tổng đếm tăng) → ngọc rơi → đòn bay. Quái cuối: slow-motion → pháo hoa → rương mở → từng món loot hiện ra.
+- UI/UX mới: design system (kính + khung vàng), font tự host, app-like (chặn bôi chọn/menu giữ), PWA (nút cài, fullscreen), góc tiền tệ trên phải, màn Kho đồ, credit "made by duyluma" + version (`npm run stamp`).
+- Đội hình: 3 đội lưu sẵn, đổi đội trưởng, màn chuẩn bị trước trận (chọn khu → chọn đội → Vào trận). Đội trưởng nổi bật trong trận (ô cao hơn, viền vàng, vương miện).
+- Âm thanh: mẫu CC0 (`tools/build-audio.py`), cao độ combo tăng dần; synth dự phòng.

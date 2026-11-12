@@ -471,5 +471,18 @@
   "app.install": "Cài app ra màn hình",
   "app.fullscreen": "Toàn màn hình",
   "app.helpIOS": "Trên iPhone/iPad: mở bằng Safari, bấm nút Chia sẻ rồi chọn 'Thêm vào Màn hình chính'. Mở từ biểu tượng đó game sẽ chạy toàn màn hình.",
-  "app.helpOther": "Trình duyệt chưa cho cài trực tiếp. Mở menu của trình duyệt (dấu ba chấm) rồi chọn 'Cài đặt ứng dụng' hoặc 'Thêm vào màn hình chính'. Mở từ biểu tượng đó game sẽ chạy toàn màn hình."
+  "app.helpOther": "Trình duyệt chưa cho cài trực tiếp. Mở menu của trình duyệt (dấu ba chấm) rồi chọn 'Cài đặt ứng dụng' hoặc 'Thêm vào màn hình chính'. Mở từ biểu tượng đó game sẽ chạy toàn màn hình.",
+  "battle.comboWord": "combo",
+  "hub.credit": "Made by duyluma",
+  "hub.version": "Phiên bản {v} · bản dựng {b} · {d}",
+  "result.victory": "Chiến thắng",
+  "result.victoryBoss": "Hạ gục thủ lĩnh",
+  "team.preset": "Đội {n}",
+  "team.prep": "Chuẩn bị: {zone}",
+  "team.makeLeader": "Đặt {name} làm đội trưởng",
+  "team.go": "Vào trận",
+  "team.pickFor": "Chọn nhân vật cho: {n}",
+  "hub.items": "Kho đồ",
+  "items.currency": "Tiền tệ",
+  "items.stones": "Tinh Thạch theo hệ"
 }

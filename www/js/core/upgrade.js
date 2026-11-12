@@ -68,7 +68,38 @@ export function setTeam(progress, team) {
   if (!team.every((id) => progress.characters[id])) return fail('not_owned');
   const p = structuredClone(progress);
   p.team = team.slice();
+  const ps = presetsOf(p);
+  ps[p.preset ?? 0] = team.slice();
+  p.presets = ps;
   return { ok: true, progress: p };
+}
+
+export const PRESET_COUNT = 3;
+const validTeam = (p, t) => Array.isArray(t) && t.length === 5 && new Set(t).size === 5 && t.every((id) => p.characters[id]);
+// 3 đội lưu sẵn; ô thiếu/hỏng lấy đội đang dùng.
+export function presetsOf(progress) {
+  const cur = progress.preset ?? 0;
+  return Array.from({ length: PRESET_COUNT }, (_, i) => {
+    const t = progress.presets?.[i];
+    return validTeam(progress, t) ? t.slice() : i === cur ? progress.team.slice() : progress.team.slice();
+  });
+}
+export function selectPreset(progress, i) {
+  if (!Number.isInteger(i) || i < 0 || i >= PRESET_COUNT) return fail('bad_preset');
+  const p = structuredClone(progress);
+  const ps = presetsOf(p);
+  ps[p.preset ?? 0] = p.team.slice(); // lưu đội cũ
+  p.presets = ps;
+  p.preset = i;
+  p.team = ps[i].slice();
+  return { ok: true, progress: p };
+}
+// Đặt nhân vật ở ô `slot` làm đội trưởng (đổi chỗ với ô 1).
+export function makeLeader(progress, slot) {
+  if (!Number.isInteger(slot) || slot < 0 || slot > 4) return fail('bad_slot');
+  const t = progress.team.slice();
+  [t[0], t[slot]] = [t[slot], t[0]];
+  return setTeam(progress, t);
 }
 
 // Đội chuẩn bị vào trận: [{id, level, awaken}].

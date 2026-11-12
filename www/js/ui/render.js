@@ -83,16 +83,85 @@ export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
   g.restore();
 }
 
-function bar(g, x, y, w, h, frac, color) {
-  g.fillStyle = 'rgba(255,255,255,0.12)';
-  g.fillRect(x, y, w, h);
-  g.fillStyle = color;
-  g.fillRect(x, y, Math.max(0, w * Math.min(1, frac)), h);
+// Thanh máu: rãnh tối, viền, thân có độ bóng và vạch chia.
+function bar(g, x, y, w, h, frac, color, light) {
+  g.fillStyle = 'rgba(4,5,18,0.85)';
+  g.fillRect(x - 1, y - 1, w + 2, h + 2);
+  const fw = Math.max(0, w * Math.min(1, frac));
+  if (fw > 0) {
+    const gr = g.createLinearGradient(0, y, 0, y + h);
+    gr.addColorStop(0, light || '#ffffff');
+    gr.addColorStop(0.35, color);
+    gr.addColorStop(1, color);
+    g.fillStyle = gr;
+    g.fillRect(x, y, fw, h);
+    g.fillStyle = 'rgba(255,255,255,0.28)';
+    g.fillRect(x, y, fw, Math.max(1, h * 0.28));
+  }
+  g.fillStyle = 'rgba(4,5,18,0.3)';
+  for (let k = 1; k < 10; k++) g.fillRect(x + (w * k) / 10 - 0.5, y, 1, h);
+  g.strokeStyle = 'rgba(226,183,90,0.7)';
+  g.lineWidth = 1;
+  g.strokeRect(x - 0.5, y - 0.5, w + 1, h + 1);
 }
 
-function text(g, s, x, y, size, color = '#e8ebff', align = 'center', weight = '600') {
+// Bốn góc vàng: dấu hiệu "điểm dị" của UI.
+function brackets(g, x, y, w, h, len, color, lw = 2) {
+  g.save();
+  g.strokeStyle = color;
+  g.lineWidth = lw;
+  g.beginPath();
+  for (const [cx, cy, dx, dy] of [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]]) {
+    g.moveTo(cx + dx * len, cy);
+    g.lineTo(cx, cy);
+    g.lineTo(cx, cy + dy * len);
+  }
+  g.stroke();
+  g.restore();
+}
+function panel(g, x, y, w, h, accent) {
+  const gr = g.createLinearGradient(0, y, 0, y + h);
+  gr.addColorStop(0, 'rgba(33,40,100,0.88)');
+  gr.addColorStop(1, 'rgba(10,13,40,0.94)');
+  g.fillStyle = gr;
+  g.fillRect(x, y, w, h);
+  g.strokeStyle = 'rgba(77,86,184,0.9)';
+  g.lineWidth = 1;
+  g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+  if (accent) {
+    g.fillStyle = accent;
+    g.fillRect(x + 1, y + 1, w - 2, 3);
+  }
+}
+
+// Chữ có viền tối và tô chuyển sắc (trên sáng, dưới màu hệ) kèm quầng sáng nhẹ.
+function outlined(g, str, x, y, size, top, bottom, family, lw = 5, weight = '700') {
+  g.save();
+  g.font = `${weight} ${size}px ${family}`;
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.lineJoin = 'round';
+  g.miterLimit = 2;
+  g.lineWidth = lw;
+  g.strokeStyle = 'rgba(8,8,28,0.95)';
+  g.shadowColor = bottom;
+  g.shadowBlur = size * 0.35;
+  g.strokeText(str, x, y);
+  g.shadowBlur = 0;
+  const gr = g.createLinearGradient(0, y - size * 0.5, 0, y + size * 0.5);
+  gr.addColorStop(0, top);
+  gr.addColorStop(0.55, top);
+  gr.addColorStop(1, bottom);
+  g.fillStyle = gr;
+  g.fillText(str, x, y);
+  g.restore();
+}
+const SANS = '"Be Vietnam Pro", system-ui, sans-serif';
+const SERIF = 'Cormorant, "Times New Roman", serif';
+const NUM = 'Oswald, "Be Vietnam Pro", system-ui, sans-serif'; // số: chữ cao hẹp, dễ đọc khi to
+function text(g, s, x, y, size, color = '#e8ebff', align = 'center', weight = '600', family = SANS) {
   g.fillStyle = color;
-  g.font = `${weight} ${size}px system-ui, sans-serif`;
+  g.font = `${weight} ${size}px ${family}`;
   g.textAlign = align;
   g.textBaseline = 'middle';
   g.fillText(s, x, y);
@@ -187,6 +256,13 @@ function statusFx(g, effects, x, y, t) {
 //         hl:Set, fall:array|null, fallT:0..1, drag:{path,x,y}|null, timer:0..1|null, floaters:[], shake, combo, turn, flash }
 export function draw(g, view, t) {
   g.clearRect(0, 0, W, H);
+  g.save();
+  if (view.camShake > 0.2) g.translate(Math.sin(t * 0.13) * view.camShake * 0.6, Math.cos(t * 0.17) * view.camShake * 0.6);
+  if ((view.zoom || 1) > 1.001) {
+    g.translate(W / 2, 190);
+    g.scale(view.zoom, view.zoom);
+    g.translate(-W / 2, -190);
+  }
   g.fillStyle = '#12152b';
   g.fillRect(0, 0, W, H);
   const bg = getImg('bg:battle');
@@ -198,15 +274,17 @@ export function draw(g, view, t) {
   view.enemies.forEach((e, i) => {
     const cx = slot * i + slot / 2;
     const dead = e.hp <= 0;
+    const dk = dead ? Math.min(1, (e.deadAge ?? 9999) / 650) : 0; // tiến độ tan biến
+    if (dk >= 1) return;
     const sh = (view.shake && view.shake.enemy === i ? Math.sin(t * 0.06) * 8 : 0) + (e.hit ? Math.sin(t * 0.09) * 10 * e.hit : 0);
     g.save();
-    g.globalAlpha = dead ? 0.2 : 1;
+    g.globalAlpha = dead ? 1 - dk : 1;
     g.fillStyle = COLORS[e.element];
     g.globalAlpha *= 0.25;
     if (!getImg(`monster:${e.id}`)) g.fillRect(cx - 70 + sh, 90, 140, 150);
-    g.globalAlpha = dead ? 0.2 : 1;
+    g.globalAlpha = dead ? 1 - dk : 1;
     const mi = getImg(`monster:${e.id}`);
-    const sc = 1 + 0.08 * (e.hit || 0);
+    const sc = 1 + 0.08 * (e.hit || 0) + dk * 0.35;
     if (mi) {
       const bob = dead ? 0 : Math.sin(t * 0.003 + i) * 3;
       const sz = 150 * sc;
@@ -244,14 +322,20 @@ export function draw(g, view, t) {
       g.restore();
       text(g, view.t('battle.locked'), cx, 98, 13, '#ff8a96');
     }
-    bar(g, cx - 65, 255, 130, 12, (e.hpShow ?? e.hp) / e.maxHp, '#ff6b6b');
-    text(g, `${Math.max(0, Math.round(e.hp))}`, cx, 266, 10, '#ffffff');
-    text(g, view.t(`monster.${e.id}`), cx, 280, 15);
+    g.globalAlpha = dead ? 1 - dk : 1;
+    panel(g, cx - 82, 244, 164, 76, null);
+    brackets(g, cx - 82, 244, 164, 76, 9, view.focus === i ? '#ff4d5e' : '#e2b75a');
+    g.fillStyle = COLORS[e.element];
+    g.fillRect(cx - 82, 244, 4, 76);
+    text(g, view.t(`monster.${e.id}`), cx + 2, 258, 15, '#ffe9ad', 'center', '700', SERIF);
+    bar(g, cx - 70, 270, 140, 11, (e.hpShow ?? e.hp) / e.maxHp, '#e8475b', '#ff9aa6');
+    text(g, `${Math.max(0, Math.round(e.hp))}`, cx, 276, 9, '#ffffff', 'center', '800');
     if (!dead) {
       const off = e.effects?.some((x) => x.key === 'stun' || x.key === 'freeze');
-      text(g, off ? view.t('effect.stun.name') : view.t('battle.attackIn', { n: e.cd }), cx, 302, 13, off ? '#9ad0ff' : '#ffb86b');
-      if (e.effects?.length) badges(g, e.effects, cx, 314, view, 'center');
+      text(g, off ? view.t('effect.stun.name') : view.t('battle.attackIn', { n: e.cd }), cx, 294, 12, off ? '#9ad0ff' : '#ffc27a');
+      if (e.effects?.length) badges(g, e.effects, cx, 302, view, 'center');
     }
+    g.globalAlpha = 1;
   });
 
   for (const r of view.rings || []) {
@@ -296,32 +380,70 @@ export function draw(g, view, t) {
   g.globalAlpha = 1;
 
   // HUD
-  text(g, view.t('battle.turn', { n: view.turn + 1 }), 16, 24, 15, '#9aa2ff', 'left');
-  text(g, view.titleText, W - 16, 24, 13, '#8a91d8', 'right');
+  g.fillStyle = 'rgba(5,6,22,0.62)';
+  g.fillRect(0, 0, W, 38);
+  g.fillStyle = 'rgba(226,183,90,0.55)';
+  g.fillRect(0, 38, W, 1.5);
+  text(g, view.t('battle.turn', { n: view.turn + 1 }), 16, 20, 15, '#ffe9ad', 'left', '700');
+  text(g, view.titleText, W - 16, 20, 13, '#aab2f0', 'right');
   const sh = (view.teamFx || []).find((e) => e.key === 'shield');
-  if (sh) text(g, view.t('battle.shield', { n: sh.pool }), W - 16, 330, 16, '#6bd5ff', 'right');
-  if (view.teamFx?.length) badges(g, view.teamFx, 16, 336, view);
-  if (view.combo > 0) text(g, view.t('battle.combo', { n: view.combo }), W / 2 - 110, 340, 30 + Math.min(10, view.combo), '#ffd84a');
-  if (view.tally && view.tally.shown > 0) text(g, `${Math.round(view.tally.shown)}`, W / 2 + 70, 340, Math.round(34 * (1 + 0.45 * Math.min(1, view.tally.pulse))), '#ff8a3c');
+  if (sh) text(g, view.t('battle.shield', { n: sh.pool }), W - 16, 336, 15, '#6bd5ff', 'right', '700');
+  if (view.teamFx?.length) badges(g, view.teamFx, 16, 326, view);
+  if (view.combo > 0) {
+    outlined(g, `${view.combo}`, W / 2 - 128, 338, 54 + Math.min(16, view.combo * 2), '#fff3b0', '#e2a52a', NUM, 5);
+    text(g, view.t('battle.comboWord'), W / 2 - 128, 364, 13, '#ffe9ad', 'center', '700');
+  }
+  if (view.tally && view.tally.shown > 0) outlined(g, new Intl.NumberFormat(document.documentElement.lang || 'vi').format(Math.round(view.tally.shown)), W / 2 + 90, 340, Math.round(50 * (1 + 0.4 * Math.min(1, view.tally.pulse))), '#fff0d0', '#ff7a2a', NUM, 5);
 
   // máu đội chung
-  bar(g, 16, 358, W - 32, 18, view.hp / view.maxHp, '#4cc46a');
-  text(g, `${Math.round(view.hp)} / ${view.maxHp}`, W / 2, 367, 13, '#0b0d1a');
+  bar(g, 16, 372, W - 32, 14, view.hp / view.maxHp, '#2fa86c', '#a8f5cb');
+  text(g, `${Math.round(view.hp)} / ${view.maxHp}`, W / 2, 379, 11, '#ffffff', 'center', '800');
 
   // đội hình
   view.members.forEach((m, i) => {
     const x = 12 + i * 104;
-    const y = 388;
-    g.fillStyle = 'rgba(255,255,255,0.06)';
-    g.fillRect(x, y, 98, 78);
-    drawOrb(g, m.element, x + 49, y + 28, 20);
-    text(g, view.t(`char.${m.id}`), x + 49, y + 58, 11, '#cfd3ff');
+    const lead = i === 0;
+    const y = lead ? 384 : 394; // đội trưởng cao hơn 10px
+    const oy = lead ? 10 : 0;
     const ready = m.skillCd === 0;
-    text(g, ready ? view.t('battle.skillReady') : view.t('battle.skillCd', { n: m.skillCd }), x + 49, y + 72, 11, ready ? '#7dffa0' : '#8a8fc0');
-    if (ready && view.canAct) {
-      g.strokeStyle = '#7dffa0';
+    panel(g, x, y, 98, 70 + oy, lead ? '#ffd24a' : COLORS[m.element]);
+    if (lead) {
+      g.save();
+      g.globalAlpha = 0.7 + 0.3 * Math.sin(t * 0.004);
+      g.strokeStyle = '#ffd24a';
       g.lineWidth = 2;
-      g.strokeRect(x, y, 98, 78);
+      g.strokeRect(x + 1, y + 1, 96, 68 + oy);
+      g.restore();
+      // vương miện nhỏ + nhãn
+      g.fillStyle = '#ffd24a';
+      g.beginPath();
+      const cx0 = x + 14, cy0 = y + 15;
+      g.moveTo(cx0 - 7, cy0 + 4); g.lineTo(cx0 - 8, cy0 - 5); g.lineTo(cx0 - 3, cy0); g.lineTo(cx0, cy0 - 7); g.lineTo(cx0 + 3, cy0); g.lineTo(cx0 + 8, cy0 - 5); g.lineTo(cx0 + 7, cy0 + 4);
+      g.closePath();
+      g.fill();
+      text(g, view.t('team.leader'), x + 58, y + 14, 10, '#ffe9ad', 'center', '800');
+    }
+    drawOrb(g, m.element, x + 49, y + 26 + oy / 2 + (lead ? 4 : 0), 18);
+    text(g, view.t(`char.${m.id}`), x + 49, y + 50 + oy, 11, lead ? '#fff4c9' : '#e7eaff', 'center', lead ? '800' : '600');
+    if (ready) text(g, view.t('battle.skillReady'), x + 49, y + 63 + oy, 11, '#7dffa0', 'center', '700');
+    else {
+      // hồi chiêu: chấm đầy = số lượt còn lại
+      const n = m.skillMax || 1;
+      const gap = Math.min(12, 80 / n);
+      const x0 = x + 49 - ((n - 1) * gap) / 2;
+      for (let k = 0; k < n; k++) {
+        g.fillStyle = k < m.skillCd ? '#8a93d8' : 'rgba(138,147,216,0.25)';
+        g.beginPath();
+        g.arc(x0 + k * gap, y + 62 + oy, 3, 0, Math.PI * 2);
+        g.fill();
+      }
+    }
+    if (ready && view.canAct) {
+      const glow = 0.55 + 0.45 * Math.sin(t * 0.006);
+      g.save();
+      g.globalAlpha = glow;
+      brackets(g, x - 2, y - 2, 102, 74 + oy, 12, '#7dffa0', 2.5);
+      g.restore();
     }
   });
 
@@ -329,27 +451,41 @@ export function draw(g, view, t) {
   for (const d of view.duos || []) {
     const cx = 12 + (d.slot + 1) * 104 - 3;
     const ready = d.cd === 0;
-    g.fillStyle = ready ? '#ffb347' : '#3a3f78';
+    g.fillStyle = ready ? '#e2b75a' : '#2a3070';
     g.beginPath();
-    g.roundRect(cx - 30, 377, 60, 22, 11);
+    g.roundRect(cx - 28, 384, 56, 22, 3);
     g.fill();
-    text(g, ready ? view.t('battle.duo') : `${view.t('battle.duo')} ${d.cd}`, cx, 388, 12, ready ? '#2a1600' : '#aab0ff');
+    g.strokeStyle = ready ? '#fff0bd' : '#4a56b8';
+    g.lineWidth = 1;
+    g.stroke();
+    text(g, ready ? view.t('battle.duo') : `${view.t('battle.duo')} ${d.cd}`, cx, 395.5, 12, ready ? '#2a1600' : '#aab0ff', 'center', '800');
   }
 
   // đồng hồ kéo
-  g.fillStyle = 'rgba(255,255,255,0.08)';
-  g.fillRect(0, 466, W, 8);
+  g.fillStyle = 'rgba(4,5,18,0.9)';
+  g.fillRect(0, 468, W, 10);
   if (view.timer !== null) {
-    g.fillStyle = view.timer < 0.25 ? '#ff6b6b' : '#6b79ff';
-    g.fillRect(0, 466, W * view.timer, 8);
+    const low = view.timer < 0.25;
+    g.fillStyle = low ? '#ff5468' : '#e2b75a';
+    g.shadowColor = g.fillStyle;
+    g.shadowBlur = low ? 14 : 8;
+    g.fillRect(0, 470, W * view.timer, 6);
+    g.shadowBlur = 0;
   }
 
-  // bàn
+  // bàn: khung kính, mỗi ô là một hốc bo nhẹ
+  g.fillStyle = 'rgba(5,6,22,0.92)';
+  g.fillRect(0, BOARD_Y, W, ROWS * CELL);
   for (let r = 0; r < ROWS; r++)
     for (let c = 0; c < COLS; c++) {
-      g.fillStyle = (r + c) % 2 ? '#171a36' : '#1c2040';
-      g.fillRect(BOARD_X + c * CELL, BOARD_Y + r * CELL, CELL, CELL);
+      g.fillStyle = (r + c) % 2 ? 'rgba(30,36,92,0.55)' : 'rgba(22,27,72,0.55)';
+      g.beginPath();
+      g.roundRect(BOARD_X + c * CELL + 2, BOARD_Y + r * CELL + 2, CELL - 4, CELL - 4, 8);
+      g.fill();
     }
+  g.fillStyle = 'rgba(226,183,90,0.55)';
+  g.fillRect(0, BOARD_Y - 1, W, 1.5);
+  g.fillRect(0, BOARD_Y + ROWS * CELL - 0.5, W, 1.5);
   const held = view.drag && view.drag.path.length ? view.drag.path[view.drag.path.length - 1] : -1;
   g.save();
   g.beginPath();
@@ -378,7 +514,20 @@ export function draw(g, view, t) {
     }
     const pulse = view.hl && view.hl.has(i) ? 1 + Math.sin(t * 0.03) * 0.12 : 1;
     const alpha = view.hl && view.hl.has(i) ? 0.75 : 1;
-    drawOrb(g, type, x, y, 34 * pulse, !!view.board.enh[i], alpha);
+    if (view.hl && view.hl.has(i)) {
+      // vùng ghép được: viền sáng nhấp nháy quanh ô
+      g.save();
+      g.globalAlpha = 0.55 + 0.35 * Math.sin(t * 0.012);
+      g.strokeStyle = '#fff3b0';
+      g.shadowColor = '#ffd24a';
+      g.shadowBlur = 12;
+      g.lineWidth = 3;
+      g.beginPath();
+      g.roundRect(p.x - CELL / 2 + 3, p.y - CELL / 2 + 3, CELL - 6, CELL - 6, 9);
+      g.stroke();
+      g.restore();
+    }
+    drawOrb(g, type, x, y, 34 * pulse, !!view.board.enh[i], 1);
   }
   // viên bị đi qua nổi lên: to hơn một chút, có bóng, vẽ phía trên viên đang cầm
   for (const l of lifted) {
@@ -444,19 +593,33 @@ export function draw(g, view, t) {
     g.fillRect(0, 0, W, H);
   }
 
-  // chữ nổi (sát thương, hồi máu)
+  // chữ nổi: nảy ra (overshoot), bay lên chậm, mờ dần ở cuối
   for (const f of view.floaters) {
     const k = f.age / f.life;
+    const pop = Math.min(1, f.age / 150);
+    const back = 1 + 2.2 * Math.pow(pop - 1, 3) + 1.2 * Math.pow(pop - 1, 2); // easeOutBack
+    const sc = f.kind === 'dmg' ? 0.35 + 0.65 * back + (f.age < 150 ? 0.18 * (1 - pop) : 0) : 0.6 + 0.4 * back;
+    const rise = 46 * (1 - Math.pow(1 - Math.min(1, k * 1.3), 2));
     g.save();
-    g.globalAlpha = 1 - k * k;
-    g.lineWidth = 5;
-    g.strokeStyle = 'rgba(10,10,25,0.85)';
-    g.lineJoin = 'round';
-    g.font = `800 ${f.size || 24}px system-ui, sans-serif`;
-    g.textAlign = 'center';
-    g.textBaseline = 'middle';
-    g.strokeText(f.s, f.x, f.y - k * 40);
-    text(g, f.s, f.x, f.y - k * 40, f.size || 24, f.color, 'center', '800');
+    g.globalAlpha = k < 0.7 ? 1 : 1 - (k - 0.7) / 0.3;
+    g.translate(f.x, f.y - rise);
+    g.scale(sc, sc);
+    if (f.kind === 'dmg') outlined(g, f.s, 0, 0, f.size || 40, '#ffffff', f.color, NUM, Math.max(4, (f.size || 40) * 0.13));
+    else outlined(g, f.s, 0, 0, f.size || 24, f.color, f.color, SANS, 4, '800');
     g.restore();
+  }
+  g.restore(); // hết máy quay
+
+  // vignette khi slow-motion, chớp trắng khi quái chết
+  if (view.vig > 0.01) {
+    const gr = g.createRadialGradient(W / 2, 330, 160, W / 2, 330, 640);
+    gr.addColorStop(0, 'rgba(0,0,0,0)');
+    gr.addColorStop(1, `rgba(0,0,10,${0.7 * view.vig})`);
+    g.fillStyle = gr;
+    g.fillRect(0, 0, W, H);
+  }
+  if (view.whiteFlash > 0.01) {
+    g.fillStyle = `rgba(255,255,255,${view.whiteFlash * 0.6})`;
+    g.fillRect(0, 0, W, H);
   }
 }

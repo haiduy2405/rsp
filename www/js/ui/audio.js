@@ -41,6 +41,7 @@ export function createAudio(cfg, settings) {
         d[i] = (s / 4294967296) * 2 - 1;
       }
       applyGains();
+      loadSamples();
     }
     if (ac.state === 'suspended' && !document.hidden) ac.resume();
     if (track && !timer) schedule();
@@ -72,8 +73,38 @@ export function createAudio(cfg, settings) {
     src.stop(t0 + Math.min(dur, 0.3));
   }
 
-  function sfx(name) {
+  // Mẫu âm (CC0) giải mã sẵn; thiếu mẫu thì dùng synth dự phòng.
+  const bufs = {};
+  async function loadSamples() {
+    if (!ac || !cfg.samples) return;
+    await Promise.all(Object.entries(cfg.samples).map(async ([k, v]) => {
+      if (bufs[k]) return;
+      try {
+        const r = await fetch(v.url);
+        bufs[k] = await ac.decodeAudioData(await r.arrayBuffer());
+      } catch {
+        /* dùng synth */
+      }
+    }));
+  }
+  function sample(name, rateMul) {
+    const b = bufs[name];
+    if (!b) return false;
+    const v = cfg.samples[name];
+    const src = ac.createBufferSource();
+    const g = ac.createGain();
+    src.buffer = b;
+    src.playbackRate.value = (v.rate || 1) * rateMul;
+    g.gain.value = v.gain ?? 1;
+    src.connect(g);
+    g.connect(sfxBus);
+    src.start(ac.currentTime + 0.003);
+    return true;
+  }
+
+  function sfx(name, rateMul = 1) {
     if (!ac || settings.sfx === false || ac.state !== 'running') return;
+    if (sample(name, rateMul)) return;
     const def = cfg.sfx[name];
     if (!def) return;
     const t0 = ac.currentTime + 0.005;

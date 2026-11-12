@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { newProgress, isValidProgress } from '../www/js/core/progress.js';
-import { levelCost, levelUp, awakenCost, awaken, grantCharacter, setTeam, teamRoster } from '../www/js/core/upgrade.js';
+import { levelCost, levelUp, awakenCost, awaken, grantCharacter, setTeam, teamRoster, selectPreset, makeLeader, presetsOf } from '../www/js/core/upgrade.js';
 import { migrate } from '../www/js/save/migrate.js';
 import { createRun, playRun, newRunRecord, runStep } from '../www/js/core/run.js';
 import { statsFor } from '../www/js/core/stats.js';
@@ -129,4 +129,21 @@ test('chuyến leo tháp dùng chỉ số theo Level/Thức tỉnh và vẫn xá
   rec.actions.push(a);
   r = runStep(ctx, r, a).run;
   assert.deepEqual(playRun(ctx, rec), r);
+});
+
+test('đội lưu sẵn + đổi đội trưởng', () => {
+  const p0 = newProgress(ctx);
+  const l = makeLeader(p0, 2);
+  assert.ok(l.ok);
+  assert.equal(l.progress.team[0], p0.team[2]);
+  assert.equal(l.progress.team[2], p0.team[0]);
+  assert.ok(isValidProgress(l.progress));
+  const a = selectPreset(l.progress, 1);
+  assert.ok(a.ok && a.progress.preset === 1);
+  const b = makeLeader(a.progress, 4);
+  const c = selectPreset(b.progress, 0);
+  assert.deepEqual(c.progress.team, l.progress.team); // đội 1 giữ nguyên
+  assert.deepEqual(presetsOf(c.progress)[1], b.progress.team); // đội 2 giữ thay đổi
+  assert.equal(selectPreset(p0, 3).ok, false);
+  assert.equal(makeLeader(p0, 9).ok, false);
 });

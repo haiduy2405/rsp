@@ -25,12 +25,13 @@ const minutes = Number(process.argv[2] || 30);
     }
     if (await click('#tut-skip')) continue;
     if (await click('#continue')) continue;
+    if (await click('#team-go')) { runs++; continue; }
     if (await click('#leave')) continue;
     if (await click('[data-choice="0"]')) continue;
     if (await click('[data-door="0"]')) continue;
     if (await click('#back')) continue;
     if (await click('#ob-hub')) continue;
-    if (await click('[data-zone]')) { runs++; continue; }
+    if (await click('[data-zone]')) continue;
     await p.waitForTimeout(300);
   }
   const growth = samples.length > 4 ? samples[samples.length - 1] - samples[Math.floor(samples.length / 3)] : 0;
