@@ -23,7 +23,8 @@ const DIAG_ASSIST = 0.38; // tỉ lệ ô: lệch ngang và dọc đều vượt
 const NOFX = { sfx() {}, vibrate() {} };
 
 
-export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null, onSkillAsk = null, onSettled = null, hintOpts = {} }) {
+export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null, onSkillAsk = null, onSettled = null, hintOpts = {}, guard = null, onReject = null }) {
+  let moveGuard = guard; // tutorial: chỉ cho đúng nước/hành động được chỉ định
   const g = canvas.getContext('2d');
   let state = initial;
   let busy = false;
@@ -455,7 +456,13 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     drag = null;
     view.drag = null;
     view.timer = null;
-    if (d.path.length >= 2) run({ type: 'move', path: d.path });
+    if (d.path.length >= 2 && moveGuard && !moveGuard({ type: 'move', path: d.path })) {
+      view.board = structuredClone(state.board); // sai đường: trả bàn về như cũ, yêu cầu kéo lại
+      if (view.hintKeep) view.hint = view.hintKeep;
+      fx.sfx('error');
+      fx.vibrate?.(30);
+      onReject?.({ type: 'move', path: d.path });
+    } else if (d.path.length >= 2) run({ type: 'move', path: d.path });
     else { view.board = structuredClone(state.board); if (hint && view.hintKeep) view.hint = view.hintKeep; }
   }
 
@@ -487,6 +494,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       }
       return;
     }
+    if (moveGuard && !moveGuard({ type: 'skill', index: pr.idx })) { fx.sfx('error'); onReject?.({ type: 'skill', index: pr.idx }); return; }
     if (state.members[pr.idx]?.skillCd === 0) {
       if (onSkillAsk) onSkillAsk(pr.idx, () => { if (!busy && state.status === 'playing' && state.members[pr.idx]?.skillCd === 0) run({ type: 'skill', index: pr.idx }); });
       else run({ type: 'skill', index: pr.idx });
@@ -751,6 +759,14 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       findHintAsync(ctx, s0, undefined, 4, opts).then((hp) => { if (hp && alive && state === s0 && !busy && !(s0.freeze > 0)) view.hint = { path: hp.path, text: t('tut.hint', { n: hp.combos }) }; });
     },
     hideHint() { view.hint = null; view.hintKeep = null; },
+    // Bài hướng dẫn: đặt bàn cố định, đường chỉ định và bộ lọc nước đi.
+    setGuide({ board = null, path = null, text = '', allow = null, title = null }) {
+      if (title !== null) view.titleText = title;
+      if (board) { state.board = { cells: board.slice(), enh: new Array(board.length).fill(0) }; sync(); }
+      moveGuard = allow;
+      view.hint = path ? { path: path.slice(), text } : null;
+      view.hintKeep = view.hint;
+    },
     getHint: () => (view.hint ? view.hint.path.slice() : null),
     getDragPath: () => (drag ? drag.path.slice() : null),
     getState: () => state,

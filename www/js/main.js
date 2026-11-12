@@ -911,11 +911,11 @@ function showBattle() {
 // Màn hướng dẫn: một trận ngắn với đội mượn sẵn, quái yếu. Bong bóng chỉ dẫn đổi theo từng nước đi; thua thì chơi lại.
 function startTutorial(retry = false) {
   const tc = ctx.config.tutorial;
-  const st0 = createBattle(ctx, { seed: tc.seed, team: teamRoster(progress), enemies: tc.enemies, scale: tc.scale });
+  // Đội, quái, bàn và đường kéo đều cố định trong config: mọi tài khoản học cùng một bài.
+  const st0 = createBattle(ctx, { seed: tc.seed, team: tc.team, enemies: tc.enemies, scale: tc.scale });
   st0.members[0].skillCd = 0; // tướng đầu sẵn kỹ năng để dạy
-  let moves = 0;
-  let skillShown = false;
-  let skillUsed = false;
+  const lessons = tc.lessons;
+  let li = 0;
   $('coach')?.remove();
   const bubble = h('div', { id: 'coach' });
   $('wrap').appendChild(bubble);
@@ -927,6 +927,24 @@ function startTutorial(retry = false) {
     bubble.classList.add('on');
     audio.sfx('tick');
   };
+  const samePath = (a, b) => a.length === b.length && a.every((c, i) => c === b[i]);
+  const startLesson = (i) => {
+    li = i;
+    if (i >= lessons.length) {
+      game.setGuide({ title: t('tut.lesson', { n: lessons.length, total: lessons.length }), allow: null });
+      coach('tut.free');
+      game.requestHint();
+      return;
+    }
+    const L = lessons[i];
+    const title = t('tut.lesson', { n: i + 1, total: lessons.length });
+    if (L.kind === 'skill') {
+      game.setGuide({ title, board: L.board || null, allow: (a) => a.type === 'skill' && a.index === L.index });
+    } else {
+      game.setGuide({ title, board: L.board, path: L.path, text: t('tut.guide'), allow: (a) => a.type === 'move' && samePath(a.path, L.path) });
+    }
+    coach(L.coach);
+  };
   const done = () => { bubble.remove(); $('pause-btn')?.remove(); $('hint-btn')?.remove(); };
   audio.playMusic('battle');
   $('screen').classList.remove('show');
@@ -936,23 +954,19 @@ function startTutorial(retry = false) {
     ctx,
     t,
     state: st0,
-    titleText: t('tut.title'),
+    titleText: t('tut.lesson', { n: 1, total: lessons.length }),
     intro: null,
     stepper: (state, action) => battleStep(ctx, state, action),
     fx: audio,
     hint: true,
     hintOpts: tc.hint,
     onInspect: showInspect,
-    onSkillAsk(idx, go) { showSkillAsk(idx, () => { skillUsed = true; go(); }); },
+    onSkillAsk(idx, go) { go(); }, // tutorial: dùng kỹ năng ngay, không hỏi xác nhận
     celebrate,
-    onSettled(state, action) {
-      if (action.type === 'skill') { coach('tut.c5'); game.requestHint(); return; }
-      moves += 1;
-      if (moves < 4) game.requestHint();
-      if (moves === 1) coach('tut.c2');
-      else if (moves === 2 && !skillShown && state.members[0].skillCd === 0) { skillShown = true; coach('tut.c4'); }
-      else if (moves <= 3) coach('tut.c3');
-      else coach('tut.c5');
+    onReject(a) { coach(a.type === 'skill' ? 'tut.wrongSkill' : 'tut.wrong'); },
+    onSettled(state) {
+      if (li < lessons.length) startLesson(li + 1);
+      else game.requestHint();
     },
     onEnd(state) {
       done();
@@ -968,8 +982,7 @@ function startTutorial(retry = false) {
     },
   });
   window.__game = game;
-  void skillUsed;
-  setTimeout(() => coach(retry ? 'tut.c1b' : 'tut.c1'), 400);
+  setTimeout(() => startLesson(0), 400);
 }
 
 function startBattleUI() {

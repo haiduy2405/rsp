@@ -945,5 +945,16 @@
   "unit.timeFreeze": "Dừng thời gian {turns} lượt: thả tay ngọc không tiêu, bấm Tiêu mới tính",
   "battle.clear": "Tiêu",
   "battle.frozen": "Dừng thời gian: còn {n} lượt",
-  "battle.freezeHint": "Xoay thoải mái, xong bấm Tiêu"
+  "battle.freezeHint": "Xoay thoải mái, xong bấm Tiêu",
+  "tut.lesson": "Bài {n}/{total}",
+  "tut.guide": "Nhấn ở viên đầu, nhả ở viên cuối",
+  "tut.l1": "Bài 1: kéo ngang. Nhấn vào viên ngọc sáng rồi kéo sang trái 1 ô, thả tay. 3 ngọc cùng màu nối nhau sẽ tiêu.",
+  "tut.l2": "Bài 2: kéo dọc. Nhấn vào viên ngọc sáng, kéo lên 1 ô rồi thả. Hàng dọc cũng tiêu được.",
+  "tut.l3": "Bài 3: kéo xa hơn. Giữ ngọc và kéo qua 2 ô theo đường chấm sáng trước khi thả.",
+  "tut.l4": "Bài 4: kỹ năng. Tướng đầu đã sẵn \"Kiện Lên Trời\" (đánh mạnh 1 quái). Chạm vào tướng ấy để dùng.",
+  "tut.l5": "Bài 5: kéo chéo. Ngọc được đi cả đường chéo. Kéo viên sáng lên góc chéo rồi thả.",
+  "tut.l6": "Bài 6: nhiều combo. Kéo theo đường chấm sáng gồm cả đường chéo, được 3 cụm một lượt!",
+  "tut.free": "Giờ tự do: tự kéo ngọc, hạ hết quái để thắng. Chấm sáng gợi ý nước đi.",
+  "tut.wrong": "Chưa đúng. Nhấn đúng viên có chấm đầu, kéo theo đường chấm sáng, thả ở chấm cuối.",
+  "tut.wrongSkill": "Chưa phải lúc dùng kỹ năng. Làm theo chỉ dẫn đã nhé."
 }

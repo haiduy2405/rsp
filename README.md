@@ -332,3 +332,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Màn kết quả vừa một màn hình (lưới 5x2), nút Lật hết/Xong luôn thấy.
 - Cutscene tướng 4★: dựng màn chính ngay dưới lớp cutscene rồi mới mờ đi, hết nháy.
 - Nút gợi ý/tạm dừng trong trận cùng hàng với Lượt/Tầng (không cộng vùng an toàn).
+
+## v0.45.0 — Tutorial có kịch bản
+- 6 bài cố định (bàn, đội, quái, đường kéo nằm trong config.tutorial, mọi tài khoản giống nhau): kéo ngang, dọc, xa 3 ô, dùng kỹ năng, kéo chéo, combo nhiều cụm; sau đó tự do đến khi thắng.
+- Phải kéo đúng đường chỉ định, sai thì trả bàn và nhắc kéo lại. Ô tiêu đề đổi thành "Bài n/6".
+- Đội tutorial cố định: Kiện Lên Trời, Bennu, Fenrir, Heimdall, Eir. Test e2e: tests/e2e/tutorial.cjs.

@@ -431,10 +431,19 @@
     "starter": { "four": 1, "three": 9 }
   },
   "tutorial": {
-    "hint": { "maxCombos": 2, "maxSteps": 2 },
     "seed": 20260101,
+    "team": ["coc_kien_troi", "bennu", "fenrir", "heimdall", "eir"],
     "enemies": ["m_ember", "m_tide", "m_shade"],
-    "scale": { "hp": 0.2, "atk": 0.35 }
+    "scale": { "hp": 0.3, "atk": 0.35 },
+    "hint": { "maxCombos": 2, "maxSteps": 2 },
+    "lessons": [
+      { "id": "horizontal", "kind": "move", "path": [28, 27], "coach": "tut.l1", "board": [3, 3, 5, 3, 0, 3, 3, 2, 2, 5, 2, 4, 4, 0, 1, 1, 2, 2, 3, 3, 2, 5, 4, 4, 1, 0, 0, 3, 0, 3] },
+      { "id": "vertical", "kind": "move", "path": [23, 17], "coach": "tut.l2", "board": [2, 2, 1, 2, 2, 0, 5, 5, 2, 2, 4, 0, 1, 2, 3, 0, 5, 2, 1, 3, 4, 0, 2, 0, 3, 2, 0, 4, 4, 5] },
+      { "id": "long", "kind": "move", "path": [18, 19, 20], "coach": "tut.l3", "board": [4, 5, 4, 0, 2, 2, 0, 5, 4, 3, 1, 4, 3, 2, 0, 4, 0, 4, 0, 4, 5, 4, 5, 1, 5, 4, 0, 5, 3, 3] },
+      { "id": "skill", "kind": "skill", "index": 0, "coach": "tut.l4" },
+      { "id": "diagonal", "kind": "move", "path": [19, 14], "coach": "tut.l5", "board": [5, 3, 3, 5, 2, 5, 2, 0, 4, 4, 1, 2, 5, 2, 3, 1, 1, 4, 4, 1, 1, 3, 2, 0, 2, 1, 0, 5, 1, 0] },
+      { "id": "combo", "kind": "move", "path": [2, 3, 10, 17, 16, 15], "coach": "tut.l6", "board": [1, 1, 3, 5, 3, 4, 0, 3, 1, 3, 3, 1, 0, 1, 2, 5, 0, 3, 1, 1, 4, 3, 5, 0, 3, 4, 1, 0, 5, 0] }
+    ]
   },
   "onboarding": {
     "avatars": 12,
