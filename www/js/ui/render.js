@@ -203,7 +203,7 @@ export function draw(g, view, t) {
     g.globalAlpha = dead ? 0.2 : 1;
     g.fillStyle = COLORS[e.element];
     g.globalAlpha *= 0.25;
-    g.fillRect(cx - 70 + sh, 90, 140, 150);
+    if (!getImg(`monster:${e.id}`)) g.fillRect(cx - 70 + sh, 90, 140, 150);
     g.globalAlpha = dead ? 0.2 : 1;
     const mi = getImg(`monster:${e.id}`);
     const sc = 1 + 0.08 * (e.hit || 0);
@@ -327,21 +327,42 @@ export function draw(g, view, t) {
       g.fillRect(BOARD_X + c * CELL, BOARD_Y + r * CELL, CELL, CELL);
     }
   const held = view.drag && view.drag.path.length ? view.drag.path[view.drag.path.length - 1] : -1;
+  // viên đang cầm luồn bên dưới
+  if (held >= 0) drawOrb(g, view.board.cells[held], view.drag.x, view.drag.y, 40, !!view.board.enh[held], 0.92);
+  const lifted = [];
   for (let i = 0; i < COLS * ROWS; i++) {
     const type = view.board.cells[i];
     if (type < 0) continue;
     if (i === held) continue;
     const p = cellCenter(i);
+    let x = p.x;
     let y = p.y;
     if (view.fall) y -= view.fall[i] * CELL * (1 - view.fallT);
     if (y < BOARD_Y - CELL / 2) continue;
+    const sl = view.slides && view.slides[i];
+    if (sl) {
+      const k = Math.min(1, sl.age / 160);
+      const e = 1 - (1 - k) * (1 - k);
+      x = sl.x + (p.x - sl.x) * e;
+      y = sl.y + (p.y - sl.y) * e;
+      lifted.push({ i, type, x, y, k });
+      continue;
+    }
     const pulse = view.hl && view.hl.has(i) ? 1 + Math.sin(t * 0.03) * 0.12 : 1;
     const alpha = view.hl && view.hl.has(i) ? 0.75 : 1;
-    drawOrb(g, type, p.x, y, 34 * pulse, !!view.board.enh[i], alpha);
+    drawOrb(g, type, x, y, 34 * pulse, !!view.board.enh[i], alpha);
   }
-  if (held >= 0) {
-    const type = view.board.cells[held];
-    drawOrb(g, type, view.drag.x, view.drag.y, 40, !!view.board.enh[held]);
+  // viên bị đi qua nổi lên: to hơn một chút, có bóng, vẽ phía trên viên đang cầm
+  for (const l of lifted) {
+    const up = Math.sin(l.k * Math.PI);
+    g.save();
+    g.globalAlpha = 0.35 * up;
+    g.fillStyle = '#000';
+    g.beginPath();
+    g.ellipse(l.x + 4, l.y + 14 + up * 6, 34, 26, 0, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+    drawOrb(g, l.type, l.x, l.y - up * 8, 34 * (1 + 0.22 * up), !!view.board.enh[l.i]);
   }
 
   if (view.hint && !view.drag) {

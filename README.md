@@ -66,3 +66,10 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 - Hướng dẫn trận đầu: bàn tay chỉ nước đi cụ thể (tìm bằng core).
 - Menu: thẻ nhân vật có chân dung, hồ sơ phi hành gia ở Hub, khu có biểu tượng hệ, lật thẻ triệu hồi.
 - Soak test: `NODE_PATH=$(npm root -g) node tests/e2e/m5-soak.cjs [phút]` (cần `npm run serve`).
+
+## Polish đợt 3
+- Kéo ngọc tự do: được đi lại ô đã qua (`cell_repeated` bỏ). Bắc cầu ô trung gian theo quỹ đạo ngón tay nên kéo vòng tròn nhanh, cắt góc không bị đứt; trễ nhẹ 6% ô chống rung ở biên.
+- Viên bị đi qua trượt + nổi lên (có bóng), viên đang cầm luồn bên dưới; tiếng ngọc chạm nhau 3 cao độ.
+- Nhấn giữ tướng/quái (450ms) trong trận: bảng chi tiết (chỉ số, kỹ năng, hiệu ứng đang có). Chạm nhanh vào tướng vẫn là dùng kỹ năng.
+- Art quái procedural (24), `tools/gen-art.py`.
+- e2e mới: flows, monkey, m5-inspect, m5-circle.

@@ -41,7 +41,7 @@ test('board: sinh bàn không có nhóm 3 sẵn, xác định theo seed', () => 
 test('move: kiểm tra đường kéo và hoán đổi dọc đường', () => {
   assert.equal(validatePath([0]), 'path_too_short');
   assert.equal(validatePath([0, 2]), 'not_adjacent');
-  assert.equal(validatePath([0, 1, 0]), 'cell_repeated');
+  assert.equal(validatePath([0, 1, 0]), null); // được đi lại ô đã qua
   assert.equal(validatePath([0, 7]), 'not_adjacent');
   assert.equal(validatePath([0, 7], true), null);
   assert.equal(validatePath([0, 99]), 'cell_out_of_range');

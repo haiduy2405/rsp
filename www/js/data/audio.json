@@ -24,7 +24,9 @@
   },
   "sfx": {
     "pick":    [{ "t": 0, "f0": 520, "f1": 620, "dur": 0.06, "wave": "sine", "gain": 0.5 }],
-    "move":    [{ "t": 0, "f0": 330, "f1": 330, "dur": 0.03, "wave": "triangle", "gain": 0.25 }],
+    "move":    [{ "t": 0, "f0": 1900, "f1": 1500, "dur": 0.05, "wave": "sine", "gain": 0.3 }, { "t": 0, "f0": 2850, "f1": 2300, "dur": 0.035, "wave": "sine", "gain": 0.15 }, { "t": 0, "noise": true, "dur": 0.012, "gain": 0.12 }],
+    "move2":   [{ "t": 0, "f0": 2100, "f1": 1700, "dur": 0.05, "wave": "sine", "gain": 0.3 }, { "t": 0, "f0": 3150, "f1": 2550, "dur": 0.035, "wave": "sine", "gain": 0.15 }, { "t": 0, "noise": true, "dur": 0.012, "gain": 0.12 }],
+    "move3":   [{ "t": 0, "f0": 2350, "f1": 1900, "dur": 0.05, "wave": "sine", "gain": 0.3 }, { "t": 0, "f0": 3500, "f1": 2850, "dur": 0.035, "wave": "sine", "gain": 0.15 }, { "t": 0, "noise": true, "dur": 0.012, "gain": 0.12 }],
     "drop":    [{ "t": 0, "f0": 260, "f1": 180, "dur": 0.08, "wave": "triangle", "gain": 0.4 }],
     "match":   [{ "t": 0, "f0": 440, "f1": 660, "dur": 0.1, "wave": "sine", "gain": 0.5 }],
     "combo":   [{ "t": 0, "f0": 523, "f1": 523, "dur": 0.07, "wave": "square", "gain": 0.25 }, { "t": 0.07, "f0": 659, "f1": 659, "dur": 0.07, "wave": "square", "gain": 0.25 }, { "t": 0.14, "f0": 784, "f1": 784, "dur": 0.12, "wave": "square", "gain": 0.25 }],

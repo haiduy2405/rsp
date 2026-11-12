@@ -39,7 +39,7 @@ function findHint(ctx, state) {
   return best?.path ?? null;
 }
 
-export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false }) {
+export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null }) {
   const g = canvas.getContext('2d');
   let state = initial;
   let busy = false;
@@ -246,9 +246,32 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     else view.board = structuredClone(state.board);
   }
 
-  function onDown(ev) {
+  // Nhấn giữ tướng/quái: xem chi tiết. Chạm nhanh vào tướng: dùng kỹ năng.
+  let press = null;
+  function startPress(kind, idx, p, ev) {
+    clearTimeout(press?.timer);
+    press = { kind, idx, x: p.x, y: p.y, fired: false, id: ev.pointerId };
+    if (onInspect) press.timer = setTimeout(() => { if (press) { press.fired = true; fx.vibrate?.(15); onInspect(kind, idx); } }, 450);
+  }
+  function endPress(ev, cancel) {
+    if (!press) return;
+    const pr = press;
+    press = null;
+    clearTimeout(pr.timer);
+    if (cancel || pr.fired || pr.kind !== 'member') return;
     if (busy || state.status !== 'playing') return;
-    const p = pos(ev);
+    if (state.members[pr.idx]?.skillCd === 0) run({ type: 'skill', index: pr.idx });
+  }
+
+  function onDown(ev) {
+    const p0 = pos(ev);
+    if (state.status !== 'playing' || busy) {
+      // đang bận: chỉ cho xem chi tiết
+      if (p0.y >= 388 && p0.y <= 466) { const i = Math.floor((p0.x - 12) / 104); if (i >= 0 && i < state.members.length) startPress('member', i, p0, ev); }
+      else if (p0.y >= 80 && p0.y <= 330 && state.enemies.length) startPress('enemy', Math.min(state.enemies.length - 1, Math.floor(p0.x / (W / state.enemies.length))), p0, ev);
+      return;
+    }
+    const p = p0;
     for (const d of state.duos) {
       const cx = 12 + (d.slot + 1) * 104 - 3;
       if (Math.abs(p.x - cx) <= 30 && p.y >= 377 && p.y <= 399) {
@@ -258,7 +281,12 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     }
     if (p.y >= 388 && p.y <= 466) {
       const idx = Math.floor((p.x - 12) / 104);
-      if (idx >= 0 && idx < state.members.length && state.members[idx].skillCd === 0) run({ type: 'skill', index: idx });
+      if (idx >= 0 && idx < state.members.length) startPress('member', idx, p, ev);
+      return;
+    }
+    if (p.y >= 80 && p.y <= 330 && state.enemies.length) {
+      const idx = Math.min(state.enemies.length - 1, Math.floor(p.x / (W / state.enemies.length)));
+      startPress('enemy', idx, p, ev);
       return;
     }
     const c = cellAt(p.x, p.y);
@@ -271,25 +299,77 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   }
 
   // Thử thêm ô (px,py); trả về true nếu đường kéo thay đổi.
-  function tryCell(c) {
-    if (c < 0 || state.locked.includes(c)) return false;
+  function slideFrom(dest, src) {
+    // Viên ngọc bị đi qua trượt từ ô nó đang ở (src) về ô trống mà viên cầm để lại (dest).
+    const from = cellCenter(src);
+    (view.slides ||= {})[dest] = { x: from.x, y: from.y, age: 0 };
+  }
+
+  // Đi một bước sang ô kề n (lùi một bước = hoàn tác).
+  function stepTo(n) {
     const last = drag.path[drag.path.length - 1];
-    if (c === last) return false;
-    if (drag.path.length >= 2 && c === drag.path[drag.path.length - 2]) {
+    if (drag.path.length >= 2 && n === drag.path[drag.path.length - 2]) {
       drag.path.pop();
-      return true;
-    }
-    if (!drag.path.includes(c) && areAdjacent(last, c, allowDiag)) {
-      drag.path.push(c);
+      slideFrom(last, n);
       fx.sfx('move');
-      fx.vibrate(8);
-      if (!drag.t0) drag.t0 = performance.now();
-      return true;
+      return;
     }
-    return false;
+    drag.path.push(n);
+    slideFrom(last, n);
+    fx.sfx(['move', 'move2', 'move3'][(drag.path.length - 2) % 3]);
+    fx.vibrate(8);
+    if (!drag.t0) drag.t0 = performance.now();
+  }
+
+  const cr = (c) => [Math.floor(c / 6), c % 6];
+  const manh = (a, b) => { const [ar, ac] = cr(a); const [br, bc] = cr(b); return Math.abs(ar - br) + Math.abs(ac - bc); };
+  function segDist(px, py, x0, y0, x1, y1) {
+    const dx = x1 - x0, dy = y1 - y0, l2 = dx * dx + dy * dy;
+    const k = l2 ? Math.max(0, Math.min(1, ((px - x0) * dx + (py - y0) * dy) / l2)) : 0;
+    return Math.hypot(px - (x0 + k * dx), py - (y0 + k * dy));
+  }
+
+  // Ngón tay (x,y) vừa đi từ (px,py): đưa viên cầm tới ô chứa ngón tay. Nếu ngón tay cắt góc hoặc đi rất nhanh
+  // nhảy qua ô, các ô trung gian được bắc cầu theo quỹ đạo ngón tay nên không bị mất bước.
+  function follow(x, y, px, py) {
+    const c = cellAt(x, y);
+    if (c < 0) return false;
+    let last = drag.path[drag.path.length - 1];
+    if (c === last) return false;
+    const dc = Math.hypot(x - cellCenter(c).x, y - cellCenter(c).y);
+    const dl = Math.hypot(x - cellCenter(last).x, y - cellCenter(last).y);
+    if (dc > dl - CELL * 0.06) return false; // trễ nhẹ chống rung ở biên ô
+    let moved = false;
+    for (let guard = 0; guard < 8 && last !== c; guard++) {
+      let target = c;
+      if (!areAdjacent(last, c, allowDiag)) {
+        let best = null;
+        for (const n of cellsAround(last)) {
+          if (state.locked.includes(n) || manh(n, c) >= manh(last, c)) continue;
+          const d = segDist(cellCenter(n).x, cellCenter(n).y, px, py, x, y);
+          if (!best || d < best.d) best = { n, d };
+        }
+        if (!best) break;
+        target = best.n;
+      } else if (state.locked.includes(c)) break;
+      stepTo(target);
+      last = target;
+      moved = true;
+    }
+    return moved;
+  }
+  function cellsAround(c) {
+    const [r, k] = cr(c);
+    const out = [];
+    if (r > 0) out.push(c - 6);
+    if (r < 4) out.push(c + 6);
+    if (k > 0) out.push(c - 1);
+    if (k < 5) out.push(c + 1);
+    return out;
   }
 
   function onMove(ev) {
+    if (press && !press.fired) { const q = pos(ev); if (Math.hypot(q.x - press.x, q.y - press.y) > 18) endPress(ev, true); }
     if (!drag) return;
     // Ngón tay di chuyển nhanh có thể bỏ qua ô: nội suy từ vị trí trước tới vị trí mới, bước nhỏ hơn 1/4 ô.
     const events = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [];
@@ -299,14 +379,13 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       const dx = p.x - drag.x;
       const dy = p.y - drag.y;
       const n = Math.max(1, Math.ceil(Math.hypot(dx, dy) / (CELL / 4)));
+      let qx = drag.x, qy = drag.y;
       for (let k = 1; k <= n; k++) {
         const x = drag.x + (dx * k) / n;
         const y = drag.y + (dy * k) / n;
-        const c = cellAt(x, y);
-        if (c < 0) continue;
-        const ctr = cellCenter(c);
-        if (Math.hypot(x - ctr.x, y - ctr.y) > CELL * 0.46) continue; // chỉ đổi ô khi vào gần tâm ô
-        if (tryCell(c)) changed = true;
+        if (follow(x, y, qx, qy)) changed = true;
+        qx = x;
+        qy = y;
       }
       drag.x = p.x;
       drag.y = p.y;
@@ -316,8 +395,10 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
 
   canvas.addEventListener('pointerdown', onDown);
   canvas.addEventListener('pointermove', onMove);
-  canvas.addEventListener('pointerup', release);
-  canvas.addEventListener('pointercancel', release);
+  const up = (ev) => { endPress(ev, false); release(); };
+  const cancel = (ev) => { endPress(ev, true); release(); };
+  canvas.addEventListener('pointerup', up);
+  canvas.addEventListener('pointercancel', cancel);
 
   let last = performance.now();
   function frame(now) {
@@ -329,6 +410,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       view.timer = Math.max(0, k);
       if (k <= 0) release();
     }
+    if (view.slides) for (const k in view.slides) { view.slides[k].age += dt; if (view.slides[k].age > 180) delete view.slides[k]; }
     for (const f of view.floaters) f.age += dt;
     view.floaters = view.floaters.filter((f) => f.age < f.life);
     for (const q of view.particles) {
@@ -359,14 +441,16 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   requestAnimationFrame(frame);
 
   return {
+    getDragPath: () => (drag ? drag.path.slice() : null),
     getState: () => state,
     isBusy: () => busy,
     destroy() {
       alive = false;
       canvas.removeEventListener('pointerdown', onDown);
       canvas.removeEventListener('pointermove', onMove);
-      canvas.removeEventListener('pointerup', release);
-      canvas.removeEventListener('pointercancel', release);
+      canvas.removeEventListener('pointerup', up);
+      canvas.removeEventListener('pointercancel', cancel);
+      clearTimeout(press?.timer);
     },
   };
 }

@@ -36,7 +36,7 @@ const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
     if (rnd() < 0.3) { const inp = await p.$$('#screen input[type=text], #screen input:not([type]), #screen textarea:not([readonly])'); if (inp.length) await inp[0].fill(['Duy', '', 'x'.repeat(40), '<b>', '😀'][Math.floor(rnd() * 5)]).catch(() => {}); }
     await p.waitForTimeout(150);
     const sig = text.slice(0, 80); same = sig === lastSig ? same + 1 : 0; lastSig = sig;
-    if (same > 40) { log('KẸT màn: ' + sig.replace(/\s+/g, ' ')); same = 0; await p.reload(); }
+    if (same > 40) { const bk = await p.$('#screen #back'); if (bk) { await bk.click().catch(() => {}); same = 0; continue; } log('KẸT màn: ' + sig.replace(/\s+/g, ' ')); same = 0; await p.reload(); }
   }
   console.log(`hành động: ${actions}`); console.log(problems.size ? 'VẤN ĐỀ:\n' + [...problems].join('\n') : 'Không phát hiện vấn đề.');
   await b.close();

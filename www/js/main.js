@@ -71,6 +71,7 @@ function h(tag, props = {}, ...kids) {
 const btn = (label, onclick, cls = '', extra = {}) => h('button', { class: cls, onclick, ...extra }, label);
 let atHub = false;
 const screen = (...kids) => {
+  $('info')?.remove();
   atHub = false;
   audio.playMusic('hub');
   $('screen').style.backgroundImage = '';
@@ -677,6 +678,7 @@ function startBattleUI() {
     },
     fx: audio,
     hint,
+    onInspect: showInspect,
     onEnd(st) {
       audio.sfx(st.status === 'won' ? 'win' : 'lose');
       run = pending;
@@ -686,6 +688,52 @@ function startBattleUI() {
   window.__game = game;
 }
 let pending = null;
+
+// Bảng chi tiết khi nhấn giữ tướng/quái trong trận.
+function effectRows(effects, holder) {
+  if (!effects?.length) return [h('div', { class: 'muted' }, t('info.noEffects'))];
+  return effects.map((e) => {
+    const extra = [t('info.turnsLeft', { n: e.turns })];
+    if (e.stacks > 1) extra.push(t('info.stackN', { n: e.stacks }));
+    if (e.pool != null) extra.push(t('info.shieldPool', { n: e.pool }));
+    else if (e.value) extra.push(`${pct(e.value)}%`);
+    return h('div', { class: 'muted' }, h('b', {}, t(`effect.${e.key}.name`)), ` (${extra.join(', ')}): `, t(`effect.${e.key}.desc`));
+  });
+}
+function showInspect(kind, idx) {
+  const st = game?.getState?.();
+  if (!st || $('info')) return;
+  let body;
+  if (kind === 'member') {
+    const m = st.members[idx];
+    if (!m) return;
+    const c = ctx.characters[m.id];
+    const duos = ctx.duoList.filter((d) => d.a === m.id || d.b === m.id);
+    body = [
+      h('div', { class: 'charrow' }, portrait(m.id, 72), h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`char.${m.id}`), ' ', h('small', {}, stars(m.id))), h('div', {}, h('span', { class: 'chip', style: `background:${COLORS[m.element]}` }, el(m.element)), ' ', h('small', {}, `${t('char.level', { n: m.level, max: ctx.config.progression.levelMax })} · ${t('char.awaken', { n: m.awaken })}`)))),
+      h('div', { class: 'row' }, h('span', { class: 'res' }, `${t('stat.hp')} ${m.hp}`), h('span', { class: 'res' }, `${t('stat.atk')} ${m.atk}`), h('span', { class: 'res' }, `${t('stat.heal')} ${m.heal}`)),
+      h('div', { class: 'muted' }, t('info.teamHp', { hp: Math.round(st.hp), max: st.maxHp })),
+      h('div', { class: 'card' }, h('b', {}, `${t('char.skill')}: ${t(`skill.${m.id}`)}`), h('div', { class: 'muted' }, m.skillCd === 0 ? t('info.skillReady') : t('info.skillWait', { n: m.skillCd }), ` · ${t('char.cooldown', { n: m.skillMax })}`), c.skill.units.map((u) => h('div', {}, unitText(u)))),
+      idx === 0 && c.leader ? h('div', { class: 'card' }, h('b', {}, t('char.leader')), h('div', {}, leaderText(c.leader))) : null,
+      duos.length ? h('div', { class: 'card' }, h('b', {}, t('char.duo')), duos.map((d) => h('div', {}, h('b', {}, t(`duo.${d.id}`)), ` · ${t('char.duoWith', { name: t(`char.${d.a === m.id ? d.b : d.a}`) })}`))) : null,
+      h('div', { class: 'card' }, h('b', {}, t('info.teamEffects')), effectRows(st.team.effects)),
+    ];
+  } else {
+    const e = st.enemies[idx];
+    if (!e) return;
+    const mk = ctx.monsters[e.id]?.kind || 'normal';
+    const off = e.effects?.some((x) => x.key === 'stun' || x.key === 'freeze');
+    const im = getImg(`monster:${e.id}`);
+    body = [
+      h('div', { class: 'charrow' }, im ? h('img', { src: im.src, alt: '', style: 'width:96px;height:96px;flex:none' }) : null, h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`monster.${e.id}`)), h('div', {}, h('span', { class: 'chip', style: `background:${COLORS[e.element]}` }, el(e.element)), ' ', h('small', {}, t(`info.kind.${mk}`))))),
+      h('div', { class: 'row' }, h('span', { class: 'res' }, t('info.hpNow', { hp: Math.max(0, Math.round(e.hp)), max: e.maxHp })), h('span', { class: 'res' }, t('info.attack', { atk: e.atk, n: e.every }))),
+      e.hp > 0 ? h('div', { class: 'muted' }, off ? t('info.stunnedNow') : t('info.cdNow', { n: e.cd })) : null,
+      h('div', { class: 'card' }, h('b', {}, t('info.effects')), effectRows(e.effects)),
+    ];
+  }
+  const close = () => $('info')?.remove();
+  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox' }, body, btn(t('info.close'), close, 'primary', { id: 'info-close' }))));
+}
 
 function showResult() {
   const r = run.lastResult;
