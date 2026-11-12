@@ -656,8 +656,13 @@ export function draw(g, view, t) {
     pts.forEach((q, i) => (i ? g.lineTo(q.x, q.y) : g.moveTo(q.x, q.y)));
     g.stroke();
     g.setLineDash([]);
-    const k = (t % 1400) / 1400;
-    const q = { x: pts[0].x + (pts[1].x - pts[0].x) * Math.min(1, k * 1.4), y: pts[0].y + (pts[1].y - pts[0].y) * Math.min(1, k * 1.4) };
+    // viên ngọc dẫn đường chạy dọc cả đường gợi ý rồi nghỉ một nhịp
+    const segs = pts.length - 1;
+    const run = segs * 420;
+    const kk = Math.min(1, (t % (run + 600)) / run) * segs;
+    const si = Math.min(segs - 1, Math.floor(kk));
+    const f = kk - si;
+    const q = { x: pts[si].x + (pts[si + 1].x - pts[si].x) * f, y: pts[si].y + (pts[si + 1].y - pts[si].y) * f };
     g.fillStyle = 'rgba(255,255,255,0.9)';
     g.beginPath();
     g.arc(q.x, q.y, 20, 0, Math.PI * 2);

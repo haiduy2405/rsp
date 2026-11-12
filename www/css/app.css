@@ -737,3 +737,4 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .dd-foe { display: flex; align-items: center; gap: 10px; padding: 4px 0; text-align: left; }
 .dd-foe img { width: 54px; height: 54px; object-fit: contain; flex: none; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
 .runmap .nd.cur { -webkit-touch-callout: none; user-select: none; }
+.mapscreen .hold-hint { margin: -2px 0 0; font-size: 11.5px; text-align: center; }

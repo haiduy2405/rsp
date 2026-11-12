@@ -2,6 +2,7 @@
 import { applyPath } from '../core/move.js';
 import { areAdjacent } from '../core/board.js';
 import { step as coreStep } from '../core/battle.js';
+import { findHint } from './hint.js';
 import { W, H, CELL, cellAt, cellCenter, draw } from './render.js';
 
 const sleep = (ms, fn) =>
@@ -20,28 +21,6 @@ const easeOut = (k) => 1 - (1 - k) * (1 - k);
 // onEnd(finalState) gọi sau khi hoạt ảnh kết thúc và trận đã phân thắng thua.
 const NOFX = { sfx() {}, vibrate() {} };
 
-// Gợi ý cho người mới: tìm một nước đổi 2 ô kề nhau tạo ra combo, ưu tiên hệ có trong đội.
-function findHint(ctx, state) {
-  let best = null;
-  for (let a = 0; a < 30; a++) {
-    if (state.locked.includes(a)) continue;
-    const ra = (a / 6) | 0;
-    const cand = [a + 1, a + 6];
-    if (ctx.config.board.allowDiagonal) cand.push(a + 7, a + 5);
-    for (const b of cand) {
-      if (b >= 30 || state.locked.includes(b)) continue;
-      const dc = Math.abs((b % 6) - (a % 6));
-      if (dc > 1 || (b === a + 1 && b % 6 === 0)) continue;
-      void ra;
-      const r = coreStep(ctx, state, { type: 'move', path: [a, b] });
-      const st = r.events.find((e) => e.type === 'step');
-      if (!st) continue;
-      const dmg = st.hits.reduce((n, h) => n + (h.kind === 'damage' ? h.amount : 0), 0);
-      if (!best || dmg > best.dmg) best = { path: [a, b], dmg };
-    }
-  }
-  return best?.path ?? null;
-}
 
 export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null, onSkillAsk = null }) {
   const g = canvas.getContext('2d');
@@ -104,7 +83,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   }
   if (hint) {
     const hp = findHint(ctx, state);
-    if (hp) view.hint = { path: hp, text: t('tut.hint') };
+    if (hp) view.hint = { path: hp.path, text: t('tut.hint', { n: hp.combos }) };
   }
 
   const TALLY = { x: W / 2 + 90, y: 340 }; // nơi vẽ tổng sát thương (khớp render.js)
@@ -446,6 +425,10 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.combo = 0;
     busy = false;
     view.canAct = state.status === 'playing';
+    if (hint && state.status === 'playing') {
+      const hp = findHint(ctx, state);
+      view.hint = hp ? { path: hp.path, text: t('tut.hint', { n: hp.combos }) } : null;
+    }
     if (state.status !== 'playing' && alive) onEnd(state);
   }
 

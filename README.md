@@ -265,3 +265,7 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.36.1
 - Chọn cửa: nhấn giữ một cửa trên bản đồ xem chi tiết (mô tả, quái kèm hệ/nhịp đánh) rồi "Vào cửa này" hoặc đóng; thả tay không tự vào cửa.
+
+## v0.37.0 — Gợi ý nhiều bước
+- Gợi ý trong trận giờ là một đường kéo nhiều bước (tối đa 8) tạo nhiều combo nhất, dò bằng mô phỏng thật của lõi (beam search, ~30ms); hiện "tạo N combo", viên dẫn đường chạy hết đường; tự tính lại sau mỗi lượt khi gợi ý còn bật.
+- Màn chọn cửa: dòng nhắc "Nhấn giữ một cửa để xem chi tiết".

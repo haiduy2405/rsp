@@ -845,6 +845,7 @@ function showDoors() {
     mapHeader(),
     map,
     h('p', { class: 'sub mapcap' }, h('span', {}, run.doors.length > 1 ? t('run.chooseDoor') : t('run.finalDoor')), infoBtn),
+    run.doors.length > 1 ? h('div', { class: 'muted hold-hint' }, t('run.holdHint')) : null,
     infoPanel,
     relicStrip(),
     items,
