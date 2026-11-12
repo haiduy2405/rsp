@@ -387,3 +387,8 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 .row.tabs button { min-height: 0; padding: 8px 4px; font-size: 13px; width: auto; }
 .row.tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .row.tabs button, .row.tabs button.primary { min-width: 0; width: 100%; padding: 8px 2px; }
+
+/* Avatar: mẫu SVG hoặc ảnh người chơi */
+.avatar { overflow: hidden; padding: 0; background: #0b0d18; }
+.av-fill { display: block; width: 100%; height: 100%; }
+.av-fill svg, .av-fill img { width: 100%; height: 100%; display: block; object-fit: cover; }

@@ -141,3 +141,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - **Vàng ×10** toàn hệ thống (loot, shop, Di Vật, kỹ năng, Thức tỉnh, bán Tiểu Linh) để dễ phân biệt với các tiền tệ khác. Save v9 tự đổi dữ liệu cũ.
 - **Hòm đồ** (đổi tên từ Kho đồ): lưới ô icon theo độ hiếm, chạm xem chi tiết, tab lọc.
 - Vuốt mép / nút Back của trình duyệt = nút mũi tên quay lại ở góc trái trên.
+
+## Avatar (v0.21)
+- 12 avatar phi hành gia vẽ SVG (`ui/avatar.js`): nam/nữ, trẻ/trung niên/già, 6 tông da. Người chơi cũng có thể tải ảnh riêng (cắt vuông, thu 128px JPEG, lưu trong save, giới hạn `config.onboarding.photoMax`).

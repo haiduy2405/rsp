@@ -7,6 +7,7 @@ import { createStorage, browserAdapter } from './save/storage.js';
 import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useElixir, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
 import { KEYS } from './core/effects.js';
+import { avatarNode, photoFromFile } from './ui/avatar.js';
 import { summon, buyTickets, redeemCharacter, effectiveRates } from './core/summon.js';
 import { finishOnboarding, completeTutorial, storyUnlocked, updateProfile } from './core/onboarding.js';
 import { newProgress } from './core/progress.js';
@@ -207,7 +208,7 @@ function showHub() {
     h(
       'div',
       { class: 'hub-top' },
-      h('div', { class: 'avatar', id: 'b-profile', role: 'button', tabindex: '0', 'aria-label': t('profile.title'), style: `background:${COLORS[progress.player.avatar % 6]};cursor:pointer`, onclick: () => showProfile() }, (progress.player.name || '?')[0].toUpperCase()),
+      h('div', { class: 'avatar', id: 'b-profile', role: 'button', tabindex: '0', 'aria-label': t('profile.title'), style: 'cursor:pointer', onclick: () => showProfile() }, avatarNode(progress.player)),
       h('div', { class: 'who', id: 'b-profile-name', style: 'cursor:pointer', onclick: () => showProfile() }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, progress.player.callsign)),
       dockBtn('help', t('hub.help'), () => showGlossary(), 'b-help', 'help-btn'),
       dockBtn('settings', t('hub.settings'), () => showSettings(), 'b-set', 'help-btn'),
@@ -241,7 +242,7 @@ function showProfile(msg) {
   const st = progress.stats;
   const clears = Object.keys(progress.clears).reduce((a, z) => a + zoneClears(progress, z), 0);
   const stat = (label, v) => h('div', { class: 'card item-row' }, h('span', {}, label), h('b', {}, new Intl.NumberFormat(lang).format(v)));
-  const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (d.avatar === i ? ' sel' : ''), 'data-avatar': i, style: `background:${COLORS[i % 6]}`, onclick: () => { d.avatar = i; showProfile(); } }, (d.name || '?')[0].toUpperCase()));
+  const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (d.avatar === i && !d.photo ? ' sel' : ''), 'data-avatar': i, onclick: () => { d.avatar = i; d.photo = null; showProfile(); } }, avatarNode({ avatar: i })));
   const save1 = () => {
     const r = updateProfile(ctx, progress, d);
     if (!r.ok) return showProfile(t(`ob.bad.${r.reason}`, { max: r.reason === 'bad_callsign' ? o.callsignMax : o.nameMax }) );
@@ -252,12 +253,13 @@ function showProfile(msg) {
     showProfile(t('profile.saved'));
   };
   const keep = (e, k) => { d[k] = e.target.value; };
-  const dirty = d.name !== progress.player.name || d.callsign !== progress.player.callsign || (d.hometown || '') !== (progress.player.hometown || '') || d.avatar !== progress.player.avatar;
+  const dirty = d.name !== progress.player.name || d.callsign !== progress.player.callsign || (d.hometown || '') !== (progress.player.hometown || '') || d.avatar !== progress.player.avatar || (d.photo || null) !== (progress.player.photo || null);
   screen(
     h('h2', {}, t('profile.title')),
-    h('div', { class: 'prof-head' }, h('div', { class: 'avatar big', style: `background:${COLORS[d.avatar % 6]}` }, (d.name || '?')[0].toUpperCase())),
+    h('div', { class: 'prof-head' }, h('div', { class: 'avatar big' }, avatarNode(d))),
     msg ? h('div', { class: 'notice' }, msg) : null,
     h('div', { class: 'row' }, av),
+    photoPicker(d, () => showProfile(), 'pf'),
     h('label', {}, t('ob.name'), h('input', { id: 'pf-name', maxlength: String(o.nameMax), value: d.name, oninput: (e) => keep(e, 'name') })),
     h('label', {}, t('ob.callsign'), h('input', { id: 'pf-callsign', maxlength: String(o.callsignMax), value: d.callsign, oninput: (e) => keep(e, 'callsign') })),
     h('label', {}, t('ob.hometown'), h('input', { id: 'pf-hometown', maxlength: String(o.hometownMax), value: d.hometown || '', oninput: (e) => keep(e, 'hometown') })),
@@ -588,6 +590,21 @@ function showTeam(slot, msg, stage) {
   );
 }
 
+// Chọn ảnh làm avatar: thu về 128px JPEG rồi lưu trong bản nháp `draft.photo`.
+function photoPicker(draft, redraw, pre) {
+  const input = h('input', { type: 'file', accept: 'image/*', id: `${pre}-photo-input`, style: 'display:none', onchange: async (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    try {
+      draft.photo = await photoFromFile(f);
+      redraw();
+    } catch {
+      input.parentElement.append(h('div', { class: 'notice' }, t('ob.bad.bad_image')));
+    }
+  } });
+  return h('div', { class: 'row' }, input, btn(t('ob.photo'), () => input.click(), '', { id: `${pre}-photo` }), draft.photo ? btn(t('ob.photoClear'), () => { draft.photo = null; redraw(); }, '', { id: `${pre}-photo-clear` }) : null);
+}
+
 // Hòm đồ: lưới ô icon (độ hiếm quyết định màu nền), chạm một ô để xem chi tiết.
 const RARITY_COL = ['#6b6f7d', '#6b6f7d', '#4fae7b', '#4f8fe0', '#a066e8', '#e0a64a'];
 let itemsTab = 'all';
@@ -915,7 +932,7 @@ function showSettings(msg = null, confirmDelete = false) {
 }
 
 // Onboarding: mở đầu -> quê hương -> Tín Vật -> ngoại hình -> tên -> lượt triệu hồi đầu.
-const ob = { hometown: '', culture: null, avatar: 0, name: '', callsign: '' };
+const ob = { hometown: '', culture: null, avatar: 0, photo: null, name: '', callsign: '' };
 let obTimers = [];
 function showOnboarding(step = 1, err = null) {
   obTimers.forEach(clearTimeout);
@@ -940,15 +957,15 @@ function showOnboarding(step = 1, err = null) {
       btn(t('ob.next'), next(4), 'primary', { id: 'ob-next', ...(ob.culture ? {} : { disabled: '' }) }),
     );
   } else if (step === 4) {
-    const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (ob.avatar === i ? ' sel' : ''), 'data-avatar': i, style: `background:${COLORS[i % 6]}`, onclick: () => { ob.avatar = i; showOnboarding(4); } }, String(i + 1)));
-    screen(h('div', { class: 'card' }, h('p', {}, t('ob.avatar'))), h('div', { class: 'row' }, av), btn(t('ob.next'), next(5), 'primary', { id: 'ob-next' }));
+    const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (ob.avatar === i && !ob.photo ? ' sel' : ''), 'data-avatar': i, onclick: () => { ob.avatar = i; ob.photo = null; showOnboarding(4); } }, avatarNode({ avatar: i })));
+    screen(h('div', { class: 'card' }, h('p', {}, t('ob.avatar'))), h('div', { class: 'row' }, av), photoPicker(ob, () => showOnboarding(4), 'ob'), btn(t('ob.next'), next(5), 'primary', { id: 'ob-next' }));
   } else if (step === 5) {
     screen(
       err ? h('div', { class: 'notice' }, err) : null,
       h('label', {}, t('ob.name'), h('input', { id: 'ob-name', maxlength: String(o.nameMax), value: ob.name, oninput: (e) => (ob.name = e.target.value) })),
       h('label', {}, t('ob.callsign'), h('input', { id: 'ob-callsign', maxlength: String(o.callsignMax), value: ob.callsign, oninput: (e) => (ob.callsign = e.target.value) })),
       btn(t('ob.start'), () => {
-        const r = finishOnboarding(ctx, progress, { name: ob.name, callsign: ob.callsign, hometown: ob.hometown, avatar: ob.avatar, culture: ob.culture });
+        const r = finishOnboarding(ctx, progress, { name: ob.name, callsign: ob.callsign, hometown: ob.hometown, avatar: ob.avatar, photo: ob.photo, culture: ob.culture });
         if (!r.ok) {
           const key = `ob.bad.${r.reason}`;
           return showOnboarding(5, dicts[lang][key] ? t(key, { max: r.reason === 'bad_name' ? o.nameMax : o.callsignMax }) : t('ob.bad.other'));

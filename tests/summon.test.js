@@ -232,3 +232,14 @@ test('save: migrate v3 lên v4 giữ dữ liệu; người đã chơi bỏ qua o
   delete v2.characters;
   assert.ok(isValidProgress(migrate(v2, 2, ctx)));
 });
+
+test('avatar: ảnh người chơi phải là JPEG data URL nhỏ, mẫu avatar nằm trong dải', () => {
+  const p0 = newProgress(ctx);
+  const ok = 'data:image/jpeg;base64,/9j/4AAQ';
+  assert.equal(finishOnboarding(ctx, p0, input({ photo: 'http://x/a.png' })).reason, 'bad_photo');
+  assert.equal(finishOnboarding(ctx, p0, input({ photo: ok + 'A'.repeat(cfg_photoMax()) })).reason, 'bad_photo');
+  const r = finishOnboarding(ctx, p0, input({ photo: ok, avatar: 11 }));
+  assert.equal(r.progress.player.photo, ok);
+  assert.equal(finishOnboarding(ctx, p0, input({ avatar: 12 })).reason, 'bad_avatar');
+});
+const cfg_photoMax = () => ctx.config.onboarding.photoMax;

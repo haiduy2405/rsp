@@ -488,7 +488,8 @@
     ]
   },
   "onboarding": {
-    "avatars": 8,
+    "avatars": 12,
+    "photoMax": 24000,
     "nameMax": 20,
     "callsignMax": 12,
     "hometownMax": 24

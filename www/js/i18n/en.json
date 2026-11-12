@@ -836,5 +836,9 @@
   "items.desc.fodder": "Feed to a hero for EXP, or sell for Gold.",
   "result.heroExp": "Each hero gains +{n} EXP",
   "result.levelUp": "{name} reached Lv {lv}",
-  "summon.spirit": "Spirit Gems: {n}"
+  "summon.spirit": "Spirit Gems: {n}",
+  "ob.photo": "Use your own photo",
+  "ob.photoClear": "Remove photo",
+  "ob.bad.bad_photo": "Invalid photo.",
+  "ob.bad.bad_image": "Couldn't read this image."
 }

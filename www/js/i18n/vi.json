@@ -836,5 +836,9 @@
   "items.desc.fodder": "Cho tướng ăn để lấy EXP, hoặc bán lấy Vàng.",
   "result.heroExp": "Mỗi tướng nhận +{n} EXP",
   "result.levelUp": "{name} lên Lv {lv}",
-  "summon.spirit": "Linh Thạch: {n}"
+  "summon.spirit": "Linh Thạch: {n}",
+  "ob.photo": "Dùng ảnh của bạn",
+  "ob.photoClear": "Bỏ ảnh",
+  "ob.bad.bad_photo": "Ảnh không hợp lệ.",
+  "ob.bad.bad_image": "Không đọc được ảnh này."
 }
