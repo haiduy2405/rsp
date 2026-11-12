@@ -343,3 +343,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.46.1
 - Tutorial: bàn bài 1 có sẵn từ khung hình đầu (hết giật do đổi bàn), các lần đổi bàn sau hiện dần. Ô tiêu đề chỉ ghi 1/6 đến 6/6, không chữ "Tầng".
+
+## v0.46.2
+- Tutorial: hết bài cứng thì chơi tự do, không gợi ý nữa. Khung chữ hướng dẫn nổi bật hơn: nền đậm, viền vàng phát sáng, tiêu đề to màu vàng + chỉ dẫn nhỏ, nảy lên mỗi khi đổi bài, mờ bớt sau 7 giây để thấy quái.

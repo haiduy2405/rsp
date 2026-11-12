@@ -920,12 +920,19 @@ function startTutorial(retry = false) {
   $('coach')?.remove();
   const bubble = h('div', { id: 'coach' });
   $('wrap').appendChild(bubble);
+  let dimTimer = 0;
   const coach = (key) => {
     if (!key) { bubble.classList.remove('on'); return; }
     bubble.classList.remove('on');
     void bubble.offsetWidth;
-    bubble.textContent = t(key);
+    // Câu đầu (tới dấu chấm đầu tiên) là tiêu đề to màu vàng, phần còn lại là chỉ dẫn nhỏ hơn.
+    const full = t(key);
+    const cut = full.indexOf('. ');
+    bubble.replaceChildren(h('div', { class: 'co-h' }, cut > 0 ? full.slice(0, cut + 1) : full), ...(cut > 0 ? [h('div', { class: 'co-b' }, full.slice(cut + 2))] : []));
+    bubble.classList.remove('dim');
     bubble.classList.add('on');
+    clearTimeout(dimTimer);
+    dimTimer = setTimeout(() => bubble.classList.add('dim'), 7000); // đọc xong thì mờ bớt để thấy quái
     audio.sfx('tick');
   };
   const samePath = (a, b) => a.length === b.length && a.every((c, i) => c === b[i]);
@@ -934,8 +941,7 @@ function startTutorial(retry = false) {
     if (i >= lessons.length) {
       game.setGuide({ title: t('tut.lesson', { n: lessons.length, total: lessons.length }), allow: null });
       coach('tut.free');
-      game.requestHint();
-      return;
+      return; // chơi tự do: không còn gợi ý
     }
     const L = lessons[i];
     const title = t('tut.lesson', { n: i + 1, total: lessons.length });
@@ -946,7 +952,7 @@ function startTutorial(retry = false) {
     }
     coach(L.coach);
   };
-  const done = () => { bubble.remove(); $('pause-btn')?.remove(); $('hint-btn')?.remove(); };
+  const done = () => { clearTimeout(dimTimer); bubble.remove(); $('pause-btn')?.remove(); $('hint-btn')?.remove(); };
   audio.playMusic('battle');
   $('screen').classList.remove('show');
   game?.destroy();
@@ -967,7 +973,6 @@ function startTutorial(retry = false) {
     onReject(a) { coach(a.type === 'skill' ? 'tut.wrongSkill' : 'tut.wrong'); },
     onSettled(state) {
       if (li < lessons.length) startLesson(li + 1);
-      else game.requestHint();
     },
     onEnd(state) {
       done();
