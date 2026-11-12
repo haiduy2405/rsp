@@ -231,3 +231,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.33.2
 - Chi tiết tướng và Đội hình chuyển tông nâu ấm: header bớt ám màu hệ, nhãn Active hổ phách, viền 3★ đồng, ô chọn hổ phách.
+
+## v0.33.3
+- Nút Thức tỉnh to, vàng sáng khi đủ nguyên liệu (mờ khi thiếu); thẻ thưởng màn kết quả chuyển nâu ấm.

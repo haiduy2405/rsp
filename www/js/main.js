@@ -389,6 +389,7 @@ function showChar(id, msg, back) {
   const st = statsFor(ctx, id, pc.level, pc.awaken);
   const aw = awakenCost(ctx, id, pc.awaken + 1);
   const inv = progress.inventory;
+  const awakenReady = !!aw && inv.shards >= aw.shards && inv.stones[aw.element][aw.stone] >= aw.stones && inv.gold >= aw.gold;
   const kit = resolveKit(ctx, id, pc.skillLv, formOf(pc.awaken));
   const keys = [...new Set([...keysOf(kit.skill.units), ...(kit.passive?.units ? keysOf(kit.passive.units) : []), ...ctx.duoList.filter((d) => d.a === id || d.b === id).flatMap((d) => keysOf(d.skill.units))])];
   // Thực hiện một hành động nâng cấp (hàm thuần trả {ok, progress}), lưu, vẽ lại với thông báo.
@@ -449,7 +450,7 @@ function showChar(id, msg, back) {
     grow,
     skills,
     h('div', { class: 'hp-grow' }, h('div', { class: 'muted' }, t('char.form', { n: formOf(pc.awaken) })), aw
-      ? [h('div', { class: 'muted' }, t('char.form2Preview', { cap: ctx.config.progression.levelMax, pct: Math.round(ctx.config.progression.awaken[0].stat * 100) })), heroUI.activeBox(id, { skillLv: pc.skillLv, awaken: 1, cooldown: skillCooldown(ctx, id, 1, pc.skillLv) }), h('div', { class: 'muted' }, t('char.awakenCost', { shards: aw.shards, stones: aw.stones, kind: t(`stone.${aw.stone}`), element: el(aw.element), gold: aw.gold })), btn(t('char.awakenBtn'), () => act(() => awaken(ctx, progress, id)), '', { id: 'awaken' })]
+      ? [h('div', { class: 'muted' }, t('char.form2Preview', { cap: ctx.config.progression.levelMax, pct: Math.round(ctx.config.progression.awaken[0].stat * 100) })), heroUI.activeBox(id, { skillLv: pc.skillLv, awaken: 1, cooldown: skillCooldown(ctx, id, 1, pc.skillLv) }), h('div', { class: 'muted' }, t('char.awakenCost', { shards: aw.shards, stones: aw.stones, kind: t(`stone.${aw.stone}`), element: el(aw.element), gold: aw.gold })), btn(t('char.awakenBtn'), () => act(() => awaken(ctx, progress, id)), '', { id: 'awaken', class: awakenReady ? 'ready' : 'notready' })]
       : h('div', { class: 'muted' }, t('char.maxAwaken'))),
     h('div', { class: 'muted' }, `${t('res.shard')} ${inv.shards} · ${t('res.gold')} ${inv.gold} · ${t('res.stone')} ${el(c.element)}: ${inv.stones[c.element].normal}/${inv.stones[c.element].rare}`),
     btn(t('back'), goBack, '', { id: 'back' }),
