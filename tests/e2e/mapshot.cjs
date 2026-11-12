@@ -7,5 +7,5 @@ const { chromium, devices } = require('playwright');
   await p.fill('#ob-name', 'Duy'); await p.fill('#ob-callsign', 'Sao'); await p.tap('#ob-start'); await p.tap('#ob-hub');
   await p.waitForTimeout(600); await p.tap('[data-zone]'); await p.waitForTimeout(400);
   await p.tap('[data-stage="1"]'); await p.waitForTimeout(300); await p.tap('#team-go'); await p.waitForTimeout(900);
-  await p.screenshot({ path: '/home/claude/art-src/shots/map.png' }); console.log('errors', errs); await b.close();
+  await p.screenshot({ path: '/home/claude/art-src/shots/map.png' }); await p.tap('#door-info'); await p.waitForTimeout(700); await p.screenshot({ path: '/home/claude/art-src/shots/map2.png' }); console.log('errors', errs); await b.close();
 })();

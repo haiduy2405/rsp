@@ -57,7 +57,12 @@ const audio = createAudio(audioCfg, {
   get haptic() { return progress.settings.haptic; },
 });
 document.addEventListener('pointerdown', () => audio.unlock(), { capture: true });
-document.addEventListener('click', (e) => { if (e.target.closest?.('#screen button')) audio.sfx('ui'); }, { capture: true });
+document.addEventListener('click', (e) => {
+  const el = e.target.closest?.('#screen button, #screen [role=button], #screen [data-zone], #screen [data-zone-card], #screen [data-stage], #screen [data-door], #screen .slot, #screen .tier, #screen .rchip, #screen .card.btn, #info button, .dock button');
+  if (!el || el.disabled) return;
+  if (el.id === 'door-info') return; // tự phát âm riêng
+  audio.sfx(el.matches('.tier, .rchip, .slot, [data-stage]') ? 'tick' : el.matches('[data-door]') ? 'open' : 'ui');
+}, { capture: true });
 let run = null;
 let record = null;
 let game = null;
@@ -793,11 +798,20 @@ function showDoors() {
   };
   const items = h('div', { class: 'itembar' }, ['potion', 'shield', 'time'].map((it) => {
     const off = run.items[it] <= 0 || (it === 'potion' && run.hp >= run.maxHp) || run.armed[it];
-    const b = h('button', { class: 'itm' + (run.armed[it] ? ' armed' : ''), 'data-item': it, onclick: () => act({ type: 'useItem', item: it }), ...(off ? { disabled: '' } : {}) });
+    const b = h('button', { class: 'itm' + (run.armed[it] ? ' armed' : ''), 'data-item': it, title: t(`item.${it}`), 'aria-label': `${t(`item.${it}`)} ×${run.items[it]}`, onclick: () => act({ type: 'useItem', item: it }), ...(off ? { disabled: '' } : {}) });
     b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ITEM_ICON[it]}</svg>`;
-    b.append(h('b', {}, `${t(`item.${it}`)} ×${run.items[it]}`), h('small', {}, run.armed[it] ? t('run.armed') : desc[it]));
+    b.append(h('b', {}, `×${run.items[it]}`));
+    if (run.armed[it]) b.append(h('small', {}, t('run.armed')));
     return b;
   }));
+  // Bảng thông tin (ẩn mặc định): quái từng cửa + mô tả vật phẩm
+  const itemInfo = h('div', { class: 'iteminfo' }, ['potion', 'shield', 'time'].map((it) => {
+    const ic = h('span', { class: 'ii-ico', 'data-item': it });
+    ic.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ITEM_ICON[it]}</svg>`;
+    return h('div', { class: 'ii' }, ic, h('div', {}, h('b', {}, `${t(`item.${it}`)} ×${run.items[it]}`), h('small', {}, desc[it])));
+  }));
+  const infoPanel = h('div', { class: 'infopanel' }, h('div', { class: 'ip-in' }, doorList(), itemInfo));
+  const infoBtn = h('button', { class: 'infobtn', id: 'door-info', 'aria-label': t('run.info'), 'aria-expanded': 'false', onclick: () => { const on = infoPanel.classList.toggle('open'); infoBtn.setAttribute('aria-expanded', String(on)); infoBtn.classList.toggle('on', on); audio.sfx('tick'); setTimeout(focusMap, 380); } }, 'i');
   const map = h('div', { class: 'runmap' + (DEBUG ? ' static' : '') });
   map.innerHTML = runMapSVG();
   map.querySelectorAll('[data-door]').forEach((nd) => {
@@ -808,8 +822,8 @@ function showDoors() {
   screen(
     mapHeader(),
     map,
-    h('p', { class: 'sub mapcap' }, run.doors.length > 1 ? t('run.chooseDoor') : t('run.finalDoor')),
-    doorList(),
+    h('p', { class: 'sub mapcap' }, h('span', {}, run.doors.length > 1 ? t('run.chooseDoor') : t('run.finalDoor')), infoBtn),
+    infoPanel,
     relicStrip(),
     items,
     btn(t('run.leave'), leaveRun, 'ghost', { id: 'leave-run' }),
@@ -818,9 +832,9 @@ function showDoors() {
   // cuộn bản đồ tới tầng đang chọn (kéo cuộn để xem phần còn lại)
   const svg = map.querySelector('svg');
   const vy = run.floors > 1 ? 468 - run.floor * ((468 - 118) / (run.floors - 1)) : 468;
-  const focus = () => { map.scrollTop = Math.max(0, (vy / 600) * svg.clientHeight - map.clientHeight * 0.55); };
-  focus();
-  requestAnimationFrame(focus);
+  const focusMap = () => { map.scrollTop = Math.max(0, (vy / 600) * svg.clientHeight - map.clientHeight * 0.55); };
+  focusMap();
+  requestAnimationFrame(focusMap);
   $('screen').style.setProperty('--zc', COLORS[ctx.zones[run.zoneId].element] || '#ffb25a');
 }
 

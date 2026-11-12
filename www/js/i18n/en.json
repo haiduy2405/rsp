@@ -132,6 +132,7 @@
   "res.shard": "Soul Shard",
   "res.stone": "Stone",
   "run.floor": "Floor {n}/{total}",
+  "run.info": "Show enemies and items",
   "run.chooseDoor": "Choose a door",
   "run.finalDoor": "Final floor, no choice",
   "run.hp": "Team HP",

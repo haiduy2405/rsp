@@ -565,6 +565,34 @@
     "dur": 0.12,
     "gain": 0.1
    }
+  ],
+  "tick": [
+   {
+    "t": 0,
+    "f0": 520,
+    "f1": 380,
+    "dur": 0.05,
+    "wave": "triangle",
+    "gain": 0.05
+   }
+  ],
+  "open": [
+   {
+    "t": 0,
+    "f0": 180,
+    "f1": 260,
+    "dur": 0.14,
+    "wave": "sine",
+    "gain": 0.09
+   },
+   {
+    "t": 0.05,
+    "f0": 360,
+    "f1": 520,
+    "dur": 0.12,
+    "wave": "triangle",
+    "gain": 0.05
+   }
   ]
  },
  "samples": {
@@ -575,18 +603,18 @@
   },
   "move": {
    "url": "assets/audio/move.mp3",
-   "gain": 0.16,
-   "rate": 1
+   "gain": 0.12,
+   "rate": 0.84
   },
   "move2": {
    "url": "assets/audio/move2.mp3",
-   "gain": 0.16,
-   "rate": 1.122
+   "gain": 0.12,
+   "rate": 0.94
   },
   "move3": {
    "url": "assets/audio/move3.mp3",
-   "gain": 0.16,
-   "rate": 1.26
+   "gain": 0.12,
+   "rate": 1.05
   },
   "drop": {
    "url": "assets/audio/drop.mp3",

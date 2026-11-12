@@ -258,3 +258,7 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.35.1
 - Bản đồ chọn cửa hiển thị kích thước thật, kéo cuộn dọc để xem các tầng trên; tự cuộn tới tầng đang chọn.
+
+## v0.36.0
+- Chọn cửa: thông tin quái + mô tả vật phẩm ẩn sau nút (i); bản đồ chiếm phần còn lại; vật phẩm gọn (icon + số lượng).
+- Âm: thêm tick (tab/ải/ô đội hình/chip) và open (chọn cửa), âm bấm phủ thêm thẻ/hub/hộp thoại; tiếng kéo ngọc trầm và nhỏ hơn (rate ~-3 bán cung, gain 0.16 -> 0.12).
