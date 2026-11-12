@@ -389,3 +389,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 ### v0.52.0
 - **Nhiệm vụ hằng ngày** (`core/quests.js`, dữ liệu `config.quests`): 5 nhiệm vụ mỗi ngày (Vào game cố định + 4 trong 6 loại: thắng 5 trận, thắng 1 ải, triệu hồi, nhận quà shop, cho tướng lên cấp, nâng kỹ năng), nhận Linh Thạch, xong hết thì thêm 1 Vé + 20 Linh Thạch. Chấm đỏ ở nút Nhiệm vụ. Trường `progress.quests` tùy chọn nên không đổi version save. Tab Thành tựu vẫn "sắp có". Test: `tests/quests.test.js`, `tests/e2e/quests.cjs`.
 - **Cân bằng đồng bộ với 7 ải:** `balance-sim.js --curve`, `run.stageScale.values` theo ải (ải Boss nhẹ hơn ải 6), chỉnh lại `zoneScale`. Chi tiết và chỗ còn lệch ở `docs/BALANCE_LOG.md`.
+
+### v0.53.0
+- **Thành tựu** nằm trong màn Nhiệm vụ (tab "Thành tựu"): 9 thành tựu, mỗi cái nhiều bậc, nhận Linh Thạch (bậc cuối có Vé Triệu Hồi). Đo từ tiến trình sẵn có: ải thắng, trận thắng (bộ đếm mới `stats.battles`), khu chinh phục Dễ/Khó, lần triệu hồi, số tướng, tướng 5★, cấp cao nhất, tướng Thức tỉnh.
+- Logic thuần ở `core/achievements.js`; số liệu ở `config.achievements`; trạng thái `progress.achv` (tùy chọn, không đổi SAVE_VERSION).
+- Chấm đỏ ở tab và nút Nhiệm vụ khi có thưởng chưa nhận.

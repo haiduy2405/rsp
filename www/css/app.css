@@ -958,3 +958,6 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .quest.claimed { opacity: .6; }
 .quest .q-done { flex: none; min-width: 84px; text-align: center; color: #7dffa0; font-weight: 700; }
 .quest.bonus { border-color: #f0b94a; }
+#tab-daily, #tab-achv { position: relative; }
+#tab-daily .red-dot, #tab-achv .red-dot { top: -4px; right: 6px; left: auto; }
+.quest.achv small { display: block; line-height: 1.35; }

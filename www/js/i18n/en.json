@@ -1010,5 +1010,17 @@
   "quest.resetNote": "Resets every day.",
   "err.not_ready": "Not ready yet",
   "err.claimed": "Already claimed",
-  "err.no_quest": "No such quest"
+  "err.no_quest": "No such quest",
+  "achv.wins": "Climbs won",
+  "achv.battles": "Battles won",
+  "achv.zonesEasy": "Conquer zones (Easy)",
+  "achv.zonesHard": "Conquer zones (Hard)",
+  "achv.pulls": "Summons",
+  "achv.heroes": "Collect heroes",
+  "achv.fiveStar": "Collect 5★ heroes",
+  "achv.maxLevel": "Highest hero level",
+  "achv.awakened": "Awakened heroes",
+  "achv.tier": "Tier {n}/{m}",
+  "achv.max": "Completed",
+  "achv.next": "Goal {goal}"
 }

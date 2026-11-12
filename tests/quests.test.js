@@ -48,3 +48,26 @@ test('nhiệm vụ: thưởng thêm khi xong hết, sang ngày mới làm mới'
   assert.equal(next.quests.day, 801);
   assert.equal(next.quests.bonusClaimed, false);
 });
+
+test('thành tựu: đo từ tiến trình, nhận từng bậc đúng thưởng, không nhận khi chưa đủ hoặc đã hết', async () => {
+  const { listAchievements, claimAchievement, hasAchvClaimable, bumpBattles, metric } = await import('../www/js/core/achievements.js');
+  let p = newProgress(ctx);
+  assert.equal(hasAchvClaimable(ctx, p), false);
+  assert.equal(claimAchievement(ctx, p, 'wins').reason, 'not_ready');
+  assert.equal(claimAchievement(ctx, p, 'nope').reason, 'no_quest');
+  p.stats.wins = 12;
+  p.stages.fire = { easy: 7 };
+  assert.equal(metric(ctx, p, 'zonesEasy'), 1);
+  assert.equal(hasAchvClaimable(ctx, p), true);
+  const before = p.inventory.spirit;
+  let r = claimAchievement(ctx, p, 'wins');
+  assert.equal(r.ok, true);
+  assert.equal(r.progress.inventory.spirit, before + ctx.config.achievements.find((a) => a.id === 'wins').tiers[0].reward.spirit);
+  r = claimAchievement(ctx, r.progress, 'wins'); // bậc 2 (goal 10) cũng đủ vì wins=12
+  assert.equal(r.ok, true);
+  assert.equal(listAchievements(ctx, r.progress).find((a) => a.id === 'wins').claimed, 2);
+  assert.equal(claimAchievement(ctx, r.progress, 'wins').reason, 'not_ready'); // bậc 3 cần 50
+  assert.equal(p.achv, undefined); // không sửa bản gốc
+  assert.equal(bumpBattles(p, 3).stats.battles, 3);
+  for (const a of ctx.config.achievements) assert.ok(a.tiers.every((t, i) => i === 0 || t.goal > a.tiers[i - 1].goal), a.id);
+});

@@ -1010,5 +1010,17 @@
   "quest.resetNote": "Làm mới mỗi ngày.",
   "err.not_ready": "Chưa đủ điều kiện",
   "err.claimed": "Đã nhận rồi",
-  "err.no_quest": "Không có nhiệm vụ này"
+  "err.no_quest": "Không có nhiệm vụ này",
+  "achv.wins": "Thắng ải (chuyến leo)",
+  "achv.battles": "Thắng trận",
+  "achv.zonesEasy": "Chinh phục khu (Dễ)",
+  "achv.zonesHard": "Chinh phục khu (Khó)",
+  "achv.pulls": "Triệu hồi",
+  "achv.heroes": "Sưu tầm tướng",
+  "achv.fiveStar": "Sưu tầm tướng 5★",
+  "achv.maxLevel": "Tướng cấp cao nhất",
+  "achv.awakened": "Tướng Thức tỉnh",
+  "achv.tier": "Bậc {n}/{m}",
+  "achv.max": "Hoàn thành",
+  "achv.next": "Mục tiêu {goal}"
 }

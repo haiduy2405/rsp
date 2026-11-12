@@ -23,5 +23,10 @@ const { chromium } = require('playwright');
   const shopQ = await p.locator('[data-quest=shop_free]').count();
   console.log('có nhiệm vụ shop_free hôm nay:', shopQ, shopQ ? '| xong: ' + await p.locator('[data-quest=shop_free].done').count() : '');
   await p.screenshot({ path: `${dir}/q2.png` });
+  await p.evaluate(() => { window.__progress().stats.wins = 12; });
+  await p.click('#tab-achv'); await p.waitForSelector('[data-achv]'); await p.waitForTimeout(300);
+  console.log('thành tựu:', await p.locator('[data-achv]').count(), '| sẵn nhận:', await p.locator('[data-achv].done').count());
+  await p.screenshot({ path: `${dir}/q3.png` });
+  if (await p.locator('#claim-achv-wins:not([disabled])').count()) { await p.click('#claim-achv-wins'); await p.waitForTimeout(300); console.log('nhận thành tựu:', await p.textContent('#quest-msg')); }
   console.log('errors:', errs); await b.close();
 })();

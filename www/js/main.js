@@ -1,6 +1,7 @@
 import { buildCtx, loadRaw } from './core/ctx.js';
 import { hasFreeOffer } from './core/shop.js';
 import { createGuide } from './ui/guide.js';
+import { listAchievements, claimAchievement, hasAchvClaimable, bumpBattles } from './core/achievements.js';
 import { trackQuest, claimQuest, claimBonus, hasClaimable, ensureQuests, isDone, allClaimed } from './core/quests.js';
 import { createRun, runStep, newRunRecord, debugWinBattle, runLayout } from './core/run.js';
 import { stageOpen, tierOpen, stagesDone, zoneClears } from './core/stage.js';
@@ -85,7 +86,7 @@ let seedText = '';
 
 // ---- tiện ích DOM
 let atHub = false;
-const track = (kind, n = 1) => { progress = trackQuest(ctx, progress, ui.dayKey(), kind, n); }; // tiến độ nhiệm vụ hằng ngày
+const track = (kind, n = 1) => { progress = trackQuest(ctx, progress, ui.dayKey(), kind, n); if (kind === 'win_battle') progress = bumpBattles(progress, n); }; // tiến độ nhiệm vụ hằng ngày
 const guide = createGuide($('wrap'));
 const guideStep = () => progress?.onboarding?.guide;
 const guideSet = (step) => { if (step) progress.onboarding.guide = step; else delete progress.onboarding.guide; save(); };
@@ -242,7 +243,7 @@ function showHub() {
       dockBtn('summon', t('hub.summon'), () => ui.showSummon('standard'), 'b-summon', 'sub', progress.summon.freeDay !== ui.dayKey()),
       h('button', { class: 'battle', id: 'b-battle', onclick: () => { if (guideStep() === 'battle') guideSet('zone'); showZones(); }, 'aria-label': t('hub.battle') }, h('img', { src: 'assets/ui/icons/battle.webp', alt: '', draggable: 'false' }), h('span', {}, t('hub.battle'))),
       dockBtn('shop', t('hub.shop'), () => { if (guideStep() === 'shop') guideSet('claim'); ui.showShop(); }, 'b-shop', '', hasFreeOffer(ctx, progress, ui.dayKey())),
-      dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest', '', hasClaimable(ctx, progress, ui.dayKey())),
+      dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest', '', hasClaimable(ctx, progress, ui.dayKey()) || hasAchvClaimable(ctx, progress)),
     ),
   );
   $('screen').classList.add('hub');
@@ -632,6 +633,7 @@ function showTeam(slot, msg, stage) {
 
 // Cửa hàng và Nhiệm vụ: khung chờ, chưa có nội dung (gói ủng hộ ở M6; nhiệm vụ làm sau).
 let questMsg = null;
+let questTab = 'daily';
 function showQuests() {
   progress = ensureQuests(ctx, progress, ui.dayKey());
   const day = ui.dayKey();
@@ -653,13 +655,26 @@ function showQuests() {
   const bonus = h('div', { class: 'card quest bonus' + (all && !q.bonusClaimed ? ' done' : '') + (q.bonusClaimed ? ' claimed' : '') },
     h('div', { class: 'q-info' }, h('b', {}, t('quest.bonus')), h('small', { class: 'muted' }, rewardText(cfg.bonus))),
     q.bonusClaimed ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), () => claim(() => claimBonus(ctx, progress, day)), all ? 'primary' : '', { id: 'claim-bonus', ...(all ? {} : { disabled: '' }) }));
+  const goTab = (tab) => { questTab = tab; questMsg = null; showQuests(); };
+  const achvRows = listAchievements(ctx, progress).map((a) => {
+    const prev = a.claimed ? a.tiers[a.claimed - 1].goal : 0;
+    const goal = a.next ? a.next.goal : a.tiers[a.tiers.length - 1].goal;
+    const pct = a.next ? Math.round((100 * Math.max(0, Math.min(a.value, goal) - prev)) / (goal - prev)) : 100;
+    return h('div', { class: 'card quest achv' + (a.ready ? ' done' : '') + (!a.next ? ' claimed' : ''), 'data-achv': a.id },
+      h('div', { class: 'q-info' }, h('b', {}, t(`achv.${a.id}`)), h('div', { class: 'q-bar' }, h('i', { style: `width:${pct}%` })),
+        h('small', { class: 'muted' }, a.next ? `${Math.min(a.value, goal)}/${goal} · ${rewardText(a.next.reward)} · ${t('achv.tier', { n: a.claimed + 1, m: a.tiers.length })}` : `${t('achv.max')} · ${a.tiers.length}/${a.tiers.length}`)),
+      !a.next ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), () => claim(() => claimAchievement(ctx, progress, a.id)), a.ready ? 'primary' : '', { id: `claim-achv-${a.id}`, ...(a.ready ? {} : { disabled: '' }) }));
+  });
+  const dot = (on) => (on ? h('i', { class: 'red-dot' }) : null);
+  const dailyDot = hasClaimable(ctx, progress, day), achvDot = hasAchvClaimable(ctx, progress);
   screen(
     h('h2', {}, t('hub.quests')),
-    h('div', { class: 'row' }, h('button', { class: 'primary', disabled: '' }, t('quest.daily')), h('button', { disabled: '', title: t('soon.title') }, t('quest.achv'))),
-    h('div', { class: 'muted' }, t('quest.resetNote')),
+    h('div', { class: 'row' },
+      h('button', { class: questTab === 'daily' ? 'primary' : '', id: 'tab-daily', onclick: () => goTab('daily') }, t('quest.daily'), dot(dailyDot)),
+      h('button', { class: questTab === 'achv' ? 'primary' : '', id: 'tab-achv', onclick: () => goTab('achv') }, t('quest.achv'), dot(achvDot))),
+    questTab === 'daily' ? h('div', { class: 'muted' }, t('quest.resetNote')) : null,
     questMsg ? h('div', { class: 'notice', id: 'quest-msg' }, questMsg) : null,
-    rows,
-    bonus,
+    ...(questTab === 'daily' ? [...rows, bonus] : achvRows),
     btn(t('back'), showHub, '', { id: 'back' }),
   );
   questMsg = null;
