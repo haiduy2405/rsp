@@ -135,7 +135,8 @@ function dockBtn(icon, label, onclick, id, cls = '') {
   return b;
 }
 const CUR_COL = { gold: '#ffd24a', spirit: '#b58bff', ticket: '#ff9a4a', shard: '#ff9acb' };
-const curPill = (k, v, id) => h('button', { class: 'cur-pill', ...(id ? { id } : {}), onclick: () => ui.showItems(), 'aria-label': t(`res.${k}`) }, h('img', { src: `assets/ui/items/${k}.webp`, alt: '', draggable: 'false' }), h('b', {}, new Intl.NumberFormat(lang).format(v)));
+const lastCur = {};
+const curPill = (k, v, id) => h('button', { class: 'cur-pill' + (lastCur[k] !== undefined && lastCur[k] !== v ? ' bump' : '') + ((lastCur[k] = v), ''), ...(id ? { id } : {}), onclick: () => ui.showItems(), 'aria-label': t(`res.${k}`) }, h('img', { src: `assets/ui/items/${k}.webp`, alt: '', draggable: 'false' }), h('b', {}, new Intl.NumberFormat(lang).format(v)));
 const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } : {}) }, label, h('b', {}, String(value)));
 
 // Cảnh chính: Tòa Tháp giữa các đảo nổi. Mỗi khu mở là một viên ngọc phát sáng trên đảo (chạm để vào khu).
@@ -160,6 +161,7 @@ ${orbs}
 </svg>`;
   const box = h('div', { class: 'hub-scene' + (DEBUG ? ' static' : '') });
   box.innerHTML = svg;
+  if (!DEBUG) for (let i = 0; i < 12; i++) box.appendChild(h('i', { class: 'spark', style: `left:${(i * 37 + 11) % 92 + 3}%;top:${(i * 53 + 17) % 62 + 8}%;animation-delay:${(i * 0.83).toFixed(2)}s;animation-duration:${(5 + (i % 4)).toFixed(0)}s` })); // đom đóm bay quanh Tháp
   box.querySelectorAll('[data-zone]').forEach((n) => {
     const go = () => showStages(n.getAttribute('data-zone'));
     n.addEventListener('click', go);

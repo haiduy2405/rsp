@@ -386,6 +386,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         await sleep(Math.max(350, wait));
       } else if (e.type === 'enemyAttack') {
         view.shake = { enemy: e.enemy };
+        view.lunge = { enemy: e.enemy, age: 0 }; // quái lao về phía đội khi tấn công
         if (e.amount > 0) {
           view.hurt = 1;
           fx.sfx('hurt');
@@ -696,6 +697,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     }
     view.particles = view.particles.filter((q) => q.age < q.life);
     view.hurt = Math.max(0, view.hurt - dt / 450);
+    if (view.lunge) { view.lunge.age += dt; if (view.lunge.age > 520) view.lunge = null; }
     for (const r of view.rings) r.age += dt;
     view.rings = view.rings.filter((r) => r.age < r.life);
     for (const sh of view.shots) {

@@ -341,11 +341,14 @@ export function draw(g, view, t) {
     if (!getImg(`monster:${e.id}`)) g.fillRect(cx - 70 + sh, 90, 140, 150);
     g.globalAlpha = dead ? 1 - dk : 1;
     const mi = getImg(`monster:${e.id}`);
-    const sc = 1 + 0.08 * (e.hit || 0) + dk * 0.35;
+    // Lao tới khi tấn công: phóng to + trượt xuống rồi lùi về (view.lunge.age 0..520ms).
+    const lk = view.lunge && view.lunge.enemy === i ? Math.sin(Math.min(1, view.lunge.age / 520) * Math.PI) : 0;
+    const sc = 1 + 0.08 * (e.hit || 0) + dk * 0.35 + 0.22 * lk;
     if (mi) {
-      const bob = dead ? 0 : Math.sin(t * 0.003 + i) * 3;
+      const bob = dead ? 0 : Math.sin(t * 0.003 + i) * 3 + lk * 46;
       const sz = 150 * sc;
-      g.drawImage(mi, cx + sh - sz / 2, 165 - sz / 2 + bob, sz, sz);
+      const br = dead ? 0 : Math.sin(t * 0.0042 + i * 1.7) * 0.025; // thở: co giãn dọc, chân đứng yên
+      g.drawImage(mi, cx + sh - sz / 2 * (1 - br), 165 - sz / 2 + bob - sz * br, sz * (1 - br), sz * (1 + br));
     } else drawOrb(g, e.element, cx + sh, 160, 46 * (1 + 0.12 * (e.hit || 0)));
     if (e.effects?.length && !dead) statusFx(g, e.effects, cx + sh, 160, t);
     if (e.hit) {

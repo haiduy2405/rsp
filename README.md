@@ -234,3 +234,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.33.3
 - Nút Thức tỉnh to, vàng sáng khi đủ nguyên liệu (mờ khi thiếu); thẻ thưởng màn kết quả chuyển nâu ấm.
+
+## v0.34.0 — Animation
+- Quái thở nhẹ + lao tới khi tấn công; nút lún khi bấm; danh sách ải trượt vào, ải sẵn sàng nhấp nháy, boss phát lửa.
+- Bảng/hộp thoại bật lên; chi tiết tướng vào sân; nút Thức tỉnh phát sáng khi đủ điều kiện; tiền tệ nảy khi đổi; đom đóm ở màn chính.
+- Tôn trọng `prefers-reduced-motion`.

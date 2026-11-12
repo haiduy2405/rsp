@@ -197,7 +197,7 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 .back-top:active { transform: scale(.92); }
 
 .slot-sel { border-color: #ffcf7a !important; background: linear-gradient(180deg, rgba(255, 190, 90, .26), rgba(44, 26, 15, .9)) !important; box-shadow: 0 0 0 2px #ffcf7a, 0 0 18px rgba(255, 190, 90, .5) !important; }
-@keyframes selpulse { 50% { box-shadow: 0 0 0 2px #7dffa0, 0 0 28px rgba(125, 255, 160, .85); } }
+@keyframes selpulse { 50% { box-shadow: 0 0 0 2px #ffcf7a, 0 0 28px rgba(255, 190, 90, .85); } }
 .sel-tag { color: #7dffa0; font-weight: 800; }
 .in-team { color: #7dffa0; font-weight: 700; }
 
@@ -562,3 +562,65 @@ details.card[open] > summary { margin-bottom: 8px; }
 #awaken { width: 100%; padding: 14px; font: 800 20px var(--serif); letter-spacing: .3px; }
 #awaken.ready { color: #2a1503; border-color: #7a4a14; background: linear-gradient(180deg, #ffe08a, #e8a23a); box-shadow: 0 0 0 2px rgba(255, 207, 122, .5), 0 0 22px rgba(255, 190, 90, .5); }
 #awaken.notready { opacity: .55; }
+
+/* ===== Animation pass (v0.34.0) ===== */
+/* Nút: nhấn lún, rê tay sáng lên */
+button { transition: transform .12s ease-out, filter .15s, box-shadow .2s; }
+button:active:not(:disabled) { transform: scale(.95); filter: brightness(.92); }
+@media (hover: hover) { button:hover:not(:disabled):not(.locked) { filter: brightness(1.1); } }
+/* Thẻ bấm được: lún khi chạm */
+.card.btn, .tile, .slot { transition: transform .14s ease-out, box-shadow .2s, filter .15s; }
+.card.btn:active:not(.locked), .tile:active, .slot:active { transform: scale(.975); }
+/* Danh sách vào lần lượt (tối đa 8 mục đầu) */
+@keyframes listIn { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
+.stagelist > *, #screen.show > .card.btn { animation: listIn .38s cubic-bezier(.2, .9, .25, 1) both; }
+.stagelist > :nth-child(1), #screen.show > .card.btn:nth-of-type(1) { animation-delay: .04s; }
+.stagelist > :nth-child(2), #screen.show > .card.btn:nth-of-type(2) { animation-delay: .09s; }
+.stagelist > :nth-child(3), #screen.show > .card.btn:nth-of-type(3) { animation-delay: .14s; }
+.stagelist > :nth-child(4), #screen.show > .card.btn:nth-of-type(4) { animation-delay: .19s; }
+.stagelist > :nth-child(5), #screen.show > .card.btn:nth-of-type(5) { animation-delay: .24s; }
+.stagelist > :nth-child(6), #screen.show > .card.btn:nth-of-type(6) { animation-delay: .29s; }
+.stagelist > :nth-child(n+7), #screen.show > .card.btn:nth-of-type(n+7) { animation-delay: .34s; }
+/* Ải sẵn sàng đánh: viền nhịp thở; boss: ánh lửa */
+@keyframes readyPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 190, 90, 0); } 50% { box-shadow: 0 0 16px 2px rgba(255, 190, 90, .55); } }
+@keyframes bossFlame { 0%, 100% { box-shadow: 0 0 10px rgba(255, 110, 60, .35); } 50% { box-shadow: 0 0 24px 3px rgba(255, 110, 60, .7); } }
+.gate.stage:not(.locked):not(.clear) { animation: listIn .38s both, readyPulse 1.8s ease-in-out .5s infinite; }
+.gate.stage.boss:not(.locked) { animation: listIn .38s both, bossFlame 1.6s ease-in-out .5s infinite; }
+.gate.stage.boss .snum { animation: bob 2.2s ease-in-out infinite; }
+.gate.stage.clear .snum { animation: popIn .4s ease-out both; }
+/* Tab độ khó đang chọn */
+.tiertabs .tier.on { animation: popIn .3s ease-out; }
+@keyframes popIn { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+/* Hộp thông tin / bảng: bật lên */
+@keyframes boxPop { from { opacity: 0; transform: translateY(14px) scale(.94); } to { opacity: 1; transform: none; } }
+.infobox { animation: boxPop .26s cubic-bezier(.2, 1.2, .3, 1) both; }
+/* Chi tiết tướng: tranh vào + ngôi sao lấp lánh, thanh EXP chạy */
+@keyframes artIn { from { opacity: 0; transform: translateY(16px) scale(.92); } to { opacity: 1; transform: none; } }
+@keyframes starGlint { 0%, 80%, 100% { filter: brightness(1); } 90% { filter: brightness(1.8) drop-shadow(0 0 4px #ffe08a); } }
+.hp-art { animation: artIn .45s cubic-bezier(.2, .9, .25, 1) both; }
+.hp-el { animation: popIn .4s ease-out .1s both; }
+.hp-head .stars { animation: starGlint 3.2s ease-in-out 1s infinite; }
+.hp-exp .bar > *, .hp-exp [class*="fill"] { transition: width .6s cubic-bezier(.2, .9, .25, 1); }
+.hp-skill { animation: listIn .35s both; }
+.hp-skill:nth-of-type(2) { animation-delay: .06s; } .hp-skill:nth-of-type(3) { animation-delay: .12s; } .hp-skill:nth-of-type(4) { animation-delay: .18s; }
+/* Nút Thức tỉnh sẵn sàng: nhịp sáng */
+@keyframes awakenGlow { 0%, 100% { box-shadow: 0 0 0 2px rgba(255, 207, 122, .5), 0 0 18px rgba(255, 190, 90, .4); } 50% { box-shadow: 0 0 0 3px rgba(255, 224, 150, .85), 0 0 34px rgba(255, 190, 90, .85); } }
+#awaken.ready { animation: awakenGlow 1.5s ease-in-out infinite; }
+/* Đội hình: ô vừa được đặt tướng bật lên, ô đang chọn nhịp thở */
+.slot-sel { animation: selpulse 1.2s ease-in-out infinite; }
+.slot > div:not(.plus) { animation: popIn .3s ease-out; }
+/* Màn chính: tiền nháy khi đổi, chấm thông báo nhịp tim, dock nhún nhẹ */
+@keyframes bump { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+.cur-pill.bump b { animation: bump .45s ease-out; }
+.dock button:not(.battle) img { transition: transform .2s; }
+.dock button:not(.battle):active img { transform: translateY(-4px) scale(1.12); }
+/* Toast / thông báo nổi */
+.notice { animation: listIn .35s both; }
+@media (prefers-reduced-motion: reduce) {
+  .stagelist > *, .gate.stage, .infobox, .hp-art, .hp-el, .hp-skill, .hp-head .stars, #awaken.ready, .slot-sel, .slot > div, .tiertabs .tier.on, .notice, #screen.show > .card.btn { animation: none !important; }
+}
+
+/* Màn chính: đom đóm bay lên quanh Tháp */
+@keyframes spark { 0% { opacity: 0; transform: translate(0, 12px) scale(.5); } 25% { opacity: .95; } 100% { opacity: 0; transform: translate(14px, -46px) scale(1.1); } }
+.hub-scene .spark { position: absolute; width: 6px; height: 6px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff6cf 0%, #ffd77a 45%, rgba(255, 215, 122, 0) 72%); animation: spark 6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hub-scene .spark { animation: none !important; } }
