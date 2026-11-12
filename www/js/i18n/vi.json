@@ -840,5 +840,8 @@
   "ob.photo": "Dùng ảnh của bạn",
   "ob.photoClear": "Bỏ ảnh",
   "ob.bad.bad_photo": "Ảnh không hợp lệ.",
-  "ob.bad.bad_image": "Không đọc được ảnh này."
+  "ob.bad.bad_image": "Không đọc được ảnh này.",
+  "end.firstClear": "Lần clear đầu: +{n} Linh Thạch",
+  "stage.info.firstClear": "Thưởng clear lần đầu",
+  "stage.info.claimed": "đã nhận"
 }

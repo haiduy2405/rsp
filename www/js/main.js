@@ -2,7 +2,7 @@ import { buildCtx, loadRaw } from './core/ctx.js';
 import { createRun, runStep, newRunRecord, debugWinBattle } from './core/run.js';
 import { stageOpen, clearsOf, zoneClears } from './core/stage.js';
 import { stageInfo } from './core/stageinfo.js';
-import { applyRunResult } from './core/progress.js';
+import { applyRunResult, firstClearSpirit } from './core/progress.js';
 import { createStorage, browserAdapter } from './save/storage.js';
 import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useElixir, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
@@ -107,7 +107,6 @@ const lootLine = (l) => {
   const parts = [];
   if (l.gold) parts.push(`${t('res.gold')} ${l.gold >= 0 ? '+' : ''}${l.gold}`);
   for (const tier of [1, 2, 3]) if (l.elixir?.[tier]) parts.push(`${t(`res.elixir.${tier}`)} +${l.elixir[tier]}`);
-  if (l.spirit) parts.push(`${t('res.spirit')} +${l.spirit}`);
   if (l.shards) parts.push(`${t('res.shard')} +${l.shards}`);
   for (const [k, n] of Object.entries(l.fodder || {})) parts.push(`${fodderName(k)} +${n}`);
   for (const [k, n] of Object.entries(l.offerings || {})) parts.push(`${offeringName(k)} +${n}`);
@@ -337,7 +336,7 @@ function showStageInfo(zoneId, diff) {
       row(t('stage.info.floors'), String(si.floors)),
       h('small', { class: 'muted' }, `${t('door.normal')}: ${names(si.monsters.normal)}`), h('small', { class: 'muted' }, `Elite: ${names(si.monsters.elite)}`), h('small', { class: 'muted' }, `Boss: ${names(si.monsters.boss)}`)),
     h('div', { class: 'si-sec' }, h('b', {}, t('affix.title')), aff, h('small', { class: 'muted' }, si.affixPool.map((a) => t(`affix.${a}`)).join(', '))),
-    h('div', { class: 'si-sec' }, h('b', {}, t('stage.info.loot')), h('small', { class: 'muted' }, t('diff.reward', { gold: si.gold, drop: si.drop })), src,
+    h('div', { class: 'si-sec' }, h('b', {}, t('stage.info.loot')), row(t('stage.info.firstClear'), progress.clears[zoneId]?.[diff] ? t('stage.info.claimed') : `${si.firstClear} ${t('res.spirit')}`), h('small', { class: 'muted' }, t('diff.reward', { gold: si.gold, drop: si.drop })), src,
       h('small', { class: 'muted' }, `${t('stage.info.offering')} ${si.races.map((r) => t(`race.${r}`)).join(', ')}: ${tiers}`)),
   ];
   $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox stageinfo' }, ...body, btn(t('info.close'), close, 'primary', { id: 'info-close' }))));
@@ -1438,7 +1437,6 @@ function lootRows(l) {
   for (const [k, n] of Object.entries(l.offerings || {})) rows.push({ k: 'offering', label: offeringName(k), n, rare: Number(k.split('_')[1]) >= 2 });
   for (const [k, n] of Object.entries(l.fodder || {})) rows.push({ k: 'fodder', label: fodderName(k), n, rare: ctx.fodder[k].star === 2 });
   if (l.shards) rows.push({ k: 'shard', label: t('res.shard'), n: l.shards, rare: true });
-  if (l.spirit) rows.push({ k: 'spirit', label: t('res.spirit'), n: l.spirit, rare: true });
   if (l.stones?.normal) rows.push({ k: 'stoneN', label: `${t('res.stone')} ${t('stone.normal')}`, n: l.stones.normal });
   if (l.stones?.rare) rows.push({ k: 'stoneR', label: `${t('res.stone')} ${t('stone.rare')}`, n: l.stones.rare, rare: true });
   return rows;
@@ -1563,9 +1561,11 @@ function showShop() {
 
 let savedThisRun = false;
 let endLevels = [];
+let firstClear = 0;
 function showEnd() {
   if (!savedThisRun) {
     const before = progress;
+    firstClear = run.result === 'won' && !before.clears[run.zoneId]?.[run.diff] ? firstClearSpirit(ctx, run.zoneId, run.diff) : 0;
     progress = applyRunResult(ctx, progress, run);
     endLevels = progress.team.filter(Boolean).map((id) => ({ id, from: before.characters[id].level, to: progress.characters[id].level })).filter((x) => x.to > x.from);
     delete progress.activeRun;
@@ -1578,6 +1578,7 @@ function showEnd() {
     h('h1', {}, t(won ? 'end.won' : 'end.lost')),
     floorTitle(),
     h('div', { class: 'card' }, h('b', {}, t('end.loot')), h('p', {}, lootLine(run.loot))),
+    firstClear ? h('div', { class: 'card notice', id: 'end-first' }, t('end.firstClear', { n: firstClear })) : null,
     run.heroExp ? h('div', { class: 'card', id: 'end-exp' }, h('b', {}, t('result.heroExp', { n: run.heroExp })), endLevels.map((x) => h('div', { class: 'muted' }, t('result.levelUp', { name: t(`char.${x.id}`), lv: x.to })))) : null,
     won ? h('div', { class: 'muted' }, t('end.completion')) : h('div', { class: 'notice' }, t('end.noCompletion')),
     run.pityGranted ? h('div', { class: 'notice' }, t('end.pity')) : null,

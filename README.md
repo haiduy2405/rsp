@@ -144,3 +144,7 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## Avatar (v0.21)
 - 12 avatar phi hành gia vẽ SVG (`ui/avatar.js`): nam/nữ, trẻ/trung niên/già, 6 tông da. Người chơi cũng có thể tải ảnh riêng (cắt vuông, thu 128px JPEG, lưu trong save, giới hạn `config.onboarding.photoMax`).
+
+## Linh Thạch chỉ từ lần clear đầu (v0.23)
+- Loot thường không còn rớt Linh Thạch. Mỗi ải (khu × độ khó) tặng Linh Thạch một lần ở lần clear đầu (`config.firstClear`: Dễ 60 / Thường 100 / Khó 150, +10%/khu). Hiện trong thông tin ải và màn kết thúc.
+- Nguồn Linh Thạch khác (nhiệm vụ ngày, mốc tiến trình, sự kiện, gói ủng hộ) sẽ thêm ở bản online.

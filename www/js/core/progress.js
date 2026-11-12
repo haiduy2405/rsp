@@ -6,6 +6,12 @@ import { grantExp } from './upgrade.js';
 // Tiến trình người chơi (dữ liệu được lưu). Hàm thuần: nhận progress, trả progress mới.
 export const SAVE_VERSION = 9;
 
+// Linh Thạch thưởng lần clear đầu tiên của một ải: gốc theo độ khó, tăng theo khu (config.firstClear).
+export function firstClearSpirit(ctx, zoneId, diff) {
+  const f = ctx.config.firstClear;
+  return Math.round(f.spirit[diff] * (1 + f.zoneGrowth * ctx.zones[zoneId].order));
+}
+
 export const DEFAULT_TEAM = ['thetis', 'bennu', 'atalanta', 'eos', 'eir'];
 
 export function newProgress(ctx) {
@@ -61,7 +67,6 @@ export function applyRunResult(ctx, progress, run) {
   const inv = p.inventory;
   inv.gold += run.loot.gold;
   for (const t of [1, 2, 3]) inv.elixir[t] += run.loot.elixir[t];
-  inv.spirit += run.loot.spirit;
   inv.shards += run.loot.shards;
   inv.stones[zone.element].normal += run.loot.stones.normal;
   inv.stones[zone.element].rare += run.loot.stones.rare;
@@ -73,6 +78,7 @@ export function applyRunResult(ctx, progress, run) {
   if (run.result === 'won') {
     p.stats.wins += 1;
     const c = (p.clears[run.zoneId] ??= {});
+    if (!c[run.diff]) inv.spirit += firstClearSpirit(ctx, run.zoneId, run.diff); // Linh Thạch chỉ tặng lần clear đầu của mỗi ải (khu × độ khó)
     c[run.diff] = (c[run.diff] || 0) + 1;
     const next = ctx.zoneList[zone.order + 1];
     if (run.diff === ctx.config.difficulty.order[0] && next && !p.unlocked.includes(next.id)) p.unlocked.push(next.id); // thắng Dễ mở khu kế

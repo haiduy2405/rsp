@@ -61,3 +61,18 @@ test('save: migrate v4 lên v5 đổi clears thành theo độ khó và ', () =>
   assert.deepEqual(out.clears, { zone_water: { easy: 3 } });
   assert.ok(isValidProgress(out));
 });
+
+test('Linh Thạch chỉ thưởng lần clear đầu của mỗi ải (khu × độ khó), loot thường không rớt Linh Thạch', async () => {
+  const { newProgress, applyRunResult, firstClearSpirit } = await import('../www/js/core/progress.js');
+  const p = newProgress(ctx);
+  const mkEnd = (diff) => ({ phase: 'end', result: 'won', zoneId: 'zone_water', diff, loot: { gold: 0, elixir: { 1: 0, 2: 0, 3: 0 }, shards: 0, stones: { normal: 0, rare: 0 }, fodder: {}, offerings: {} }, rareMissed: false, heroExp: 0 });
+  const a = applyRunResult(ctx, p, mkEnd('easy'));
+  assert.equal(a.inventory.spirit, firstClearSpirit(ctx, 'zone_water', 'easy'));
+  assert.ok(a.inventory.spirit > 0);
+  const b = applyRunResult(ctx, a, mkEnd('easy'));
+  assert.equal(b.inventory.spirit, a.inventory.spirit, 'clear lại không thêm');
+  const c = applyRunResult(ctx, b, mkEnd('normal'));
+  assert.ok(c.inventory.spirit > b.inventory.spirit, 'độ khó khác là ải mới');
+  assert.ok(firstClearSpirit(ctx, 'zone_fire', 'easy') > firstClearSpirit(ctx, 'zone_water', 'easy'));
+  for (const kind of Object.keys(ctx.config.loot)) assert.equal(ctx.config.loot[kind].spirit, undefined);
+});

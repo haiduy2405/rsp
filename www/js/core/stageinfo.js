@@ -1,3 +1,4 @@
+import { firstClearSpirit } from './progress.js';
 // Thông tin một ải (khu x độ khó) cho màn xem chi tiết: hệ số quái, quái trong khu, tỉ lệ đặc tính và bảng rớt.
 // Tính cùng công thức với rollLoot/startBattle, không gọi rng.
 
@@ -21,7 +22,6 @@ export function stageInfo(ctx, zoneId, diff) {
       add('stone.rare', spec.stone.rareChance, [1, 1]);
     }
     if (spec.shard) add('shard', spec.shard.chance, spec.shard.count);
-    if (spec.spirit) add('spirit', spec.spirit.chance, spec.spirit.count);
     if (spec.fodder) add('fodder', spec.fodder.chance, spec.fodder.count);
     if (spec.offering) add('offering', spec.offering.chance, spec.offering.count);
     for (const [tier, e] of Object.entries(spec.elixir || {})) add(`elixir.${tier}`, e.chance, e.count);
@@ -46,6 +46,7 @@ export function stageInfo(ctx, zoneId, diff) {
     races: [...new Set(zone.monsters.normal.map((m) => ctx.monsters[m].race))],
     affix,
     affixPool: Object.keys(ac.list).filter((id) => (ac.list[id].minZone ?? 0) <= zone.order),
+    firstClear: firstClearSpirit(ctx, zoneId, diff),
     sources,
     tiers,
     gold: d.gold,

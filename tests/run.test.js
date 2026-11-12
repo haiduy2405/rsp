@@ -380,7 +380,7 @@ test('fuzz: 200 chuyến bot ngẫu nhiên luôn kết thúc, tài nguyên hợp
     assert.equal(run.phase, 'end');
     assert.ok(run.hp >= 0 && run.hp <= run.maxHp);
     const l = run.loot;
-    for (const v of [l.gold, l.elixir[1], l.elixir[2], l.elixir[3], l.spirit, l.shards, l.stones.normal, l.stones.rare]) assert.ok(Number.isInteger(v) && v >= 0);
+    for (const v of [l.gold, l.elixir[1], l.elixir[2], l.elixir[3], l.shards, l.stones.normal, l.stones.rare]) assert.ok(Number.isInteger(v) && v >= 0);
     if (run.result === 'won') {
       won++;
       assert.ok(run.completion);

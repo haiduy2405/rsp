@@ -840,5 +840,8 @@
   "ob.photo": "Use your own photo",
   "ob.photoClear": "Remove photo",
   "ob.bad.bad_photo": "Invalid photo.",
-  "ob.bad.bad_image": "Couldn't read this image."
+  "ob.bad.bad_image": "Couldn't read this image.",
+  "end.firstClear": "First clear: +{n} Spirit Gems",
+  "stage.info.firstClear": "First-clear bonus",
+  "stage.info.claimed": "claimed"
 }

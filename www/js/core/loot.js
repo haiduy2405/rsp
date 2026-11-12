@@ -1,6 +1,6 @@
 // Loot: số lượng và tỉ lệ nằm trong config.loot. Mọi ngẫu nhiên qua rng truyền vào.
 export function emptyLoot() {
-  return { gold: 0, elixir: { 1: 0, 2: 0, 3: 0 }, spirit: 0, shards: 0, stones: { normal: 0, rare: 0 }, fodder: {}, offerings: {} };
+  return { gold: 0, elixir: { 1: 0, 2: 0, 3: 0 }, shards: 0, stones: { normal: 0, rare: 0 }, fodder: {}, offerings: {} };
 }
 
 // Cộng hai bảng đếm { khóa: số } (không sửa đầu vào).
@@ -14,7 +14,6 @@ export function addLoot(a, b) {
   return {
     gold: a.gold + b.gold,
     elixir: { 1: a.elixir[1] + b.elixir[1], 2: a.elixir[2] + b.elixir[2], 3: a.elixir[3] + b.elixir[3] },
-    spirit: a.spirit + b.spirit,
     shards: a.shards + b.shards,
     stones: { normal: a.stones.normal + b.stones.normal, rare: a.stones.rare + b.stones.rare },
     fodder: mergeCounts(a.fodder, b.fodder),
@@ -39,7 +38,6 @@ export function rollLoot(ctx, kind, rng, diff = 'easy', element = 0, races = [],
     if (rng.next() < chance(spec.stone.rareChance)) out.stones.rare = 1;
   }
   if (spec.shard && rng.next() < chance(spec.shard.chance)) out.shards = between(rng, spec.shard.count);
-  if (spec.spirit && rng.next() < chance(spec.spirit.chance)) out.spirit = between(rng, spec.spirit.count);
   // Tiểu Linh (quái cùi) của hệ khu vực: 1★ hay gặp, 2★ hiếm hơn và hiếm hơn nữa ở độ khó thấp.
   if (spec.fodder && rng.next() < chance(spec.fodder.chance)) {
     const n = between(rng, spec.fodder.count);
