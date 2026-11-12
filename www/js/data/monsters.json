@@ -18,7 +18,7 @@
   {
     "id": "m_shade",
     "element": 4,
-    "race": "linh",
+    "race": "nhan",
     "hp": 4500,
     "atk": 320,
     "attackEvery": 3
@@ -35,7 +35,7 @@
   {
     "id": "water_n2",
     "element": 0,
-    "race": "thu",
+    "race": "long",
     "hp": 2800,
     "atk": 190,
     "attackEvery": 2,
@@ -44,7 +44,7 @@
   {
     "id": "water_e1",
     "element": 0,
-    "race": "long",
+    "race": "thu",
     "hp": 7350,
     "atk": 420,
     "attackEvery": 3,
@@ -81,7 +81,7 @@
   {
     "id": "fire_n1",
     "element": 1,
-    "race": "long",
+    "race": "thu",
     "hp": 1870,
     "atk": 195,
     "attackEvery": 3,
@@ -90,7 +90,7 @@
   {
     "id": "fire_n2",
     "element": 1,
-    "race": "thu",
+    "race": "linh",
     "hp": 1870,
     "atk": 150,
     "attackEvery": 2,
@@ -99,7 +99,7 @@
   {
     "id": "fire_e1",
     "element": 1,
-    "race": "linh",
+    "race": "thu",
     "hp": 4730,
     "atk": 325,
     "attackEvery": 3,
@@ -136,7 +136,7 @@
   {
     "id": "wood_n1",
     "element": 2,
-    "race": "thu",
+    "race": "linh",
     "hp": 1800,
     "atk": 190,
     "attackEvery": 3,
@@ -154,7 +154,7 @@
   {
     "id": "wood_e1",
     "element": 2,
-    "race": "linh",
+    "race": "long",
     "hp": 4400,
     "atk": 310,
     "attackEvery": 3,
@@ -170,7 +170,7 @@
   {
     "id": "wood_b1",
     "element": 2,
-    "race": "than",
+    "race": "long",
     "hp": 9400,
     "atk": 380,
     "attackEvery": 3,
@@ -209,7 +209,7 @@
   {
     "id": "light_e1",
     "element": 3,
-    "race": "than",
+    "race": "linh",
     "hp": 4500,
     "atk": 320,
     "attackEvery": 3,
@@ -246,7 +246,7 @@
   {
     "id": "dark_n1",
     "element": 4,
-    "race": "thu",
+    "race": "linh",
     "hp": 1750,
     "atk": 185,
     "attackEvery": 3,
@@ -255,7 +255,7 @@
   {
     "id": "dark_n2",
     "element": 4,
-    "race": "nhan",
+    "race": "linh",
     "hp": 1750,
     "atk": 145,
     "attackEvery": 2,
@@ -264,7 +264,7 @@
   {
     "id": "dark_e1",
     "element": 4,
-    "race": "linh",
+    "race": "nhan",
     "hp": 4020,
     "atk": 290,
     "attackEvery": 3,
@@ -280,7 +280,7 @@
   {
     "id": "dark_b1",
     "element": 4,
-    "race": "long",
+    "race": "thu",
     "hp": 8650,
     "atk": 350,
     "attackEvery": 3,
@@ -310,7 +310,7 @@
   {
     "id": "heart_n2",
     "element": 2,
-    "race": "thu",
+    "race": "linh",
     "hp": 1440,
     "atk": 130,
     "attackEvery": 2,
@@ -335,7 +335,7 @@
   {
     "id": "heart_b1",
     "element": 2,
-    "race": "than",
+    "race": "linh",
     "hp": 6860,
     "atk": 305,
     "attackEvery": 3,

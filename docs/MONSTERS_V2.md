@@ -1,4 +1,4 @@
-# Đổi quái sang phản diện nổi tiếng (bản đề xuất, chờ Duy duyệt)
+# Đổi quái sang phản diện nổi tiếng (đã duyệt, triển khai v0.46.0)
 
 ## Nguyên tắc
 - Chỉ dùng tên và hình tượng từ thần thoại, truyền thuyết, văn học dân gian đã thuộc phạm vi công cộng; thiết kế, mô tả, art là của riêng game. Không dùng nhân vật, tên riêng, ngoại hình của phim, game, truyện có bản quyền.
@@ -41,3 +41,8 @@
 1. Duyệt hoặc đổi tên trong bảng (đặc biệt Boss: Leviathan, Typhon, Hydra, Sphinx, Cerberus, Cửu Vĩ Hồ).
 2. Art: ảnh hiện tại (sứa, cua, rắn tro...) không khớp tên mới. Phương án: đổi tên ngay, giữ ảnh cũ tạm; hoặc Duy cấp ảnh mới rồi mới đổi. Tên tệp ảnh giữ theo id nên thay ảnh là chép đè.
 3. Tộc (race) của quái quyết định Lễ Vật rớt. Mặc định giữ nguyên tộc hiện tại; nếu muốn khớp hơn (ví dụ Ifrit = Linh, Typhon = Thần) thì nói mình chỉnh.
+
+## Đã làm (v0.46.0)
+- Duyệt nguyên bảng. Đã đổi tên VI/EN, art mới cho cả 27 quái (sinh bằng ChatGPT, nhập bằng `tools/art-import-mon.py`), id giữ nguyên.
+- Lamia, Siren, Pixie vẽ lại bản kín đáo cho phù hợp mọi lứa tuổi.
+- Tộc chỉnh cho khớp: Thuồng Luồng/Nidhogg/Hydra = Long; Kappa/Kraken/Salamander/Chimera/Griffin/Cerberus = Thú; Ifrit/Leshy/Mandrake/Ma Trơi/Golem/Ghoul/Banshee/Siren/Pixie/Cửu Vĩ Hồ/Imp/Nixie = Linh; Baba Yaga/Lamia/Goblin = Nhân; Leviathan = Long; Typhon/Sphinx = Thần.

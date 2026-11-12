@@ -337,3 +337,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - 6 bài cố định (bàn, đội, quái, đường kéo nằm trong config.tutorial, mọi tài khoản giống nhau): kéo ngang, dọc, xa 3 ô, dùng kỹ năng, kéo chéo, combo nhiều cụm; sau đó tự do đến khi thắng.
 - Phải kéo đúng đường chỉ định, sai thì trả bàn và nhắc kéo lại. Ô tiêu đề đổi thành "Bài n/6".
 - Đội tutorial cố định: Kiện Lên Trời, Bennu, Fenrir, Heimdall, Eir. Test e2e: tests/e2e/tutorial.cjs.
+
+## v0.46.0 — Quái phản diện thần thoại
+- 27 quái đổi sang phản diện thần thoại/truyền thuyết (Kappa, Kraken, Leviathan, Typhon, Hydra, Sphinx, Cerberus, Cửu Vĩ Hồ...), art mới, tộc khớp lại. Chi tiết: docs/MONSTERS_V2.md.
