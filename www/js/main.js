@@ -83,7 +83,15 @@ const screen = (...kids) => {
   game?.destroy();
   game = null;
   const el = $('screen');
-  el.replaceChildren(...kids.flat().filter(Boolean));
+  const list = kids.flat().filter(Boolean);
+  el.replaceChildren(...list);
+  // Nút quay lại cố định góc trái trên: cùng hành động với nút "Quay lại" ở cuối trang.
+  const bottom = el.querySelector('#back:not(.primary)');
+  if (bottom) {
+    const b = h('button', { class: 'back-top', id: 'back-top', 'aria-label': t('back'), onclick: () => bottom.click() });
+    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6L3 12l6 6"/><path d="M3 12h11a6 6 0 0 1 6 6v1"/></svg>';
+    el.prepend(h('div', { class: 'back-wrap' }, b));
+  }
   el.classList.add('show');
   el.scrollTop = 0;
 };
@@ -342,7 +350,7 @@ function showTeam(slot, msg, zoneId) {
 // Kho: toàn bộ tài nguyên đang có.
 function showItems() {
   const inv = progress.inventory;
-  const row = (label, value, col) => h('div', { class: 'card item-row' }, h('i', { style: `background:${col}` }), h('span', {}, label), h('b', {}, new Intl.NumberFormat(lang).format(value)));
+  const row = (label, value, col) => h('div', { class: 'card item-row' }, h('i', { style: `background:${col}` }), h('span', {}, label), h('b', {}, typeof value === 'number' ? new Intl.NumberFormat(lang).format(value) : value));
   screen(
     h('h2', {}, t('hub.items')),
     h('h3', {}, t('items.currency')),

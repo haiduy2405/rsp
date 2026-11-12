@@ -175,3 +175,8 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 .item-row i { width: 14px; height: 14px; border-radius: 50%; flex: none; }
 .item-row span { flex: 1; text-align: left; }
 .item-row b { font-family: 'Oswald', var(--sans); color: var(--gold-hi); }
+
+.back-wrap { position: sticky; top: 0; z-index: 20; height: 0; width: 100%; overflow: visible; align-self: flex-start; }
+.back-top { position: absolute; left: -4px; top: -4px; width: 46px; height: 46px; min-height: 0; padding: 0; display: grid; place-items: center; clip-path: none; border-radius: 50%; background: rgba(8, 10, 34, .82); border: 1px solid var(--gold); box-shadow: 0 2px 10px rgba(0, 0, 0, .5); backdrop-filter: blur(6px); color: var(--gold-hi); }
+.back-top svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.back-top:active { transform: scale(.92); }
