@@ -23,6 +23,13 @@ function towerSVG() {
 <path d="M200 190 L216 230 L200 250 L184 230Z" fill="#ffe9ad" class="ld-gem"/></g></svg>`;
 }
 
+function enterFullscreen() {
+  const d = document.documentElement;
+  const standalone = matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches || navigator.standalone === true;
+  if (standalone || document.fullscreenElement || !d.requestFullscreen) return; // iOS Safari không hỗ trợ; app cài sẵn đã toàn màn hình
+  try { d.requestFullscreen({ navigationUI: 'hide' })?.catch(() => {}); } catch { /* bị từ chối: bỏ qua */ }
+}
+
 // Trả { el, setProgress(0..1), ready(): Promise } — ready() hiện lời nhắc "chạm để vào" và resolve khi người chơi chạm.
 export function createLoading({ t, title, subtitle, auto = false }) {
   const el = document.createElement('div');
@@ -77,7 +84,16 @@ export function createLoading({ t, title, subtitle, auto = false }) {
     if (auto) { clearInterval(timer); resolve(); return; }
     tap.textContent = t('load.tap');
     el.classList.add('done');
-    el.addEventListener('pointerdown', () => { clearInterval(timer); resolve(); }, { once: true });
+    // Phím/chạm bất kỳ: vào game và đẩy toàn màn hình ngay trong cử chỉ của người chơi (pointerup mới tính là kích hoạt trên cảm ứng).
+    const go = () => {
+      el.removeEventListener('pointerup', go);
+      removeEventListener('keydown', go);
+      clearInterval(timer);
+      enterFullscreen();
+      resolve();
+    };
+    el.addEventListener('pointerup', go);
+    addEventListener('keydown', go);
   });
   return { el, setProgress, ready };
 }

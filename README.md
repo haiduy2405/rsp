@@ -320,3 +320,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - 12/24 tướng có kỹ năng đội trưởng (5★ 6/6, 4★ 4/8, 3★ 2/10): thêm thời gian kéo, hệ số combo, Cầu Vồng (cả đội khác hệ), sát thương/HP theo hệ hoặc cả đội, hồi máu.
 - Bỏ bị động và Form 2 trong dữ liệu; Thức tỉnh chỉ tăng chỉ số. Bị động sẽ thêm sau.
 - Chi tiết: docs/SKILLS_V2.md. Test e2e: tests/e2e/freeze.cjs.
+
+## v0.43.1
+- Màn tải: chạm hoặc nhấn phím bất kỳ để vào game và tự bật toàn màn hình (bỏ qua nếu đã cài app hoặc trình duyệt không hỗ trợ, như iOS Safari).
