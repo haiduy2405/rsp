@@ -225,3 +225,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Màn chọn ải mới (3 tab độ khó, danh sách 7 ải, giữ để xem quái/bảng rớt), nút "Ải tiếp theo" ở màn kết quả.
 - Icon 6 vùng vẽ tay (`assets/ui/zones/`, key `zone:<id>`) thay viên ngọc ở màn chính và danh sách vùng; vùng chưa mở xám + khóa.
 - Cân bằng: ải 7 khớp dải thắng cũ (`STAGE=7 node tools/balance-sim.js --targets`), khu Ám/Tim tăng hệ số khu.
+
+## v0.33.1
+- Nút Install/Fullscreen dời xuống giữa màn chính, không che đảo; khu Tim tăng hệ số (mô phỏng ải 7: 70%, trong dải).

@@ -261,8 +261,8 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 .dock button.sub { width: 56px; height: 56px; min-height: 0; margin: -8px auto 0; border-radius: 50%; background: rgba(12, 10, 40, .9); border: 1.5px solid var(--bone-dim); color: var(--bone); box-shadow: 0 0 0 3px rgba(12, 10, 40, .8); }
 .dock button.main { }
 .hub-scene.static * { animation: none !important; }
-.hub-install { position: absolute; z-index: 2; left: 12px; top: calc(110px + var(--sat)); }
-.hub-install .row { gap: 6px; justify-content: flex-start; }
+.hub-install { position: absolute; z-index: 2; left: 50%; transform: translateX(-50%); bottom: calc(215px + var(--sab, 0px)); white-space: nowrap; }
+.hub-install .row { gap: 6px; justify-content: center; }
 .hub-install .row button { min-height: 30px; padding: 3px 10px; font-size: 12px; }
 .hub-foot { bottom: calc(126px + var(--sab)); }
 .prof-head { display: grid; place-items: center; }
