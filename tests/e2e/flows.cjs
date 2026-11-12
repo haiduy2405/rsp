@@ -5,7 +5,7 @@ const { chromium } = require('playwright');
   const bad = [];
   const chk = async (tag) => { const tx = await p.textContent('#screen'); if (/\b(err|char|res|set|hub|battle|summon|effect|stone|stat|story|skill|duo)\.[A-Za-z.]{2,}/.test(tx) || /null|undefined|NaN/.test(tx)) bad.push(tag + ': ' + tx.replace(/\s+/g, ' ').slice(0, 160)); };
   await p.goto('http://localhost:8080/?debug'); await p.waitForSelector('#ob-skip'); await p.click('#ob-skip');
-  await p.fill('#ob-hometown', 'Mao Khê'); await p.click('#ob-next'); await p.click('[data-culture=viet]'); await p.click('#ob-next');
+  await p.click('[data-flag=VN]'); await p.click('#ob-next'); await p.click('[data-culture=viet]'); await p.click('#ob-next');
   await p.click('[data-avatar="1"]'); await p.click('#ob-next'); await p.fill('#ob-name', 'Duy'); await p.fill('#ob-callsign', 'Sao'); await p.click('#ob-start');
   await p.waitForSelector('[data-first]'); await p.click('#ob-hub'); await p.waitForSelector('#b-shop');
   for (const lang of ['vi', 'en', 'vi']) {

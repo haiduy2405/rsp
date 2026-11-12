@@ -272,3 +272,7 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.37.1
 - Ô đội hình trong trận: hiện icon tướng (viền theo hệ), icon hệ nhỏ ở góc ô; chưa có icon thì quay về viên ngọc hệ.
+
+## v0.38.0 — Chọn quốc kỳ quê hương
+- Mở đầu và màn Hồ sơ: thay ô gõ tên quê hương bằng lưới cờ tròn nhỏ (68 nước, bấm lại để bỏ chọn); lưu mã 2 chữ (VD VN) vào player.hometown, quê cũ dạng chữ vẫn giữ nguyên.
+- Cờ: bộ circle-flags (MIT, github.com/HatScripts/circle-flags) trong www/assets/ui/flags; danh sách ở data/flags.json, tên nước qua i18n (flag.XX).

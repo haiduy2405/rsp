@@ -6,6 +6,7 @@ import { summon } from '../core/summon.js';
 import { finishOnboarding, storyUnlocked, updateProfile } from '../core/onboarding.js';
 import { newProgress } from '../core/progress.js';
 import * as offline from '../ui/offline.js';
+import { flagPicker } from './flags.js';
 
 export function install(app) {
   const { audio, ctx, dicts, save, screen, setLang, showHub, storage, t } = app;
@@ -40,7 +41,7 @@ export function install(app) {
       photoPicker(d, () => showProfile(), 'pf'),
       h('label', {}, t('ob.name'), h('input', { id: 'pf-name', maxlength: String(o.nameMax), value: d.name, oninput: (e) => keep(e, 'name') })),
       h('label', {}, t('ob.callsign'), h('input', { id: 'pf-callsign', maxlength: String(o.callsignMax), value: d.callsign, oninput: (e) => keep(e, 'callsign') })),
-      h('label', {}, t('ob.hometown'), h('input', { id: 'pf-hometown', maxlength: String(o.hometownMax), value: d.hometown || '', oninput: (e) => keep(e, 'hometown') })),
+      h('label', {}, t('ob.hometown')), flagPicker(ctx, t, d.hometown || '', (c) => keep({ target: { value: c } }, 'hometown'), 'pf'),
       d.culture ? h('div', { class: 'muted' }, `${t('profile.token')}: ${t(`ob.token.${d.culture}`)}`) : null,
       btn(t('profile.save'), save1, 'primary', { id: 'pf-save' }),
       h('h3', {}, t('profile.stats')),
@@ -197,7 +198,7 @@ export function install(app) {
     } else if (step === 2) {
       screen(
         h('div', { class: 'card' }, h('p', {}, t('ob.aida'))),
-        h('label', {}, t('ob.hometown'), h('input', { id: 'ob-hometown', maxlength: String(o.hometownMax), value: ob.hometown, oninput: (e) => (ob.hometown = e.target.value) })),
+        h('label', {}, t('ob.hometown')), flagPicker(ctx, t, ob.hometown, (c) => (ob.hometown = c), 'ob'),
         h('p', { class: 'muted' }, t('ob.hometownHint')),
         btn(t('ob.next'), next(3), 'primary', { id: 'ob-next' }),
       );

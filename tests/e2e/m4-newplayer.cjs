@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
   const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => m.type()==='error' && errs.push(m.text()));
   await p.goto('http://localhost:8080/?debug'); await p.waitForSelector('#ob-skip');
   await p.click('#ob-skip');
-  await p.fill('#ob-hometown','Mao Khê'); await p.click('#ob-next');
+  await p.click('[data-flag=VN]'); await p.click('#ob-next');
   await p.click('[data-culture=viet]'); await p.click('#ob-next');
   await p.click('[data-avatar="2"]'); await p.click('#ob-next');
   await p.click('#ob-start'); // empty name -> error
