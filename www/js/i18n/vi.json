@@ -981,5 +981,20 @@
   "tut.done.2": "AIDA: Cả đám quái gục xuống chỉ trong vài nước đi. Tòa Tháp đã không chọn nhầm người.",
   "tut.done.3": "Nhưng một mình thì chưa đủ. Hãy gọi những linh hồn sẽ đồng hành cùng bạn.",
   "summon.orSpirit": "hoặc {n} Linh Thạch",
-  "summon.confirmSpirit": "Không đủ vé. Dùng {spirit} Linh Thạch để triệu hồi {count} lượt trên \"{banner}\"?"
+  "summon.confirmSpirit": "Không đủ vé. Dùng {spirit} Linh Thạch để triệu hồi {count} lượt trên \"{banner}\"?",
+  "guide.teamHold": "Nhấn giữ một tướng để xem chi tiết",
+  "guide.next": "Tiếp",
+  "guide.skip": "Bỏ qua",
+  "guide.done": "Xong",
+  "guide.hero.head": "Tên, hệ (màu), tộc và số sao của tướng.",
+  "guide.hero.stats": "Chỉ số chiến đấu: Máu, Công, Hồi máu và Tộc.",
+  "guide.hero.level": "Cấp độ và thanh kinh nghiệm. Lên cấp để mạnh hơn.",
+  "guide.hero.active": "Kỹ năng chủ động: chạm tướng khi hết hồi chiêu để tung ra.",
+  "guide.hero.leader": "Kỹ năng đội trưởng: chỉ có tác dụng khi tướng đứng đầu đội.",
+  "guide.hero.passive": "Kỹ năng bị động: tự phát huy khi tướng có mặt trong đội.",
+  "guide.hero.duo": "Ghép Duo: ghép đúng cặp tướng cạnh nhau sẽ mở thêm kỹ năng.",
+  "guide.hero.keys": "Từ khóa hiệu ứng của tướng. Chạm giữ để xem giải thích.",
+  "guide.hero.grow": "Nâng cấp: dùng Thuốc và nguyên liệu để lên cấp.",
+  "guide.hero.skillup": "Nâng kỹ năng bằng đồ cúng, mỗi kỹ năng có cấp riêng.",
+  "guide.hero.awaken": "Thức tỉnh: đổi sang dạng mạnh hơn, cần mảnh và đá."
 }

@@ -981,5 +981,20 @@
   "tut.done.2": "AIDA: The whole pack fell in a handful of moves. The Tower chose well.",
   "tut.done.3": "But you can't climb alone. Call the spirits who will fight beside you.",
   "summon.orSpirit": "or {n} Spirit Gems",
-  "summon.confirmSpirit": "Not enough tickets. Spend {spirit} Spirit Gems to summon {count} on \"{banner}\"?"
+  "summon.confirmSpirit": "Not enough tickets. Spend {spirit} Spirit Gems to summon {count} on \"{banner}\"?",
+  "guide.teamHold": "Press and hold a hero to see details",
+  "guide.next": "Next",
+  "guide.skip": "Skip",
+  "guide.done": "Done",
+  "guide.hero.head": "The hero's name, element (colour), race and stars.",
+  "guide.hero.stats": "Battle stats: HP, Attack, Heal and Race.",
+  "guide.hero.level": "Level and experience bar. Level up to grow stronger.",
+  "guide.hero.active": "Active skill: tap the hero when its cooldown is over to unleash it.",
+  "guide.hero.leader": "Leader skill: only works while the hero leads the team.",
+  "guide.hero.passive": "Passive skill: works automatically while the hero is on the team.",
+  "guide.hero.duo": "Duo: put the right pair side by side to unlock an extra skill.",
+  "guide.hero.keys": "Effect keywords of this hero. Press and hold one to read it.",
+  "guide.hero.grow": "Upgrade: spend Elixirs and materials to level up.",
+  "guide.hero.skillup": "Raise skills with offerings. Each skill has its own level.",
+  "guide.hero.awaken": "Awaken: change to a stronger form, needs shards and stones."
 }

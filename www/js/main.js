@@ -92,6 +92,7 @@ const screen = (...kids) => {
   $('info')?.remove();
   $('pause-btn')?.remove();
   guide.clear();
+  $('tour-ui')?.remove();
   $('screen').onpointerdown = null;
   atHub = false;
   audio.playMusic('hub');
@@ -436,6 +437,41 @@ function longPress(node, fn, ms = 450) {
   return node;
 }
 
+// Dẫn người chơi đi qua từng mục trong trang chi tiết tướng (chạy một lần).
+function runHeroTour() {
+  const hasTag = (k) => document.querySelector(`#screen .hp-tag.${k}`)?.closest('.hp-skill');
+  const grows = [...document.querySelectorAll('#screen .hp-grow')];
+  const steps = [
+    ['#screen .hp-head', 'guide.hero.head'],
+    ['#screen .hp-stats', 'guide.hero.stats'],
+    ['#screen .hp-level', 'guide.hero.level'],
+    [hasTag('active'), 'guide.hero.active'],
+    [hasTag('leader'), 'guide.hero.leader'],
+    [hasTag('passive'), 'guide.hero.passive'],
+    [hasTag('duo'), 'guide.hero.duo'],
+    [document.querySelector('#screen .fxrow')?.closest('.card'), 'guide.hero.keys'],
+    [grows[0], 'guide.hero.grow'],
+    [grows[1], 'guide.hero.skillup'],
+    [grows[2], 'guide.hero.awaken'],
+  ].map(([el, key]) => [typeof el === 'string' ? document.querySelector(el) : el, key]).filter(([el]) => el);
+  if (!steps.length) return;
+  let i = 0;
+  const ui = h('div', { id: 'tour-ui', class: 'tour-ui' });
+  const end = () => { ui.remove(); guide.clear(); };
+  const next = h('button', { id: 'tour-next', class: 'primary' }, t('guide.next'));
+  const skip = h('button', { id: 'tour-skip', class: 'ghost' }, t('guide.skip'));
+  const show = () => {
+    const [el, key] = steps[i];
+    guide.point(el, t(key), 0, { dock: true });
+    next.textContent = i === steps.length - 1 ? t('guide.done') : t('guide.next');
+  };
+  next.onclick = () => { audio.sfx('tick'); if (++i >= steps.length) end(); else show(); };
+  skip.onclick = end;
+  ui.append(skip, next);
+  $('wrap').appendChild(ui);
+  setTimeout(show, 350);
+}
+
 function showChar(id, msg, back) {
   if (back) charBack = back;
   const goBack = charBack || showCollection;
@@ -510,6 +546,7 @@ function showChar(id, msg, back) {
     h('div', { class: 'muted' }, `${t('res.shard')} ${inv.shards} · ${t('res.gold')} ${inv.gold} · ${t('res.stone')} ${el(c.element)}: ${inv.stones[c.element].normal}/${inv.stones[c.element].rare}`),
     btn(t('back'), goBack, '', { id: 'back' }),
   );
+  if (progress.onboarding.teamTour !== 'done' && !guideStep()) { progress.onboarding.teamTour = 'done'; save(); runHeroTour(); } // lần đầu xem chi tiết tướng: dẫn từng mục
 }
 
 // Ô nhân vật vuông kiểu thẻ: viền độ hiếm, chấm hệ, sao, cấp. `slotNo` = đang ở ô số mấy trong đội.
@@ -586,6 +623,7 @@ function showTeam(slot, msg, stage) {
     btn(t('back'), showHub, '', { id: 'back' }),
   );
   if (gt && !needLeader && members.length) { guideSet('team'); guidePoint('#team-go', 'guide.team'); }
+  else if (!stage && !guideStep() && progress.onboarding.teamTour !== 'done' && members.length) guidePoint('#screen .roster > *', 'guide.teamHold', 600);
 }
 
 // Cửa hàng và Nhiệm vụ: khung chờ, chưa có nội dung (gói ủng hộ ở M6; nhiệm vụ làm sau).

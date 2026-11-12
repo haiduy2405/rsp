@@ -945,3 +945,6 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .lp-orb::before { content: ''; position: absolute; left: 50%; top: -16px; width: 4px; height: 18px; margin-left: -2px; border-radius: 2px; background: #6a3f1a; box-shadow: 0 -4px 0 2px #ffd24a, 0 -6px 10px 4px rgba(255, 160, 60, .9); z-index: 1; }
 #screen.hub .hub-notice { width: auto; box-sizing: border-box; transition: opacity .5s; }
 #screen.hub .hub-notice.fade { opacity: 0; }
+
+.tour-ui { position: absolute; left: 0; right: 0; bottom: 12px; z-index: 26; display: flex; justify-content: center; gap: 10px; padding: 0 16px; }
+.tour-ui button { min-width: 110px; }

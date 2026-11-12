@@ -378,3 +378,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ### v0.50.3
 - Thông báo ở màn chính hết bị lệch phải (width 100% + lề), và tự mờ rồi biến mất sau 4 giây.
+
+### v0.51.0
+- Lần đầu vào Đội hình: chỉ tay vào 1 tướng (nhấn giữ để xem chi tiết). Mở chi tiết lần đầu thì dẫn từng mục (tên/hệ/tộc, chỉ số, cấp, chủ động, đội trưởng, bị động, Duo, từ khóa, nâng cấp, nâng kỹ năng, thức tỉnh) bằng vòng sáng + chú thích, có nút Tiếp/Bỏ qua. Lưu ở `progress.onboarding.teamTour`. Test: `tests/e2e/herotour.cjs`.
