@@ -484,5 +484,8 @@
   "team.pickFor": "Pick a character for: {n}",
   "hub.items": "Items",
   "items.currency": "Currency",
-  "items.stones": "Stones by element"
+  "items.stones": "Stones by element",
+  "team.selected": "Selected",
+  "team.inTeam": "In slot {n}",
+  "team.holdHint": "Hold a character for details. Pick a slot, then tap another character to replace/swap."
 }

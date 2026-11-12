@@ -484,5 +484,8 @@
   "team.pickFor": "Chọn nhân vật cho: {n}",
   "hub.items": "Kho đồ",
   "items.currency": "Tiền tệ",
-  "items.stones": "Tinh Thạch theo hệ"
+  "items.stones": "Tinh Thạch theo hệ",
+  "team.selected": "Đang chọn",
+  "team.inTeam": "Đang ở ô {n}",
+  "team.holdHint": "Nhấn giữ một tướng để xem chi tiết. Chọn một ô rồi chạm tướng khác để thay/đổi chỗ."
 }

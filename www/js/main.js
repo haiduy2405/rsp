@@ -259,7 +259,7 @@ function showCollection() {
   const list = ctx.characterList.slice().sort((a, b) => a.element - b.element || b.rarity - a.rarity);
   screen(
     h('h2', {}, `${t('hub.collection')} ${owned().length}/${list.length}`),
-    list.map((c) => charCard(c.id, () => showChar(c.id))),
+    list.map((c) => charCard(c.id, () => showChar(c.id, undefined, showCollection))),
     btn(t('back'), showHub, '', { id: 'back' }),
   );
 }
@@ -268,7 +268,34 @@ function keywordBlock(keys) {
   return keys.map((k) => h('div', { class: 'muted' }, h('b', {}, t(`effect.${k}.name`)), ': ', t(`effect.${k}.desc`)));
 }
 
-function showChar(id, msg) {
+let charBack = null;
+// Nhấn giữ (450ms) gọi fn; nhấc tay sau khi đã kích hoạt thì nuốt cú click.
+function longPress(node, fn, ms = 450) {
+  let timer = 0;
+  let fired = false;
+  let x0 = 0;
+  let y0 = 0;
+  const cancel = () => clearTimeout(timer);
+  node.addEventListener('pointerdown', (e) => {
+    fired = false;
+    x0 = e.clientX;
+    y0 = e.clientY;
+    cancel();
+    timer = setTimeout(() => {
+      fired = true;
+      audio.vibrate(15);
+      fn();
+    }, ms);
+  });
+  node.addEventListener('pointermove', (e) => { if (Math.hypot(e.clientX - x0, e.clientY - y0) > 10) cancel(); });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) node.addEventListener(ev, cancel);
+  node.addEventListener('click', (e) => { if (fired) { e.stopImmediatePropagation(); e.preventDefault(); fired = false; } }, true);
+  return node;
+}
+
+function showChar(id, msg, back) {
+  if (back) charBack = back;
+  const goBack = charBack || showCollection;
   const c = ctx.characters[id];
   const pc = progress.characters[id];
   const st = statsFor(ctx, id, pc.level, pc.awaken);
@@ -299,7 +326,7 @@ function showChar(id, msg) {
       ? [h('div', { class: 'muted' }, t('char.awakenCost', { shards: aw.shards, stones: aw.stones, kind: t(`stone.${aw.stone}`), element: el(aw.element), gold: aw.gold })), btn(t('char.awakenBtn'), () => act(() => awaken(ctx, progress, id)), '', { id: 'awaken' })]
       : h('div', { class: 'muted' }, t('char.maxAwaken')),
     h('div', { class: 'muted' }, `${t('res.essence')} ${progress.inventory.essence} · ${t('res.shard')} ${progress.inventory.shards} · ${t('res.gold')} ${progress.inventory.gold} · ${t('res.stone')} ${el(c.element)}: ${progress.inventory.stones[c.element].normal}/${progress.inventory.stones[c.element].rare}`),
-    btn(t('back'), showCollection, '', { id: 'back' }),
+    btn(t('back'), goBack, '', { id: 'back' }),
   );
 }
 
@@ -330,19 +357,19 @@ function showTeam(slot, msg, zoneId) {
   const slots = h('div', { class: 'row', style: 'align-items:flex-end' }, team.map((id, i) => {
     const lead = i === 0;
     const sel = i === slot;
-    return h('div', { class: 'card btn', style: `width:${lead ? 96 : 84}px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px;${lead ? 'padding-bottom:14px;border-color:#ffd24a;box-shadow:0 0 14px #ffd24a88;' : ''}${sel ? 'outline:2px solid #7dffa0;' : ''}`, 'data-slot': i, onclick: () => showTeam(i, undefined, zoneId) }, h('small', { style: lead ? 'color:#ffd24a;font-weight:800' : '' }, lead ? '♛ ' + t('team.leader') : t('team.slot', { n: i + 1 })), portrait(id, lead ? 72 : 60), h('small', {}, t(`char.${id}`)));
+    return longPress(h('div', { class: 'card btn' + (sel ? ' slot-sel' : ''), style: `width:${lead ? 96 : 84}px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px;${lead ? 'padding-bottom:14px;border-color:#ffd24a;box-shadow:0 0 14px #ffd24a88;' : ''}`, 'data-slot': i, onclick: () => showTeam(i, undefined, zoneId) }, h('small', { style: lead ? 'color:#ffd24a;font-weight:800' : '' }, lead ? '♛ ' + t('team.leader') : t('team.slot', { n: i + 1 })), portrait(id, lead ? 72 : 60), h('small', {}, t(`char.${id}`)), sel ? h('small', { class: 'sel-tag' }, t('team.selected')) : null), () => showChar(id, undefined, () => showTeam(i, undefined, zoneId)));
   }));
   screen(
     h('h2', {}, zoneId ? t('team.prep', { zone: t(`zone.${zoneId}`) }) : t('hub.team')),
     tabs,
-    h('p', { class: 'muted' }, t('team.hint')),
+    h('p', { class: 'muted' }, t('team.hint'), ' ', t('team.holdHint')),
     slots,
     slot > 0 ? btn(t('team.makeLeader', { name: t(`char.${team[slot]}`) }), () => { apply(makeLeader(progress, slot)); showTeam(0, undefined, zoneId); }, '', { id: 'make-leader' }) : null,
     h('div', { class: 'muted' }, `${t('char.leader')}: ${leaderText(ctx.characters[team[0]].leader)}`),
     h('div', { class: 'muted' }, duos.length ? `${t('team.duoActive')}: ${duos.map((d) => t(`duo.${d.id}`)).join(', ')}` : t('team.noDuo')),
     zoneId ? btn(t('team.go'), () => startRun(zoneId), 'primary', { id: 'team-go' }) : null,
     h('h3', {}, t('team.pickFor', { n: slot === 0 ? t('team.leader') : t('team.slot', { n: slot + 1 }) })),
-    owned().map((c) => charCard(c.id, () => pick(c.id))),
+    owned().map((c) => longPress(charCard(c.id, () => pick(c.id), team.includes(c.id) ? h('small', { class: 'in-team' }, t('team.inTeam', { n: team.indexOf(c.id) + 1 })) : null), () => showChar(c.id, undefined, () => showTeam(slot, undefined, zoneId)))),
     btn(t('back'), showHub, '', { id: 'back' }),
   );
 }
