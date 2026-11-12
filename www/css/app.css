@@ -691,3 +691,11 @@ button.ghost#leave-run { min-height: 0; padding: 9px 22px; font-size: 14px; widt
 .runmap svg { -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 7%, #000 93%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 7%, #000 93%, transparent 100%); }
 .dl-foe { width: 46px; } .dl-foe img { width: 32px; height: 32px; } .dl-foe small { max-width: 46px; }
 .dl-foe { width: 56px; } .dl-foe small { max-width: 56px; white-space: normal; text-align: center; }
+
+/* Bản đồ cuộn được: kích thước thật, kéo để xem các tầng trên/dưới */
+.runmap { flex: 0 0 auto !important; height: min(46vh, 480px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; touch-action: pan-y; -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 7%, #000 93%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 7%, #000 93%, transparent 100%); }
+.runmap::-webkit-scrollbar { display: none; }
+.runmap svg { position: static; display: block; width: 100%; height: auto; -webkit-mask-image: none; mask-image: none; }
+.runmap { height: min(33vh, 340px); }
+.dl-foe small { display: none; } .dl-foe { width: auto; } .dl-foe img { width: 34px; height: 34px; }
+.doorlist .dl { padding-top: 4px; padding-bottom: 4px; }

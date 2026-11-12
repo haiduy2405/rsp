@@ -255,3 +255,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Tiêu đề có huy hiệu vùng, nhãn độ khó, chấm tầng (boss viền đỏ), thanh máu có tim.
 - Bản đồ: trụ đá có lửa theo hệ của vùng, vòng viền vàng quanh cửa, mép mờ dần.
 - Danh sách cửa: số hiệu, icon loại cửa, ảnh quái xem trước; vật phẩm mỗi loại một màu; nút thoát dạng viền.
+
+## v0.35.1
+- Bản đồ chọn cửa hiển thị kích thước thật, kéo cuộn dọc để xem các tầng trên; tự cuộn tới tầng đang chọn.

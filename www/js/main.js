@@ -815,6 +815,12 @@ function showDoors() {
     btn(t('run.leave'), leaveRun, 'ghost', { id: 'leave-run' }),
   );
   $('screen').classList.add('mapscreen');
+  // cuộn bản đồ tới tầng đang chọn (kéo cuộn để xem phần còn lại)
+  const svg = map.querySelector('svg');
+  const vy = run.floors > 1 ? 468 - run.floor * ((468 - 118) / (run.floors - 1)) : 468;
+  const focus = () => { map.scrollTop = Math.max(0, (vy / 600) * svg.clientHeight - map.clientHeight * 0.55); };
+  focus();
+  requestAnimationFrame(focus);
   $('screen').style.setProperty('--zc', COLORS[ctx.zones[run.zoneId].element] || '#ffb25a');
 }
 
