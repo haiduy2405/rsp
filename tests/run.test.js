@@ -123,12 +123,14 @@ test('run: máu đội giữ qua các ải; ải sau bắt đầu với máu hi�
 test('run: quái mạnh dần theo ải (floorScale)', () => {
   const { run, idx } = findRun(doorOf('normal'));
   const a = runStep(ctx, run, { type: 'door', index: idx }).run;
-  const base = ctx.monsters[a.battle.enemies[0].id].hp;
-  assert.equal(a.battle.enemies[0].maxHp, base); // ải 0: nhân 1
+  const zs = ctx.config.run.zoneScale;
+  const order = ctx.zones[run.zoneId].order;
+  const base = Math.round(ctx.monsters[a.battle.enemies[0].id].hp * (zs.hp[order] ?? 1));
+  assert.equal(a.battle.enemies[0].maxHp, base); // ải 0: chỉ nhân hệ số khu
   const later = { ...run, floor: 2 };
   later.doors = ['normal', 'chest'];
   const b = runStep(ctx, later, { type: 'door', index: 0 }).run;
-  assert.equal(b.battle.enemies[0].maxHp, Math.round(ctx.monsters[b.battle.enemies[0].id].hp * (1 + ctx.config.run.floorScale.hp * 2)));
+  assert.equal(b.battle.enemies[0].maxHp, Math.round(ctx.monsters[b.battle.enemies[0].id].hp * (1 + ctx.config.run.floorScale.hp * 2) * (zs.hp[order] ?? 1)));
 });
 
 test('run: thua giữ loot đã nhặt, mất thưởng hoàn thành', () => {

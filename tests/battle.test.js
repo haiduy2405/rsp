@@ -68,8 +68,8 @@ test('battle: sát thương combo tăng theo n và nhóm 4 ngọc được nhân
   assert.ok(dmg.length >= 2);
   // Hỏa vs Thủy: bị khắc x0.5. Nhóm 3: 150*1*1*0.5=75
   assert.equal(dmg[0].raw, 75);
-  // Nhóm 4 là combo thứ 2: size=1.25, four=1.5, combo=1.25 => 150*1.25*1.5*1.25*0.5
-  assert.equal(dmg[1].raw, Math.round(150 * 1.25 * 1.5 * 1.25 * 0.5));
+  // Nhóm 4 là combo thứ 2: size=1.25, four=1.5, combo = 1 + step (đọc từ config, không viết cứng)
+  assert.equal(dmg[1].raw, Math.round(150 * 1.25 * 1.5 * (1 + ctx.config.combo.step) * 0.5));
 });
 
 test('battle: quái đánh sau N lượt và có thể thua', () => {

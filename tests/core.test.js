@@ -99,6 +99,6 @@ test('damage: bảng khắc hệ và hệ số combo', () => {
   assert.equal(elementMultiplier(4, 3, c), 1.5);
   assert.equal(elementMultiplier(0, 3, c), 1);
   assert.equal(comboMultiplier(1, c), 1);
-  assert.equal(comboMultiplier(5, c), 2);
+  assert.equal(comboMultiplier(5, c), 1 + 4 * c.combo.step);
   assert.ok(COLS === 6);
 });

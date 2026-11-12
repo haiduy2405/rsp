@@ -1,0 +1,3 @@
+#!/bin/sh
+# Chặn commit khi test đỏ. Bật bằng: git config core.hooksPath .githooks  (npm install tự chạy qua script prepare)
+npm test --silent >/dev/null 2>&1 || { echo "npm test đang đỏ, không commit."; exit 1; }
