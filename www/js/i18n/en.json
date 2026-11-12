@@ -465,5 +465,11 @@
   "info.holdHint": "Hold a hero or monster to see details",
   "info.stunnedNow": "Stunned/frozen, will not attack",
   "info.cdNow": "Attacks in {n} turns",
-  "info.teamEffects": "Team effects"
+  "info.teamEffects": "Team effects",
+  "battle.locked": "Target",
+  "battle.lockHint": "Tap a monster to lock target",
+  "app.install": "Install app",
+  "app.fullscreen": "Fullscreen",
+  "app.helpIOS": "On iPhone/iPad: open in Safari, tap Share, then 'Add to Home Screen'. Launch from that icon for fullscreen.",
+  "app.helpOther": "Your browser can't install directly. Open the browser menu (three dots) and choose 'Install app' or 'Add to Home screen'. Launch from that icon for fullscreen."
 }

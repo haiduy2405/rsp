@@ -24,3 +24,7 @@ Thời gian chuyến mô phỏng: 7,0 / 9,0 / 10,4 / 12,8 / 10,5 / 14,6 phút (k
 - Hệ Tim (hồi máu) xuất hiện nhiều nhất trong đội thắng khi người chơi chưa nâng cấp (≈43% so với 12–22% các hệ khác); Quang và Ám thấp nhất. Chưa chỉnh: cần dữ liệu người chơi thật, bot tham lam đánh giá hồi máu cao.
 - Đội ngẫu nhiên chưa tối ưu; người chơi giỏi sẽ thắng nhiều hơn bot ở khu sau. Cần Duy chơi thử rồi báo cảm giác.
 - Chưa chỉnh số mảnh/chi phí Thức tỉnh (loot-sim vẫn đạt 1–2 chuyến/bậc từ M2).
+
+## Cho phép kéo ngọc đi chéo (allowDiagonal = true)
+- Duy yêu cầu. Bot mô phỏng giờ cũng đi chéo. Đi chéo làm thắng nhiều hơn: khu Hỏa 83% -> 91%, Mộc 79% -> 84%.
+- Chỉnh run.zoneScale.atk: Hỏa 1.25 -> 1.38, Mộc 2.0 -> 2.1. Kết quả: Thủy 100 / Hỏa 88 / Mộc 82 / Quang 74 / Ám 70 / Tim 71 (đều trong dải).

@@ -31,6 +31,12 @@ function randomPath(rng, locked) {
       if (r < 4) opts.push(cur + 6);
       if (c > 0) opts.push(cur - 1);
       if (c < 5) opts.push(cur + 1);
+      if (ctx.config.board.allowDiagonal) {
+        if (r > 0 && c > 0) opts.push(cur - 7);
+        if (r > 0 && c < 5) opts.push(cur - 5);
+        if (r < 4 && c > 0) opts.push(cur + 5);
+        if (r < 4 && c < 5) opts.push(cur + 7);
+      }
       const ok = opts.filter((q) => !seen.has(q) && !locked.includes(q));
       if (!ok.length) break;
       const q = ok[rng.int(ok.length)];

@@ -221,6 +221,29 @@ export function draw(g, view, t) {
       g.fill();
     }
     g.restore();
+    if (view.focus === i && !dead) {
+      // khóa mục tiêu: vòng ngắm xoay + bốn góc
+      const R = 84 + (view.lockFlash || 0) * 14;
+      g.save();
+      g.translate(cx + sh, 165);
+      g.rotate(t * 0.0012);
+      g.strokeStyle = '#ff4d5e';
+      g.lineWidth = 4;
+      g.shadowColor = '#ff4d5e';
+      g.shadowBlur = 14;
+      for (let q = 0; q < 4; q++) {
+        g.rotate(Math.PI / 2);
+        g.beginPath();
+        g.arc(0, 0, R, -0.35, 0.35);
+        g.stroke();
+        g.beginPath();
+        g.moveTo(R + 6, 0);
+        g.lineTo(R + 20, 0);
+        g.stroke();
+      }
+      g.restore();
+      text(g, view.t('battle.locked'), cx, 98, 13, '#ff8a96');
+    }
     bar(g, cx - 65, 255, 130, 12, (e.hpShow ?? e.hp) / e.maxHp, '#ff6b6b');
     text(g, `${Math.max(0, Math.round(e.hp))}`, cx, 266, 10, '#ffffff');
     text(g, view.t(`monster.${e.id}`), cx, 280, 15);

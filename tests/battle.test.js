@@ -126,3 +126,30 @@ test('fuzz: 1000 trận ngẫu nhiên không crash, bàn luôn hợp lệ, trậ
   }
   assert.equal(won + lost, 1000);
 });
+
+test('battle: khóa mục tiêu dồn sát thương/kỹ năng 1 mục tiêu vào quái đã khóa, chạm lại để bỏ', () => {
+  const a = createBattle(ctx, { seed: 5, team: TEAM, enemies: ['water_n1', 'water_n1'] });
+  assert.equal(a.focus, null);
+  const bad = step(ctx, a, { type: 'target', index: 9 });
+  assert.equal(bad.events[0].type, 'invalid');
+  const r = step(ctx, a, { type: 'target', index: 1 });
+  assert.equal(r.state.focus, 1);
+  assert.equal(r.state.turn, a.turn, 'khóa không tốn lượt');
+  assert.equal(a.focus, null, 'state cũ không bị sửa');
+  // Mọi đòn đánh vào quái 1
+  const rng = mulberry32(3);
+  let s = r.state;
+  for (let i = 0; i < 40 && s.status === 'playing'; i++) {
+    const before0 = s.enemies[0].hp;
+    const out = step(ctx, s, { type: 'move', path: randomPath(rng) });
+    if (out.events[0]?.type === 'invalid') continue;
+    if (s.enemies[1].hp > 0) assert.equal(out.state.enemies[0].hp, before0, 'quái không bị khóa không bị đánh');
+    s = out.state;
+  }
+  assert.equal(step(ctx, r.state, { type: 'target', index: 1 }).state.focus, null);
+  // quái khóa chết thì tự chuyển sang quái còn sống
+  const dead = structuredClone(r.state);
+  dead.enemies[1].hp = 0;
+  const hit = step(ctx, dead, { type: 'skill', index: 2 });
+  assert.notEqual(hit.events[0]?.type, 'invalid');
+});

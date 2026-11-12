@@ -100,11 +100,16 @@ export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects
     maxHp,
     dragBonusMs: dragBonusMs ?? 0,
     enemies: foes,
+    focus: null,
   };
 }
 
+const firstAliveRaw = (s) => s.enemies.findIndex((e) => e.hp > 0);
+// Mục tiêu khóa (nếu còn sống) được ưu tiên; không thì quái sống đầu tiên.
 function firstAlive(s) {
-  return s.enemies.findIndex((e) => e.hp > 0);
+  const f = s.focus;
+  if (Number.isInteger(f) && s.enemies[f] && s.enemies[f].hp > 0) return f;
+  return firstAliveRaw(s);
 }
 const aliveIdx = (s) => s.enemies.map((_, i) => i).filter((i) => s.enemies[i].hp > 0);
 
@@ -232,7 +237,7 @@ function endOfTurn(s, events) {
   if (!hasEffect(s.team, 'lock')) s.locked = [];
 }
 
-// action: { type: 'move', path } | { type: 'skill', index } | { type: 'duo', index }
+// action: { type: 'move', path } | { type: 'skill', index } | { type: 'duo', index } | { type: 'target', index } (khóa mục tiêu, không tốn lượt)
 // Trả về { state, events }. State đầu vào không bị sửa.
 export function step(ctx, state, action) {
   if (state.status !== 'playing') return { state, events: [{ type: 'invalid', reason: 'battle_over' }] };
@@ -240,6 +245,13 @@ export function step(ctx, state, action) {
   const rng = mulberry32(s.rng);
   const events = [];
   const invalid = (reason) => ({ state, events: [{ type: 'invalid', reason }] });
+
+  if (action.type === 'target') {
+    const i = action.index;
+    if (!Number.isInteger(i) || !s.enemies[i] || s.enemies[i].hp <= 0) return invalid('bad_target');
+    s.focus = s.focus === i ? null : i; // chạm lại để bỏ khóa
+    return { state: s, events: [{ type: 'target', enemy: s.focus }] };
+  }
 
   if (action.type === 'skill') {
     const m = s.members[action.index];

@@ -338,3 +338,28 @@ for m in mons:
     svg = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">{aura}<ellipse cx="256" cy="492" rx="150" ry="14" fill="#000" opacity=".3"/>{mon(KIND[mid], e, tier)}{crown}</svg>'
     render(svg, f'{S}/monsters/{mid}.svg', f'{A}/monsters/{mid}.webp', 512, 512, 82)
 print('quái xong')
+
+# ---------- icon app (PWA) ----------
+os.makedirs(os.path.join(ROOT, 'www', 'icons'), exist_ok=True)
+def app_icon(size, pad):
+    # pad: phần lề an toàn (maskable cần ~10%)
+    s = 512
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {s} {s}">
+<defs><radialGradient id="bg" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="#5b3bd6"/><stop offset=".55" stop-color="#1b1747"/><stop offset="1" stop-color="#090a1c"/></radialGradient>
+<linearGradient id="tw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset="1" stop-color="#8b6bff"/></linearGradient>
+<radialGradient id="o" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#d8f0ff"/><stop offset=".5" stop-color="#3b9cff"/><stop offset="1" stop-color="#0d2a5c"/></radialGradient></defs>
+<rect width="{s}" height="{s}" fill="url(#bg)"/>
+<g transform="translate({s/2} {s/2}) scale({1-pad*2/s}) translate({-s/2} {-s/2})">
+<circle cx="256" cy="210" r="190" fill="#a98cff" opacity=".18"/>
+<path d="M256 52 L318 400 L194 400Z" fill="url(#tw)" stroke="#120f33" stroke-width="10" stroke-linejoin="round"/>
+<path d="M256 52 L256 400" stroke="#120f33" stroke-width="6" opacity=".35"/>
+<path d="M150 400 H362 L392 440 H120Z" fill="#2a2563" stroke="#120f33" stroke-width="10" stroke-linejoin="round"/>
+<circle cx="256" cy="300" r="58" fill="url(#o)" stroke="#fff" stroke-width="8"/>
+<ellipse cx="238" cy="278" rx="18" ry="10" fill="#fff" opacity=".7"/>
+</g></svg>'''
+for name, size, pad in (('icon-192.png', 192, 0), ('icon-512.png', 512, 0), ('icon-maskable-512.png', 512, 56), ('apple-touch-icon.png', 180, 0)):
+    p = os.path.join(ROOT, 'www', 'icons', name)
+    open(os.path.join(S, 'app-' + name.replace('.png', '.svg')), 'w', encoding='utf8').write(app_icon(size, pad))
+    png = subprocess.run(['rsvg-convert', '-w', str(size), '-h', str(size), os.path.join(S, 'app-' + name.replace('.png', '.svg'))], capture_output=True, check=True).stdout
+    open(p, 'wb').write(png)
+print('icon app xong')

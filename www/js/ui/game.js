@@ -26,8 +26,12 @@ function findHint(ctx, state) {
   for (let a = 0; a < 30; a++) {
     if (state.locked.includes(a)) continue;
     const ra = (a / 6) | 0;
-    for (const b of [a + 1, a + 6]) {
-      if (b >= 30 || state.locked.includes(b) || (b === a + 1 && b % 6 === 0)) continue;
+    const cand = [a + 1, a + 6];
+    if (ctx.config.board.allowDiagonal) cand.push(a + 7, a + 5);
+    for (const b of cand) {
+      if (b >= 30 || state.locked.includes(b)) continue;
+      const dc = Math.abs((b % 6) - (a % 6));
+      if (dc > 1 || (b === a + 1 && b % 6 === 0)) continue;
       void ra;
       const r = coreStep(ctx, state, { type: 'move', path: [a, b] });
       const st = r.events.find((e) => e.type === 'step');
@@ -86,6 +90,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.locked = state.locked.slice();
     view.teamFx = state.team.effects.map((e) => ({ ...e }));
     view.duos = state.duos.map((d) => ({ ...d }));
+    view.focus = Number.isInteger(state.focus) && state.enemies[state.focus]?.hp > 0 ? state.focus : -1;
   }
   sync();
   if (hint) {
@@ -314,8 +319,20 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     const pr = press;
     press = null;
     clearTimeout(pr.timer);
-    if (cancel || pr.fired || pr.kind !== 'member') return;
+    if (cancel || pr.fired) return;
     if (busy || state.status !== 'playing') return;
+    if (pr.kind === 'enemy') {
+      if (state.enemies[pr.idx]?.hp > 0) {
+        const r = stepper(state, { type: 'target', index: pr.idx });
+        if (r.events[0]?.type !== 'invalid') {
+          state = r.state;
+          sync();
+          fx.sfx('pick');
+          view.lockFlash = 1;
+        }
+      }
+      return;
+    }
     if (state.members[pr.idx]?.skillCd === 0) run({ type: 'skill', index: pr.idx });
   }
 
@@ -378,7 +395,8 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   }
 
   const cr = (c) => [Math.floor(c / 6), c % 6];
-  const manh = (a, b) => { const [ar, ac] = cr(a); const [br, bc] = cr(b); return Math.abs(ar - br) + Math.abs(ac - bc); };
+  // khoảng cách theo số bước đi (Chebyshev khi cho đi chéo, Manhattan khi không)
+  const manh = (a, b) => { const [ar, ac] = cr(a); const [br, bc] = cr(b); const dr = Math.abs(ar - br); const dc = Math.abs(ac - bc); return allowDiag ? Math.max(dr, dc) : dr + dc; };
   function segDist(px, py, x0, y0, x1, y1) {
     const dx = x1 - x0, dy = y1 - y0, l2 = dx * dx + dy * dy;
     const k = l2 ? Math.max(0, Math.min(1, ((px - x0) * dx + (py - y0) * dy) / l2)) : 0;
@@ -421,6 +439,12 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     if (r < 4) out.push(c + 6);
     if (k > 0) out.push(c - 1);
     if (k < 5) out.push(c + 1);
+    if (allowDiag) {
+      if (r > 0 && k > 0) out.push(c - 7);
+      if (r > 0 && k < 5) out.push(c - 5);
+      if (r < 4 && k > 0) out.push(c + 5);
+      if (r < 4 && k < 5) out.push(c + 7);
+    }
     return out;
   }
 
@@ -467,6 +491,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       if (k <= 0) release();
     }
     if (view.tally) { const ty = view.tally; ty.shown += (ty.target - ty.shown) * Math.min(1, dt / 120); if (Math.abs(ty.target - ty.shown) < 1) ty.shown = ty.target; ty.pulse = Math.max(0, ty.pulse - dt / 500); }
+    if (view.lockFlash) view.lockFlash = Math.max(0, view.lockFlash - dt / 400);
     if (view.slides) for (const k in view.slides) { view.slides[k].age += dt; if (view.slides[k].age > 180) delete view.slides[k]; }
     for (const f of view.floaters) f.age += dt;
     view.floaters = view.floaters.filter((f) => f.age < f.life);

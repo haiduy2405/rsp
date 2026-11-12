@@ -465,5 +465,11 @@
   "info.holdHint": "Nhấn giữ tướng hoặc quái để xem chi tiết",
   "info.stunnedNow": "Đang choáng/đóng băng, không tấn công",
   "info.cdNow": "Tấn công sau {n} lượt",
-  "info.teamEffects": "Hiệu ứng của cả đội"
+  "info.teamEffects": "Hiệu ứng của cả đội",
+  "battle.locked": "Mục tiêu",
+  "battle.lockHint": "Chạm quái để khóa mục tiêu",
+  "app.install": "Cài app ra màn hình",
+  "app.fullscreen": "Toàn màn hình",
+  "app.helpIOS": "Trên iPhone/iPad: mở bằng Safari, bấm nút Chia sẻ rồi chọn 'Thêm vào Màn hình chính'. Mở từ biểu tượng đó game sẽ chạy toàn màn hình.",
+  "app.helpOther": "Trình duyệt chưa cho cài trực tiếp. Mở menu của trình duyệt (dấu ba chấm) rồi chọn 'Cài đặt ứng dụng' hoặc 'Thêm vào màn hình chính'. Mở từ biểu tượng đó game sẽ chạy toàn màn hình."
 }

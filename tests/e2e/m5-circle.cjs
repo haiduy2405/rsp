@@ -17,6 +17,7 @@ const { chromium, devices } = require('playwright');
   for (const dir of [1, -1]) for (const steps of [6, 12, 24]) for (const R of [60, 90]) {
     // vòng quanh góc giữa 4 ô (c=2..3, r=1..2), bắt đầu từ tâm ô (2,1)
     const mx = 135 + 45 + 45, my = 480 + 135 + 0; // điểm giữa 4 ô
+    if (!(await p.evaluate(() => !!window.__game && window.__game.getState().status === 'playing'))) { console.log('trận đã kết thúc, dừng'); break; }
     const mid = { x: 45 + 3 * 90, y: 480 + 2 * 90 };
     const a0 = px(cx(2), cy(1)); await p.mouse.move(a0.x, a0.y); await p.mouse.down();
     const ang0 = Math.atan2(cy(1) - mid.y, cx(2) - mid.x);

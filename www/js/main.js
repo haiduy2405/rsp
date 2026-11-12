@@ -130,6 +130,7 @@ function showHub() {
       h('div', { style: 'flex:1' }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, `${progress.player.callsign} · ${t('hub.sub')}`)),
     ),
     notice ? h('div', { class: 'notice' }, t(notice)) : null,
+    installRow(),
     h(
       'div',
       { class: 'row' },
@@ -796,6 +797,48 @@ function showEnd() {
     }, 'primary', { id: 'back' }),
   );
 }
+
+// ---- Cảm giác app: chặn menu giữ/chuột phải, kéo ảnh, bôi đen, zoom cử chỉ
+for (const ev of ['contextmenu', 'dragstart', 'selectstart', 'gesturestart']) {
+  document.addEventListener(ev, (e) => {
+    if (ev === 'selectstart' && /^(INPUT|TEXTAREA)$/.test(e.target?.tagName || '')) return;
+    if (ev === 'contextmenu' && /^(INPUT|TEXTAREA)$/.test(e.target?.tagName || '')) return;
+    e.preventDefault();
+  }, { passive: false });
+}
+document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+document.addEventListener('wheel', (e) => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+
+// ---- Cài app (PWA)
+let installEvt = null;
+const isStandalone = () => window.matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches || window.navigator.standalone === true;
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; if (atHub) showHub(); });
+window.addEventListener('appinstalled', () => { installEvt = null; if (atHub) showHub(); });
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function installRow() {
+  if (isStandalone()) return null;
+  const canFs = !!document.documentElement.requestFullscreen && !isIOS;
+  return h('div', { class: 'row' },
+    btn(t('app.install'), async () => {
+      if (installEvt) {
+        installEvt.prompt();
+        await installEvt.userChoice.catch(() => {});
+        installEvt = null;
+        showHub();
+      } else showInstallHelp();
+    }, 'primary', { id: 'b-install' }),
+    canFs ? btn(t('app.fullscreen'), () => document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}), '', { id: 'b-fs' }) : null,
+  );
+}
+function showInstallHelp() {
+  screen(
+    h('h2', {}, t('app.install')),
+    h('div', { class: 'card' }, h('p', {}, t(isIOS ? 'app.helpIOS' : 'app.helpOther'))),
+    btn(t('back'), showHub, '', { id: 'back' }),
+  );
+}
+if ('serviceWorker' in navigator && !DEBUG && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 
 if (DEBUG) {
   window.__ctx = ctx;
