@@ -447,6 +447,31 @@ export function draw(g, view, t) {
       g.restore();
       text(g, view.t('battle.locked'), cx, 98, 13, '#ff8a96');
     }
+    if (view.guideEnemy === i && !dead && view.focus !== i) {
+      // bài hướng dẫn: mũi tên nảy + vòng vàng nhấp nháy trên quái cần khóa
+      const bob = Math.sin(t * 0.008) * 7;
+      g.save();
+      g.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(t * 0.005));
+      g.strokeStyle = '#ffd978';
+      g.lineWidth = 4;
+      g.setLineDash([10, 8]);
+      g.beginPath();
+      g.arc(cx + sh, 165, 84, 0, Math.PI * 2);
+      g.stroke();
+      g.setLineDash([]);
+      g.globalAlpha = 1;
+      g.fillStyle = '#ffd978';
+      g.strokeStyle = '#3a210e';
+      g.lineWidth = 3;
+      g.beginPath();
+      g.moveTo(cx - 20, 64 + bob);
+      g.lineTo(cx + 20, 64 + bob);
+      g.lineTo(cx, 96 + bob);
+      g.closePath();
+      g.stroke();
+      g.fill();
+      g.restore();
+    }
     g.globalAlpha = dead ? 1 - dk : 1;
     panel(g, cx - 82, 244, 164, 76, null);
     brackets(g, cx - 82, 244, 164, 76, 9, view.focus === i ? '#ff4d5e' : '#dcc3a0');

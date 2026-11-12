@@ -358,3 +358,9 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Tutorial: dùng skill tướng cũng hỏi xác nhận như trận thường.
 - Cửa hàng: chấm đỏ ở biểu tượng shop khi còn quà miễn phí chưa nhận hôm nay (`hasFreeOffer` trong core/shop.js, có test).
 - Sửa nháy sau cutscene 4★ → màn chính: không gỡ class `hubin` bằng timer nữa (gỡ giữa chừng làm màn nháy 1 khung lộ bàn đấu bên dưới).
+
+### v0.49.0
+- Chuỗi chỉ tay tân thủ sau cutscene 4★ (`ui/guide.js`, bước lưu ở `progress.onboarding.guide`): Cửa hàng (chấm đỏ) → nhận quà → quay lại → Chiến đấu → khu đầu → ải 1 → Vào trận → bảng luật chọn đường → chạm cửa → xác nhận. Test: `tests/e2e/guide.cjs`.
+- Chọn cửa trên bản đồ luôn có hộp xác nhận (chạm cửa mở chi tiết + nút "Vào cửa này"; chỉ khi còn đúng 1 cửa thì vào thẳng).
+- Chấm đỏ ở nút Triệu hồi khi còn lượt miễn phí hôm nay.
+- Tutorial bài 4: phải khóa mục tiêu vào quái ít máu nhất (mũi tên chỉ) rồi mới dùng skill.

@@ -112,6 +112,7 @@ export function install(app) {
       f.classList.add('go');
       audio.sfx('fanfare');
       // Dựng màn chính NGAY dưới lớp cutscene (còn đục), rồi mới mờ cutscene: không lộ màn triệu hồi cũ, không có nhịp trống.
+      app.guideSet('shop'); // bắt đầu chuỗi chỉ tay: shop → chiến đấu → ải 1 → vào trận
       enterHubFx();
       root.classList.add('out');
       setTimeout(() => root.remove(), reduced() ? 50 : 750);

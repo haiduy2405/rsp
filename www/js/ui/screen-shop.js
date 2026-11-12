@@ -50,9 +50,13 @@ export function install(app) {
       msg ? h('div', { class: 'notice', id: 'shop-msg' }, msg) : null,
       cards,
       btn(t('hub.items'), () => app.showItems(), '', { id: 'shop-items' }),
-      btn(t('back'), showHub, '', { id: 'back' }),
+      btn(t('back'), () => { if (app.guideStep() === 'claim') app.guideSet('battle'); showHub(); }, '', { id: 'back' }),
     );
     msg = null;
+    if (app.guideStep() === 'claim') {
+      const free = document.querySelector('#screen .shop-offer button.primary:not([disabled])');
+      app.guidePoint(free || '#back-top', free ? 'guide.claim' : 'guide.back');
+    }
   }
 
   return { showShop };

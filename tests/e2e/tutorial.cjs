@@ -22,7 +22,7 @@ const { chromium } = require('playwright');
   await p.screenshot({ path: `${dir}/tu-wrong.png` });
   for (let i = 0; i < cfg.length; i++) {
     const L = cfg[i];
-    if (L.kind === 'skill') { const hx = box.x + ((12 + 52) / 540) * box.width; const hy = box.y + (420 / 960) * box.height; await p.mouse.click(hx, hy); }
+    if (L.kind === 'skill') { const st = await p.evaluate(() => window.__game.getState().enemies.map(e => e.hp)); let lo = -1; st.forEach((h, k) => { if (h > 0 && (lo < 0 || h < st[lo])) lo = k; }); await p.mouse.click(box.x + (((540 / 3) * lo + 90) / 540) * box.width, box.y + (165 / 960) * box.height); await p.waitForTimeout(600); const hx = box.x + ((12 + 52) / 540) * box.width; const hy = box.y + (420 / 960) * box.height; await p.mouse.click(hx, hy); await p.waitForTimeout(500); await p.locator('#skill-ok').click({ timeout: 1500 }).catch(() => {}); }
     else await drag(L.path);
     await p.waitForFunction(() => !window.__game.isBusy(), null, { timeout: 15000 }).catch(() => {}); await p.waitForTimeout(900);
     console.log('lesson', i + 1, L.id, await info(), (await p.textContent('#coach') || '').slice(0, 40));

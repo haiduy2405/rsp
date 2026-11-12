@@ -1,5 +1,6 @@
 import { buildCtx, loadRaw } from './core/ctx.js';
 import { hasFreeOffer } from './core/shop.js';
+import { createGuide } from './ui/guide.js';
 import { createRun, runStep, newRunRecord, debugWinBattle, runLayout } from './core/run.js';
 import { stageOpen, tierOpen, stagesDone, zoneClears } from './core/stage.js';
 import { stageInfo } from './core/stageinfo.js';
@@ -83,9 +84,14 @@ let seedText = '';
 
 // ---- tiện ích DOM
 let atHub = false;
+const guide = createGuide($('wrap'));
+const guideStep = () => progress?.onboarding?.guide;
+const guideSet = (step) => { if (step) progress.onboarding.guide = step; else delete progress.onboarding.guide; save(); };
+const guidePoint = (target, key, delay) => guide.point(target, t(key), delay);
 const screen = (...kids) => {
   $('info')?.remove();
   $('pause-btn')?.remove();
+  guide.clear();
   $('screen').onpointerdown = null;
   atHub = false;
   audio.playMusic('hub');
@@ -229,15 +235,20 @@ function showHub() {
       'nav',
       { class: 'dock' },
       dockBtn('team', t('hub.team'), () => showTeam(), 'b-team'),
-      dockBtn('summon', t('hub.summon'), () => ui.showSummon('standard'), 'b-summon', 'sub'),
-      h('button', { class: 'battle', id: 'b-battle', onclick: () => showZones(), 'aria-label': t('hub.battle') }, h('img', { src: 'assets/ui/icons/battle.webp', alt: '', draggable: 'false' }), h('span', {}, t('hub.battle'))),
-      dockBtn('shop', t('hub.shop'), () => ui.showShop(), 'b-shop', '', hasFreeOffer(ctx, progress, ui.dayKey())),
+      dockBtn('summon', t('hub.summon'), () => ui.showSummon('standard'), 'b-summon', 'sub', progress.summon.freeDay !== ui.dayKey()),
+      h('button', { class: 'battle', id: 'b-battle', onclick: () => { if (guideStep() === 'battle') guideSet('zone'); showZones(); }, 'aria-label': t('hub.battle') }, h('img', { src: 'assets/ui/icons/battle.webp', alt: '', draggable: 'false' }), h('span', {}, t('hub.battle'))),
+      dockBtn('shop', t('hub.shop'), () => { if (guideStep() === 'shop') guideSet('claim'); ui.showShop(); }, 'b-shop', '', hasFreeOffer(ctx, progress, ui.dayKey())),
       dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest'),
     ),
   );
   $('screen').classList.add('hub');
   atHub = true;
   notice = null;
+  // Hướng dẫn tân thủ: shop (quà miễn phí) → Chiến đấu → ải 1 → Vào trận → luật chọn đường
+  let gs = guideStep();
+  if (gs && gs !== 'shop' && gs !== 'battle') { guideSet('battle'); gs = 'battle'; }
+  if (gs === 'shop') guidePoint('#b-shop', 'guide.shop', 1000);
+  else if (gs === 'battle') guidePoint('#b-battle', 'guide.battle');
 }
 
 function resumeChip() {
@@ -276,7 +287,9 @@ function showStages(zoneId, tier) {
     onHold(card, () => showStageInfo(zoneId, tier, n));
     return card;
   });
+  const gst = ['zone', 'stage', 'team'].includes(guideStep());
   screen(h('h2', {}, t(`zone.${zoneId}`)), tabs, h('div', { class: 'muted tier-note' }, t('diff.reward', { gold: df.gold, drop: df.drop })), h('div', { class: 'stagelist' }, cards), h('div', { class: 'muted hold-hint' }, t('stage.hold')), btn(t('back'), showZones, '', { id: 'back' }));
+  if (gst) { guideSet('stage'); guidePoint(`#screen [data-stage="${done + 1 > total ? 1 : done + 1}"]`, 'guide.stage'); }
 }
 
 // Giữ lâu (450ms) trên một phần tử để mở thông tin; thả tay sau khi mở không tính là chạm.
@@ -339,6 +352,7 @@ function showZones() {
     );
   });
   const act0 = activeRunInfo();
+  const gz = ['zone', 'stage', 'team'].includes(guideStep());
   screen(
     h('h2', {}, t('hub.zones')),
     act0 ? h('div', { class: 'card' }, h('b', {}, t('run.resume')), h('div', { class: 'muted' }, `${stageLabel(act0.run)} · ${t('run.floor', { n: act0.run.floor + 1, total: act0.run.floors })}`), h('div', { class: 'row' }, btn(t('run.resume'), resumeRun, 'primary', { id: 'zones-resume' }), btn(t('run.abandon'), () => { clearActiveRun(); showZones(); }, '', { id: 'zones-abandon' }))) : null,
@@ -346,6 +360,7 @@ function showZones() {
     h('details', {}, h('summary', {}, t('hub.debug')), h('label', {}, t('hub.seed'), h('input', { id: 'seed', inputmode: 'numeric', value: seedText, oninput: (e) => (seedText = e.target.value) })), h('p', { class: 'muted' }, t('hub.progress'))),
     btn(t('back'), showHub, '', { id: 'back' }),
   );
+  if (gz) { guideSet('zone'); guidePoint('#screen [data-zone-card]:not(.locked)', 'guide.zone'); }
 }
 
 function setLang(l) {
@@ -512,6 +527,7 @@ function tile(id, slotNo) {
 
 // Màn đội hình: dùng cả ở menu (Đội hình) lẫn trước khi vào trận (stage = { zoneId, diff } có giá trị).
 function showTeam(slot, msg, stage) {
+  const gt = stage && ['stage', 'team'].includes(guideStep());
   const team = progress.team;
   if (slot === undefined || slot === null) slot = Math.max(0, team.indexOf(null));
   const members = team.filter((id) => id !== null);
@@ -567,6 +583,7 @@ function showTeam(slot, msg, stage) {
     btn(`${t('hub.collection')} ${owned().length}/${ctx.characterList.length}`, () => showCollection(), '', { id: 'team-col' }),
     btn(t('back'), showHub, '', { id: 'back' }),
   );
+  if (gt && !needLeader && members.length) { guideSet('team'); guidePoint('#team-go', 'guide.team'); }
 }
 
 // Cửa hàng và Nhiệm vụ: khung chờ, chưa có nội dung (gói ủng hộ ở M6; nhiệm vụ làm sau).
@@ -637,6 +654,7 @@ function startRun({ zoneId, diff, stage = 1 }) {
   runPath = [];
   savedThisRun = false;
   delete progress.activeRun;
+  if (guideStep() === 'team') guideSet('doors');
   render();
 }
 
@@ -820,6 +838,7 @@ function doorList() {
 }
 
 // Giữ lâu một cửa trên bản đồ: xem chi tiết cửa đó (quái, mô tả) rồi chọn vào hoặc đóng.
+let doorHint = false; // sau phần luật: chỉ tay vào nút xác nhận ở lần mở chi tiết cửa đầu tiên
 function showDoorDetail(i) {
   if ($('info')) return;
   const k = run.doors[i];
@@ -837,6 +856,17 @@ function showDoorDetail(i) {
     h('div', { class: 'charrow' }, ico, h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`door.${k}`)), h('small', { class: 'muted' }, t(`door.desc.${k}`)))),
     h('div', { class: 'card' }, h('b', {}, foes ? t('run.foes') : t('run.reward')), rows),
     h('div', { class: 'row' }, btn(t('info.close'), close, '', { id: 'info-close' }), btn(t('run.enterDoor'), () => { close(); act({ type: 'door', index: i }); }, 'primary', { id: 'door-enter' })))));
+  if (doorHint) { doorHint = false; guidePoint('#door-enter', 'guide.enter', 250); }
+}
+
+function showRules() {
+  const close = () => {
+    $('info')?.remove();
+    doorHint = true;
+    guidePoint('#screen [data-door]', 'guide.door', 300);
+  };
+  const body = h('div', { class: 'infobox rules-box' }, h('h3', {}, t('guide.rules.title')), h('ul', {}, [1, 2, 3, 4, 5].map((n) => h('li', {}, t(`guide.rules.${n}`)))), btn(t('guide.rules.ok'), close, 'primary', { id: 'rules-ok' }));
+  setTimeout(() => { if (!$('info')) $('wrap').appendChild(h('div', { id: 'info' }, body)); }, 350);
 }
 
 function showDoors() {
@@ -867,7 +897,7 @@ function showDoors() {
   map.innerHTML = runMapSVG();
   map.querySelectorAll('[data-door]').forEach((nd) => {
     const idx = Number(nd.getAttribute('data-door'));
-    const go = () => { if (heldFlag.v) return; act({ type: 'door', index: idx }); };
+    const go = () => { if (heldFlag.v) return; if (run.doors.length > 1) showDoorDetail(idx); else act({ type: 'door', index: idx }); }; // chọn cửa nào cũng có xác nhận (cửa duy nhất thì vào luôn)
     onHold(nd, () => showDoorDetail(idx));
     nd.addEventListener('click', go);
     nd.addEventListener('keydown', (e) => e.key === 'Enter' && go());
@@ -883,6 +913,7 @@ function showDoors() {
     btn(t('run.leave'), leaveRun, 'ghost', { id: 'leave-run' }),
   );
   $('screen').classList.add('mapscreen');
+  if (guideStep() === 'doors') { guideSet(null); showRules(); }
   // cuộn bản đồ tới tầng đang chọn (kéo cuộn để xem phần còn lại)
   const svg = map.querySelector('svg');
   const vy = run.floors > 1 ? 468 - run.floor * ((468 - 118) / (run.floors - 1)) : 468;
@@ -939,6 +970,7 @@ function startTutorial(retry = false) {
     audio.sfx('tick');
   };
   const samePath = (a, b) => a.length === b.length && a.every((c, i) => c === b[i]);
+  let lockIdx = -1;
   const startLesson = (i) => {
     li = i;
     if (i >= lessons.length) {
@@ -949,7 +981,19 @@ function startTutorial(retry = false) {
     const L = lessons[i];
     const title = t('tut.lesson', { n: i + 1, total: lessons.length });
     if (L.kind === 'skill') {
-      game.setGuide({ title, board: L.board || null, allow: (a) => a.type === 'skill' && a.index === L.index });
+      // Bài kỹ năng: trước hết khóa mục tiêu vào quái ÍT MÁU NHẤT (mũi tên chỉ), rồi mới dùng skill đánh đúng quái đó.
+      const st = game.getState();
+      const low = st.enemies.reduce((b, e, k) => (e.hp > 0 && (b < 0 || e.hp < st.enemies[b].hp) ? k : b), -1);
+      if (L.lock && st.focus !== low) {
+        lockIdx = low;
+        game.setGuide({ title, board: L.board || null, enemy: low, allow: (a) => a.type === 'target' && a.index === low });
+        coach(L.coachLock);
+      } else {
+        lockIdx = -1;
+        game.setGuide({ title, board: L.board || null, allow: (a) => a.type === 'skill' && a.index === L.index && (!L.lock || game.getState().focus === low) });
+        coach(L.coach);
+      }
+      return;
     } else {
       game.setGuide({ title, board: L.board, path: L.path, text: t('tut.guide'), allow: (a) => a.type === 'move' && samePath(a.path, L.path) });
     }
@@ -972,7 +1016,8 @@ function startTutorial(retry = false) {
     onInspect: showInspect,
     onSkillAsk: showSkillAsk, // tutorial cũng hỏi xác nhận như trận thường để người chơi quen
     celebrate,
-    onReject(a) { coach(a.type === 'skill' ? 'tut.wrongSkill' : 'tut.wrong'); },
+    onReject(a) { coach(a.type === 'target' ? 'tut.wrongTarget' : a.type === 'skill' ? 'tut.wrongSkill' : 'tut.wrong'); },
+    onLock() { if (lockIdx >= 0) startLesson(li); }, // đã khóa đúng quái: sang bước dùng skill
     onSettled(state) {
       if (li < lessons.length) startLesson(li + 1);
     },
@@ -1346,7 +1391,7 @@ function showInstallHelp() {
 // ---- Màn hình tách module: dùng chung trạng thái qua `app`, gọi chéo qua `app.*` / `ui.*`
 const ui = {};
 const app = {
-  startTutorial: () => startTutorial(), enterHub: showHub,
+  startTutorial: () => startTutorial(), enterHub: showHub, guideStep, guideSet, guidePoint,
   ctx, audio, storage, slots, enterSlot, dicts, h, btn, $, el, chip, portrait, CUR_COL, fodderName, offeringName, pct, save, screen, setLang, showHub,
   t: (...a) => t(...a),
   get lang() { return lang; },
@@ -1369,6 +1414,7 @@ if ('serviceWorker' in navigator && !DEBUG && location.protocol.startsWith('http
 
 if (DEBUG) {
   window.__ctx = ctx;
+  window.__progress = () => progress;
   window.__cheat = (ids = []) => {
     const p = structuredClone(progress);
     for (const tier of [1, 2, 3]) p.inventory.elixir[tier] += 50;

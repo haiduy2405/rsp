@@ -23,7 +23,7 @@ const DIAG_ASSIST = 0.38; // tỉ lệ ô: lệch ngang và dọc đều vượt
 const NOFX = { sfx() {}, vibrate() {} };
 
 
-export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null, onSkillAsk = null, onSettled = null, hintOpts = {}, guard = null, onReject = null }) {
+export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null, onSkillAsk = null, onSettled = null, hintOpts = {}, guard = null, onReject = null, onLock = null }) {
   let moveGuard = guard; // tutorial: chỉ cho đúng nước/hành động được chỉ định
   const g = canvas.getContext('2d');
   let state = initial;
@@ -484,12 +484,14 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     if (pr.kind === 'team') return;
     if (pr.kind === 'enemy') {
       if (state.enemies[pr.idx]?.hp > 0) {
+        if (moveGuard && !moveGuard({ type: 'target', index: pr.idx })) { fx.sfx('error'); onReject?.({ type: 'target', index: pr.idx }); return; }
         const r = stepper(state, { type: 'target', index: pr.idx });
         if (r.events[0]?.type !== 'invalid') {
           state = r.state;
           sync();
           fx.sfx('pick');
           view.lockFlash = 1;
+          onLock?.(state.focus);
         }
       }
       return;
@@ -761,8 +763,9 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     },
     hideHint() { view.hint = null; view.hintKeep = null; },
     // Bài hướng dẫn: đặt bàn cố định, đường chỉ định và bộ lọc nước đi.
-    setGuide({ board = null, path = null, text = '', allow = null, title = null }) {
+    setGuide({ board = null, path = null, text = '', allow = null, title = null, enemy = null }) {
       if (title !== null) view.titleText = title;
+      view.guideEnemy = enemy;
       if (board) { const same = state.board.cells.every((c, i) => c === board[i]); state.board = { cells: board.slice(), enh: new Array(board.length).fill(0) }; sync(); if (!same) view.boardIn = 0; }
       moveGuard = allow;
       view.hint = path ? { path: path.slice(), text } : null;
