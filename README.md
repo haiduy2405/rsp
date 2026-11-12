@@ -239,3 +239,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Quái thở nhẹ + lao tới khi tấn công; nút lún khi bấm; danh sách ải trượt vào, ải sẵn sàng nhấp nháy, boss phát lửa.
 - Bảng/hộp thoại bật lên; chi tiết tướng vào sân; nút Thức tỉnh phát sáng khi đủ điều kiện; tiền tệ nảy khi đổi; đom đóm ở màn chính.
 - Tôn trọng `prefers-reduced-motion`.
+
+## v0.34.1 — Animation (phần 2)
+- Ô tướng sẵn sàng kỹ năng: hào quang xanh dâng lên + hạt sáng bay.
+- Cửa hàng: ưu đãi trượt vào lần lượt, nút lún. Triệu hồi: thẻ úp nhịp sáng tím.
+- Số sát thương đã có bật/co sẵn (không đổi).

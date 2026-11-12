@@ -624,3 +624,12 @@ button:active:not(:disabled) { transform: scale(.95); filter: brightness(.92); }
 @keyframes spark { 0% { opacity: 0; transform: translate(0, 12px) scale(.5); } 25% { opacity: .95; } 100% { opacity: 0; transform: translate(14px, -46px) scale(1.1); } }
 .hub-scene .spark { position: absolute; width: 6px; height: 6px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff6cf 0%, #ffd77a 45%, rgba(255, 215, 122, 0) 72%); animation: spark 6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .hub-scene .spark { animation: none !important; } }
+
+/* Cửa hàng: ưu đãi trượt vào; Triệu hồi: thẻ úp nhịp sáng, đến lượt lật có độ trễ */
+.shop-offer { animation: listIn .35s both; }
+.shop-offer:nth-child(2) { animation-delay: .05s; } .shop-offer:nth-child(3) { animation-delay: .1s; } .shop-offer:nth-child(4) { animation-delay: .15s; } .shop-offer:nth-child(5) { animation-delay: .2s; } .shop-offer:nth-child(n+6) { animation-delay: .25s; }
+.shop-offer button:active { transform: scale(.94); }
+@keyframes backGlow { 0%, 100% { box-shadow: 0 0 0 rgba(167, 119, 255, 0); } 50% { box-shadow: 0 0 16px rgba(167, 119, 255, .55); } }
+.sumcard.back { animation: backGlow 2s ease-in-out infinite; }
+.sumcard.back:nth-child(odd) { animation-delay: .5s; }
+@media (prefers-reduced-motion: reduce) { .shop-offer, .sumcard.back { animation: none !important; } }

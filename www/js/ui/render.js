@@ -506,6 +506,20 @@ export function draw(g, view, t) {
         g.fill();
       }
     }
+    if (ready) {
+      // hào quang dâng lên từ chân ô khi kỹ năng sẵn sàng
+      const ph = ((t * 0.0012 + i * 0.37) % 1);
+      const gr = g.createLinearGradient(0, y + 70 + oy, 0, y);
+      gr.addColorStop(0, 'rgba(125,255,160,0.28)');
+      gr.addColorStop(1, 'rgba(125,255,160,0)');
+      g.save();
+      g.beginPath(); g.rect(x, y, 98, 70 + oy); g.clip();
+      g.fillStyle = gr; g.fillRect(x, y, 98, 70 + oy);
+      g.globalAlpha = 0.5 * (1 - ph);
+      g.fillStyle = '#c8ffd6';
+      g.beginPath(); g.arc(x + 14 + ((i * 29) % 70), y + 66 + oy - ph * (60 + oy), 2.2, 0, Math.PI * 2); g.fill();
+      g.restore();
+    }
     if (ready && view.canAct) {
       const glow = 0.55 + 0.45 * Math.sin(t * 0.006);
       g.save();
