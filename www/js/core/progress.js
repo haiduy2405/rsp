@@ -2,8 +2,9 @@ import { newSummonState } from './summon.js';
 import { newPlayer } from './onboarding.js';
 import { mergeCounts } from './loot.js';
 import { newCharacter, SKILL_KINDS } from './kit.js';
+import { grantExp } from './upgrade.js';
 // Tiến trình người chơi (dữ liệu được lưu). Hàm thuần: nhận progress, trả progress mới.
-export const SAVE_VERSION = 8;
+export const SAVE_VERSION = 9;
 
 export const DEFAULT_TEAM = ['thetis', 'bennu', 'atalanta', 'eos', 'eir'];
 
@@ -12,7 +13,7 @@ export function newProgress(ctx) {
   for (let e = 0; e < 6; e++) stones[e] = { normal: 0, rare: 0 };
   return {
     version: SAVE_VERSION,
-    inventory: { gold: 0, essence: 0, spirit: 0, shards: 0, stones, fodder: {}, offerings: {} }, // essence = Bánh EXP; fodder = Tiểu Linh { 'hệ_sao': số }; offerings = Lễ Vật { 'tộc_bậc': số }
+    inventory: { gold: 0, elixir: { 1: 0, 2: 0, 3: 0 }, tickets: 0, spirit: 0, shards: 0, stones, fodder: {}, offerings: {} }, // elixir = Đan Tinh Hoa { bậc: số } (EXP cố định mỗi viên); tickets = Vé Triệu Hồi; spirit = Linh Thạch (đổi vé); fodder = Tiểu Linh { 'hệ_sao': số }; offerings = Lễ Vật { 'tộc_bậc': số }
     unlocked: [ctx.zoneList[0].id],
     clears: {}, // { zoneId: { easy, normal, hard } } số lần thắng
     pity: {},
@@ -29,7 +30,7 @@ export function newProgress(ctx) {
 export function isValidProgress(p) {
   if (!p || typeof p !== 'object' || p.version !== SAVE_VERSION) return false;
   const inv = p.inventory;
-  if (!inv || typeof inv.gold !== 'number' || typeof inv.essence !== 'number') return false;
+  if (!inv || typeof inv.gold !== 'number' || !inv.elixir || Object.values(inv.elixir).some((n) => !Number.isInteger(n) || n < 0) || !Number.isInteger(inv.tickets) || inv.tickets < 0) return false;
   if (typeof inv.spirit !== 'number' || typeof inv.shards !== 'number' || !inv.stones) return false;
   for (let e = 0; e < 6; e++) {
     const s = inv.stones[e];
@@ -59,13 +60,14 @@ export function applyRunResult(ctx, progress, run) {
   const zone = ctx.zones[run.zoneId];
   const inv = p.inventory;
   inv.gold += run.loot.gold;
-  inv.essence += run.loot.essence;
+  for (const t of [1, 2, 3]) inv.elixir[t] += run.loot.elixir[t];
   inv.spirit += run.loot.spirit;
   inv.shards += run.loot.shards;
   inv.stones[zone.element].normal += run.loot.stones.normal;
   inv.stones[zone.element].rare += run.loot.stones.rare;
   inv.fodder = mergeCounts(inv.fodder, run.loot.fodder);
   inv.offerings = mergeCounts(inv.offerings, run.loot.offerings);
+  for (const id of p.team) if (id) grantExp(ctx, p.characters[id], id, run.heroExp); // EXP cố định sau trận, cả khi thua
   p.pity[run.zoneId] = run.rareMissed;
   p.stats.runs += 1;
   if (run.result === 'won') {

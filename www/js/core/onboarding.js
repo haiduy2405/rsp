@@ -20,7 +20,7 @@ export function finishOnboarding(ctx, progress, input) {
   const p = structuredClone(progress);
   p.player = { name, callsign, hometown, avatar: input.avatar, culture: input.culture };
   p.onboarding.done = true;
-  p.inventory.spirit += ctx.config.summon.welcomeSpirit; // quà chào mừng để thử Nghi Thức
+  p.inventory.tickets += ctx.config.summon.welcomeTickets; // quà chào mừng để thử Nghi Thức
   return { ok: true, progress: p };
 }
 

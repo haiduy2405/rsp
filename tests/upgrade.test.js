@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { newProgress, isValidProgress } from '../www/js/core/progress.js';
-import { expToNext, expToMax, useCakes, feedFodder, sellFodder, fodderExp, awakenCost, awaken, grantCharacter, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, placeInSlot, clearTeam, autoTeam, charPower } from '../www/js/core/upgrade.js';
+import { expToNext, expToMax, useElixir, feedFodder, sellFodder, fodderExp, awakenCost, awaken, grantCharacter, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, placeInSlot, clearTeam, autoTeam, charPower } from '../www/js/core/upgrade.js';
 import { migrate } from '../www/js/save/migrate.js';
 import { createRun, playRun, newRunRecord, runStep } from '../www/js/core/run.js';
 import { statsFor } from '../www/js/core/stats.js';
@@ -11,7 +11,7 @@ import { loadCtx } from './helpers.js';
 const ctx = loadCtx();
 const rich = () => {
   const p = newProgress(ctx);
-  p.inventory.essence = 100000;
+  p.inventory.elixir = { 1: 100000, 2: 100000, 3: 100000 };
   p.inventory.gold = 100000;
   p.inventory.shards = 500;
   for (let e = 0; e < 6; e++) p.inventory.stones[e] = { normal: 100, rare: 100 };
@@ -26,26 +26,29 @@ test('EXP: cần nhiều hơn theo cấp và độ hiếm, trần ở levelMax, 
   assert.equal(expToNext(ctx, 'thetis', max), null);
   const p = rich();
   const need = expToNext(ctx, 'thetis', 1);
-  const r = useCakes(ctx, p, 'thetis', need + 5);
-  assert.equal(r.progress.characters.thetis.level, 2);
-  assert.equal(r.progress.characters.thetis.exp, 5);
-  assert.equal(r.progress.inventory.essence, p.inventory.essence - need - 5);
+  const unit = ctx.config.elixir[1].exp;
+  const k = Math.ceil(need / unit);
+  const r = useElixir(ctx, p, 'thetis', 1, k);
+  assert.ok(r.progress.characters.thetis.level >= 2);
+  assert.equal(r.progress.inventory.elixir[1], p.inventory.elixir[1] - k);
+  assert.equal(r.exp, k * unit);
   assert.equal(p.characters.thetis.level, 1); // không sửa progress gốc
-  assert.equal(useCakes(ctx, newProgress(ctx), 'thetis', 10).reason, 'not_enough_essence');
-  assert.equal(useCakes(ctx, p, 'zeus', 10).reason, 'not_owned');
+  assert.equal(useElixir(ctx, newProgress(ctx), 'thetis', 1, 10).reason, 'not_enough_elixir');
+  assert.equal(useElixir(ctx, p, 'zeus', 1, 10).reason, 'not_owned');
+  assert.equal(useElixir(ctx, p, 'thetis', 9, 1).reason, 'bad_item');
   // dùng vô hạn Bánh: dừng đúng ở cấp tối đa, không tốn thừa
-  p.inventory.essence = 10 ** 6;
+  p.inventory.elixir = { 1: 10 ** 6, 2: 10 ** 6, 3: 10 ** 6 };
   const total = expToMax(ctx, 'thetis', p.characters.thetis);
-  const q = useCakes(ctx, p, 'thetis', 10 ** 9);
+  const q = useElixir(ctx, p, 'thetis', 1, 10 ** 9);
   const cap1 = ctx.config.progression.levelCapForm1;
   assert.equal(q.progress.characters.thetis.level, cap1, 'Form 1 bị chặn ở levelCapForm1');
   assert.equal(q.progress.characters.thetis.exp, 0);
-  assert.equal(q.used, total);
-  assert.equal(useCakes(ctx, q.progress, 'thetis', 10).reason, 'max_level');
+  assert.equal(q.used, Math.ceil(total / unit));
+  assert.equal(useElixir(ctx, q.progress, 'thetis', 1, 10).reason, 'max_level');
   // Thức tỉnh Form 2 mở trần tới levelMax
   const f2 = structuredClone(q.progress);
   f2.characters.thetis.awaken = 1;
-  assert.equal(useCakes(ctx, f2, 'thetis', 10 ** 9).progress.characters.thetis.level, max);
+  assert.equal(useElixir(ctx, f2, 'thetis', 3, 10 ** 9).progress.characters.thetis.level, max);
 });
 
 test('Tiểu Linh: cho ăn lấy EXP (cùng hệ được thêm), bán lấy Vàng, không ăn thừa', () => {
@@ -143,13 +146,13 @@ test('save: migrate v2 lên v3 chuyển đội mẫu cũ sang đội khởi đ�
   v2.inventory.gold = 321;
   const out = migrate(v2, 2, ctx);
   assert.ok(isValidProgress(out));
-  assert.equal(out.inventory.gold, 321);
+  assert.equal(out.inventory.gold, 3210);
   assert.deepEqual(out.team, newProgress(ctx).team);
 });
 
 test('chuyến leo tháp dùng chỉ số theo Level/Thức tỉnh và vẫn xác định theo replay', () => {
   let p = rich();
-  p = useCakes(ctx, p, 'thetis', 5000).progress;
+  p = useElixir(ctx, p, 'thetis', 2, 10).progress;
   p = awaken(ctx, p, 'thetis').progress;
   const team = teamRoster(p);
   const lowRun = createRun(ctx, { seed: 4, zoneId: 'zone_water', team: teamRoster(newProgress(ctx)) });
@@ -248,5 +251,5 @@ test('migrate v7 → v8: Thức tỉnh thành Form 2; vượt cấp 30 cũng lê
   };
   const out = migrate(old, 7, ctx);
   assert.deepEqual([out.characters.a.awaken, out.characters.b.awaken, out.characters.c.awaken], [1, 1, 0]);
-  assert.equal(out.version, 8);
+  assert.equal(out.version, 9);
 });

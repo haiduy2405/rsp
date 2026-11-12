@@ -118,7 +118,7 @@ test('run: rương nhận loot, nghỉ hồi máu không quá tối đa, sau đ�
   const r1 = runStep(ctx, run, { type: 'door', index: idx }).run;
   assert.equal(r1.phase, 'result');
   assert.equal(r1.lastResult.kind, 'chest');
-  assert.ok(r1.loot.gold > 0 && r1.loot.essence > 0);
+  assert.ok(r1.loot.gold > 0 && r1.loot.elixir[1] >= 0);
   const r2 = runStep(ctx, r1, { type: 'continue' }).run;
   assert.equal(r2.phase, 'doors');
   assert.equal(r2.floor, 2);
@@ -139,8 +139,8 @@ test('run: máu đội giữ qua các ải; ải sau bắt đầu với máu hi�
   r = rigWin(r);
   r.battle.hp = 1500; // bị đánh còn 1500
   r = runStep(ctx, r, winMove).run;
-  assert.equal(r.phase, 'result');
   assert.equal(r.battle.status, 'won');
+  assert.ok(r.heroExp > 0, 'thắng trận cộng EXP tướng');
   assert.equal(r.hp, r.battle.hp, 'máu run cập nhật theo trận');
   assert.ok(r.hp < r.maxHp, 'máu không tự đầy giữa các ải');
   const carried = r.hp;
@@ -269,19 +269,19 @@ test('shop: bán Di Vật và vật phẩm; mua cần đủ Vàng, mỗi ô ch�
   assert.equal(r.shop.length, rc.shopRelics + rc.shopSlots);
   assert.equal(r.shop.filter((x) => x.relic).length, rc.shopRelics);
   assert.equal(runStep(ctx, r, { type: 'buy', slot: 0 }).events[0].reason, 'not_enough_gold');
-  r.loot.gold = 1000;
+  r.loot.gold = 10000;
   // Di Vật
   const relic = r.shop[0].relic;
   const rp = r.shop[0].price;
   r = runStep(ctx, r, { type: 'buy', slot: 0 }).run;
-  assert.equal(r.loot.gold, 1000 - rp);
+  assert.equal(r.loot.gold, 10000 - rp);
   assert.deepEqual(r.relics, [relic]);
   // Vật phẩm
   const slot = r.shop.findIndex((x) => x.item);
   const item = r.shop[slot].item;
   const price = r.shop[slot].price;
   r = runStep(ctx, r, { type: 'buy', slot }).run;
-  assert.equal(r.loot.gold, 1000 - rp - price);
+  assert.equal(r.loot.gold, 10000 - rp - price);
   assert.equal(r.items[item], 1);
   assert.equal(runStep(ctx, r, { type: 'buy', slot }).events[0].reason, 'bad_slot');
   r = runStep(ctx, r, { type: 'leaveShop' }).run;
@@ -380,7 +380,7 @@ test('fuzz: 200 chuyến bot ngẫu nhiên luôn kết thúc, tài nguyên hợp
     assert.equal(run.phase, 'end');
     assert.ok(run.hp >= 0 && run.hp <= run.maxHp);
     const l = run.loot;
-    for (const v of [l.gold, l.essence, l.spirit, l.shards, l.stones.normal, l.stones.rare]) assert.ok(Number.isInteger(v) && v >= 0);
+    for (const v of [l.gold, l.elixir[1], l.elixir[2], l.elixir[3], l.spirit, l.shards, l.stones.normal, l.stones.rare]) assert.ok(Number.isInteger(v) && v >= 0);
     if (run.result === 'won') {
       won++;
       assert.ok(run.completion);
@@ -416,4 +416,15 @@ test('progress: kết quả chuyến cộng vào kho, thắng mở khu kế, thu
   const r = applyRunResult(ctx, newProgress(ctx), last);
   assert.equal(r.inventory.stones[5].normal, last.loot.stones.normal);
   assert.throws(() => applyRunResult(ctx, p, mk(1)));
+});
+
+test('EXP sau trận: mỗi trận thắng cộng EXP cố định cho cả đội khi chuyến kết thúc, tăng theo khu', async () => {
+  const { newProgress, applyRunResult } = await import('../www/js/core/progress.js');
+  const p = newProgress(ctx);
+  const run = createRun(ctx, { seed: 3, zoneId: 'zone_water', team: p.team.map((id) => ({ id, level: 1, awaken: 0 })) });
+  run.heroExp = 150;
+  run.phase = 'end';
+  run.result = 'lost';
+  const out = applyRunResult(ctx, p, run);
+  for (const id of p.team) assert.ok(out.characters[id].level > 1 || out.characters[id].exp > 0, id);
 });

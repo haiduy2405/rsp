@@ -99,7 +99,7 @@ test('save: migrate v1 giả lập lên bản hiện tại', () => {
   const out = migrate(v1, 1, ctx);
   assert.equal(out.version, SAVE_VERSION);
   assert.ok(isValidProgress(out));
-  assert.equal(out.inventory.gold, 500);
+  assert.equal(out.inventory.gold, 5000); // ×10 theo thang Vàng mới
   assert.deepEqual(out.inventory.stones[0], { normal: 5, rare: 0 });
   assert.deepEqual(out.inventory.stones[5], { normal: 1, rare: 0 });
   assert.deepEqual(out.unlocked, ['zone_water', 'zone_fire', 'zone_wood']);

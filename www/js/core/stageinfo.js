@@ -24,8 +24,8 @@ export function stageInfo(ctx, zoneId, diff) {
     if (spec.spirit) add('spirit', spec.spirit.chance, spec.spirit.count);
     if (spec.fodder) add('fodder', spec.fodder.chance, spec.fodder.count);
     if (spec.offering) add('offering', spec.offering.chance, spec.offering.count);
-    const scaleG = (r) => r.map((x) => Math.round(x * d.gold));
-    return { kind, gold: scaleG(spec.gold), essence: scaleG(spec.essence), drops };
+    for (const [tier, e] of Object.entries(spec.elixir || {})) add(`elixir.${tier}`, e.chance, e.count);
+    return { kind, gold: spec.gold.map((x) => Math.round(x * d.gold)), drops };
   });
 
   const ac = cfg.affix;

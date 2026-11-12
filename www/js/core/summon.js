@@ -56,23 +56,23 @@ export function rollPull(ctx, st, banner, rng, culture) {
 
 const fail = (reason) => ({ ok: false, reason });
 
-// params: { bannerId, count, free, dayKey, seed }. Chi phí Linh Thạch = inventory.spirit.
+// params: { bannerId, count, free, dayKey, seed }. Chi phí = Vé Triệu Hồi (inventory.tickets), 1 vé mỗi lượt.
 export function summon(ctx, progress, { bannerId, count, free = false, dayKey, seed }) {
   const cfg = ctx.config.summon;
   const banner = ctx.banners[bannerId];
   if (!banner) return fail('unknown_banner');
   if (!(count === 1 || count === cfg.multiCount)) return fail('bad_count');
   const st0 = progress.summon;
-  let cost = cfg.costPerPull * count;
+  let cost = cfg.ticketsPerPull * count;
   if (free) {
     if (count !== 1) return fail('bad_count');
     if (st0.freeDay === dayKey) return fail('free_used');
     cost = 0;
   }
-  if (progress.inventory.spirit < cost) return fail('not_enough_spirit');
+  if (progress.inventory.tickets < cost) return fail('not_enough_tickets');
   let p = structuredClone(progress);
   const st = p.summon;
-  p.inventory.spirit -= cost;
+  p.inventory.tickets -= cost;
   if (free) st.freeDay = dayKey;
   const rng = mulberry32(seed);
   const results = [];
@@ -86,6 +86,17 @@ export function summon(ctx, progress, { bannerId, count, free = false, dayKey, s
   }
   if (st.history.length > cfg.historyMax) st.history.splice(0, st.history.length - cfg.historyMax);
   return { ok: true, progress: p, results, cost, free };
+}
+
+// Mua Vé Triệu Hồi bằng Linh Thạch theo gói (config.summon.ticketPacks).
+export function buyTickets(ctx, progress, pack) {
+  const def = ctx.config.summon.ticketPacks[pack];
+  if (!def) return fail('bad_pack');
+  if (progress.inventory.spirit < def.spirit) return fail('not_enough_spirit');
+  const p = structuredClone(progress);
+  p.inventory.spirit -= def.spirit;
+  p.inventory.tickets += def.tickets;
+  return { ok: true, progress: p, tickets: def.tickets, spirit: def.spirit };
 }
 
 // Đổi Mảnh Linh Hồn lấy nhân vật tự chọn (chưa sở hữu, không phải nhân vật dự trữ).

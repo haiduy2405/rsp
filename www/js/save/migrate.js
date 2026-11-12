@@ -5,7 +5,7 @@
 // v4: thêm player, onboarding, summon, settings; xem core/progress.js.
 // v5: clears theo độ khó { zoneId: { easy, normal, hard } }.
 // v6: EXP (characters[id].exp), Tiểu Linh (inventory.fodder).
-// v7: skillLv, Lễ Vật. v8: Thức tỉnh một bậc (Form 2).
+// v7: skillLv, Lễ Vật. v8: Thức tỉnh một bậc (Form 2). v9: Đan Tinh Hoa 3 bậc, Vé Triệu Hồi, Vàng ×10.
 import { SAVE_VERSION, DEFAULT_TEAM } from '../core/progress.js';
 
 const steps = {
@@ -73,6 +73,11 @@ const steps = {
     // v8: Thức tỉnh còn một bậc (Form 2). Ai đã thức tỉnh hoặc vượt cấp 30 thì lên thẳng Form 2.
     const characters = Object.fromEntries(Object.entries(data.characters).map(([id, c]) => [id, { ...c, awaken: c.awaken > 0 || c.level > 30 ? 1 : 0 }]));
     return { ...data, version: 8, characters };
+  },
+  8(data) {
+    // v9: Bánh EXP cũ (1 = 1 EXP) đổi thành Đan bậc 1 (100 EXP/viên); Vàng nhân 10 theo thang mới; Linh Thạch giữ nguyên, chưa có Vé.
+    const { essence = 0, ...inv } = data.inventory;
+    return { ...data, version: 9, inventory: { ...inv, gold: (inv.gold || 0) * 10, elixir: { 1: Math.floor(essence / 100), 2: 0, 3: 0 }, tickets: 0 } };
   },
 };
 

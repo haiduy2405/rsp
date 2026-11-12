@@ -120,15 +120,15 @@
     "items": {
       "potion": {
         "healPct": 0.25,
-        "price": 60
+        "price": 600
       },
       "shield": {
         "pct": 0.25,
-        "price": 80
+        "price": 800
       },
       "time": {
         "bonusMs": 2000,
-        "price": 70
+        "price": 700
       }
     },
     "zoneScale": {
@@ -146,13 +146,12 @@
   "loot": {
     "normal": {
       "gold": [
-        30,
-        60
+        300,
+        600
       ],
-      "essence": [
-        15,
-        30
-      ],
+      "elixir": {
+        "1": { "chance": 0.25, "count": [1, 2] }
+      },
       "stone": {
         "normalChance": 0.35,
         "normalCount": [
@@ -193,13 +192,13 @@
     },
     "elite": {
       "gold": [
-        70,
-        120
+        700,
+        1200
       ],
-      "essence": [
-        35,
-        60
-      ],
+      "elixir": {
+        "1": { "chance": 0.6, "count": [1, 2] },
+        "2": { "chance": 0.15, "count": [1, 1] }
+      },
       "stone": {
         "normalChance": 0.6,
         "normalCount": [
@@ -240,13 +239,14 @@
     },
     "boss": {
       "gold": [
-        120,
-        200
+        1200,
+        2000
       ],
-      "essence": [
-        60,
-        100
-      ],
+      "elixir": {
+        "1": { "chance": 0.8, "count": [2, 3] },
+        "2": { "chance": 0.4, "count": [1, 1] },
+        "3": { "chance": 0.03, "count": [1, 1] }
+      },
       "stone": {
         "normalChance": 0.9,
         "normalCount": [
@@ -287,13 +287,13 @@
     },
     "chest": {
       "gold": [
-        60,
-        120
+        600,
+        1200
       ],
-      "essence": [
-        30,
-        60
-      ],
+      "elixir": {
+        "1": { "chance": 0.5, "count": [1, 3] },
+        "2": { "chance": 0.25, "count": [1, 1] }
+      },
       "stone": {
         "normalChance": 0.7,
         "normalCount": [
@@ -334,13 +334,13 @@
     },
     "completion": {
       "gold": [
-        150,
-        250
+        1500,
+        2500
       ],
-      "essence": [
-        80,
-        140
-      ],
+      "elixir": {
+        "2": { "chance": 0.7, "count": [1, 2] },
+        "3": { "chance": 0.1, "count": [1, 1] }
+      },
       "stone": {
         "normalChance": 1.0,
         "normalCount": [
@@ -373,13 +373,12 @@
     },
     "swarm": {
       "gold": [
-        45,
-        90
+        450,
+        900
       ],
-      "essence": [
-        22,
-        45
-      ],
+      "elixir": {
+        "1": { "chance": 0.35, "count": [1, 2] }
+      },
       "stone": {
         "normalChance": 0.45,
         "normalCount": [
@@ -455,7 +454,7 @@
         "5": 2
       },
       "stages": [
-        { "shards": 20, "stone": "rare", "stones": 3, "gold": 3000 }
+        { "shards": 20, "stone": "rare", "stones": 3, "gold": 30000 }
       ]
     },
     "duplicateShards": {
@@ -472,10 +471,14 @@
     },
     "pity5": 60,
     "guarantee4Every": 10,
-    "costPerPull": 100,
+    "ticketsPerPull": 1,
+    "ticketPacks": [
+      { "tickets": 1, "spirit": 100 },
+      { "tickets": 10, "spirit": 900 }
+    ],
     "multiCount": 10,
     "redeemShards": 200,
-    "welcomeSpirit": 1000,
+    "welcomeTickets": 10,
     "historyMax": 100,
     "cultures": [
       "viet",
@@ -590,7 +593,14 @@
       }
     }
   },
+  "elixir": {
+    "1": { "exp": 100 },
+    "2": { "exp": 500 },
+    "3": { "exp": 2500 }
+  },
   "exp": {
+    "battle": { "normal": 12, "swarm": 10, "elite": 25, "boss": 50 },
+    "battleZoneGrowth": 0.25,
     "base": 40,
     "growth": 0.1,
     "rarityMult": {
@@ -622,10 +632,10 @@
         8
       ],
       "gold": [
-        200,
-        500,
-        1000,
-        2000
+        2000,
+        5000,
+        10000,
+        20000
       ],
       "rarityMult": {
         "3": 1,
@@ -650,9 +660,9 @@
   "relic": {
     "choices": 3,
     "price": {
-      "1": 80,
-      "2": 150,
-      "3": 260
+      "1": 800,
+      "2": 1500,
+      "3": 2600
     },
     "weights": {
       "shop": {

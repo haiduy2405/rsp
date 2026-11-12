@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mulberry32 } from '../www/js/core/rng.js';
 import { newProgress, isValidProgress } from '../www/js/core/progress.js';
-import { newSummonState, rollPull, summon, redeemCharacter, effectiveRates } from '../www/js/core/summon.js';
+import { newSummonState, rollPull, summon, buyTickets, redeemCharacter, effectiveRates } from '../www/js/core/summon.js';
 import { finishOnboarding, completeTutorial, storyUnlocked } from '../www/js/core/onboarding.js';
 import { migrate } from '../www/js/save/migrate.js';
 import { loadCtx } from './helpers.js';
@@ -13,7 +13,7 @@ const input = (o = {}) => ({ name: 'An', callsign: 'Kite', hometown: 'Mạo Khê
 const onboarded = (o) => finishOnboarding(ctx, newProgress(ctx), input(o)).progress;
 const rich = (o) => {
   const p = onboarded(o);
-  p.inventory.spirit = 1_000_000;
+  p.inventory.tickets = 1_000_000;
   return p;
 };
 
@@ -102,23 +102,37 @@ test('Tín Vật: lượt đầu tiên chắc chắn 4★ của nền văn hóa 
   }
 });
 
-test('chi phí: 100 Linh Thạch mỗi lượt, x10 = 1000, thiếu thì từ chối và không đổi gì', () => {
+test('chi phí: 1 Vé mỗi lượt, x10 = 10 Vé, thiếu thì từ chối và không đổi gì', () => {
   const p = onboarded();
-  p.inventory.spirit = 150;
-  assert.equal(summon(ctx, p, { bannerId: 'standard', count: 10, dayKey: 1, seed: 1 }).reason, 'not_enough_spirit');
+  p.inventory.tickets = 1 + 5;
+  assert.equal(summon(ctx, p, { bannerId: 'standard', count: 10, dayKey: 1, seed: 1 }).reason, 'not_enough_tickets');
   const r = summon(ctx, p, { bannerId: 'standard', count: 1, dayKey: 1, seed: 1 });
-  assert.equal(r.progress.inventory.spirit, 50);
+  assert.equal(r.progress.inventory.tickets, 5);
   assert.equal(summon(ctx, p, { bannerId: 'standard', count: 3, dayKey: 1, seed: 1 }).reason, 'bad_count');
   assert.equal(summon(ctx, p, { bannerId: 'nope', count: 1, dayKey: 1, seed: 1 }).reason, 'unknown_banner');
-  assert.equal(p.inventory.spirit, 150);
+  assert.equal(p.inventory.tickets, 6);
 });
 
-test('lượt miễn phí: 1 lần mỗi ngày, chỉ đơn lẻ, không tốn Linh Thạch', () => {
+test('mua vé: 100 Linh Thạch = 1 vé, 900 = 10 vé, thiếu thì từ chối', () => {
   const p = onboarded();
-  p.inventory.spirit = 0;
+  p.inventory.spirit = 1000;
+  p.inventory.tickets = 0;
+  const a = buyTickets(ctx, p, 1);
+  assert.equal(a.progress.inventory.tickets, 10);
+  assert.equal(a.progress.inventory.spirit, 100);
+  const b = buyTickets(ctx, p, 0);
+  assert.equal(b.progress.inventory.tickets, 1);
+  assert.equal(b.progress.inventory.spirit, 900);
+  assert.equal(buyTickets(ctx, a.progress, 1).reason, 'not_enough_spirit');
+  assert.equal(buyTickets(ctx, p, 7).reason, 'bad_pack');
+});
+
+test('lượt miễn phí: 1 lần mỗi ngày, chỉ đơn lẻ, không tốn Vé', () => {
+  const p = onboarded();
+  p.inventory.tickets = 0;
   let r = summon(ctx, p, { bannerId: 'standard', count: 1, free: true, dayKey: 100, seed: 1 });
   assert.equal(r.ok, true);
-  assert.equal(r.progress.inventory.spirit, 0);
+  assert.equal(r.progress.inventory.tickets, 0);
   assert.equal(summon(ctx, r.progress, { bannerId: 'standard', count: 1, free: true, dayKey: 100, seed: 2 }).reason, 'free_used');
   assert.equal(summon(ctx, r.progress, { bannerId: 'standard', count: 1, free: true, dayKey: 101, seed: 2 }).ok, true);
   assert.equal(summon(ctx, p, { bannerId: 'standard', count: 10, free: true, dayKey: 100, seed: 1 }).reason, 'bad_count');
@@ -178,14 +192,14 @@ test('lịch sử triệu hồi giữ tối đa historyMax bản ghi mới nhấ
   assert.equal(p.summon.history.at(-1).n, p.summon.pulls);
 });
 
-test('onboarding: kiểm tra dữ liệu, tặng Linh Thạch chào mừng, chỉ làm một lần', () => {
+test('onboarding: kiểm tra dữ liệu, tặng Vé chào mừng, chỉ làm một lần', () => {
   const p0 = newProgress(ctx);
   assert.equal(p0.onboarding.done, false);
   for (const bad of [{ name: '' }, { name: 'x'.repeat(40) }, { callsign: '' }, { avatar: 99 }, { avatar: 1.5 }, { culture: 'la_ma' }, { hometown: 'y'.repeat(60) }])
     assert.equal(finishOnboarding(ctx, p0, input(bad)).ok, false, JSON.stringify(bad));
   const r = finishOnboarding(ctx, p0, input({ name: '  An   Nguyễn ' }));
   assert.equal(r.progress.player.name, 'An Nguyễn');
-  assert.equal(r.progress.inventory.spirit, cfg.welcomeSpirit);
+  assert.equal(r.progress.inventory.tickets, cfg.welcomeTickets);
   assert.equal(r.progress.onboarding.done, true);
   assert.equal(finishOnboarding(ctx, r.progress, input()).reason, 'already_done');
   assert.ok(isValidProgress(r.progress));
@@ -210,7 +224,7 @@ test('save: migrate v3 lên v4 giữ dữ liệu; người đã chơi bỏ qua o
   v3.stats.runs = 4;
   const out = migrate(v3, 3, ctx);
   assert.ok(isValidProgress(out));
-  assert.equal(out.inventory.gold, 777);
+  assert.equal(out.inventory.gold, 7770);
   assert.equal(out.onboarding.done, true);
   v3.stats.runs = 0;
   assert.equal(migrate(v3, 3, ctx).onboarding.done, false);

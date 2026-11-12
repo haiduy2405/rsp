@@ -46,7 +46,7 @@ test('độ khó: quái mạnh dần, rớt nhiều dần', () => {
   assert.ok(hpOf(NORMAL) > hpOf(EASY) && hpOf(HARD) > hpOf(NORMAL));
   const avg = (d) => {
     let t = 0;
-    for (let i = 0; i < 4000; i++) { const l = rollLoot(ctx, 'boss', mulberry32(i), d); t += l.gold + l.essence + l.shards * 50 + l.stones.rare * 300 + l.stones.normal * 20; }
+    for (let i = 0; i < 4000; i++) { const l = rollLoot(ctx, 'boss', mulberry32(i), d); t += l.gold + l.elixir[1] * 100 + l.elixir[2] * 500 + l.shards * 50 + l.stones.rare * 300 + l.stones.normal * 20; }
     return t / 4000;
   };
   assert.ok(avg(NORMAL) > avg(EASY) * 1.3 && avg(HARD) > avg(NORMAL) * 1.2, 'khó hơn thì phần thưởng ngon hơn');

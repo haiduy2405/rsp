@@ -36,16 +36,16 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   for (const diff of ctx.config.difficulty.order) {
     let seed = 1;
     let pity = false;
-    const st = { normal: 0, rare: 0, withRare: 0, floors: 0, pityHits: 0, gold: 0, essence: 0, shards: 0 };
+    const st = { normal: 0, rare: 0, withRare: 0, floors: 0, pityHits: 0, gold: 0, exp: 0, shards: 0 };
     for (let i = 0; i < N; i++) {
       const r = simulateRun(ctx, seed++, 'zone_water', pity, diff);
       pity = r.rareMissed;
       st.normal += r.loot.stones.normal; st.rare += r.loot.stones.rare;
       st.withRare += r.loot.stones.rare > 0 ? 1 : 0; st.floors += r.floors;
-      st.pityHits += r.pityGranted ? 1 : 0; st.gold += r.loot.gold; st.essence += r.loot.essence; st.shards += r.loot.shards;
+      st.pityHits += r.pityGranted ? 1 : 0; st.gold += r.loot.gold; st.exp += [1, 2, 3].reduce((a, t) => a + r.loot.elixir[t] * ctx.config.elixir[t].exp, 0); st.shards += r.loot.shards;
     }
     const a = (x) => x / N;
-    const line = `${diff.padEnd(6)} Vàng ${a(st.gold).toFixed(0)} | Tinh Hoa ${a(st.essence).toFixed(0)} | Mảnh ${a(st.shards).toFixed(2)} | Hiếm ${a(st.rare).toFixed(2)} | có Hiếm ${(100 * st.withRare / N).toFixed(0)}% | bảo hiểm ${(100 * st.pityHits / N).toFixed(0)}%`;
+    const line = `${diff.padEnd(6)} Vàng ${a(st.gold).toFixed(0)} | EXP đan ${a(st.exp).toFixed(0)} | Mảnh ${a(st.shards).toFixed(2)} | Hiếm ${a(st.rare).toFixed(2)} | có Hiếm ${(100 * st.withRare / N).toFixed(0)}% | bảo hiểm ${(100 * st.pityHits / N).toFixed(0)}%`;
     const runs = (r) => Math.max(r.shards / a(st.shards), r.stones / a(st.rare), r.gold / a(st.gold));
     const fmt = (rar) => { const n = runs(cost[rar]); const [lo, hi] = target[rar]; return `${rar}★ ${n.toFixed(1)} chuyến (mục tiêu ${lo}-${hi}) ${diff === 'hard' ? 'nhanh hơn có chủ đích' : n >= lo && n <= hi ? 'OK' : 'LỆCH'}`; };
     console.log(`${line}\n       Form 2: ${fmt(3)} | ${fmt(5)}`);

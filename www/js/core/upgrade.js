@@ -24,7 +24,7 @@ export function expToMax(ctx, id, ch) {
 }
 
 // Cộng EXP, tự lên cấp; phần dư khi đã tối đa bị bỏ. Trả progress mới và số cấp tăng.
-function grantExp(ctx, ch, id, amount) {
+export function grantExp(ctx, ch, id, amount) {
   const before = ch.level;
   ch.exp += amount;
   for (let need = expToNext(ctx, id, ch.level, ch.awaken); need !== null && ch.exp >= need; need = expToNext(ctx, id, ch.level, ch.awaken)) {
@@ -35,18 +35,20 @@ function grantExp(ctx, ch, id, amount) {
   return ch.level - before;
 }
 
-// Dùng Bánh EXP (1 Bánh = 1 EXP); không dùng quá số cần để đạt cấp tối đa.
-export function useCakes(ctx, progress, id, amount) {
+// Dùng Đan Tinh Hoa bậc `tier` (EXP cố định mỗi viên, config.elixir); không dùng thừa quá số cần để đạt cấp tối đa.
+export function useElixir(ctx, progress, id, tier, count = 1) {
   const ch = progress.characters[id];
+  const e = ctx.config.elixir[tier];
   if (!ch) return fail('not_owned');
+  if (!e) return fail('bad_item');
   const need = expToMax(ctx, id, ch);
   if (need <= 0) return fail('max_level');
-  const n = Math.min(amount, need, progress.inventory.essence);
-  if (n <= 0) return fail('not_enough_essence');
+  const n = Math.min(count, Math.ceil(need / e.exp), progress.inventory.elixir[tier]);
+  if (n <= 0) return fail('not_enough_elixir');
   const p = structuredClone(progress);
-  p.inventory.essence -= n;
-  const levels = grantExp(ctx, p.characters[id], id, n);
-  return { ok: true, progress: p, used: n, levels };
+  p.inventory.elixir[tier] -= n;
+  const levels = grantExp(ctx, p.characters[id], id, n * e.exp);
+  return { ok: true, progress: p, used: n, exp: n * e.exp, levels };
 }
 
 // Cho tướng ăn Tiểu Linh `key` ('hệ_sao') x count. Cùng hệ với tướng được thêm % EXP.

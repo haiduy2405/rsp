@@ -4,10 +4,10 @@ import { stageOpen, clearsOf, zoneClears } from './core/stage.js';
 import { stageInfo } from './core/stageinfo.js';
 import { applyRunResult } from './core/progress.js';
 import { createStorage, browserAdapter } from './save/storage.js';
-import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useCakes, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
+import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useElixir, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
 import { KEYS } from './core/effects.js';
-import { summon, redeemCharacter, effectiveRates } from './core/summon.js';
+import { summon, buyTickets, redeemCharacter, effectiveRates } from './core/summon.js';
 import { finishOnboarding, completeTutorial, storyUnlocked, updateProfile } from './core/onboarding.js';
 import { newProgress } from './core/progress.js';
 import { createT, detectLang } from './i18n/index.js';
@@ -105,7 +105,7 @@ const offeringsLine = (o, race) => {
 const lootLine = (l) => {
   const parts = [];
   if (l.gold) parts.push(`${t('res.gold')} ${l.gold >= 0 ? '+' : ''}${l.gold}`);
-  if (l.essence) parts.push(`${t('res.essence')} +${l.essence}`);
+  for (const tier of [1, 2, 3]) if (l.elixir?.[tier]) parts.push(`${t(`res.elixir.${tier}`)} +${l.elixir[tier]}`);
   if (l.spirit) parts.push(`${t('res.spirit')} +${l.spirit}`);
   if (l.shards) parts.push(`${t('res.shard')} +${l.shards}`);
   for (const [k, n] of Object.entries(l.fodder || {})) parts.push(`${fodderName(k)} +${n}`);
@@ -138,7 +138,7 @@ function dockBtn(icon, label, onclick, id, cls = '') {
   b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[icon]}</svg>`;
   return b;
 }
-const CUR_COL = { gold: '#ffd24a', spirit: '#b58bff', essence: '#6bd5ff', shard: '#ff9acb' };
+const CUR_COL = { gold: '#ffd24a', spirit: '#b58bff', ticket: '#ff9a4a', shard: '#ff9acb' };
 const curPill = (k, v, id) => h('button', { class: 'cur-pill', ...(id ? { id } : {}), onclick: () => showItems(), 'aria-label': t(`res.${k}`) }, h('i', { style: `background:${CUR_COL[k]}` }), h('b', {}, new Intl.NumberFormat(lang).format(v)));
 const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } : {}) }, label, h('b', {}, String(value)));
 
@@ -212,7 +212,7 @@ function showHub() {
       dockBtn('help', t('hub.help'), () => showGlossary(), 'b-help', 'help-btn'),
       dockBtn('settings', t('hub.settings'), () => showSettings(), 'b-set', 'help-btn'),
     ),
-    h('div', { class: 'cur', id: 'cur' }, curPill('gold', inv.gold), curPill('spirit', inv.spirit, 'spirit'), curPill('essence', inv.essence)),
+    h('div', { class: 'cur', id: 'cur' }, curPill('gold', inv.gold), curPill('spirit', inv.spirit, 'spirit'), curPill('ticket', inv.tickets, 'tickets')),
     notice ? h('div', { class: 'notice hub-notice' }, t(notice)) : null,
     installRow() ? h('div', { class: 'hub-install' }, installRow()) : null,
     activeRunInfo() ? resumeChip() : null,
@@ -320,9 +320,9 @@ function showStageInfo(zoneId, diff) {
   const close = () => $('info')?.remove();
   const row = (k, v) => h('div', { class: 'si-row' }, h('span', {}, k), h('b', {}, v));
   const names = (ids) => ids.map((m) => t(`monster.${m}`)).join(', ');
-  const dropLabel = (key) => (key.startsWith('stone.') ? `${t('res.stone')} ${t(`stone.${key.slice(6)}`)}` : t(`res.${key}`));
+  const dropLabel = (key) => (key.startsWith('elixir.') ? t(`res.${key}`) : key.startsWith('stone.') ? `${t('res.stone')} ${t(`stone.${key.slice(6)}`)}` : t(`res.${key}`));
   const src = si.sources.map((s) => h('div', { class: 'si-src' },
-    h('div', { class: 'si-head' }, h('b', {}, t(`loot.src.${s.kind}`)), h('small', { class: 'muted' }, `${t('res.gold')} ${rangeText(s.gold)} · ${t('res.essence')} ${rangeText(s.essence)}`)),
+    h('div', { class: 'si-head' }, h('b', {}, t(`loot.src.${s.kind}`)), h('small', { class: 'muted' }, `${t('res.gold')} ${rangeText(s.gold)}`)),
     s.drops.map((d) => row(dropLabel(d.key), `${pctText(d.chance)} · ×${rangeText(d.count)}`)),
   ));
   const tiers = si.tiers.map((x) => `${t('loot.tier', { n: x.tier })} ${pctText(x.pct)}`).join(' · ');
@@ -459,7 +459,7 @@ function showChar(id, msg, back) {
     } else showChar(id, t(`err.${r.reason}`));
   };
   const need = expToMax(ctx, id, pc);
-  const gained = (r) => t('char.gained', { n: r.gained ?? r.used }) + (r.levels ? ` · ${t('char.levelsUp', { n: r.levels })}` : '');
+  const gained = (r) => t('char.gained', { n: r.gained ?? r.exp ?? r.used }) + (r.levels ? ` · ${t('char.levelsUp', { n: r.levels })}` : '');
   const fodderKeys = Object.keys(inv.fodder).sort();
   const grow = h(
     'div',
@@ -468,8 +468,8 @@ function showChar(id, msg, back) {
     need <= 0
       ? h('div', { class: 'muted' }, t('char.maxLevel'))
       : [
-          h('div', { class: 'muted' }, `${t('char.cakes')}: ${inv.essence}`),
-          h('div', { class: 'row' }, [100, 1000].map((n) => btn(t('char.useCakes', { n }), () => act(() => useCakes(ctx, progress, id, n), gained), '', { 'data-cakes': n })), btn(t('char.useCakesMax'), () => act(() => useCakes(ctx, progress, id, 1e9), gained), '', { id: 'cakes-max' })),
+          h('div', { class: 'muted' }, t('char.elixir')),
+          [1, 2, 3].map((tier) => h('div', { class: 'fodder-row', 'data-elixir': tier }, itemIcon(`elixir${tier}`, 'sm'), h('span', {}, `${t(`res.elixir.${tier}`)} ×${inv.elixir[tier]} `, h('small', { class: 'muted' }, `+${ctx.config.elixir[tier].exp} EXP`)), btn(t('char.useOne'), () => act(() => useElixir(ctx, progress, id, tier, 1), gained)), btn(t('char.useUpTo'), () => act(() => useElixir(ctx, progress, id, tier, 1e9), gained)))),
           fodderKeys.length
             ? fodderKeys.map((k) => {
                 const f = ctx.fodder[k];
@@ -588,31 +588,49 @@ function showTeam(slot, msg, stage) {
   );
 }
 
-// Kho: toàn bộ tài nguyên đang có.
+// Hòm đồ: lưới ô icon (độ hiếm quyết định màu nền), chạm một ô để xem chi tiết.
+const RARITY_COL = ['#6b6f7d', '#6b6f7d', '#4fae7b', '#4f8fe0', '#a066e8', '#e0a64a'];
+let itemsTab = 'all';
+let itemsSel = null;
+function inventoryEntries() {
+  const inv = progress.inventory;
+  const list = [];
+  const add = (e) => e.count > 0 && list.push(e);
+  add({ key: 'ticket', tab: 'mats', name: t('res.ticket'), count: inv.tickets, rarity: 4, icon: 'ticket', desc: t('items.desc.ticket') });
+  for (const tier of [1, 2, 3]) add({ key: `elixir${tier}`, tab: 'elixir', name: t(`res.elixir.${tier}`), count: inv.elixir[tier], rarity: tier + 1, icon: `elixir${tier}`, desc: t('elixir.desc', { n: ctx.config.elixir[tier].exp }) });
+  add({ key: 'shard', tab: 'mats', name: t('res.shard'), count: inv.shards, rarity: 4, icon: 'shard', desc: t('items.desc.shard') });
+  for (let e = 0; e < 6; e++) {
+    add({ key: `stoneN${e}`, tab: 'mats', name: `${t('res.stone')} ${t('stone.normal')} · ${el(e)}`, count: inv.stones[e].normal, rarity: 3, icon: 'stoneN', tint: COLORS[e], desc: t('items.desc.stone') });
+    add({ key: `stoneR${e}`, tab: 'mats', name: `${t('res.stone')} ${t('stone.rare')} · ${el(e)}`, count: inv.stones[e].rare, rarity: 4, icon: 'stoneR', tint: COLORS[e], desc: t('items.desc.stone') });
+  }
+  for (const k of Object.keys(inv.offerings).sort()) add({ key: `off_${k}`, tab: 'mats', name: offeringName(k), count: inv.offerings[k], rarity: Number(k.split('_')[1]) + 1, icon: 'offering', desc: t('items.desc.offering') });
+  for (const k of Object.keys(inv.fodder).sort()) add({ key: `fod_${k}`, tab: 'fodder', name: fodderName(k), count: inv.fodder[k], rarity: ctx.fodder[k].star + 1, icon: 'fodder', desc: t('items.desc.fodder'), fodder: k });
+  return list;
+}
 function showItems() {
   const inv = progress.inventory;
-  const row = (label, value, col) => h('div', { class: 'card item-row' }, h('i', { style: `background:${col}` }), h('span', {}, label), h('b', {}, typeof value === 'number' ? new Intl.NumberFormat(lang).format(value) : value));
+  const fmt = (n) => new Intl.NumberFormat(lang).format(n);
+  const all = inventoryEntries();
+  const shown = itemsTab === 'all' ? all : all.filter((e) => e.tab === itemsTab);
+  const sel = shown.find((e) => e.key === itemsSel) || null;
+  const tile = (e) => {
+    const b = h('button', { class: `slot${sel?.key === e.key ? ' sel' : ''}`, 'data-item': e.key, style: `--rc:${RARITY_COL[e.rarity]}`, 'aria-label': e.name, onclick: () => { itemsSel = e.key; showItems(); } }, itemIcon(e.icon, 'lg', e.tint), h('b', {}, fmt(e.count)));
+    return b;
+  };
+  const detail = sel
+    ? h('div', { class: 'card item-detail', id: 'item-detail', style: `--rc:${RARITY_COL[sel.rarity]}` }, h('div', { class: 'row' }, itemIcon(sel.icon, 'lg', sel.tint), h('div', {}, h('b', {}, sel.name), h('div', { class: 'muted' }, t('items.owned', { n: fmt(sel.count) })))), h('div', { class: 'muted' }, sel.desc),
+        sel.fodder ? h('div', { class: 'row' }, btn(`${t('fodder.sell')} (${ctx.fodder[sel.fodder].sell} ${t('res.gold')})`, () => sell(sel.fodder, 1)), btn(t('fodder.sellAll'), () => sell(sel.fodder, 999))) : null)
+    : h('div', { class: 'muted', id: 'item-detail' }, t('items.pick'));
+  function sell(k, n) {
+    const r = sellFodder(ctx, progress, k, n);
+    if (r.ok) { progress = r.progress; save(); showItems(); }
+  }
   screen(
     h('h2', {}, t('hub.items')),
-    h('h3', {}, t('items.currency')),
-    row(t('res.gold'), inv.gold, CUR_COL.gold),
-    row(t('res.spirit'), inv.spirit, CUR_COL.spirit),
-    row(t('res.essence'), inv.essence, CUR_COL.essence),
-    row(t('res.shard'), inv.shards, CUR_COL.shard),
-    h('h3', {}, t('items.fodder')),
-    Object.keys(inv.fodder).length
-      ? Object.keys(inv.fodder).sort().map((k) => {
-          const sell = (n) => {
-            const r = sellFodder(ctx, progress, k, n);
-            if (r.ok) { progress = r.progress; save(); showItems(); }
-          };
-          return h('div', { class: 'card fodder-row', 'data-fodder': k }, h('span', {}, `${fodderName(k)} ×${inv.fodder[k]} `, h('small', { class: 'muted' }, `${ctx.fodder[k].sell} ${t('res.gold')}`)), btn(t('fodder.sell'), () => sell(1)), btn(t('fodder.sellAll'), () => sell(999)));
-        })
-      : h('div', { class: 'muted' }, t('char.noFodder')),
-    h('h3', {}, t('items.offerings')),
-    Object.keys(inv.offerings).length ? Object.keys(inv.offerings).sort().map((k) => row(offeringName(k), inv.offerings[k], COLORS[4])) : h('div', { class: 'muted' }, t('items.noOfferings')),
-    h('h3', {}, t('items.stones')),
-    [0, 1, 2, 3, 4, 5].map((e) => row(`${el(e)} · ${t('stone.normal')} / ${t('stone.rare')}`, `${inv.stones[e].normal} / ${inv.stones[e].rare}`, COLORS[e])),
+    h('div', { class: 'row' }, h('div', { class: 'res', id: 'inv-gold' }, h('i', { class: 'dot', style: `background:${CUR_COL.gold}` }), t('res.gold'), h('b', {}, fmt(inv.gold))), h('div', { class: 'res', id: 'inv-spirit' }, h('i', { class: 'dot', style: `background:${CUR_COL.spirit}` }), t('res.spirit'), h('b', {}, fmt(inv.spirit)))),
+    h('div', { class: 'row tabs' }, ['all', 'elixir', 'mats', 'fodder'].map((k) => btn(t(k === 'all' ? 'items.all' : `items.tab.${k}`), () => { itemsTab = k; itemsSel = null; showItems(); }, k === itemsTab ? 'primary' : '', { 'data-tab': k }))),
+    detail,
+    shown.length ? h('div', { class: 'item-grid', id: 'item-grid' }, shown.map(tile)) : h('div', { class: 'muted' }, t('items.empty')),
     btn(t('back'), showHub, '', { id: 'back' }),
   );
 }
@@ -671,12 +689,16 @@ function showSummon(bannerId, pending = null, msg = null) {
     showSummonResult(bannerId, r.results);
   };
   const ask = (count) => {
-    const cost = cfg.costPerPull * count;
+    const cost = cfg.ticketsPerPull * count;
     showSummon(bannerId, { count, cost });
   };
   screen(
     h('h2', {}, t('summon.title')),
-    h('div', { class: 'res', id: 'spirit' }, t('summon.spirit', { n: progress.inventory.spirit })),
+    h('div', { class: 'row' }, h('div', { class: 'res', id: 'tickets' }, itemIcon('ticket', 'sm'), t('summon.tickets', { n: progress.inventory.tickets })), h('div', { class: 'res', id: 'spirit' }, t('summon.spirit', { n: progress.inventory.spirit }))),
+    h('div', { class: 'row' }, cfg.ticketPacks.map((pk, i) => btn(t('summon.buy', { t: pk.tickets, s: pk.spirit }), () => {
+      const r = buyTickets(ctx, progress, i);
+      if (r.ok) { progress = r.progress; save(); audio.sfx('reveal'); showSummon(bannerId, null, null); } else showSummon(bannerId, null, `err.${r.reason}`);
+    }, '', { id: `buy-${i}` }))),
     msg ? h('div', { class: 'notice' }, t(msg)) : null,
     h('div', { class: 'row' }, ctx.bannerList.map((b) => btn(t(`banner.${b.id}.name`), () => showSummon(b.id), b.id === bannerId ? 'primary' : '', { 'data-banner': b.id }))),
     h('div', { class: 'card' }, h('b', {}, t(`banner.${bannerId}.name`)), h('div', { class: 'muted' }, t(`banner.${bannerId}.desc`)), h('div', { class: 'muted' }, rateUp)),
@@ -692,13 +714,13 @@ function showSummon(bannerId, pending = null, msg = null) {
       sm.firstDone ? null : h('div', { class: 'muted' }, t('summon.tokenNote')),
     ),
     pending
-      ? confirmBox(t('summon.confirm', { cost: pending.cost, count: pending.count, banner: t(`banner.${bannerId}.name`), left: progress.inventory.spirit - pending.cost }), () => doSummon(pending.count, false), () => showSummon(bannerId))
+      ? confirmBox(t('summon.confirm', { cost: pending.cost, count: pending.count, banner: t(`banner.${bannerId}.name`), left: progress.inventory.tickets - pending.cost }), () => doSummon(pending.count, false), () => showSummon(bannerId))
       : h(
           'div',
           { class: 'row' },
           freeAvail ? btn(t('summon.free'), () => doSummon(1, true), 'primary', { id: 'pull-free' }) : h('div', { class: 'muted' }, t('summon.freeUsed')),
-          btn(t('summon.x1', { cost: cfg.costPerPull }), () => ask(1), '', { id: 'pull-1' }),
-          btn(t('summon.x10', { cost: cfg.costPerPull * cfg.multiCount }), () => ask(cfg.multiCount), '', { id: 'pull-10' }),
+          btn(t('summon.x1', { cost: cfg.ticketsPerPull }), () => ask(1), '', { id: 'pull-1' }),
+          btn(t('summon.x10', { cost: cfg.ticketsPerPull * cfg.multiCount }), () => ask(cfg.multiCount), '', { id: 'pull-10' }),
         ),
     h('div', { class: 'row' }, btn(t('summon.history'), showHistory, '', { id: 'b-history' }), btn(t('summon.redeem'), () => showRedeem(), '', { id: 'b-redeem' })),
     btn(t('back'), showHub, '', { id: 'back' }),
@@ -945,7 +967,7 @@ function showFirstSummon(r) {
   screen(
     h('div', { class: 'card' }, h('p', {}, t('ob.firstSummon'))),
     h('div', { class: `card sumcard ${rarityCls(r.rarity)}`, 'data-first': r.id }, h('h3', {}, t(`char.${r.id}`), ' ', chip(r.id), ' ', h('small', {}, '★'.repeat(r.rarity))), h('small', {}, t('summon.forced'))),
-    h('p', { class: 'muted' }, t('ob.welcome', { n: ctx.config.summon.welcomeSpirit })),
+    h('p', { class: 'muted' }, t('ob.welcome', { n: ctx.config.summon.welcomeTickets })),
     btn(t('ob.toHub'), showHub, 'primary', { id: 'ob-hub' }),
   );
 }
@@ -1369,7 +1391,10 @@ function showInspect(kind, idx) {
 // ---- Cảnh thưởng: rương rung, mở nắp, đồ bay ra từng món có số đếm tăng và âm thanh
 const REWARD_ICON = {
   gold: '<circle cx="12" cy="12" r="9" fill="#e2b75a" stroke="#8a6a2a" stroke-width="1.5"/><circle cx="12" cy="12" r="5.5" fill="none" stroke="#fff0bd" stroke-width="1.5"/>',
-  essence: '<path d="M12 2.5c3.4 4.2 6.4 7.2 6.4 10.8a6.4 6.4 0 0 1-12.8 0C5.6 9.700 8.600 6.700 12 2.500z" fill="#b58bff" stroke="#5a3aa8" stroke-width="1.4"/><ellipse cx="9.800" cy="12" rx="1.400" ry="2.400" fill="#fff" opacity=".6"/>',
+  elixir1: '<path d="M12 3c3 3.800 5.600 6.600 5.600 9.800a5.600 5.600 0 0 1-11.200 0C6.400 9.600 9 6.800 12 3z" fill="#6bd5ff" stroke="#1f6f9a" stroke-width="1.4"/><ellipse cx="9.800" cy="12.500" rx="1.200" ry="2.200" fill="#fff" opacity=".6"/>',
+  elixir2: '<path d="M9.500 3h5v4.500l4.200 8.300a2.800 2.800 0 0 1-2.500 4.200H7.800a2.800 2.800 0 0 1-2.500-4.200l4.200-8.300z" fill="#9a8cff" stroke="#443a9a" stroke-width="1.400" stroke-linejoin="round"/><path d="M7 15h10" stroke="#e8e4ff" stroke-width="1.400" opacity=".8"/><rect x="9" y="2" width="6" height="2.200" rx="1" fill="#d9b36a" stroke="#6f5320" stroke-width="1"/>',
+  elixir3: '<circle cx="12" cy="14" r="7.500" fill="#ffd24a" stroke="#8a6a2a" stroke-width="1.500"/><rect x="9.500" y="2.500" width="5" height="4" rx="1" fill="#d9b36a" stroke="#6f5320" stroke-width="1.200"/><path d="M12 8.500l1.500 3.200 3.500.4-2.600 2.400.7 3.500L12 16.200 8.900 18l.7-3.500L7 12.100l3.500-.4z" fill="#fff7d6" stroke="#8a6a2a" stroke-width=".8" stroke-linejoin="round"/>',
+  ticket: '<path d="M2.500 7h19v3.200a2 2 0 0 0 0 3.600V17h-19v-3.200a2 2 0 0 0 0-3.600z" fill="#ff9a4a" stroke="#8a3f10" stroke-width="1.400" stroke-linejoin="round"/><path d="M9 7.500v9" stroke="#ffe3c4" stroke-width="1.200" stroke-dasharray="1.600 1.600"/><path d="M15 9.200l.9 1.800 2 .3-1.450 1.400.35 2L15 13.700l-1.800.9.350-2L12.100 11.300l2-.3z" fill="#fff0d0"/>',
   spirit: '<path d="M12 2.500l7.500 6.500-7.500 12.500L4.500 9z" fill="#6bd5ff" stroke="#1f6f9a" stroke-width="1.4" stroke-linejoin="round"/><path d="M4.500 9h15M12 2.500L9 9l3 12.500L15 9z" fill="none" stroke="#e6f8ff" stroke-width="1" opacity=".8"/>',
   shard: '<path d="M7 3.500l8.500 2L19 14l-6.500 6.500L5 14z" fill="#ff7fb0" stroke="#a83a6a" stroke-width="1.400" stroke-linejoin="round"/><path d="M7 3.500L12.500 12 19 14" fill="none" stroke="#ffe0ee" stroke-width="1" opacity=".8"/>',
   fodder: '<ellipse cx="12" cy="13" rx="7.500" ry="6.500" fill="#8fd69a" stroke="#2f7a45" stroke-width="1.400"/><circle cx="9.500" cy="11.500" r="1.200" fill="#1c3a26"/><circle cx="14.500" cy="11.500" r="1.200" fill="#1c3a26"/>',
@@ -1377,6 +1402,13 @@ const REWARD_ICON = {
   stoneN: '<path d="M12 3l7.500 4.300v8.400L12 20l-7.500-4.300V7.300z" fill="#7d8fd8" stroke="#3a4690" stroke-width="1.400" stroke-linejoin="round"/>',
   stoneR: '<path d="M12 3l7.500 4.300v8.400L12 20l-7.500-4.300V7.300z" fill="#ffd24a" stroke="#8a6a2a" stroke-width="1.400" stroke-linejoin="round"/><path d="M12 3v17M4.500 7.300L19.500 15.700M19.500 7.300L4.500 15.700" stroke="#fff7d6" stroke-width=".8" opacity=".7"/>',
 };
+// Icon vật phẩm dùng chung (Hòm đồ, màn tướng, triệu hồi): size 'sm' | 'lg'.
+function itemIcon(k, size = 'sm', tint) {
+  const e = h('span', { class: `ricon icon-${size}` });
+  const body = tint && (k === 'stoneN' || k === 'stoneR') ? REWARD_ICON[k].replace(/fill="#(7d8fd8|ffd24a)"/, `fill="${tint}"`) : REWARD_ICON[k];
+  e.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
+  return e;
+}
 const rewardIcon = (k) => {
   const e = h('span', { class: 'ricon' });
   e.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${REWARD_ICON[k]}</svg>`;
@@ -1385,7 +1417,7 @@ const rewardIcon = (k) => {
 function lootRows(l) {
   const rows = [];
   if (l.gold) rows.push({ k: 'gold', label: t('res.gold'), n: l.gold });
-  if (l.essence) rows.push({ k: 'essence', label: t('res.essence'), n: l.essence });
+  for (const tier of [1, 2, 3]) if (l.elixir?.[tier]) rows.push({ k: `elixir${tier}`, label: t(`res.elixir.${tier}`), n: l.elixir[tier], rare: tier >= 3 });
   for (const [k, n] of Object.entries(l.offerings || {})) rows.push({ k: 'offering', label: offeringName(k), n, rare: Number(k.split('_')[1]) >= 2 });
   for (const [k, n] of Object.entries(l.fodder || {})) rows.push({ k: 'fodder', label: fodderName(k), n, rare: ctx.fodder[k].star === 2 });
   if (l.shards) rows.push({ k: 'shard', label: t('res.shard'), n: l.shards, rare: true });
@@ -1513,9 +1545,12 @@ function showShop() {
 }
 
 let savedThisRun = false;
+let endLevels = [];
 function showEnd() {
   if (!savedThisRun) {
+    const before = progress;
     progress = applyRunResult(ctx, progress, run);
+    endLevels = progress.team.filter(Boolean).map((id) => ({ id, from: before.characters[id].level, to: progress.characters[id].level })).filter((x) => x.to > x.from);
     delete progress.activeRun;
     save();
     savedThisRun = true;
@@ -1526,6 +1561,7 @@ function showEnd() {
     h('h1', {}, t(won ? 'end.won' : 'end.lost')),
     floorTitle(),
     h('div', { class: 'card' }, h('b', {}, t('end.loot')), h('p', {}, lootLine(run.loot))),
+    run.heroExp ? h('div', { class: 'card', id: 'end-exp' }, h('b', {}, t('result.heroExp', { n: run.heroExp })), endLevels.map((x) => h('div', { class: 'muted' }, t('result.levelUp', { name: t(`char.${x.id}`), lv: x.to })))) : null,
     won ? h('div', { class: 'muted' }, t('end.completion')) : h('div', { class: 'notice' }, t('end.noCompletion')),
     run.pityGranted ? h('div', { class: 'notice' }, t('end.pity')) : null,
     btn(t('end.back'), () => {
@@ -1581,7 +1617,8 @@ if (DEBUG) {
   window.__ctx = ctx;
   window.__cheat = (ids = []) => {
     const p = structuredClone(progress);
-    p.inventory.essence += 5000;
+    for (const tier of [1, 2, 3]) p.inventory.elixir[tier] += 50;
+    p.inventory.tickets += 30;
     p.inventory.gold += 20000;
     p.inventory.shards += 100;
     for (const r of ctx.config.races) for (const t of [1, 2, 3]) p.inventory.offerings[`${r}_${t}`] = (p.inventory.offerings[`${r}_${t}`] || 0) + 40;
@@ -1600,13 +1637,17 @@ if (DEBUG) {
     render();
   };
 }
-// Nút Back (Android/trình duyệt): trong chuyến thì bỏ qua để khỏi mất tiến trình, màn khác thì về Hub.
+// Vuốt mép / nút Back của trình duyệt = bấm nút mũi tên quay lại góc trái trên của màn hiện tại.
+// Luôn đẩy lại một mục lịch sử để trình duyệt không thoát trang; trong chuyến hoặc ở Hub thì bỏ qua.
 history.pushState({ rsp: 1 }, '');
 window.addEventListener('popstate', () => {
   history.pushState({ rsp: 1 }, '');
-  if (run || atHub || !progress.onboarding.done) return;
-  audio.sfx('back');
-  showHub();
+  if (run || atHub) return;
+  const back = $('back-top') || $('back');
+  if (back) {
+    audio.sfx('back');
+    back.click();
+  }
 });
 try {
   window.screen.orientation?.lock?.('portrait').catch(() => {});

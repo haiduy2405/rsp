@@ -80,6 +80,7 @@ export function createRun(ctx, { seed, zoneId, team, pityMissed = false, diff = 
     hp: maxHp, // vào chuyến mới thì đội hồi đầy
     maxHp,
     loot: emptyLoot(),
+    heroExp: 0, // EXP mỗi tướng nhận khi chuyến kết thúc (cộng dần sau từng trận thắng)
     items: { potion: 0, shield: 0, time: 0 },
     relics: [], // Di Vật đang giữ
     relicChoices: [],
@@ -146,6 +147,13 @@ function startBattle(ctx, run, rng, kind, preset, presetAffix) {
   run.phase = 'battle';
 }
 
+// EXP cố định mỗi tướng nhận sau một trận thắng: tăng theo khu và độ khó.
+function heroBattleExp(ctx, run, kind) {
+  const e = ctx.config.exp;
+  const zone = 1 + e.battleZoneGrowth * ctx.zones[run.zoneId].order;
+  return Math.round((e.battle[kind] || 0) * zone * ctx.config.difficulty[run.diff].gold);
+}
+
 // Cuộn loot của chuyến: Di Vật cộng Vàng và tỉ lệ rớt.
 function lootRoll(ctx, run, kind, rng, races) {
   const m = runMods(ctx, run);
@@ -161,7 +169,7 @@ function gainRelic(ctx, run, id) {
 
 function applyEffect(ctx, run, rng, ef, events) {
   if (ef.type === 'gold') run.loot.gold = Math.max(0, run.loot.gold + ef.amount);
-  else if (ef.type === 'essence') run.loot.essence += ef.amount;
+  else if (ef.type === 'elixir') run.loot.elixir[ef.tier] += ef.count;
   else if (ef.type === 'item') run.items[ef.item] += ef.count;
   else if (ef.type === 'stone') run.loot.stones[ef.kind] += ef.count;
   else if (ef.type === 'hpPct') {
@@ -255,6 +263,7 @@ function onBattleWon(ctx, run, rng) {
   const races = [...new Set(run.battle.enemies.map((e) => ctx.monsters[e.id].race))];
   const loot = lootRoll(ctx, run, kind, rng, races);
   run.reviveUsed = !!run.battle.reviveUsed;
+  run.heroExp += heroBattleExp(ctx, run, kind);
   run.pendingRelic = kind === 'elite';
   run.loot = addLoot(run.loot, loot);
   run.lastResult = { kind: 'battle', nodeType: run.node, loot };

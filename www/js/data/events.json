@@ -48,7 +48,7 @@
             "effects": [
               {
                 "type": "gold",
-                "amount": 80
+                "amount": 800
               }
             ]
           },
@@ -57,7 +57,7 @@
             "effects": [
               {
                 "type": "gold",
-                "amount": -40
+                "amount": -400
               }
             ]
           }
@@ -111,8 +111,9 @@
             "weight": 100,
             "effects": [
               {
-                "type": "essence",
-                "amount": 25
+                "type": "elixir",
+                "tier": 1,
+                "count": 1
               }
             ]
           }
@@ -130,7 +131,7 @@
             "effects": [
               {
                 "type": "gold",
-                "amount": 60
+                "amount": 600
               }
             ]
           },
@@ -161,8 +162,9 @@
             "weight": 65,
             "effects": [
               {
-                "type": "essence",
-                "amount": 15
+                "type": "elixir",
+                "tier": 1,
+                "count": 1
               }
             ]
           }
@@ -259,7 +261,7 @@
             "effects": [
               {
                 "type": "gold",
-                "amount": 100
+                "amount": 1000
               }
             ]
           },
@@ -337,7 +339,7 @@
             "effects": [
               {
                 "type": "gold",
-                "amount": -50
+                "amount": -500
               },
               {
                 "type": "relic",
@@ -350,7 +352,7 @@
             "effects": [
               {
                 "type": "gold",
-                "amount": -50
+                "amount": -500
               }
             ]
           }
@@ -580,8 +582,9 @@
             "weight": 65,
             "effects": [
               {
-                "type": "essence",
-                "amount": 30
+                "type": "elixir",
+                "tier": 1,
+                "count": 1
               }
             ]
           }
@@ -612,7 +615,7 @@
             "effects": [
               {
                 "type": "gold",
-                "amount": 150
+                "amount": 1500
               }
             ]
           },
@@ -643,8 +646,9 @@
             "weight": 70,
             "effects": [
               {
-                "type": "essence",
-                "amount": 20
+                "type": "elixir",
+                "tier": 1,
+                "count": 1
               }
             ]
           }

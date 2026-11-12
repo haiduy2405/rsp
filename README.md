@@ -47,7 +47,7 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 ## M4 — Triệu hồi, Tín Vật, onboarding
 - `core/summon.js`: rút seed; tỉ lệ gốc 5★ 0.5% / 4★ 13% / 3★ 86.5%, bảo đảm 5★ ở lượt 60, ≥1 4★ mỗi 10 lượt, rate-up banner văn hóa 50%, trùng → Mảnh, đổi 200 Mảnh lấy nhân vật chưa có. Tỉ lệ thực (tính cả bảo đảm): 5★ 2.00%, 4★ 16.44%, 3★ 81.57% — UI hiện cả hai; 5★ thực = 2% theo GDD.
 - Tín Vật: lượt đầu bắt buộc 4★ đúng văn hóa đã chọn, không tính vào pity.
-- `core/onboarding.js`: tạo phi hành gia (tên, biệt danh, quê tùy chọn, 8 avatar tạm), tặng 1000 Linh Thạch, hướng dẫn trận đầu (bỏ qua được).
+- `core/onboarding.js`: tạo phi hành gia (tên, biệt danh, quê tùy chọn, 8 avatar tạm), tặng 10 Vé Triệu Hồi, hướng dẫn trận đầu (bỏ qua được).
 - Màn: Nghi Thức Triệu Hồi (xác nhận trước khi tiêu, lịch sử, đổi Mảnh), Nhật ký (7 mục, mở theo khu đã vượt), Cài đặt (ngôn ngữ, âm lượng, xuất/nhập, xóa dữ liệu).
 - Save v4 (migrate từ v3). Data mới: `banners.json`, `story.json`.
 - E2E: `NODE_PATH=$(npm root -g) node tests/e2e/m4-newplayer.cjs` (cần `npm run serve`).
@@ -95,7 +95,7 @@ Xem `docs/SCHEMA.md` cho cấu trúc dữ liệu, `CLAUDE.md` cho quy tắc dự
 
 ## Hệ tướng v2, bước 1 (v0.12)
 - **Tộc**: Thần / Nhân / Thú / Long / Linh (`race` trong characters.json, monsters.json; danh sách ở `config.races`).
-- **Cấp 1–50**: EXP bằng Bánh EXP (Tinh Hoa cũ) hoặc cho ăn Tiểu Linh 1–2★ (`data/fodder.json`, rớt từ ải theo hệ khu và độ khó; cùng hệ ×1.5 EXP). Tiểu Linh bán được lấy Vàng ở màn Vật phẩm.
+- **Cấp 1–50**: EXP bằng Đan Tinh Hoa 3 cỡ (Giọt 100 / Bình 500 / Vạc 2500 EXP, `config.elixir`) hoặc cho ăn Tiểu Linh 1–2★ (`data/fodder.json`, rớt từ ải theo hệ khu và độ khó; cùng hệ ×1.5 EXP). Tiểu Linh bán được lấy Vàng ở màn Vật phẩm.
 - **AOE**: xoay nhóm ngọc từ 5 viên (`config.group.aoeSize`) thì tướng đó đánh toàn bộ quái.
 - **Thẻ tướng** kiểu ToS (`ui/hero-ui.js`): HP, ATK, Hồi, Tộc, hệ; dùng ở Bộ sưu tập và bảng thông tin trong trận.
 - **Tạm dừng** trong trận: chỉnh âm thanh hoặc thoát. Thoát bỏ trận dở, giữ tiến trình các cửa đã xong (chơi lại từ lúc chọn cửa). Test: `tests/e2e/pause.cjs`.
@@ -134,3 +134,10 @@ Sau khi xoay ngọc: mỗi tướng nảy số sát thương của mình ngay tr
 
 ## Giao diện mới (v0.19)
 Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính (nút BATTLE, Primary), vàng chỉ cho tiền tệ và độ hiếm. Tiêu đề dùng phông Fraunces (có tiếng Việt, tự host), thân chữ Be Vietnam Pro. Hub, bản đồ ải, HUD trận và nền trận đã phối lại. Kế hoạch art/nhạc thật: `docs/ART_PLAN.md`.
+
+## Kinh tế mới (v0.20)
+- **EXP sau trận**: mỗi trận thắng cộng EXP cố định cho cả đội, nhận khi chuyến kết thúc (cả khi thua); tăng theo khu và độ khó (`config.exp.battle`).
+- **Đan Tinh Hoa** 3 cỡ thay Bánh EXP (rớt theo `config.loot.*.elixir`). **Vé Triệu Hồi**: 1 vé/lượt; Linh Thạch đổi vé (100 → 1, 900 → 10, `config.summon.ticketPacks`).
+- **Vàng ×10** toàn hệ thống (loot, shop, Di Vật, kỹ năng, Thức tỉnh, bán Tiểu Linh) để dễ phân biệt với các tiền tệ khác. Save v9 tự đổi dữ liệu cũ.
+- **Hòm đồ** (đổi tên từ Kho đồ): lưới ô icon theo độ hiếm, chạm xem chi tiết, tab lọc.
+- Vuốt mép / nút Back của trình duyệt = nút mũi tên quay lại ở góc trái trên.
