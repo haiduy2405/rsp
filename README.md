@@ -276,3 +276,7 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 ## v0.38.0 — Chọn quốc kỳ quê hương
 - Mở đầu và màn Hồ sơ: thay ô gõ tên quê hương bằng lưới cờ tròn nhỏ (68 nước, bấm lại để bỏ chọn); lưu mã 2 chữ (VD VN) vào player.hometown, quê cũ dạng chữ vẫn giữ nguyên.
 - Cờ: bộ circle-flags (MIT, github.com/HatScripts/circle-flags) trong www/assets/ui/flags; danh sách ở data/flags.json, tên nước qua i18n (flag.XX).
+
+## v0.39.0
+- Gợi ý đường kéo giờ kéo dài suốt cả chuyến đầu tiên (mọi trận), hiện lại nếu kéo hụt/không hợp lệ.
+- Kéo chéo dễ hơn: ngón tay lệch >= 38% ô theo CẢ HAI trục so với tâm ô đang cầm thì tính là bước chéo (hằng DIAG_ASSIST trong ui/game.js); chỉ đổi cách nhận cử chỉ, luật chơi/lõi không đổi.

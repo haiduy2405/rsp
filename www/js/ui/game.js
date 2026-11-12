@@ -19,6 +19,7 @@ const easeOut = (k) => 1 - (1 - k) * (1 - k);
 
 // stepper(state, action) -> { state, events }: do bên ngoài cung cấp (chuyến leo tháp ghi lại hành động).
 // onEnd(finalState) gọi sau khi hoạt ảnh kết thúc và trận đã phân thắng thua.
+const DIAG_ASSIST = 0.38; // tỉ lệ ô: lệch ngang và dọc đều vượt ngưỡng này thì tính là bước chéo
 const NOFX = { sfx() {}, vibrate() {} };
 
 
@@ -407,6 +408,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       sync();
       busy = false;
       view.canAct = true;
+      if (hint && view.hintKeep) view.hint = view.hintKeep;
       return;
     }
     view.tally = { shown: 0, target: 0, pulse: 0 };
@@ -444,7 +446,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.drag = null;
     view.timer = null;
     if (d.path.length >= 2) run({ type: 'move', path: d.path });
-    else view.board = structuredClone(state.board);
+    else { view.board = structuredClone(state.board); if (hint && view.hintKeep) view.hint = view.hintKeep; }
   }
 
   // Nhấn giữ tướng/quái: xem chi tiết. Chạm nhanh vào tướng: dùng kỹ năng.
@@ -515,6 +517,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     }
     const c = cellAt(p.x, p.y);
     if (c < 0 || state.locked.includes(c)) return;
+    view.hintKeep = view.hint;
     view.hint = null;
     canvas.setPointerCapture?.(ev.pointerId);
     fx.sfx('pick');
@@ -557,13 +560,31 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   // Ngón tay (x,y) vừa đi từ (px,py): đưa viên cầm tới ô chứa ngón tay. Nếu ngón tay cắt góc hoặc đi rất nhanh
   // nhảy qua ô, các ô trung gian được bắc cầu theo quỹ đạo ngón tay nên không bị mất bước.
   function follow(x, y, px, py) {
-    const c = cellAt(x, y);
+    let c = cellAt(x, y);
     if (c < 0) return false;
     let last = drag.path[drag.path.length - 1];
+    // Kéo chéo dễ hơn: ngón tay lệch đủ xa theo CẢ HAI trục so với tâm ô đang cầm (>= 38% ô) thì tính là đi chéo,
+    // không cần tới tận ô chéo (đường chéo qua góc ô nên trước đây hay bị rơi vào ô ngang/dọc trước).
+    let diagAssist = false;
+    if (allowDiag) {
+      const lc = cellCenter(last);
+      const dx = x - lc.x;
+      const dy = y - lc.y;
+      const T = CELL * DIAG_ASSIST;
+      if (Math.abs(dx) > T && Math.abs(dy) > T) {
+        const [lr, lk] = cr(last);
+        const nr = lr + Math.sign(dy);
+        const nk = lk + Math.sign(dx);
+        const n = nr * 6 + nk;
+        if (nr >= 0 && nr < 5 && nk >= 0 && nk < 6 && !state.locked.includes(n)) { c = n; diagAssist = true; }
+      }
+    }
     if (c === last) return false;
-    const dc = Math.hypot(x - cellCenter(c).x, y - cellCenter(c).y);
-    const dl = Math.hypot(x - cellCenter(last).x, y - cellCenter(last).y);
-    if (dc > dl - CELL * 0.06) return false; // trễ nhẹ chống rung ở biên ô
+    if (!diagAssist) {
+      const dc = Math.hypot(x - cellCenter(c).x, y - cellCenter(c).y);
+      const dl = Math.hypot(x - cellCenter(last).x, y - cellCenter(last).y);
+      if (dc > dl - CELL * 0.06) return false; // trễ nhẹ chống rung ở biên ô
+    }
     let moved = false;
     for (let guard = 0; guard < 8 && last !== c; guard++) {
       let target = c;
@@ -712,6 +733,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   requestAnimationFrame(frame);
 
   return {
+    getHint: () => (view.hint ? view.hint.path.slice() : null),
     getDragPath: () => (drag ? drag.path.slice() : null),
     getState: () => state,
     refresh: sync, // dùng cho test/debug: đồng bộ view từ state

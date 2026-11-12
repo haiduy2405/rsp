@@ -591,6 +591,7 @@ function resumeRun() {
   render();
 }
 function leaveRun() {
+  showHint = false;
   saveActiveRun();
   audio.sfx('back');
   notice = 'run.saved';
@@ -885,7 +886,7 @@ function showTutorial(n) {
   const finish = () => {
     progress = completeTutorial(progress);
     save();
-    showHint = true;
+    showHint = true; // gợi ý đường kéo suốt chuyến đầu tiên
     startBattleUI();
   };
   screen(
@@ -899,7 +900,6 @@ function showTutorial(n) {
 let showHint = false;
 function startBattleUI() {
   const hint = showHint;
-  showHint = false;
   audio.playMusic(run.node === 'boss' ? 'boss' : 'battle');
   $('screen').classList.remove('show');
   game?.destroy();
@@ -1113,6 +1113,7 @@ function lootScene({ title, sub, loot, onContinue }) {
 }
 
 function showResult() {
+  showHint = false;
   const r = run.lastResult;
   if (r.kind === 'battle' || r.kind === 'chest') {
     const isBoss = r.nodeType === 'boss';
