@@ -129,44 +129,104 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     }
     return k ? k * stagger + 260 : 0; // thời gian cần chờ
   }
+  // Nhịp hoạt ảnh (ms): người chơi được "chiêm ngưỡng" từng combo rồi mới thấy đòn đánh.
+  const ANIM = { groupHold: 420, groupPop: 200, fall: 560, afterFall: 220, finale: 800, preShot: 200, stagger: 170, postShot: 350 };
+  const tally = (add) => {
+    const ty = (view.tally ||= { shown: 0, target: 0, pulse: 0 });
+    ty.target = add == null ? 0 : ty.target + add;
+    if (add != null) ty.pulse = 1;
+  };
+  const splitHits = (hits) => {
+    // gộp mọi đòn của cả lượt theo (người đánh, quái): mỗi cặp một quả cầu với tổng sát thương
+    const map = new Map();
+    let heal = 0;
+    const out = [];
+    for (const h of hits) {
+      if (h.kind === 'damage') {
+        const key = `${h.from}|${h.enemy}`;
+        const m = map.get(key) || { kind: 'damage', from: h.from, enemy: h.enemy, amount: 0, raw: 0, absorbed: 0, thawed: false };
+        m.amount += h.amount;
+        m.raw += h.raw || 0;
+        m.absorbed += h.absorbed || 0;
+        m.thawed = m.thawed || !!h.thawed;
+        map.set(key, m);
+      } else if (h.kind === 'heal') heal += h.amount;
+      else out.push(h);
+    }
+    const res = [...map.values()];
+    if (heal > 0) res.push({ kind: 'heal', amount: heal });
+    return res.concat(out);
+  };
   async function animate(events) {
+    let pendingHits = [];
+    let sawStep = false;
+    async function flush() {
+      if (!sawStep) return;
+      sawStep = false;
+      // đòn cuối: số sát thương dự tính nổ to rồi mới bắn
+      view.hl = null;
+      const ty = view.tally;
+      if (ty && ty.target > 0) {
+        fx.sfx('finale');
+        fx.vibrate(25);
+        ty.pulse = 2;
+        view.rings.push({ x: W / 2 + 70, y: 340, col: 3, age: 0, life: 700 });
+        await sleep(ANIM.finale);
+      }
+      await sleep(ANIM.preShot);
+      const hits = splitHits(pendingHits);
+      pendingHits = [];
+      tally(null);
+      const wait = applyHits(hits, ANIM.stagger);
+      await sleep(wait + ANIM.postShot);
+      view.combo = 0;
+    }
     for (const e of events) {
       if (!alive) return;
+      if (e.type !== 'step') await flush();
       if (e.type === 'step') {
         const st = e.step;
+        sawStep = true;
         view.board = structuredClone(st.boardBefore);
-        view.hl = new Set(st.groups.flatMap((x) => x.cells));
-        view.combo = e.combos;
-        fx.sfx(e.combos > 1 ? 'combo' : 'match');
-        st.groups.forEach((g, gi) => {
+        const dmg = e.hits.filter((x) => x.kind === 'damage').reduce((a, x) => a + x.amount, 0);
+        pendingHits.push(...e.hits);
+        const ng = st.groups.length;
+        let given = 0;
+        for (let gi = 0; gi < ng; gi++) {
+          const g = st.groups[gi];
           const xs = g.cells.map((c) => cellCenter(c));
           const cx = xs.reduce((a, q) => a + q.x, 0) / xs.length;
           const cy = xs.reduce((a, q) => a + q.y, 0) / xs.length;
-          floater(t('battle.combo', { n: e.comboStart + gi }), cx, cy, '#ffffff', 22);
-          // Ngọc hệ không có ai trong đội: báo rõ vì sao không có sát thương.
+          view.hl = new Set(g.cells);
+          view.combo = e.comboStart + gi;
+          fx.sfx(view.combo > 1 ? 'combo' : 'match');
+          fx.vibrate(10);
+          floater(t('battle.combo', { n: view.combo }), cx, cy, '#ffffff', 22 + Math.min(14, view.combo));
           if (g.type !== 5 && !state.members.some((m) => m.element === g.type)) floater(t('battle.noAttacker'), cx, cy + 26, '#ff9aa8', 16);
-        });
-        await sleep(330);
-        const wait = applyHits(e.hits);
-        for (const i of st.cleared) {
-          const c = cellCenter(i);
-          const col = st.boardBefore.cells[i];
-          for (let k = 0; k < 5; k++) {
-            const a = (k / 5) * Math.PI * 2 + i;
-            view.particles.push({ x: c.x, y: c.y, vx: Math.cos(a) * 0.18, vy: Math.sin(a) * 0.18 - 0.05, col, age: 0, life: 420 });
+          const share = gi === ng - 1 ? dmg - given : Math.round(dmg / ng);
+          given += share;
+          if (share > 0) tally(share);
+          await sleep(ANIM.groupHold);
+          const cleared = view.board;
+          for (const i of g.cells) {
+            const c = cellCenter(i);
+            const col = st.boardBefore.cells[i];
+            for (let k = 0; k < 6; k++) {
+              const ang = (k / 6) * Math.PI * 2 + i;
+              view.particles.push({ x: c.x, y: c.y, vx: Math.cos(ang) * 0.2, vy: Math.sin(ang) * 0.2 - 0.05, col, age: 0, life: 460 });
+            }
+            cleared.cells[i] = -1;
           }
+          view.hl = null;
+          await sleep(ANIM.groupPop);
         }
-        const cleared = structuredClone(st.boardBefore);
-        for (const i of st.cleared) cleared.cells[i] = -1;
-        view.board = cleared;
-        view.hl = null;
-        await sleep(120);
         view.board = structuredClone(st.board);
         view.fall = st.falls;
-        await sleep(260, (k) => (view.fallT = easeOut(k)));
+        fx.sfx('drop');
+        await sleep(ANIM.fall, (k) => (view.fallT = easeOut(k)));
         view.fall = null;
         view.fallT = 1;
-        await sleep(Math.max(0, wait - 380));
+        await sleep(ANIM.afterFall);
       } else if (e.type === 'skill' || e.type === 'duo') {
         fx.sfx('skill');
         for (const who of e.type === 'duo' ? [e.slot, e.slot + 1] : [e.member]) {
@@ -202,6 +262,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         await sleep(200);
       }
     }
+    await flush();
   }
 
   async function run(action) {
@@ -214,15 +275,10 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       view.canAct = true;
       return;
     }
+    view.tally = { shown: 0, target: 0, pulse: 0 };
     const hadStep = r.events.some((e) => e.type === 'step');
     if (action.type === 'move' && !hadStep) floater(t('battle.noCombo'), W / 2, 700, '#c8ccff', 30);
-    const startHp = state.enemies.reduce((a, e) => a + e.hp, 0);
     await animate(r.events);
-    const total = startHp - r.state.enemies.reduce((a, e) => a + e.hp, 0);
-    if (total > 0 && r.events.filter((e) => e.type === 'step').length) {
-      floater(t('battle.turnTotal', { n: total }), W / 2, 440, '#ffd84a', 34);
-      await sleep(350);
-    }
     state = r.state;
     sync();
     view.combo = 0;
@@ -410,6 +466,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       view.timer = Math.max(0, k);
       if (k <= 0) release();
     }
+    if (view.tally) { const ty = view.tally; ty.shown += (ty.target - ty.shown) * Math.min(1, dt / 120); if (Math.abs(ty.target - ty.shown) < 1) ty.shown = ty.target; ty.pulse = Math.max(0, ty.pulse - dt / 500); }
     if (view.slides) for (const k in view.slides) { view.slides[k].age += dt; if (view.slides[k].age > 180) delete view.slides[k]; }
     for (const f of view.floaters) f.age += dt;
     view.floaters = view.floaters.filter((f) => f.age < f.life);

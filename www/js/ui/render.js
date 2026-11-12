@@ -278,7 +278,8 @@ export function draw(g, view, t) {
   const sh = (view.teamFx || []).find((e) => e.key === 'shield');
   if (sh) text(g, view.t('battle.shield', { n: sh.pool }), W - 16, 330, 16, '#6bd5ff', 'right');
   if (view.teamFx?.length) badges(g, view.teamFx, 16, 336, view);
-  if (view.combo > 0) text(g, view.t('battle.combo', { n: view.combo }), W / 2, 330, 34, '#ffd84a');
+  if (view.combo > 0) text(g, view.t('battle.combo', { n: view.combo }), W / 2 - 110, 340, 30 + Math.min(10, view.combo), '#ffd84a');
+  if (view.tally && view.tally.shown > 0) text(g, `${Math.round(view.tally.shown)}`, W / 2 + 70, 340, Math.round(34 * (1 + 0.45 * Math.min(1, view.tally.pulse))), '#ff8a3c');
 
   // máu đội chung
   bar(g, 16, 358, W - 32, 18, view.hp / view.maxHp, '#4cc46a');
@@ -327,6 +328,10 @@ export function draw(g, view, t) {
       g.fillRect(BOARD_X + c * CELL, BOARD_Y + r * CELL, CELL, CELL);
     }
   const held = view.drag && view.drag.path.length ? view.drag.path[view.drag.path.length - 1] : -1;
+  g.save();
+  g.beginPath();
+  g.rect(0, BOARD_Y, W, ROWS * CELL + 30);
+  g.clip(); // ngọc rơi từ trên xuống không được đè lên hàng tướng
   // viên đang cầm luồn bên dưới
   if (held >= 0) drawOrb(g, view.board.cells[held], view.drag.x, view.drag.y, 40, !!view.board.enh[held], 0.92);
   const lifted = [];
@@ -364,6 +369,7 @@ export function draw(g, view, t) {
     g.restore();
     drawOrb(g, l.type, l.x, l.y - up * 8, 34 * (1 + 0.22 * up), !!view.board.enh[l.i]);
   }
+  g.restore();
 
   if (view.hint && !view.drag) {
     const pts = view.hint.path.map(cellCenter);
