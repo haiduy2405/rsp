@@ -508,5 +508,15 @@
   "team.empty": "Empty",
   "team.needLeader": "Slot 1 is the leader; put a character there to start.",
   "team.needAny": "The team is empty. Put at least one character in slot 1.",
-  "hub.battle": "Battle"
+  "hub.battle": "Battle",
+  "profile.title": "Player profile",
+  "profile.save": "Save changes",
+  "profile.saved": "Profile saved.",
+  "profile.token": "Keepsake",
+  "profile.stats": "Stats",
+  "profile.runs": "Runs",
+  "profile.wins": "Wins",
+  "profile.clears": "Zone clears",
+  "profile.owned": "Characters owned",
+  "profile.pulls": "Summons"
 }

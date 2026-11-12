@@ -6,7 +6,7 @@ import { grantCharacter, levelCost, levelUp, awakenCost, awaken, setTeam, teamRo
 import { statsFor, skillCooldown } from './core/stats.js';
 import { KEYS } from './core/effects.js';
 import { summon, redeemCharacter, effectiveRates } from './core/summon.js';
-import { finishOnboarding, completeTutorial, storyUnlocked } from './core/onboarding.js';
+import { finishOnboarding, completeTutorial, storyUnlocked, updateProfile } from './core/onboarding.js';
 import { newProgress } from './core/progress.js';
 import { createT, detectLang } from './i18n/index.js';
 import { startGame } from './ui/game.js';
@@ -202,8 +202,8 @@ function showHub() {
     h(
       'div',
       { class: 'hub-top' },
-      h('div', { class: 'avatar', style: `background:${COLORS[progress.player.avatar % 6]}` }, (progress.player.name || '?')[0].toUpperCase()),
-      h('div', { class: 'who' }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, progress.player.callsign)),
+      h('div', { class: 'avatar', id: 'b-profile', role: 'button', tabindex: '0', 'aria-label': t('profile.title'), style: `background:${COLORS[progress.player.avatar % 6]};cursor:pointer`, onclick: () => showProfile() }, (progress.player.name || '?')[0].toUpperCase()),
+      h('div', { class: 'who', id: 'b-profile-name', style: 'cursor:pointer', onclick: () => showProfile() }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, progress.player.callsign)),
       dockBtn('help', t('hub.help'), () => showGlossary(), 'b-help', 'help-btn'),
       dockBtn('settings', t('hub.settings'), () => showSettings(), 'b-set', 'help-btn'),
     ),
@@ -224,6 +224,48 @@ function showHub() {
   $('screen').classList.add('hub');
   atHub = true;
   notice = null;
+}
+
+// Hồ sơ người chơi: đổi tên, mã hiệu, quê hương, ngoại hình; xem thống kê.
+let profDraft = null;
+function showProfile(msg) {
+  const o = ctx.config.onboarding;
+  if (!profDraft) profDraft = { ...progress.player };
+  const d = profDraft;
+  const st = progress.stats;
+  const clears = Object.values(progress.clears).reduce((a, b) => a + b, 0);
+  const stat = (label, v) => h('div', { class: 'card item-row' }, h('span', {}, label), h('b', {}, new Intl.NumberFormat(lang).format(v)));
+  const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (d.avatar === i ? ' sel' : ''), 'data-avatar': i, style: `background:${COLORS[i % 6]}`, onclick: () => { d.avatar = i; showProfile(); } }, (d.name || '?')[0].toUpperCase()));
+  const save1 = () => {
+    const r = updateProfile(ctx, progress, d);
+    if (!r.ok) return showProfile(t(`ob.bad.${r.reason}`, { max: r.reason === 'bad_callsign' ? o.callsignMax : o.nameMax }) );
+    progress = r.progress;
+    save();
+    profDraft = null;
+    audio.sfx('rare');
+    showProfile(t('profile.saved'));
+  };
+  const keep = (e, k) => { d[k] = e.target.value; };
+  const dirty = d.name !== progress.player.name || d.callsign !== progress.player.callsign || (d.hometown || '') !== (progress.player.hometown || '') || d.avatar !== progress.player.avatar;
+  screen(
+    h('h2', {}, t('profile.title')),
+    h('div', { class: 'prof-head' }, h('div', { class: 'avatar big', style: `background:${COLORS[d.avatar % 6]}` }, (d.name || '?')[0].toUpperCase())),
+    msg ? h('div', { class: 'notice' }, msg) : null,
+    h('div', { class: 'row' }, av),
+    h('label', {}, t('ob.name'), h('input', { id: 'pf-name', maxlength: String(o.nameMax), value: d.name, oninput: (e) => keep(e, 'name') })),
+    h('label', {}, t('ob.callsign'), h('input', { id: 'pf-callsign', maxlength: String(o.callsignMax), value: d.callsign, oninput: (e) => keep(e, 'callsign') })),
+    h('label', {}, t('ob.hometown'), h('input', { id: 'pf-hometown', maxlength: String(o.hometownMax), value: d.hometown || '', oninput: (e) => keep(e, 'hometown') })),
+    d.culture ? h('div', { class: 'muted' }, `${t('profile.token')}: ${t(`ob.token.${d.culture}`)}`) : null,
+    btn(t('profile.save'), save1, 'primary', { id: 'pf-save' }),
+    h('h3', {}, t('profile.stats')),
+    stat(t('profile.runs'), st.runs),
+    stat(t('profile.wins'), st.wins),
+    stat(t('profile.clears'), clears),
+    stat(t('profile.owned'), Object.keys(progress.characters).length),
+    stat(t('profile.pulls'), progress.summon.pulls),
+    btn(t('back'), () => { profDraft = null; showHub(); }, '', { id: 'back' }),
+  );
+  void dirty;
 }
 
 // Chọn khu vực (từ nút CHIẾN ĐẤU).

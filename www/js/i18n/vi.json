@@ -508,5 +508,15 @@
   "team.empty": "Trống",
   "team.needLeader": "Ô 1 là đội trưởng, cần có tướng ở ô 1 mới vào trận được.",
   "team.needAny": "Đội đang trống. Chọn ít nhất một tướng vào ô 1.",
-  "hub.battle": "Chiến đấu"
+  "hub.battle": "Chiến đấu",
+  "profile.title": "Hồ sơ người chơi",
+  "profile.save": "Lưu thay đổi",
+  "profile.saved": "Đã lưu hồ sơ.",
+  "profile.token": "Tín Vật",
+  "profile.stats": "Thống kê",
+  "profile.runs": "Số chuyến leo",
+  "profile.wins": "Chuyến thắng",
+  "profile.clears": "Lần vượt khu",
+  "profile.owned": "Nhân vật đang có",
+  "profile.pulls": "Lượt triệu hồi"
 }

@@ -23,6 +23,22 @@ export function finishOnboarding(ctx, progress, input) {
   return { ok: true, progress: p };
 }
 
+// Sửa hồ sơ sau onboarding. Tín Vật (culture) đã neo lượt triệu hồi đầu nên không đổi.
+export function updateProfile(ctx, progress, input) {
+  const o = ctx.config.onboarding;
+  const name = clean(input.name);
+  const callsign = clean(input.callsign);
+  const hometown = clean(input.hometown);
+  if (!progress.onboarding.done) return fail('not_ready');
+  if (!name || name.length > o.nameMax) return fail('bad_name');
+  if (!callsign || callsign.length > o.callsignMax) return fail('bad_callsign');
+  if (hometown.length > o.hometownMax) return fail('bad_hometown');
+  if (!Number.isInteger(input.avatar) || input.avatar < 0 || input.avatar >= o.avatars) return fail('bad_avatar');
+  const p = structuredClone(progress);
+  p.player = { ...p.player, name, callsign, hometown, avatar: input.avatar };
+  return { ok: true, progress: p };
+}
+
 export function completeTutorial(progress) {
   const p = structuredClone(progress);
   p.onboarding.tutorialDone = true;

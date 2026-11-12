@@ -256,3 +256,6 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 .hub-install .row { gap: 6px; justify-content: flex-start; }
 .hub-install .row button { min-height: 30px; padding: 3px 10px; font-size: 12px; }
 .hub-foot { bottom: calc(126px + var(--sab)); }
+.prof-head { display: grid; place-items: center; }
+.avatar.big { width: 92px; height: 92px; font-size: 44px; }
+.avatar.sel { box-shadow: 0 0 0 3px var(--gold), 0 0 14px rgba(226, 183, 90, .6); }
