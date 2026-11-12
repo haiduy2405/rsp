@@ -507,5 +507,6 @@
   "team.clear": "Bỏ hết",
   "team.empty": "Trống",
   "team.needLeader": "Ô 1 là đội trưởng, cần có tướng ở ô 1 mới vào trận được.",
-  "team.needAny": "Đội đang trống. Chọn ít nhất một tướng vào ô 1."
+  "team.needAny": "Đội đang trống. Chọn ít nhất một tướng vào ô 1.",
+  "hub.battle": "Chiến đấu"
 }

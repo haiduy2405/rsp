@@ -92,6 +92,7 @@ const screen = (...kids) => {
     b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6L3 12l6 6"/><path d="M3 12h11a6 6 0 0 1 6 6v1"/></svg>';
     el.prepend(h('div', { class: 'back-wrap' }, b));
   }
+  el.classList.remove('hub');
   el.classList.add('show');
   el.scrollTop = 0;
 };
@@ -136,16 +137,104 @@ const CUR_COL = { gold: '#ffd24a', spirit: '#b58bff', essence: '#6bd5ff', shard:
 const curPill = (k, v, id) => h('button', { class: 'cur-pill', ...(id ? { id } : {}), onclick: () => showItems(), 'aria-label': t(`res.${k}`) }, h('i', { style: `background:${CUR_COL[k]}` }), h('b', {}, new Intl.NumberFormat(lang).format(v)));
 const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } : {}) }, label, h('b', {}, String(value)));
 
+// Cảnh chính: Tòa Tháp giữa các đảo nổi. Mỗi khu mở là một viên ngọc phát sáng trên đảo (chạm để vào khu).
+function hubScene() {
+  const zones = ctx.zoneList;
+  const pos = [[62, 300], [92, 430], [60, 560], [338, 290], [310, 420], [340, 550]];
+  const NS = 'http://www.w3.org/2000/svg';
+  let tiers = '';
+  for (let i = 0; i < 7; i++) {
+    const y1 = 575 - i * 50;
+    const y0 = y1 - 50;
+    const w1 = 66 - i * 6;
+    const w0 = 66 - (i + 1) * 6;
+    tiers += `<path d="M${200 - w1} ${y1} L${200 - w0} ${y0} L${200 + w0} ${y0} L${200 + w1} ${y1}Z" fill="url(#tw)" stroke="#07081c" stroke-width="1.5"/>`;
+    tiers += `<ellipse cx="200" cy="${y0}" rx="${w0 + 9}" ry="5" fill="#2a2f6a" stroke="#e2b75a" stroke-width="1.4"/>`;
+    for (const dx of [-0.45, 0, 0.45]) tiers += `<rect x="${200 + dx * w0 - 3}" y="${y0 + 14}" width="6" height="14" rx="3" fill="#ffd98a" class="win" style="animation-delay:${(i * 0.37 + dx).toFixed(2)}s"/>`;
+  }
+  let isl = '';
+  const orbs = zones.map((z, i) => {
+    const [x, y] = pos[i % pos.length];
+    const open = progress.unlocked.includes(z.id);
+    const col = COLORS[z.element];
+    isl += `<g class="isl" style="animation-delay:${(i * 0.7).toFixed(1)}s"><ellipse cx="${x}" cy="${y + 34}" rx="38" ry="9" fill="#3b4aa0"/><path d="M${x - 38} ${y + 34} Q${x} ${y + 92} ${x + 38} ${y + 34}Z" fill="url(#rk)"/><ellipse cx="${x}" cy="${y + 33}" rx="38" ry="8" fill="#4d62c9" opacity=".7"/></g>`;
+    return `<g class="zorb${open ? ' open' : ''}" ${open ? `data-zone="${z.id}" role="button" tabindex="0" aria-label="${t(`zone.${z.id}`)}"` : ''} style="animation-delay:${(i * 0.7).toFixed(1)}s;--c:${col}"><circle cx="${x}" cy="${y}" r="${open ? 22 : 17}" fill="${col}" opacity="${open ? 0.28 : 0.1}" class="halo"/><circle cx="${x}" cy="${y}" r="${open ? 14 : 11}" fill="${open ? col : '#5b6090'}" stroke="#fff" stroke-opacity="${open ? 0.9 : 0.35}" stroke-width="2"/>${open ? `<circle cx="${x - 4}" cy="${y - 5}" r="4" fill="#fff" opacity=".7"/>` : `<path d="M${x - 4} ${y + 1}h8v6h-8zM${x - 2.5} ${y + 1}v-3a2.5 2.5 0 0 1 5 0v3" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.5"/>`}</g>`;
+  }).join('');
+  const cloud = (x, y, r, o) => `<g opacity="${o}"><ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.3}"/><ellipse cx="${x - r * 0.5}" cy="${y + 4}" rx="${r * 0.6}" ry="${r * 0.22}"/><ellipse cx="${x + r * 0.55}" cy="${y + 3}" rx="${r * 0.65}" ry="${r * 0.24}"/></g>`;
+  let stars = '';
+  for (let i = 0; i < 46; i++) stars += `<circle cx="${(i * 137.5) % 400}" cy="${(i * 71.3) % 300}" r="${0.6 + (i % 3) * 0.5}" fill="#fff" opacity="${0.25 + (i % 5) * 0.12}"/>`;
+  const svg = `<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="${NS}" aria-hidden="true">
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070824"/><stop offset=".45" stop-color="#1b1a5a"/><stop offset=".75" stop-color="#3b2d86"/><stop offset="1" stop-color="#1f5a8f"/></linearGradient>
+<linearGradient id="tw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#15183f"/><stop offset=".5" stop-color="#3a3f8f"/><stop offset="1" stop-color="#171a45"/></linearGradient>
+<linearGradient id="rk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3680"/><stop offset="1" stop-color="#0d1038"/></linearGradient>
+<linearGradient id="bm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffe9ad" stop-opacity=".75"/><stop offset="1" stop-color="#ffe9ad" stop-opacity="0"/></linearGradient>
+<radialGradient id="gl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd98a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="400" height="800" fill="url(#sky)"/>${stars}
+<circle cx="200" cy="260" r="190" fill="url(#gl)" class="breathe"/>
+<g fill="#aab6ff" opacity=".35" class="cl cl1">${cloud(80, 640, 110, 0.5)}${cloud(330, 610, 120, 0.45)}</g>
+<rect x="188" y="-20" width="24" height="270" fill="url(#bm)" class="beam"/>
+${isl}
+<g class="isl main"><ellipse cx="200" cy="582" rx="108" ry="19" fill="#3b4aa0"/><path d="M92 582 Q200 700 308 582Z" fill="url(#rk)"/><ellipse cx="200" cy="580" rx="108" ry="16" fill="#5a70d8" opacity=".6"/></g>
+${tiers}
+<path d="M200 190 L226 238 L174 238Z" fill="#2a2f6a" stroke="#e2b75a" stroke-width="1.6"/>
+<g class="crystal"><path d="M200 120 L214 156 L200 186 L186 156Z" fill="#ffe9ad" stroke="#fff" stroke-width="1.5"/><path d="M200 120 L200 186" stroke="#e2b75a" stroke-width="1"/></g>
+<g fill="#cdd6ff" class="cl cl2">${cloud(60, 700, 130, 0.5)}${cloud(350, 690, 140, 0.42)}${cloud(200, 730, 160, 0.5)}</g>
+${orbs}
+</svg>`;
+  const box = h('div', { class: 'hub-scene' + (DEBUG ? ' static' : '') });
+  box.innerHTML = svg;
+  box.querySelectorAll('[data-zone]').forEach((n) => {
+    const go = () => showTeam(undefined, undefined, n.getAttribute('data-zone'));
+    n.addEventListener('click', go);
+    n.addEventListener('keydown', (e) => e.key === 'Enter' && go());
+  });
+  return box;
+}
+
 function showHub() {
   run = null;
   record = null;
+  const inv = progress.inventory;
+  screen(
+    hubScene(),
+    h(
+      'div',
+      { class: 'hub-top' },
+      h('div', { class: 'avatar', style: `background:${COLORS[progress.player.avatar % 6]}` }, (progress.player.name || '?')[0].toUpperCase()),
+      h('div', { class: 'who' }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, progress.player.callsign)),
+      dockBtn('help', t('hub.help'), () => showGlossary(), 'b-help', 'help-btn'),
+      dockBtn('settings', t('hub.settings'), () => showSettings(), 'b-set', 'help-btn'),
+    ),
+    h('div', { class: 'cur', id: 'cur' }, curPill('gold', inv.gold), curPill('spirit', inv.spirit, 'spirit'), curPill('essence', inv.essence)),
+    notice ? h('div', { class: 'notice hub-notice' }, t(notice)) : null,
+    installRow() ? h('div', { class: 'hub-install' }, installRow()) : null,
+    h('div', { class: 'hub-foot' }, h('div', { class: 'credit' }, h('b', {}, t('hub.credit')), h('span', {}, t('hub.version', { v: VERSION, b: BUILD, d: BUILD_DATE })))),
+    h(
+      'nav',
+      { class: 'dock' },
+      dockBtn('team', t('hub.team'), () => showTeam(), 'b-team'),
+      dockBtn('summon', t('hub.summon'), () => showSummon('standard'), 'b-summon', 'sub'),
+      h('button', { class: 'battle', id: 'b-battle', onclick: () => showZones(), 'aria-label': t('hub.battle') }, h('span', {}, t('hub.battle'))),
+      dockBtn('shop', t('hub.shop'), () => showHubShop(), 'b-shop'),
+      dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest'),
+    ),
+  );
+  $('screen').classList.add('hub');
+  atHub = true;
+  notice = null;
+}
+
+// Chọn khu vực (từ nút CHIẾN ĐẤU).
+function showZones() {
   const inv = progress.inventory;
   const zoneCards = ctx.zoneList.map((z) => {
     const open = progress.unlocked.includes(z.id);
     const st = inv.stones[z.element];
     return h(
       'div',
-      { class: 'card btn gate' + (open ? '' : ' locked'), 'data-zone': z.id, style: `--el:${COLORS[z.element]}`, onclick: open ? () => showTeam(undefined, undefined, z.id) : null },
+      { class: 'card btn gate' + (open ? '' : ' locked'), 'data-zone-card': z.id, style: `--el:${COLORS[z.element]}`, onclick: open ? () => showTeam(undefined, undefined, z.id) : null },
       getImg(`orb:${z.element}`) ? h('img', { src: getImg(`orb:${z.element}`).src, alt: '' }) : null,
       h(
         'div',
@@ -157,39 +246,11 @@ function showHub() {
     );
   });
   screen(
-    h(
-      'div',
-      { class: 'hub-top' },
-      h('div', { class: 'avatar', style: `background:${COLORS[progress.player.avatar % 6]}` }, (progress.player.name || '?')[0].toUpperCase()),
-      h('div', { class: 'who' }, h('b', {}, progress.player.name), h('div', { class: 'muted' }, `${progress.player.callsign} · ${t('hub.sub')}`)),
-      dockBtn('help', t('hub.help'), () => showGlossary(), 'b-help', 'help-btn'),
-      h('div', { class: 'cur', id: 'cur' }, curPill('gold', inv.gold), curPill('spirit', inv.spirit, 'spirit'), curPill('essence', inv.essence)),
-    ),
-    notice ? h('div', { class: 'notice' }, t(notice)) : null,
-    installRow(),
-    h('h2', { class: 'sect' }, t('hub.zones')),
+    h('h2', {}, t('hub.zones')),
     zoneCards,
-    h(
-      'details',
-      {},
-      h('summary', {}, t('hub.debug')),
-      h('label', {}, t('hub.seed'), h('input', { id: 'seed', inputmode: 'numeric', value: seedText, oninput: (e) => (seedText = e.target.value) })),
-      h('p', { class: 'muted' }, t('hub.progress')),
-    ),
-    h('div', { class: 'credit' }, h('b', {}, t('hub.credit')), h('span', {}, t('hub.version', { v: VERSION, b: BUILD, d: BUILD_DATE }))),
-    h(
-      'nav',
-      { class: 'dock' },
-      dockBtn('team', t('hub.team'), () => showTeam(), 'b-team'),
-      dockBtn('shop', t('hub.shop'), () => showHubShop(), 'b-shop', 'sub'),
-      dockBtn('summon', t('hub.summon'), () => showSummon('standard'), 'b-summon', 'main'),
-      dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest'),
-      dockBtn('settings', t('hub.settings'), () => showSettings(), 'b-set'),
-    ),
+    h('details', {}, h('summary', {}, t('hub.debug')), h('label', {}, t('hub.seed'), h('input', { id: 'seed', inputmode: 'numeric', value: seedText, oninput: (e) => (seedText = e.target.value) })), h('p', { class: 'muted' }, t('hub.progress'))),
+    btn(t('back'), showHub, '', { id: 'back' }),
   );
-  if (getImg('bg:hub')) $('screen').style.backgroundImage = `linear-gradient(180deg,rgba(6,7,26,.5),rgba(6,7,26,.9) 55%),url(${getImg('bg:hub').src})`;
-  atHub = true;
-  notice = null;
 }
 
 function setLang(l) {

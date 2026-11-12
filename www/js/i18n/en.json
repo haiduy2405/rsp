@@ -507,5 +507,6 @@
   "team.clear": "Clear all",
   "team.empty": "Empty",
   "team.needLeader": "Slot 1 is the leader; put a character there to start.",
-  "team.needAny": "The team is empty. Put at least one character in slot 1."
+  "team.needAny": "The team is empty. Put at least one character in slot 1.",
+  "hub.battle": "Battle"
 }

@@ -23,7 +23,7 @@ const { chromium } = require('playwright');
       await p.click('#back');
     }
     await p.click('#back'); await p.click('#back'); await p.waitForSelector('#b-shop');
-    for (const id of ['#b-help', '#b-team', '#b-quest', '#b-shop', '#b-summon']) { await p.click(id); await chk(id + ' ' + lang); await p.click('#back'); await p.waitForSelector('#b-shop'); }
+    for (const id of ['#b-help', '#b-team', '#b-quest', '#b-shop', '#b-summon', '#b-battle']) { await p.click(id); await chk(id + ' ' + lang); await p.click('#back'); await p.waitForSelector('#b-shop'); }
   }
   console.log('bad:', bad); console.log('errors:', errs);
   await b.close(); if (bad.length || errs.length) process.exit(1);
