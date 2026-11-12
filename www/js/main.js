@@ -788,6 +788,26 @@ function doorList() {
   }));
 }
 
+// Giữ lâu một cửa trên bản đồ: xem chi tiết cửa đó (quái, mô tả) rồi chọn vào hoặc đóng.
+function showDoorDetail(i) {
+  if ($('info')) return;
+  const k = run.doors[i];
+  const d = NODE[k] || NODE.normal;
+  const foes = run.preview?.[i];
+  const close = () => $('info')?.remove();
+  const ico = h('span', { class: 'dl-ico big', style: `--c:${d.col}` });
+  ico.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d.icon}</svg>`;
+  const rows = foes ? foes.map((m) => {
+    const im = getImg(`monster:${m}`);
+    const mo = ctx.monsters[m];
+    return h('div', { class: 'dd-foe' }, im ? h('img', { src: im.src, alt: '' }) : null, h('div', {}, h('b', {}, t(`monster.${m}`)), h('div', { class: 'muted' }, h('span', { class: 'chip', style: `background:${COLORS[mo?.element ?? 0]}` }, t(`element.${mo?.element ?? 0}`)), ' ', t(`info.kind.${mo?.kind || 'normal'}`), mo?.attackEvery ? ` · ${t('info.every', { n: mo.attackEvery })}` : '')));
+  }) : [h('div', { class: 'muted' }, t(`door.desc.${k}`))];
+  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox doordetail' },
+    h('div', { class: 'charrow' }, ico, h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`door.${k}`)), h('small', { class: 'muted' }, t(`door.desc.${k}`)))),
+    h('div', { class: 'card' }, h('b', {}, foes ? t('run.foes') : t('run.reward')), rows),
+    h('div', { class: 'row' }, btn(t('info.close'), close, '', { id: 'info-close' }), btn(t('run.enterDoor'), () => { close(); act({ type: 'door', index: i }); }, 'primary', { id: 'door-enter' })))));
+}
+
 function showDoors() {
   saveActiveRun();
   const rc = ctx.config.run.items;
@@ -815,7 +835,9 @@ function showDoors() {
   const map = h('div', { class: 'runmap' + (DEBUG ? ' static' : '') });
   map.innerHTML = runMapSVG();
   map.querySelectorAll('[data-door]').forEach((nd) => {
-    const go = () => act({ type: 'door', index: Number(nd.getAttribute('data-door')) });
+    const idx = Number(nd.getAttribute('data-door'));
+    const go = () => { if (heldFlag.v) return; act({ type: 'door', index: idx }); };
+    onHold(nd, () => showDoorDetail(idx));
     nd.addEventListener('click', go);
     nd.addEventListener('keydown', (e) => e.key === 'Enter' && go());
   });

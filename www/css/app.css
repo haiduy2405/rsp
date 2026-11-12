@@ -732,3 +732,8 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .runmap { min-height: 110px; }
 .infopanel .dl-foe img { width: 30px; height: 30px; }
 .infopanel .doorlist .dl { padding-top: 3px; padding-bottom: 3px; }
+/* Chi tiết cửa (giữ lâu trên bản đồ) */
+.doordetail .dl-ico.big { width: 52px; height: 52px; } .doordetail .dl-ico.big svg { width: 30px; height: 30px; }
+.dd-foe { display: flex; align-items: center; gap: 10px; padding: 4px 0; text-align: left; }
+.dd-foe img { width: 54px; height: 54px; object-fit: contain; flex: none; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
+.runmap .nd.cur { -webkit-touch-callout: none; user-select: none; }

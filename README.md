@@ -262,3 +262,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 ## v0.36.0
 - Chọn cửa: thông tin quái + mô tả vật phẩm ẩn sau nút (i); bản đồ chiếm phần còn lại; vật phẩm gọn (icon + số lượng).
 - Âm: thêm tick (tab/ải/ô đội hình/chip) và open (chọn cửa), âm bấm phủ thêm thẻ/hub/hộp thoại; tiếng kéo ngọc trầm và nhỏ hơn (rate ~-3 bán cung, gain 0.16 -> 0.12).
+
+## v0.36.1
+- Chọn cửa: nhấn giữ một cửa trên bản đồ xem chi tiết (mô tả, quái kèm hệ/nhịp đánh) rồi "Vào cửa này" hoặc đóng; thả tay không tự vào cửa.
