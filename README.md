@@ -244,3 +244,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Ô tướng sẵn sàng kỹ năng: hào quang xanh dâng lên + hạt sáng bay.
 - Cửa hàng: ưu đãi trượt vào lần lượt, nút lún. Triệu hồi: thẻ úp nhịp sáng tím.
 - Số sát thương đã có bật/co sẵn (không đổi).
+
+## v0.34.2
+- Hào quang ô tướng sẵn sàng kỹ năng đậm hơn, 4 hạt sáng bay lên (đã kiểm bằng ảnh chụp).
