@@ -83,6 +83,13 @@ const steps = {
     // v10: mảnh ghép (riêng/chung), Vé Triệu Linh, cửa hàng hằng ngày.
     return { ...data, version: 10, inventory: { ...data.inventory, soulTickets: 0, generic: { 3: 0, 4: 0, 5: 0 }, fragments: {} }, shop: { day: -1, offers: [], bought: {} } };
   },
+  10(data, ctx) {
+    // v11: 7 ải nhỏ mỗi độ khó. Đã thắng một độ khó (cũ) thì coi như xong cả 7 ải của độ khó đó.
+    const n = ctx?.config?.run?.stages ?? 7;
+    const stages = {};
+    for (const [zone, byDiff] of Object.entries(data.clears || {})) stages[zone] = Object.fromEntries(Object.entries(byDiff).filter(([, c]) => c > 0).map(([d]) => [d, n]));
+    return { ...data, version: 11, stages };
+  },
 };
 
 export function migrate(data, fromVersion, ctx) {

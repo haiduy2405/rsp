@@ -90,7 +90,7 @@ function pickDoor(run) {
 
 export function playFullRun(seed, zoneId, team, K, diff = 'easy') {
   const rng = mulberry32(seed ^ 0xabcdef);
-  let run = createRun(ctx, { seed, zoneId, team, pityMissed: false, diff });
+  let run = createRun(ctx, { seed, zoneId, team, pityMissed: false, diff, stage: Number(process.env.STAGE || 7) });
   let turns = 0;
   for (let guard = 0; run.phase !== 'end' && guard < 2000; guard++) {
     if (run.phase === 'doors') {

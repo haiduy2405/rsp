@@ -94,6 +94,12 @@
     "fx:pierce": "assets/ui/fx/pierce.webp",
     "fx:lock": "assets/ui/fx/lock.webp",
     "fx:immune": "assets/ui/fx/immune.webp",
+    "zone:zone_water": "assets/ui/zones/zone_water.webp",
+    "zone:zone_fire": "assets/ui/zones/zone_fire.webp",
+    "zone:zone_wood": "assets/ui/zones/zone_wood.webp",
+    "zone:zone_light": "assets/ui/zones/zone_light.webp",
+    "zone:zone_dark": "assets/ui/zones/zone_dark.webp",
+    "zone:zone_heart": "assets/ui/zones/zone_heart.webp",
     "bg:hub": "assets/bg/hub.webp",
     "bg:battle": "assets/bg/battle.webp",
     "ui:logo": "assets/ui/logo.webp"

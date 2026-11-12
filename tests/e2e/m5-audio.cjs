@@ -6,7 +6,7 @@ const { chromium } = require('playwright');
   await p.click('#ob-next'); await p.click('[data-culture=viet]'); await p.click('#ob-next'); await p.click('#ob-next');
   await p.fill('#ob-name','A'); await p.fill('#ob-callsign','B'); await p.click('#ob-start'); await p.click('#ob-hub');
   await p.click('#b-set'); await p.click('#opt-music'); await p.click('#opt-music'); await p.click('#back');
-  await p.click('[data-zone]'); await p.click('[data-stage=easy]'); await p.click('#team-go'); await p.click('[data-door="0"]').catch(()=>{});
+  await p.click('[data-zone]'); await p.click('[data-stage="1"]'); await p.click('#team-go'); await p.click('[data-door="0"]').catch(()=>{});
   for (const s of ['#tut-next','#tut-next','#tut-go']) { await p.waitForSelector(s,{timeout:3000}).catch(()=>{}); if (await p.locator(s).count()) await p.click(s); }
   await p.waitForTimeout(1500);
   const box = await p.locator('#cv').boundingBox();

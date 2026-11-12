@@ -215,3 +215,13 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - 12 icon vẽ tay (`www/assets/ui/fx/<key>.webp`, manifest key `fx:<key>`): Bỏng, Độc, Choáng, Đóng băng, Giảm công, Khóa ngọc (tiêu cực, viền đỏ vuông) · Khiên, Hồi máu, Tăng công, Phản đòn, Xuyên giáp, Miễn nhiễm (tích cực, viền xanh tròn).
 - Trong trận chỉ hiện icon + số lượt (Độc thêm ×tầng), không còn chữ. Bấm giữ quái/tướng xem tên + mô tả, kèm icon (cả chi tiết tướng).
 - `game.refresh()` (đồng bộ view từ state) cho test; `tests/e2e/fxshot.cjs` chụp thử badge.
+
+## v0.33.0 — 7 ải mỗi độ khó, icon vùng đất
+- Mỗi khu có 3 độ khó (Dễ/Vừa/Khó) × 7 ải. Mỗi ải là một chuyến mini (3 tầng; ải 7 có thêm Elite + Boss, quái boss to hơn `kindScale.boss`). Ải 1–6 quái thường, ải 7 boss.
+- Mở khóa tuần tự: qua ải n mở ải n+1; xong 7 ải Dễ thì mở 7 ải Vừa **và** mở khu kế; xong Vừa mở Khó. Quay lại ải nào cũng farm được.
+- Độ khó chỉ khác chỉ số + thưởng + tỉ lệ rớt (`config.difficulty`); quái trong ải y như nhau. Đã **bỏ hẳn affix** (buff ngẫu nhiên lên quái).
+- Chỉ số tăng dần theo ải (`run.stageScale` từ ải 1 đến ải 7), thưởng hoàn thành theo `run.stageReward` (ải boss nhiều nhất); Linh Thạch lần đầu chia theo ải (tổng 7 ải = `firstClear`).
+- Save v11: thêm `stages[zone][diff]` (ải cao nhất đã qua); save cũ quy đổi: đã thắng độ khó nào thì coi như xong 7 ải độ khó đó.
+- Màn chọn ải mới (3 tab độ khó, danh sách 7 ải, giữ để xem quái/bảng rớt), nút "Ải tiếp theo" ở màn kết quả.
+- Icon 6 vùng vẽ tay (`assets/ui/zones/`, key `zone:<id>`) thay viên ngọc ở màn chính và danh sách vùng; vùng chưa mở xám + khóa.
+- Cân bằng: ải 7 khớp dải thắng cũ (`STAGE=7 node tools/balance-sim.js --targets`), khu Ám/Tim tăng hệ số khu.

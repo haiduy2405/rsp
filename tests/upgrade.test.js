@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { newProgress, isValidProgress } from '../www/js/core/progress.js';
+import { newProgress, isValidProgress, SAVE_VERSION } from '../www/js/core/progress.js';
 import { expToNext, expToMax, useElixir, feedFodder, sellFodder, fodderExp, awakenCost, awaken, grantCharacter, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, placeInSlot, clearTeam, autoTeam, charPower } from '../www/js/core/upgrade.js';
 import { migrate } from '../www/js/save/migrate.js';
 import { createRun, playRun, newRunRecord, runStep } from '../www/js/core/run.js';
@@ -252,5 +252,5 @@ test('migrate v7 → v8: Thức tỉnh thành Form 2; vượt cấp 30 cũng lê
   };
   const out = migrate(old, 7, ctx);
   assert.deepEqual([out.characters.a.awaken, out.characters.b.awaken, out.characters.c.awaken], [1, 1, 0]);
-  assert.equal(out.version, 10);
+  assert.equal(out.version, SAVE_VERSION);
 });

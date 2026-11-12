@@ -7,7 +7,7 @@ const { chromium } = require('playwright');
   await p.goto('http://localhost:8080/?debug');
   await p.click('#ob-skip'); await p.click('#ob-next'); await p.click('[data-culture=viet]'); await p.click('#ob-next'); await p.click('#ob-next');
   await p.fill('#ob-name', 'Bot'); await p.fill('#ob-callsign', 'B'); await p.click('#ob-start'); await p.click('#ob-hub');
-  await p.click('[data-zone]'); await p.click('[data-stage=easy]'); await p.click('#team-go');
+  await p.click('[data-zone]'); await p.click('[data-stage="1"]'); await p.click('#team-go');
   await p.click('[data-door="0"]');
   await p.click('#tut-skip').catch(() => {});
   await p.waitForSelector('#pause-btn');

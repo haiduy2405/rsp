@@ -5,7 +5,7 @@ const { chromium, devices } = require('playwright');
   await p.goto('http://localhost:8080/?debug'); await p.evaluate(() => localStorage.clear()); await p.reload();
   await p.tap('#ob-skip'); await p.tap('#ob-next'); await p.tap('[data-culture=viet]'); await p.tap('#ob-next'); await p.tap('#ob-next');
   await p.fill('#ob-name', 'Duy'); await p.fill('#ob-callsign', 'Sao'); await p.tap('#ob-start'); await p.tap('#ob-hub');
-  await p.tap('[data-zone]'); await p.tap('[data-stage=easy]'); await p.tap('#team-go');
+  await p.tap('[data-zone]'); await p.tap('[data-stage="1"]'); await p.tap('#team-go');
   for (let n = 0; n < 12; n++) {
     if (await p.evaluate(() => !!window.__game)) break;
     if (await p.locator('#tut-skip').isVisible().catch(() => false)) { await p.tap('#tut-skip'); await p.waitForTimeout(300); continue; }

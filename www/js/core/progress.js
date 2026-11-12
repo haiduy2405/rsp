@@ -6,12 +6,17 @@ import { grantExp } from './upgrade.js';
 import { newShopState } from './shop.js';
 import { addFragments } from './fragments.js';
 // Tiến trình người chơi (dữ liệu được lưu). Hàm thuần: nhận progress, trả progress mới.
-export const SAVE_VERSION = 10;
+export const SAVE_VERSION = 11;
 
-// Linh Thạch thưởng lần clear đầu tiên của một ải: gốc theo độ khó, tăng theo khu (config.firstClear).
+// Linh Thạch thưởng lần clear đầu tiên của một độ khó trong khu (cả 7 ải): gốc theo độ khó, tăng theo khu (config.firstClear).
 export function firstClearSpirit(ctx, zoneId, diff) {
   const f = ctx.config.firstClear;
   return Math.round(f.spirit[diff] * (1 + f.zoneGrowth * ctx.zones[zoneId].order));
+}
+// Phần Linh Thạch của từng ải nhỏ: chia theo stageReward (ải boss nhiều nhất), tổng 7 ải = firstClearSpirit.
+export function firstClearStageSpirit(ctx, zoneId, diff, stage) {
+  const w = ctx.config.run.stageReward;
+  return Math.round((firstClearSpirit(ctx, zoneId, diff) * w[stage - 1]) / w.reduce((a, x) => a + x, 0));
 }
 
 export const DEFAULT_TEAM = ['thetis', 'bennu', 'atalanta', 'eos', 'eir'];
@@ -24,6 +29,7 @@ export function newProgress(ctx) {
     inventory: { gold: 0, elixir: { 1: 0, 2: 0, 3: 0 }, tickets: 0, soulTickets: 0, generic: { 3: 0, 4: 0, 5: 0 }, fragments: {}, spirit: 0, shards: 0, stones, fodder: {}, offerings: {} }, // elixir = Đan Tinh Hoa { bậc: số } (EXP cố định mỗi viên); tickets = Vé Triệu Hồi; spirit = Linh Thạch (đổi vé); fodder = Tiểu Linh { 'hệ_sao': số }; offerings = Lễ Vật { 'tộc_bậc': số }
     unlocked: [ctx.zoneList[0].id],
     clears: {}, // { zoneId: { easy, normal, hard } } số lần thắng
+    stages: {}, // { zoneId: { easy, normal, hard } } ải cao nhất đã qua (0..7)
     pity: {},
     stats: { runs: 0, wins: 0, losses: 0 },
     characters: Object.fromEntries(DEFAULT_TEAM.map((id) => [id, newCharacter()])),
@@ -51,7 +57,7 @@ export function isValidProgress(p) {
   if (!inv.fodder || Object.values(inv.fodder).some((n) => !Number.isInteger(n) || n < 0)) return false;
   if (!inv.offerings || Object.values(inv.offerings).some((n) => !Number.isInteger(n) || n < 0)) return false;
   if (!Array.isArray(p.unlocked) || p.unlocked.length === 0) return false;
-  if (!p.clears || !p.pity || !p.stats) return false;
+  if (!p.clears || !p.stages || !p.pity || !p.stats) return false;
   if (!Array.isArray(p.team) || p.team.length !== 5) return false;
   const ids = p.team.filter((id) => id !== null);
   if (new Set(ids).size !== ids.length) return false;
@@ -65,7 +71,7 @@ export function isValidProgress(p) {
   return true;
 }
 
-// Cộng kết quả một chuyến đã kết thúc vào tiến trình. Thắng Dễ mở khu kế tiếp, thắng độ khó nào thì mở độ khó sau của khu đó (xem core/stage.js).
+// Cộng kết quả một chuyến (một ải nhỏ) vào tiến trình. Qua ải n mở ải n+1; xong 7 ải Dễ mở khu kế, xong 7 ải của độ khó nào mở độ khó sau (xem core/stage.js).
 export function applyRunResult(ctx, progress, run) {
   if (run.phase !== 'end') throw new Error('run chưa kết thúc');
   const p = structuredClone(progress);
@@ -85,10 +91,15 @@ export function applyRunResult(ctx, progress, run) {
   if (run.result === 'won') {
     p.stats.wins += 1;
     const c = (p.clears[run.zoneId] ??= {});
-    if (!c[run.diff]) inv.spirit += firstClearSpirit(ctx, run.zoneId, run.diff); // Linh Thạch chỉ tặng lần clear đầu của mỗi ải (khu × độ khó)
     c[run.diff] = (c[run.diff] || 0) + 1;
+    const stage = run.stage ?? 1;
+    const sg = (p.stages[run.zoneId] ??= {});
+    if (stage > (sg[run.diff] || 0)) {
+      inv.spirit += firstClearStageSpirit(ctx, run.zoneId, run.diff, stage); // Linh Thạch chỉ tặng lần qua ải đầu tiên (khu × độ khó × ải)
+      sg[run.diff] = stage;
+    }
     const next = ctx.zoneList[zone.order + 1];
-    if (run.diff === ctx.config.difficulty.order[0] && next && !p.unlocked.includes(next.id)) p.unlocked.push(next.id); // thắng Dễ mở khu kế
+    if (run.diff === ctx.config.difficulty.order[0] && sg[run.diff] >= ctx.config.run.stages && next && !p.unlocked.includes(next.id)) p.unlocked.push(next.id); // xong 7 ải Dễ mở khu kế
   } else {
     p.stats.losses += 1;
   }

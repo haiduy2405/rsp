@@ -8,7 +8,7 @@ const { chromium } = require('playwright');
   await p.click('#ob-skip'); await p.click('#ob-next'); await p.click('[data-culture=viet]'); await p.click('#ob-next'); await p.click('#ob-next');
   await p.fill('#ob-name', 'Bot'); await p.fill('#ob-callsign', 'B'); await p.click('#ob-start'); await p.click('#ob-hub');
   await p.evaluate(() => window.__cheat && window.__cheat([])); // mở dữ liệu debug nếu có
-  await p.click('[data-zone]'); await p.click('[data-stage=easy]'); await p.click('#team-go');
+  await p.click('[data-zone]'); await p.click('[data-stage="1"]'); await p.click('#team-go');
   const shotDir = process.argv[2]; const shot = {};
   const click = async (sel) => { if (await p.locator(sel).count()) { await p.click(sel, { timeout: 1500 }).catch(() => {}); return true; } return false; };
   let battles = 0, moves = 0, ended = false, guard = 0;

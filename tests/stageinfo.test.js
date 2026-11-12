@@ -21,5 +21,5 @@ test('stageinfo: tỉ lệ rớt trong [0,1], tỉ lệ bậc Lễ Vật cộng 
   assert.deepEqual(si.sources.map((s) => s.kind), ['normal', 'swarm', 'elite', 'boss', 'chest', 'completion']);
   for (const s of si.sources) for (const d of s.drops) assert.ok(d.chance >= 0 && d.chance <= 1, `${s.kind} ${d.key}`);
   assert.ok(Math.abs(si.tiers.reduce((a, x) => a + x.pct, 0) - 1) < 1e-9);
-  assert.ok(si.races.length > 0 && si.affixPool.length > 0);
+  assert.ok(si.races.length > 0);
 });

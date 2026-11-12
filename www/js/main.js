@@ -1,8 +1,8 @@
 import { buildCtx, loadRaw } from './core/ctx.js';
-import { createRun, runStep, newRunRecord, debugWinBattle } from './core/run.js';
-import { stageOpen, clearsOf, zoneClears } from './core/stage.js';
+import { createRun, runStep, newRunRecord, debugWinBattle, runLayout } from './core/run.js';
+import { stageOpen, tierOpen, stagesDone, zoneClears } from './core/stage.js';
 import { stageInfo } from './core/stageinfo.js';
-import { applyRunResult, firstClearSpirit } from './core/progress.js';
+import { applyRunResult, firstClearStageSpirit } from './core/progress.js';
 import { createStorage, browserAdapter } from './save/storage.js';
 import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useElixir, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
@@ -148,9 +148,12 @@ function hubScene() {
     const [x, y] = pos[i % pos.length];
     const open = progress.unlocked.includes(z.id);
     const col = COLORS[z.element];
-    return `<g class="zorb${open ? ' open' : ''}" ${open ? `data-zone="${z.id}" role="button" tabindex="0" aria-label="${t(`zone.${z.id}`)}"` : ''} style="animation-delay:${(i * 0.7).toFixed(1)}s;--c:${col}"><circle cx="${x}" cy="${y}" r="${open ? 22 : 17}" fill="${col}" opacity="${open ? 0.28 : 0.1}" class="halo"/><circle cx="${x}" cy="${y}" r="${open ? 14 : 11}" fill="${open ? col : '#5b6090'}" stroke="#fff" stroke-opacity="${open ? 0.9 : 0.35}" stroke-width="2"/>${open ? `<circle cx="${x - 4}" cy="${y - 5}" r="4" fill="#fff" opacity=".7"/>` : `<path d="M${x - 4} ${y + 1}h8v6h-8zM${x - 2.5} ${y + 1}v-3a2.5 2.5 0 0 1 5 0v3" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.5"/>`}</g>`;
+    const S = open ? 66 : 60;
+    const lock = open ? '' : `<g transform="translate(${x - 9} ${y - 8})"><rect x="0" y="7" width="18" height="13" rx="3" fill="#3a2416" stroke="#f6edd6" stroke-width="1.6"/><path d="M4 7V4.5a5 5 0 0 1 10 0V7" fill="none" stroke="#f6edd6" stroke-width="1.8"/></g>`;
+    return `<g class="zorb${open ? ' open' : ''}" ${open ? `data-zone="${z.id}" role="button" tabindex="0" aria-label="${t(`zone.${z.id}`)}"` : ''} style="animation-delay:${(i * 0.7).toFixed(1)}s;--c:${col}">${open ? `<ellipse cx="${x}" cy="${y + S * 0.34}" rx="${S * 0.46}" ry="${S * 0.12}" fill="${col}" opacity=".35" class="halo"/>` : ''}<image href="assets/ui/zones/${z.id}.webp" x="${x - S / 2}" y="${y - S / 2}" width="${S}" height="${S}" ${open ? '' : 'filter="url(#zlock)" opacity=".7"'}/>${lock}</g>`;
   }).join('');
   const svg = `<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice" xmlns="${NS}" aria-hidden="true">
+<defs><filter id="zlock"><feColorMatrix type="saturate" values="0.1"/></filter></defs>
 <rect width="400" height="800" fill="#fbd9a8"/>
 <image href="assets/bg/hub.webp" x="0" y="0" width="400" height="711" preserveAspectRatio="xMidYMin slice"/>
 ${orbs}
@@ -205,23 +208,37 @@ function resumeChip() {
 }
 
 // Chọn khu vực (từ nút CHIẾN ĐẤU).
-const stageLabel = (r) => `${t(`zone.${r.zoneId}`)} · ${t(`diff.${r.diff}`)}`;
+const stageLabel = (r) => `${t(`zone.${r.zoneId}`)} · ${t(`diff.${r.diff}`)} · ${t('stage.num', { n: r.stage ?? 1 })}`;
 
-// Chọn độ khó của một khu: Dễ -> Vừa -> Khó, mở lần lượt. Khó hơn thì rớt ngon hơn.
-function showStages(zoneId) {
+// Chọn ải của một khu: 3 độ khó (Dễ -> Vừa -> Khó), mỗi độ khó 7 ải mở lần lượt, ải 7 là boss. Khó hơn thì quái mạnh hơn, thưởng và tỉ lệ rớt cao hơn.
+let stageTier = null;
+function showStages(zoneId, tier) {
   const order = ctx.config.difficulty.order;
-  const cards = order.map((d, i) => {
-    const open = stageOpen(ctx, progress, zoneId, d);
-    const df = ctx.config.difficulty[d];
+  const total = ctx.config.run.stages;
+  // Mặc định mở đúng độ khó đang chơi dở: độ khó cao nhất đã mở mà chưa xong.
+  tier ??= stageTier?.zone === zoneId ? stageTier.tier : [...order].reverse().find((d) => tierOpen(ctx, progress, zoneId, d) && stagesDone(progress, zoneId, d) < total) ?? order.find((d) => tierOpen(ctx, progress, zoneId, d)) ?? order[0];
+  stageTier = { zone: zoneId, tier };
+  const done = stagesDone(progress, zoneId, tier);
+  const df = ctx.config.difficulty[tier];
+  const tabs = h('div', { class: 'tiertabs' }, order.map((d, i) => {
+    const open = tierOpen(ctx, progress, zoneId, d);
+    return h('button', { class: 'tier' + (d === tier ? ' on' : '') + (open ? '' : ' locked'), 'data-tier': d, onclick: () => open && showStages(zoneId, d) }, t(`diff.${d}`), h('small', {}, open ? t('stage.progress', { n: stagesDone(progress, zoneId, d), total }) : '🔒'));
+  }));
+  const cards = Array.from({ length: total }, (_, i) => {
+    const n = i + 1;
+    const open = stageOpen(ctx, progress, zoneId, tier, n);
+    const clear = n <= done;
+    const boss = n === total;
     const card = h(
       'div',
-      { class: 'card btn gate stage' + (open ? '' : ' locked'), 'data-stage': d, onclick: () => !heldFlag.v && open && showTeam(undefined, undefined, { zoneId, diff: d }) },
-      h('div', { class: 'info' }, h('div', { class: 'name' }, t(`diff.${d}`)), h('small', {}, open ? t('zone.clears', { n: clearsOf(progress, zoneId, d) }) : t('diff.locked', { prev: t(`diff.${order[i - 1]}`) })), h('div', { class: 'muted' }, t('diff.reward', { gold: df.gold, drop: df.drop }))),
+      { class: 'card btn gate stage' + (boss ? ' boss' : '') + (open ? '' : ' locked') + (clear ? ' clear' : ''), 'data-stage': String(n), onclick: () => !heldFlag.v && open && showTeam(undefined, undefined, { zoneId, diff: tier, stage: n }) },
+      h('div', { class: 'snum' }, boss ? '★' : String(n)),
+      h('div', { class: 'info' }, h('div', { class: 'name' }, t(boss ? 'stage.boss' : 'stage.num', { n })), h('small', {}, clear ? t('stage.cleared') : open ? t('stage.next') : t('stage.lockedPrev'))),
     );
-    onHold(card, () => showStageInfo(zoneId, d));
+    onHold(card, () => showStageInfo(zoneId, tier, n));
     return card;
   });
-  screen(h('h2', {}, t(`zone.${zoneId}`)), ...cards, h('div', { class: 'muted hold-hint' }, t('stage.hold')), btn(t('back'), showZones, '', { id: 'back' }));
+  screen(h('h2', {}, t(`zone.${zoneId}`)), tabs, h('div', { class: 'muted tier-note' }, t('diff.reward', { gold: df.gold, drop: df.drop })), h('div', { class: 'stagelist' }, cards), h('div', { class: 'muted hold-hint' }, t('stage.hold')), btn(t('back'), showZones, '', { id: 'back' }));
 }
 
 // Giữ lâu (450ms) trên một phần tử để mở thông tin; thả tay sau khi mở không tính là chạm.
@@ -240,8 +257,8 @@ function onHold(el, fn, ms = 450) {
 // Thông tin chi tiết một ải: hệ số quái, đặc tính, quái trong khu, bảng rớt và tỉ lệ theo từng nguồn.
 const pctText = (p) => (p <= 0 ? '0%' : p >= 0.995 ? '100%' : `${(p * 100).toFixed(p < 0.1 ? 1 : 0)}%`);
 const rangeText = ([a, b]) => (a === b ? `${a}` : `${a}–${b}`);
-function showStageInfo(zoneId, diff) {
-  const si = stageInfo(ctx, zoneId, diff);
+function showStageInfo(zoneId, diff, stage = 1) {
+  const si = stageInfo(ctx, zoneId, diff, stage);
   const close = () => $('info')?.remove();
   const row = (k, v) => h('div', { class: 'si-row' }, h('span', {}, k), h('b', {}, v));
   const names = (ids) => ids.map((m) => t(`monster.${m}`)).join(', ');
@@ -251,16 +268,14 @@ function showStageInfo(zoneId, diff) {
     s.drops.map((d) => row(dropLabel(d.key), `${pctText(d.chance)} · ×${rangeText(d.count)}`)),
   ));
   const tiers = si.tiers.map((x) => `${t('loot.tier', { n: x.tier })} ${pctText(x.pct)}`).join(' · ');
-  const aff = ['normal', 'swarm', 'elite', 'boss'].map((k) => row(t(`loot.src.${k}`), `${pctText(si.affix[k].chance)} (≤${si.affix[k].max})`));
   const body = [
-    h('h3', {}, `${t(`zone.${zoneId}`)} · ${t(`diff.${diff}`)}`),
+    h('h3', {}, `${t(`zone.${zoneId}`)} · ${t(`diff.${diff}`)} · ${t('stage.num', { n: stage })}`),
     h('div', { class: 'si-sec' }, h('b', {}, t('stage.info.enemy')),
       row(t('stat.hp'), `×${si.hp[0].toFixed(2)} → ×${si.hp[1].toFixed(2)}`),
       row(t('stat.atk'), `×${si.atk[0].toFixed(2)} → ×${si.atk[1].toFixed(2)}`),
       row(t('stage.info.floors'), String(si.floors)),
       h('small', { class: 'muted' }, `${t('door.normal')}: ${names(si.monsters.normal)}`), h('small', { class: 'muted' }, `Elite: ${names(si.monsters.elite)}`), h('small', { class: 'muted' }, `Boss: ${names(si.monsters.boss)}`)),
-    h('div', { class: 'si-sec' }, h('b', {}, t('affix.title')), aff, h('small', { class: 'muted' }, si.affixPool.map((a) => t(`affix.${a}`)).join(', '))),
-    h('div', { class: 'si-sec' }, h('b', {}, t('stage.info.loot')), row(t('stage.info.firstClear'), progress.clears[zoneId]?.[diff] ? t('stage.info.claimed') : `${si.firstClear} ${t('res.spirit')}`), h('small', { class: 'muted' }, t('diff.reward', { gold: si.gold, drop: si.drop })), src,
+    h('div', { class: 'si-sec' }, h('b', {}, t('stage.info.loot')), row(t('stage.info.firstClear'), stage <= stagesDone(progress, zoneId, diff) ? t('stage.info.claimed') : `${si.firstClear} ${t('res.spirit')}`), h('small', { class: 'muted' }, t('diff.reward', { gold: si.gold, drop: si.drop })), src,
       h('small', { class: 'muted' }, `${t('stage.info.offering')} ${si.races.map((r) => t(`race.${r}`)).join(', ')}: ${tiers}`)),
   ];
   $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox stageinfo' }, ...body, btn(t('info.close'), close, 'primary', { id: 'info-close' }))));
@@ -274,13 +289,13 @@ function showZones() {
     return h(
       'div',
       { class: 'card btn gate' + (open ? '' : ' locked'), 'data-zone-card': z.id, style: `--el:${COLORS[z.element]}`, onclick: open ? () => showStages(z.id) : null },
-      getImg(`orb:${z.element}`) ? h('img', { src: getImg(`orb:${z.element}`).src, alt: '' }) : null,
+      h('img', { src: `assets/ui/zones/${z.id}.webp`, alt: '', draggable: 'false' }),
       h(
         'div',
         { class: 'info' },
         h('div', { class: 'name' }, t(`zone.${z.id}`)),
         h('small', {}, open ? t('zone.clears', { n: zoneClears(progress, z.id) }) : t('zone.locked')),
-        open ? h('div', { class: 'diffdots' }, ctx.config.difficulty.order.map((d) => h('span', { class: clearsOf(progress, z.id, d) > 0 ? 'on' : '' }, t(`diff.${d}`)))) : null,
+        open ? h('div', { class: 'diffdots' }, ctx.config.difficulty.order.map((d) => h('span', { class: stagesDone(progress, z.id, d) >= ctx.config.run.stages ? 'on' : '' }, `${t(`diff.${d}`)} ${stagesDone(progress, z.id, d)}/${ctx.config.run.stages}`))) : null,
         open ? h('div', { class: 'muted' }, `${t('stone.normal')}: ${st.normal} · ${t('stone.rare')}: ${st.rare}`) : null,
       ),
     );
@@ -494,7 +509,7 @@ function showTeam(slot, msg, stage) {
   const needLeader = team[0] === null;
   const sorted = owned().slice().sort((a, b) => b.rarity - a.rarity || a.element - b.element || progress.characters[b.id].level - progress.characters[a.id].level || (a.id < b.id ? -1 : 1));
   screen(
-    h('h2', {}, stage ? t('team.prep', { zone: `${t(`zone.${stage.zoneId}`)} · ${t(`diff.${stage.diff}`)}` }) : t('hub.team')),
+    h('h2', {}, stage ? t('team.prep', { zone: `${t(`zone.${stage.zoneId}`)} · ${t(`diff.${stage.diff}`)} · ${t('stage.num', { n: stage.stage })}` }) : t('hub.team')),
     tabs,
     slots,
     h(
@@ -574,12 +589,12 @@ function leaveRun() {
   showHub();
 }
 
-function startRun({ zoneId, diff }) {
+function startRun({ zoneId, diff, stage = 1 }) {
   const seed = pickSeed();
   const pity = !!progress.pity[zoneId];
   const team = teamRoster(progress);
-  run = createRun(ctx, { seed, zoneId, team, pityMissed: pity, diff });
-  record = newRunRecord(seed, zoneId, team, pity, diff);
+  run = createRun(ctx, { seed, zoneId, team, pityMissed: pity, diff, stage });
+  record = newRunRecord(seed, zoneId, team, pity, diff, stage);
   runPath = [];
   savedThisRun = false;
   delete progress.activeRun;
@@ -638,7 +653,7 @@ function runMapSVG() {
   const xs = (r, count) => (count === 1 ? [200] : count === 2 ? [118, 282] : [78 + Math.sin(r * 2.1) * 10, 200 + Math.cos(r * 1.7) * 10, 322 + Math.sin(r * 1.3) * 10]);
   // Tầng chưa tới: Elite/Boss đã biết trước (bố cục cố định), còn lại là '?'.
   const future = (r) => {
-    const slot = ctx.config.run.layout[r];
+    const slot = runLayout(ctx, run)[r];
     const pool = ctx.config.run.pools[slot.pool];
     const combat = Object.keys(pool).every((k) => ['normal', 'swarm', 'elite', 'boss'].includes(k));
     return Array(slot.doors).fill(slot.pool === 'elite' || slot.pool === 'boss' ? slot.pool : combat ? 'f?' : '?'); // tầng đánh hiện ⚔ mờ, tầng sự kiện hiện ?
@@ -739,9 +754,7 @@ function showRelicPick() {
 function doorList() {
   return h('div', { class: 'doorlist' }, run.doors.map((k, i) => {
     const foes = run.preview?.[i];
-    const fx = run.previewAffix?.[i] || [];
-    // Quái kèm đặc tính: "Rồng lửa [Cứng cáp, Cuồng nộ]"
-    const label = (m, j) => t(`monster.${m}`) + (fx[j]?.length ? ` [${fx[j].map((a) => t(`affix.${a}`)).join(', ')}]` : '');
+    const label = (m) => t(`monster.${m}`);
     return h('div', { class: 'dl', 'data-dl': i }, h('b', {}, `${i + 1}. ${t(`door.${k}`)}`), ' ', foes ? h('small', { class: 'muted' }, foes.map(label).join(', ')) : h('small', { class: 'muted' }, t(`door.desc.${k}`)));
   }));
 }
@@ -1079,7 +1092,7 @@ let firstClear = 0;
 function showEnd() {
   if (!savedThisRun) {
     const before = progress;
-    firstClear = run.result === 'won' && !before.clears[run.zoneId]?.[run.diff] ? firstClearSpirit(ctx, run.zoneId, run.diff) : 0;
+    firstClear = run.result === 'won' && (run.stage ?? 1) > stagesDone(before, run.zoneId, run.diff) ? firstClearStageSpirit(ctx, run.zoneId, run.diff, run.stage ?? 1) : 0;
     progress = applyRunResult(ctx, progress, run);
     endLevels = progress.team.filter(Boolean).map((id) => ({ id, from: before.characters[id].level, to: progress.characters[id].level })).filter((x) => x.to > x.from);
     delete progress.activeRun;
@@ -1097,10 +1110,11 @@ function showEnd() {
     run.heroExp ? h('div', { class: 'card', id: 'end-exp' }, h('b', {}, t('result.heroExp', { n: run.heroExp })), endLevels.map((x) => h('div', { class: 'muted' }, t('result.levelUp', { name: t(`char.${x.id}`), lv: x.to })))) : null,
     won ? h('div', { class: 'muted' }, t('end.completion')) : h('div', { class: 'notice' }, t('end.noCompletion')),
     run.pityGranted ? h('div', { class: 'notice' }, t('end.pity')) : null,
+    won && (run.stage ?? 1) < ctx.config.run.stages ? btn(t('end.nextStage'), () => { savedThisRun = false; showTeam(undefined, undefined, { zoneId: run.zoneId, diff: run.diff, stage: (run.stage ?? 1) + 1 }); }, 'primary', { id: 'end-next' }) : null,
     btn(t('end.back'), () => {
       savedThisRun = false;
       showHub();
-    }, 'primary', { id: 'back' }),
+    }, won && (run.stage ?? 1) < ctx.config.run.stages ? '' : 'primary', { id: 'back' }),
   );
 }
 

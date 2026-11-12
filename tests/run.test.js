@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mulberry32 } from '../www/js/core/rng.js';
-import { createRun, runStep, playRun, newRunRecord } from '../www/js/core/run.js';
+import { createRun, runStep, playRun, newRunRecord, stageFactor } from '../www/js/core/run.js';
 import { hashState } from '../www/js/core/hash.js';
 import { newProgress, applyRunResult, isValidProgress, DEFAULT_TEAM } from '../www/js/core/progress.js';
 import { N } from '../www/js/core/board.js';
@@ -10,7 +10,7 @@ import { simulateRun } from '../tools/loot-sim.js';
 
 const ctx = loadCtx();
 const TEAM = DEFAULT_TEAM;
-const mk = (seed, zoneId = 'zone_water', pity = false) => createRun(ctx, { seed, zoneId, team: TEAM, pityMissed: pity });
+const mk = (seed, zoneId = 'zone_water', pity = false, stage = 1) => createRun(ctx, { seed, zoneId, team: TEAM, pityMissed: pity, stage });
 
 // Đặt trận hiện tại về thế chắc thắng: quái còn 1 máu, bàn có sẵn 3 nhóm Thủy (nước kéo [0,1] không đổi bàn).
 function rigWin(run) {
@@ -56,11 +56,12 @@ const doorOf = (type) => (run) => run.doors.indexOf(type);
 
 test('run: tạo chuyến xác định, mọi ải cùng số tầng, 3 cửa mỗi tầng trừ Boss cuối', () => {
   assert.deepEqual(mk(5), mk(5));
-  const { layout } = ctx.config.run;
+  const { layouts } = ctx.config.run;
+  assert.equal(mk(1, 'zone_water', false, 7).floors, layouts.boss.length);
   for (let seed = 0; seed < 300; seed++) {
     const r = mk(seed);
-    assert.equal(r.floors, layout.length);
-    assert.equal(r.doors.length, layout[0].doors);
+    assert.equal(r.floors, layouts.mini.length);
+    assert.equal(r.doors.length, layouts.mini[0].doors);
     assert.equal(r.doors.length, 3);
     assert.equal(r.hp, r.maxHp, 'chuyến mới hồi đầy máu');
   }
@@ -68,19 +69,20 @@ test('run: tạo chuyến xác định, mọi ải cùng số tầng, 3 cửa m�
 
 const COMBAT = ['normal', 'swarm', 'elite', 'boss'];
 test('run: tầng đánh xen kẽ tầng sự kiện; mọi đường đều đủ trận, đúng 1 tầng Elite rồi Boss cuối ải (mọi khu)', () => {
-  const { layout, pools } = ctx.config.run;
+  const { pools } = ctx.config.run;
+  const layout = ctx.config.run.layouts.boss;
   const combatPool = (name) => Object.keys(pools[name]).every((k) => COMBAT.includes(k));
   assert.equal(layout.at(-1).pool, 'boss');
   assert.deepEqual(Object.keys(pools.boss), ['boss']);
   assert.deepEqual(Object.keys(pools.elite), ['elite']);
   assert.equal(layout.filter((l) => l.pool === 'elite').length, 1);
-  assert.ok(layout.filter((l) => combatPool(l.pool)).length >= 4, 'đủ tầng đánh');
+  assert.ok(layout.filter((l) => combatPool(l.pool)).length >= 3, 'đủ tầng đánh');
   for (let i = 1; i < layout.length; i++) assert.ok(combatPool(layout[i].pool) || combatPool(layout[i - 1].pool), 'không có hai tầng sự kiện liền nhau');
   for (const z of ctx.zoneList) {
     assert.ok(z.monsters.boss.length >= 1, z.id);
     // Đường nào cũng vậy: chọn lần lượt từng cửa (0, 1, 2) đi hết ải.
     for (const pick of [0, 1, 2]) {
-      let run = mk(3, z.id);
+      let run = mk(3, z.id, false, 7);
       let fights = 0;
       let elites = 0;
       let guard = 0;
@@ -107,7 +109,7 @@ test('run: tầng đánh xen kẽ tầng sự kiện; mọi đường đều đ�
         else if (run.phase === 'relic') run = runStep(ctx, run, { type: 'pickRelic', index: 0 }).run;
       }
       assert.equal(run.result, 'won', z.id);
-      assert.ok(fights >= 4, `${z.id} đường ${pick}: ${fights} trận`); // 2 tầng đánh + 1 elite + boss
+      assert.ok(fights >= 3, `${z.id} đường ${pick}: ${fights} trận`); // 1 tầng đánh + 1 elite + boss
       assert.ok(elites >= 1);
     }
   }
@@ -158,12 +160,13 @@ test('run: quái mạnh dần theo ải (floorScale)', () => {
   const a = runStep(ctx, run, { type: 'door', index: idx }).run;
   const zs = ctx.config.run.zoneScale;
   const order = ctx.zones[run.zoneId].order;
-  const base = Math.round(ctx.monsters[a.battle.enemies[0].id].hp * (zs.hp[order] ?? 1));
+  const sf = stageFactor(ctx.config.run, 'hp', 1);
+  const base = Math.round(ctx.monsters[a.battle.enemies[0].id].hp * sf * (zs.hp[order] ?? 1));
   assert.equal(a.battle.enemies[0].maxHp, base); // ải 0: chỉ nhân hệ số khu
   const later = { ...run, floor: 2 };
   later.doors = ['normal', 'chest', 'rest'];
   const b = runStep(ctx, later, { type: 'door', index: 0 }).run;
-  assert.equal(b.battle.enemies[0].maxHp, Math.round(ctx.monsters[b.battle.enemies[0].id].hp * (1 + ctx.config.run.floorScale.hp * 2) * (zs.hp[order] ?? 1)));
+  assert.equal(b.battle.enemies[0].maxHp, Math.round(ctx.monsters[b.battle.enemies[0].id].hp * (1 + ctx.config.run.floorScale.hp * 2) * sf * (zs.hp[order] ?? 1)));
 });
 
 test('run: thua giữ loot đã nhặt, mất thưởng hoàn thành', () => {
@@ -396,7 +399,7 @@ test('progress: kết quả chuyến cộng vào kho, thắng mở khu kế, thu
   let p = newProgress(ctx);
   assert.ok(isValidProgress(p));
   assert.deepEqual(p.unlocked, ['zone_water']);
-  const won = simulateRun(ctx, 21, 'zone_water', false);
+  const won = simulateRun(ctx, 21, 'zone_water', false, 'easy', 7);
   p = applyRunResult(ctx, p, won);
   assert.deepEqual(p.unlocked, ['zone_water', 'zone_fire']);
   assert.equal(p.inventory.gold, won.loot.gold);
@@ -412,7 +415,7 @@ test('progress: kết quả chuyến cộng vào kho, thắng mở khu kế, thu
   assert.deepEqual(q.unlocked, ['zone_water']);
   assert.equal(q.stats.losses, 1);
   // khu Tim cuối cùng thì không có khu kế
-  const last = simulateRun(ctx, 5, 'zone_heart', false);
+  const last = simulateRun(ctx, 5, 'zone_heart', false, 'easy', 7);
   const r = applyRunResult(ctx, newProgress(ctx), last);
   assert.equal(r.inventory.stones[5].normal, last.loot.stones.normal);
   assert.throws(() => applyRunResult(ctx, p, mk(1)));

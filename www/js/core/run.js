@@ -2,7 +2,6 @@ import { mulberry32 } from './rng.js';
 import { createBattle, step, buildMembers } from './battle.js';
 import { rollLoot, emptyLoot, addLoot } from './loot.js';
 import { relicMods, rollRelics, relicPrice } from './relic.js';
-import { rollAffixes } from './affix.js';
 
 // Một chuyến leo tháp: máy trạng thái thuần, xác định theo seed.
 // phase: 'doors' | 'battle' | 'result' | 'event' | 'shop' | 'relic' | 'end'
@@ -25,16 +24,17 @@ function weighted(rng, weights, exclude = []) {
 // nên mọi đường đều qua đủ trận thường, một tầng Elite rồi Boss cuối, mà các đường vẫn khác nhau.
 // Cửa chiến đấu có sẵn danh sách quái (run.preview) để người chơi xem trước và chọn.
 const COMBAT = ['normal', 'swarm', 'elite', 'boss'];
+// Bố cục của một ải: ải thường là chuyến mini (3 tầng), ải cuối (boss) thêm tầng Elite và Boss.
+export function runLayout(ctx, run) {
+  return ctx.config.run.layouts[run.stage >= ctx.config.run.stages ? 'boss' : 'mini'];
+}
 function rollDoors(ctx, run, rng) {
-  const { layout, pools } = ctx.config.run;
-  const slot = layout[run.floor];
+  const { pools } = ctx.config.run;
+  const slot = runLayout(ctx, run)[run.floor];
   const doors = [];
   for (let i = 0; i < slot.doors; i++) doors.push(weighted(rng, pools[slot.pool], slot.distinct ? doors : []));
   run.doors = doors;
   run.preview = doors.map((d) => (COMBAT.includes(d) ? rollEnemies(ctx, run.zoneId, d, rng) : null));
-  // Đặc tính của từng quái cũng hiện trước để người chơi chọn cửa.
-  const order = ctx.zones[run.zoneId].order;
-  run.previewAffix = doors.map((d, i) => (run.preview[i] ? rollAffixes(ctx, rng, d, order, run.diff, run.preview[i].length) : null));
 }
 
 // Quái của một trận theo loại cửa.
@@ -60,18 +60,20 @@ function recalcMaxHp(ctx, run) {
   run.maxHp = maxHp;
 }
 
-export function createRun(ctx, { seed, zoneId, team, pityMissed = false, diff = 'easy' }) {
+export function createRun(ctx, { seed, zoneId, team, pityMissed = false, diff = 'easy', stage = 1 }) {
   if (!ctx.config.difficulty[diff]) throw new Error('unknown difficulty ' + diff);
   const zone = ctx.zones[zoneId];
   if (!zone) throw new Error('unknown zone ' + zoneId);
   const rng = mulberry32(seed);
-  const floors = ctx.config.run.layout.length; // mọi ải có số tầng bằng nhau
+  if (!Number.isInteger(stage) || stage < 1 || stage > ctx.config.run.stages) throw new Error('bad stage ' + stage);
+  const floors = ctx.config.run.layouts[stage >= ctx.config.run.stages ? 'boss' : 'mini'].length;
   const { maxHp } = buildMembers(ctx, team);
   const run = {
     version: 1,
     seed,
     zoneId,
     diff,
+    stage,
     team,
     floors,
     floor: 0,
@@ -88,7 +90,6 @@ export function createRun(ctx, { seed, zoneId, team, pityMissed = false, diff = 
     reviveUsed: false,
     hpBonus: 0,
     preview: [],
-    previewAffix: [],
     armed: { shield: false, time: false },
     battle: null,
     node: null,
@@ -111,17 +112,19 @@ const pick = (rng, list) => list[rng.int(list.length)];
 // Các tộc quái thường của khu (cho rương và thưởng hoàn thành).
 const zoneRaces = (ctx, zoneId) => [...new Set(ctx.zones[zoneId].monsters.normal.map((m) => ctx.monsters[m].race))];
 
-function startBattle(ctx, run, rng, kind, preset, presetAffix) {
+// Hệ số theo ải (1..7): tuyến tính từ ải đầu tới ải boss.
+export const stageFactor = (rc, key, stage) => rc.stageScale[key].from + ((rc.stageScale[key].to - rc.stageScale[key].from) * (stage - 1)) / (rc.stages - 1);
+
+function startBattle(ctx, run, rng, kind, preset) {
   const zone = ctx.zones[run.zoneId];
   const enemies = preset || rollEnemies(ctx, run.zoneId, kind, rng);
-  const affixes = presetAffix || rollAffixes(ctx, rng, kind, zone.order, run.diff, enemies.length);
   const rc = ctx.config.run;
   const zs = rc.zoneScale || { hp: [], atk: [] };
   const df = ctx.config.difficulty[run.diff];
   const kindScale = rc.kindScale?.[kind] || { hp: 1, atk: 1 };
   const scale = {
-    hp: (1 + rc.floorScale.hp * run.floor) * (zs.hp[zone.order] ?? 1) * df.hp * kindScale.hp,
-    atk: (1 + rc.floorScale.atk * run.floor) * (zs.atk[zone.order] ?? 1) * df.atk * kindScale.atk,
+    hp: (1 + rc.floorScale.hp * run.floor) * stageFactor(rc, 'hp', run.stage) * (zs.hp[zone.order] ?? 1) * df.hp * kindScale.hp,
+    atk: (1 + rc.floorScale.atk * run.floor) * stageFactor(rc, 'atk', run.stage) * (zs.atk[zone.order] ?? 1) * df.atk * kindScale.atk,
   };
   const mods = runMods(ctx, run);
   const startEffects = [];
@@ -134,7 +137,6 @@ function startBattle(ctx, run, rng, kind, preset, presetAffix) {
     seed,
     team: run.team,
     enemies,
-    affixes,
     scale,
     hp: run.hp,
     startEffects,
@@ -155,10 +157,10 @@ function heroBattleExp(ctx, run, kind) {
 }
 
 // Cuộn loot của chuyến: Di Vật cộng Vàng và tỉ lệ rớt.
-function lootRoll(ctx, run, kind, rng, races) {
+function lootRoll(ctx, run, kind, rng, races, mult = 1) {
   const m = runMods(ctx, run);
-  const loot = rollLoot(ctx, kind, rng, run.diff, ctx.zones[run.zoneId].element, races, 1 + m.dropPct);
-  loot.gold = Math.round(loot.gold * (1 + m.goldPct));
+  const loot = rollLoot(ctx, kind, rng, run.diff, ctx.zones[run.zoneId].element, races, (1 + m.dropPct) * mult);
+  loot.gold = Math.round(loot.gold * (1 + m.goldPct) * mult);
   return loot;
 }
 
@@ -196,7 +198,7 @@ function enterNode(ctx, run, rng, type, index) {
   const rc = ctx.config.run;
   run.lastRelic = null;
   if (COMBAT.includes(type)) {
-    startBattle(ctx, run, rng, type, run.preview?.[index], run.previewAffix?.[index]);
+    startBattle(ctx, run, rng, type, run.preview?.[index]);
   } else if (type === 'chest') {
     const loot = lootRoll(ctx, run, 'chest', rng, zoneRaces(ctx, run.zoneId));
     run.loot = addLoot(run.loot, loot);
@@ -242,7 +244,7 @@ function advanceFloor(ctx, run, rng) {
 
 function endRun(ctx, run, rng, won) {
   if (won) {
-    const comp = lootRoll(ctx, run, 'completion', rng, zoneRaces(ctx, run.zoneId));
+    const comp = lootRoll(ctx, run, 'completion', rng, zoneRaces(ctx, run.zoneId), ctx.config.run.stageReward[run.stage - 1] ?? 1);
     // Bảo hiểm xui: chuyến trước hụt Tinh Thạch Hiếm thì chuyến này chắc chắn có khi hoàn thành.
     if (run.pityMissed && comp.stones.rare + run.loot.stones.rare === 0) {
       comp.stones.rare = 1;
@@ -368,9 +370,9 @@ export function runStep(ctx, run, action) {
   return { run: nr, events };
 }
 
-// Record: { seed, zoneId, diff, team, pityMissed, actions } -> run cuối.
-export function newRunRecord(seed, zoneId, team, pityMissed = false, diff = 'easy') {
-  return { seed, zoneId, diff, team, pityMissed, actions: [] };
+// Record: { seed, zoneId, diff, stage, team, pityMissed, actions } -> run cuối.
+export function newRunRecord(seed, zoneId, team, pityMissed = false, diff = 'easy', stage = 1) {
+  return { seed, zoneId, diff, stage, team, pityMissed, actions: [] };
 }
 
 export function playRun(ctx, record) {

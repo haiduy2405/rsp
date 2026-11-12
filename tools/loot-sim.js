@@ -13,9 +13,9 @@ const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'www',
 const rd = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
 const ctx = buildCtx(Object.fromEntries(DATA_FILES.map((k) => [k, rd(`${k}.json`)])));
 
-export function simulateRun(ctx, seed, zoneId, pityMissed, diff = 'easy') {
+export function simulateRun(ctx, seed, zoneId, pityMissed, diff = 'easy', stage = 7) {
   const pick = mulberry32(seed ^ 0x9e3779b9);
-  let run = createRun(ctx, { seed, zoneId, team: DEFAULT_TEAM, pityMissed, diff });
+  let run = createRun(ctx, { seed, zoneId, team: DEFAULT_TEAM, pityMissed, diff, stage });
   for (let guard = 0; run.phase !== 'end' && guard < 200; guard++) {
     if (run.phase === 'doors') run = runStep(ctx, run, { type: 'door', index: pick.int(run.doors.length) }).run;
     else if (run.phase === 'battle') run = debugWinBattle(ctx, run);

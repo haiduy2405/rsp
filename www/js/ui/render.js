@@ -380,7 +380,6 @@ export function draw(g, view, t) {
       text(g, view.t('battle.locked'), cx, 98, 13, '#ff8a96');
     }
     g.globalAlpha = dead ? 1 - dk : 1;
-    if (e.affixes?.length && !dead) text(g, e.affixes.map((a) => view.t(`affix.${a}`)).join(' · '), cx, 235, 11, '#ffb46b', 'center', '700');
     panel(g, cx - 82, 244, 164, 76, null);
     brackets(g, cx - 82, 244, 164, 76, 9, view.focus === i ? '#ff4d5e' : '#dcc3a0');
     g.fillStyle = COLORS[e.element];
