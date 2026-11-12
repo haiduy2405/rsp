@@ -157,3 +157,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - **Nguồn mảnh**: ải rớt mảnh tướng 3★ theo hệ khu vực; shop bán mảnh 3–4★ (Linh Thạch); mảnh 5★ không rớt ải, không bán shop (chỉ qua mảnh chung từ tướng 5★ trùng; nguồn khó hơn sẽ thêm sau).
 - **Vé Triệu Linh**: mỗi vé ra 1 Tiểu Linh 1★ (85%) / 2★ (15%) hệ ngẫu nhiên.
 - **Shop hằng ngày** (`core/shop.js`, `config.shop.offers`): reset theo ngày; món đầu tiên miễn phí = 50 Linh Thạch; bán Đan, Vé Triệu Linh, Tinh Thạch, Lễ Vật, mảnh 3–4★. Save v10.
+
+## v0.24.1 — art thật đợt 1
+- 8/24 tướng có art thật (Thủy Tinh, Rắn, Thetis, Cóc Kiện Trời, Thánh Gióng, Hephaestus, Surtr, Sơn Tinh) sinh bằng Gemini, nhập bằng `tools/art-import.py <ảnh> <id>` (cắt watermark, 2:3, card 1024×1536 + icon 512).

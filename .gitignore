@@ -1,7 +1,8 @@
-node_modules/
-*.keystore
-*.jks
 *.aab
 *.apk
-android/
+*.jks
+*.keystore
 .DS_Store
+android/
+art-src/
+node_modules/
