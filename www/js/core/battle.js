@@ -19,6 +19,7 @@ import {
 import { statsFor, skillCooldown, normTeam } from './stats.js';
 import { resolveKit } from './kit.js';
 import { relicMods } from './relic.js';
+import { applyAffixes } from './affix.js';
 
 // ctx = { config, characters, monsters, duoByPair, ... } (dữ liệu từ JSON, không đổi)
 export { indexById } from './ctx.js';
@@ -85,7 +86,7 @@ const triggerPassives = (ctx, s, trigger) =>
 // team: danh sách id hoặc {id, level, awaken}. Ô đầu là đội trưởng.
 // Tùy chọn cho chuyến leo tháp: scale {hp, atk} nhân chỉ số quái, hp (máu đội mang theo),
 // startEffects (hiệu ứng đội có sẵn, vd Bùa Khiên), dragBonusMs (cộng thời gian kéo cho UI).
-export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects, dragBonusMs, mods = relicMods(ctx, []), big = false, reviveUsed = false }) {
+export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects, dragBonusMs, mods = relicMods(ctx, []), big = false, reviveUsed = false, affixes }) {
   const rng = mulberry32(seed);
   const board = createBoard(rng);
   const { members, lead, maxHp } = buildMembers(ctx, team, mods);
@@ -95,11 +96,11 @@ export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects
     const d = ctx.duoByPair?.[`${members[i].id}|${members[i + 1].id}`];
     if (d) duos.push({ id: d.id, slot: i, cd: d.skill.startCooldown ?? 0 });
   }
-  const foes = enemies.map((id) => {
+  const foes = enemies.map((id, i) => {
     const m = ctx.monsters[id];
     if (!m) throw new Error('unknown monster ' + id);
     const mh = Math.round(m.hp * (scale?.hp ?? 1));
-    return {
+    const foe = {
       id,
       element: m.element,
       hp: mh,
@@ -110,6 +111,8 @@ export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects
       effects: [],
       recover: 0,
     };
+    if (affixes?.[i]?.length) applyAffixes(ctx, foe, affixes[i]);
+    return foe;
   });
   const teamHolder = { effects: [], recover: 0, maxHp };
   for (const e of startEffects || []) addEffect(teamHolder, e);

@@ -116,3 +116,7 @@ Sau khi xoay ngọc: mỗi tướng nảy số sát thương của mình ngay tr
 - **Di Vật** (`data/relics.json`, `core/relic.js`): 29 món, 3 độ hiếm, chỉ có hiệu lực trong chuyến. Gồm tăng chỉ số, khiên/tăng công đầu trận, hút máu, hồi sinh một lần, đánh toàn bộ quái từ 4 ngọc (Lăng Kính), thêm sát thương combo, giảm hồi chiêu đầu trận, thêm Vàng/rớt đồ... Nguồn: chọn 1 trong 3 sau khi thắng Elite, Đền thờ, Thương nhân, sự kiện.
 - **16 sự kiện** (`data/events.json`), thêm hiệu ứng `relic` (Di Vật ngẫu nhiên, có thể đòi bậc tối thiểu) và `maxHpPct` (máu tối đa của chuyến).
 - Nhớ: bot của balance-sim chọn Di Vật hiếm nhất và mua Di Vật trước vật phẩm.
+
+## Đặc tính quái, khó lên (v0.16)
+- **Đặc tính quái** (`config.affix`, `core/affix.js`): 8 buff riêng của từng quái (Cứng cáp, Cuồng nộ, Giáp Khiên, Gai nhọn, Tái sinh, Xuyên giáp, Nhanh nhẹn, Bất khuất), mở dần theo khu và độ khó. Cuộn lúc sinh cửa nên hiện trước ở danh sách cửa (`[Cứng cáp, Cuồng nộ]`) và trên quái trong trận. Elite hay có, Boss luôn có 1-3.
+- Hệ số khu `run.zoneScale` chỉnh lại; chi tiết số liệu ở `docs/BALANCE_LOG.md`.

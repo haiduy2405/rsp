@@ -778,5 +778,22 @@
   "shop.relicSub": "Chỉ có hiệu lực trong chuyến này",
   "relic.sheet": "Di Vật của chuyến",
   "door.enemies": "Quái: {list}",
-  "battle.revive": "Hồi sinh!"
+  "battle.revive": "Hồi sinh!",
+  "affix.tough": "Cứng cáp",
+  "affix.tough.desc": "Máu +45%",
+  "affix.fury": "Cuồng nộ",
+  "affix.fury.desc": "Công +30%",
+  "affix.ward": "Giáp Khiên",
+  "affix.ward.desc": "Có Khiên 15% máu",
+  "affix.thorns": "Gai nhọn",
+  "affix.thorns.desc": "Có Phản đòn 20%",
+  "affix.mend": "Tái sinh",
+  "affix.mend.desc": "Có Hồi máu 2% mỗi lượt",
+  "affix.pierce": "Xuyên giáp",
+  "affix.pierce.desc": "Đòn đánh Xuyên giáp, bỏ qua Khiên",
+  "affix.swift": "Nhanh nhẹn",
+  "affix.swift.desc": "Đánh sớm hơn 1 lượt, công -15%",
+  "affix.warded": "Bất khuất",
+  "affix.warded.desc": "Miễn nhiễm hiệu ứng xấu",
+  "affix.title": "Đặc tính quái"
 }

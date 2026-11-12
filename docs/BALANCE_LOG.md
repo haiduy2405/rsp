@@ -42,3 +42,11 @@ Dễ (40 đội x2, K=8): Thủy 99%, Hỏa 74%, Mộc 65%, Quang 75%, Ám 69%, 
 ## v0.15: Di Vật, bố cục xen kẽ
 Nguyên tắc cân bằng (Duy chốt): **làm tính năng thật phê trước, rồi mới chỉnh quái/chỉ số cho hợp. Không nerf để tránh "OP" làm game nhạt.** Hệ quả: Di Vật, kỹ năng bị động, kỹ năng có cấp làm đội mạnh lên rõ rệt, nên mức khó phải tăng ở phía quái.
 - Chạy `DIFF=easy node tools/balance-sim.js --targets 24 2 8` sau v0.15: tỉ lệ thắng cao hơn dải mục tiêu ở các khu 2-5 (Hỏa 98%, Mộc 85%, Quang 92%, Ám 83%, Tim 77%), thời gian 8.6-10.4 phút. Việc cần làm ở v0.16: nâng `zoneScale`/quái theo từng khu thay vì giảm sức người chơi.
+
+## v0.16: Đặc tính quái + khó lên
+Theo nguyên tắc "buff quái, không nerf người chơi": quái có thêm **đặc tính** (`config.affix`), cuộn khi sinh cửa nên hiện trước ở danh sách cửa và ngay trên quái trong trận.
+- 8 đặc tính, mở dần theo khu (`minZone`): Cứng cáp (máu ×1.3), Cuồng nộ (công ×1.3), Giáp Khiên (Khiên 15%), Gai nhọn (Phản đòn 20%), Tái sinh (Hồi máu 2%/lượt), Xuyên giáp (khu 3+), Nhanh nhẹn (đánh sớm 1 lượt, công ×0.85, khu 3+), Bất khuất (Miễn nhiễm, khu 4+). Chỉ dùng 12 từ khóa hiệu ứng sẵn có.
+- Xác suất: quái thường 0 + 7%/khu, Bầy 4%/khu, Elite 50% + 6%/khu (tối đa 2), Boss luôn có (tối đa 3); độ khó cộng thêm +12% (Vừa) / +25% (Khó).
+- Bài học chỉnh: hồi máu theo % máu tối đa của quái cực mạnh vì mỗi lượt đội chỉ gây ~10% máu tổng. Tái sinh 6% làm chuyến dài gấp 3 (~28 phút), hạ xuống 2% thì về ~10 phút. Khiên 25% cũng hạ 15%.
+- `zoneScale`: hp [1.35,1.35,1.5,1.7,2.3,2.6], atk [1.15,1.3,1.5,2.1,3.1,3.8] (Thủy khó hơn, Mộc/Quang/Tim dịu lại để bù đặc tính).
+- Kết quả sim (24 đội ×2, K=8): Dễ 98/81/65/75/60/65%, Vừa 96/69/63/63/50/46%, Khó 88/60/50/46/35/31%, đa số trong dải. Còn lệch: Thủy Vừa/Khó hơi dễ, thời gian khu Quang/Tim Vừa-Khó ~19-22 phút (quái nhiều máu + đặc tính).

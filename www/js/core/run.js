@@ -2,6 +2,7 @@ import { mulberry32 } from './rng.js';
 import { createBattle, step, buildMembers } from './battle.js';
 import { rollLoot, emptyLoot, addLoot } from './loot.js';
 import { relicMods, rollRelics, relicPrice } from './relic.js';
+import { rollAffixes } from './affix.js';
 
 // Một chuyến leo tháp: máy trạng thái thuần, xác định theo seed.
 // phase: 'doors' | 'battle' | 'result' | 'event' | 'shop' | 'relic' | 'end'
@@ -31,6 +32,9 @@ function rollDoors(ctx, run, rng) {
   for (let i = 0; i < slot.doors; i++) doors.push(weighted(rng, pools[slot.pool], slot.distinct ? doors : []));
   run.doors = doors;
   run.preview = doors.map((d) => (COMBAT.includes(d) ? rollEnemies(ctx, run.zoneId, d, rng) : null));
+  // Đặc tính của từng quái cũng hiện trước để người chơi chọn cửa.
+  const order = ctx.zones[run.zoneId].order;
+  run.previewAffix = doors.map((d, i) => (run.preview[i] ? rollAffixes(ctx, rng, d, order, run.diff, run.preview[i].length) : null));
 }
 
 // Quái của một trận theo loại cửa.
@@ -83,6 +87,7 @@ export function createRun(ctx, { seed, zoneId, team, pityMissed = false, diff = 
     reviveUsed: false,
     hpBonus: 0,
     preview: [],
+    previewAffix: [],
     armed: { shield: false, time: false },
     battle: null,
     node: null,
@@ -105,9 +110,10 @@ const pick = (rng, list) => list[rng.int(list.length)];
 // Các tộc quái thường của khu (cho rương và thưởng hoàn thành).
 const zoneRaces = (ctx, zoneId) => [...new Set(ctx.zones[zoneId].monsters.normal.map((m) => ctx.monsters[m].race))];
 
-function startBattle(ctx, run, rng, kind, preset) {
+function startBattle(ctx, run, rng, kind, preset, presetAffix) {
   const zone = ctx.zones[run.zoneId];
   const enemies = preset || rollEnemies(ctx, run.zoneId, kind, rng);
+  const affixes = presetAffix || rollAffixes(ctx, rng, kind, zone.order, run.diff, enemies.length);
   const rc = ctx.config.run;
   const zs = rc.zoneScale || { hp: [], atk: [] };
   const df = ctx.config.difficulty[run.diff];
@@ -127,6 +133,7 @@ function startBattle(ctx, run, rng, kind, preset) {
     seed,
     team: run.team,
     enemies,
+    affixes,
     scale,
     hp: run.hp,
     startEffects,
@@ -181,7 +188,7 @@ function enterNode(ctx, run, rng, type, index) {
   const rc = ctx.config.run;
   run.lastRelic = null;
   if (COMBAT.includes(type)) {
-    startBattle(ctx, run, rng, type, run.preview?.[index]);
+    startBattle(ctx, run, rng, type, run.preview?.[index], run.previewAffix?.[index]);
   } else if (type === 'chest') {
     const loot = lootRoll(ctx, run, 'chest', rng, zoneRaces(ctx, run.zoneId));
     run.loot = addLoot(run.loot, loot);

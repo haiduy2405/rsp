@@ -1115,7 +1115,10 @@ function showRelicPick() {
 function doorList() {
   return h('div', { class: 'doorlist' }, run.doors.map((k, i) => {
     const foes = run.preview?.[i];
-    return h('div', { class: 'dl', 'data-dl': i }, h('b', {}, `${i + 1}. ${t(`door.${k}`)}`), ' ', foes ? h('small', { class: 'muted' }, foes.map((m) => t(`monster.${m}`)).join(', ')) : h('small', { class: 'muted' }, t(`door.desc.${k}`)));
+    const fx = run.previewAffix?.[i] || [];
+    // Quái kèm đặc tính: "Rồng lửa [Cứng cáp, Cuồng nộ]"
+    const label = (m, j) => t(`monster.${m}`) + (fx[j]?.length ? ` [${fx[j].map((a) => t(`affix.${a}`)).join(', ')}]` : '');
+    return h('div', { class: 'dl', 'data-dl': i }, h('b', {}, `${i + 1}. ${t(`door.${k}`)}`), ' ', foes ? h('small', { class: 'muted' }, foes.map(label).join(', ')) : h('small', { class: 'muted' }, t(`door.desc.${k}`)));
   }));
 }
 

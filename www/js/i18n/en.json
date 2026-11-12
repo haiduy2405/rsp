@@ -778,5 +778,22 @@
   "shop.relicSub": "Only lasts for this run",
   "relic.sheet": "Run Relics",
   "door.enemies": "Foes: {list}",
-  "battle.revive": "Revived!"
+  "battle.revive": "Revived!",
+  "affix.tough": "Sturdy",
+  "affix.tough.desc": "HP +45%",
+  "affix.fury": "Furious",
+  "affix.fury.desc": "ATK +30%",
+  "affix.ward": "Warded",
+  "affix.ward.desc": "Starts with a Shield of 15% HP",
+  "affix.thorns": "Thorned",
+  "affix.thorns.desc": "Has 20% Reflect",
+  "affix.mend": "Mending",
+  "affix.mend.desc": "Heals 2% per turn",
+  "affix.pierce": "Piercing",
+  "affix.pierce.desc": "Attacks pierce Shields",
+  "affix.swift": "Swift",
+  "affix.swift.desc": "Attacks 1 turn sooner, ATK -15%",
+  "affix.warded": "Unyielding",
+  "affix.warded.desc": "Immune to negative effects",
+  "affix.title": "Foe traits"
 }

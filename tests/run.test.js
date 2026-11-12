@@ -18,7 +18,10 @@ function rigWin(run) {
   const cells = Array.from({ length: N }, (_, i) => (((i % 6) + ((i / 6) | 0)) % 2 === 0 ? 4 : 5));
   for (const row of [0, 2, 4]) for (const c of [0, 1, 2]) cells[row * 6 + c] = 0;
   r.battle.board = { cells, enh: new Array(N).fill(0) };
-  r.battle.enemies.forEach((e) => (e.hp = 1));
+  r.battle.enemies.forEach((e) => {
+    e.hp = 1;
+    e.effects = []; // bỏ Khiên, Phản đòn... do đặc tính quái
+  });
   return r;
 }
 // Thế chắc thua: bàn không có nhóm nào, quái sắp đánh rất mạnh.
