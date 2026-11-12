@@ -364,3 +364,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Chọn cửa trên bản đồ luôn có hộp xác nhận (chạm cửa mở chi tiết + nút "Vào cửa này"; chỉ khi còn đúng 1 cửa thì vào thẳng).
 - Chấm đỏ ở nút Triệu hồi khi còn lượt miễn phí hôm nay.
 - Tutorial bài 4: phải khóa mục tiêu vào quái ít máu nhất (mũi tên chỉ) rồi mới dùng skill.
+
+### v0.50.0
+- Xong tutorial: lời khích lệ + cutscene ngắn (`showTutorialDone`) rồi mới tới quà tân thủ.
+- Triệu hồi do người chơi kích hoạt (`launchPad` trong screen-summon.js): kéo viên ngọc vào ống pháo (hoặc chạm ngọc) mới bắn pháo. Lúc chờ: khói lượn, ngọc "thở", ống pháo sáng, bàn tay chỉ kéo lặp. Test: `tests/e2e/summonfx.cjs`.
+- Nút Triệu hồi ghi thêm giá quy đổi: x1 hoặc 100 Linh Thạch, x10 hoặc 900 Linh Thạch. Thiếu vé thì bấm sẽ hỏi trả bằng Linh Thạch (mua gói vé rồi triệu hồi).

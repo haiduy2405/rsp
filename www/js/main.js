@@ -1027,7 +1027,7 @@ function startTutorial(retry = false) {
         audio.sfx('win');
         progress = completeTutorial(progress);
         save();
-        ui.showStarterReward();
+        ui.showTutorialDone();
       } else {
         audio.sfx('lose');
         screen(h('h2', {}, t('tut.lose.title')), h('div', { class: 'card' }, h('p', {}, t('tut.lose.body'))), btn(t('tut.lose.retry'), () => startTutorial(true), 'primary', { id: 'tut-retry' }));

@@ -974,5 +974,12 @@
   "guide.rules.5": "Tap a door to see its details, then confirm. Press and hold also shows the monsters inside.",
   "guide.rules.ok": "Got it",
   "tut.l4lock": "Lesson 4: lock a target. Tap the foe with the least HP (the arrow) to lock it. Your skill will hit the locked foe.",
-  "tut.wrongTarget": "Wrong foe. Lock the one with the arrow (lowest HP)."
+  "tut.wrongTarget": "Wrong foe. Lock the one with the arrow (lowest HP).",
+  "summon.launch": "Drag the orb into the mortar to fire the fireworks!",
+  "summon.launch10": "Drag the orb into the mortar to fire {n} fireworks!",
+  "tut.done.1": "You did it, {name}! You twist orbs like a seasoned Tower climber.",
+  "tut.done.2": "AIDA: The whole pack fell in a handful of moves. The Tower chose well.",
+  "tut.done.3": "But you can't climb alone. Call the spirits who will fight beside you.",
+  "summon.orSpirit": "or {n} Spirit Gems",
+  "summon.confirmSpirit": "Not enough tickets. Spend {spirit} Spirit Gems to summon {count} on \"{banner}\"?"
 }

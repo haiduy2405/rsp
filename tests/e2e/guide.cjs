@@ -22,7 +22,7 @@ const { chromium } = require('playwright');
     if (L.id === 'skill') await p.evaluate(() => window.__game.getState().enemies.forEach(e => { if (e.hp > 0) e.hp = 1; }));
   }
   await p.waitForSelector('#st-pull', { timeout: 20000 }); await p.click('#st-pull', { force: true });
-  await p.waitForSelector('#reveal-all', { timeout: 15000 }); await p.waitForTimeout(3000); await p.click('#reveal-all'); await p.waitForTimeout(900); await p.click('#sum-done');
+  await p.waitForSelector('#lp-orb').then(() => p.click('#lp-orb', { force: true })); await p.waitForSelector('#reveal-all', { timeout: 15000 }); await p.waitForTimeout(3000); await p.click('#reveal-all'); await p.waitForTimeout(900); await p.click('#sum-done');
   await p.waitForSelector('#cut');
   for (let k = 0; k < 4; k++) { await p.click('#cut', { force: true }).catch(() => {}); await p.waitForTimeout(150); }
   const shot = async (n) => { await p.waitForTimeout(1300); await p.screenshot({ path: `${dir}/g${n}.png` }); console.log(n, await p.evaluate(() => [document.querySelector('.g-tip')?.textContent, window.__progress?.()?.onboarding?.guide])); };

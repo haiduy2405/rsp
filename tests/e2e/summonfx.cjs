@@ -13,6 +13,12 @@ const { chromium } = require('playwright');
   await p.waitForSelector('#b-summon'); await p.click('#b-summon'); await p.waitForSelector('#pull-10');
   for (const [id, tag] of [['#pull-10', 'x10'], ['#pull-1', 'x1']]) {
     await p.click(id); await p.waitForSelector('#confirm'); await p.click('#confirm-yes');
+    await p.waitForSelector('#lp-orb'); await p.waitForTimeout(1200); await p.screenshot({ path: `${dir}/lp-${tag}.png` }); if (tag === 'x1') { // x1: kéo thật (thả quá gần ống thì bắn; thả giữa chừng thì ngọc trở về)
+      const ob = await p.locator('#lp-orb').boundingBox(); const mo = await p.locator('.lp-mortar').boundingBox();
+      await p.mouse.move(ob.x + ob.width / 2, ob.y + ob.height / 2); await p.mouse.down(); await p.mouse.move(ob.x + ob.width / 2, ob.y - 60, { steps: 6 }); await p.mouse.up(); await p.waitForTimeout(500);
+      console.log('drag giữa chừng: ngọc còn đó =', await p.locator('#lp-orb').count() === 1);
+      const ob2 = await p.locator('#lp-orb').boundingBox(); await p.mouse.move(ob2.x + ob2.width / 2, ob2.y + ob2.height / 2); await p.mouse.down(); await p.mouse.move(mo.x + mo.width / 2, mo.y + 30, { steps: 10 }); await p.mouse.up();
+    } else await p.click('#lp-orb', { force: true });
     for (const ms of [500, 700, 700, 900]) { await p.waitForTimeout(ms); await p.screenshot({ path: `${dir}/fw-${tag}-${ms}-${Date.now() % 1000}.png` }); }
     await p.waitForTimeout(2500);
     await p.screenshot({ path: `${dir}/fw-${tag}-end.png` });

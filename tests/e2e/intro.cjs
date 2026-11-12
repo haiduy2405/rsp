@@ -31,7 +31,7 @@ const D = '/home/claude/art-src/shots/';
   }
   await p.waitForSelector('#st-pull', { timeout: 30000 }); await p.waitForTimeout(1200);
   await p.screenshot({ path: D + 'in4-reward.png' });
-  await p.tap('#st-pull', { force: true }); await p.waitForSelector('#reveal-all'); await p.tap('#reveal-all', { force: true }); await p.waitForTimeout(900);
+  await p.tap('#st-pull', { force: true }); await p.waitForSelector('#lp-orb').then(() => p.click('#lp-orb', { force: true })); await p.waitForSelector('#reveal-all'); await p.tap('#reveal-all', { force: true }); await p.waitForTimeout(900);
   await p.screenshot({ path: D + 'in5-result.png', fullPage: true });
   await p.tap('#sum-done'); await p.waitForSelector('#cut'); await p.waitForTimeout(1800);
   await p.screenshot({ path: D + 'in6-cut1.png' });

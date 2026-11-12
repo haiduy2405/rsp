@@ -43,6 +43,42 @@ export function install(app) {
     next();
   }
 
+  // Xong tutorial: khích lệ ngắn + cutscene rồi mới tới quà tân thủ / triệu hồi.
+  function showTutorialDone() {
+    $('cut')?.remove();
+    const name = app.progress.player.name;
+    const lines = ['tut.done.1', 'tut.done.2', 'tut.done.3'].map((k) => t(k, { name }));
+    const text = h('p', { class: 'cut-line' });
+    const tower = h('div', { class: 'cut-tower' });
+    tower.innerHTML = TOWER;
+    const root = h('div', { id: 'cut', class: 'cut' }, h('div', { class: 'cut-rays' }), h('div', { class: 'cut-glow' }), tower, text, h('div', { class: 'cut-tap' }, t('pro.tap')));
+    $('wrap').appendChild(root);
+    audio.sfx('fanfare');
+    let i = -1;
+    let timer = null;
+    const next = () => {
+      clearTimeout(timer);
+      i += 1;
+      if (i >= lines.length) return finish();
+      text.classList.remove('on');
+      void text.offsetWidth;
+      text.textContent = lines[i];
+      text.classList.add('on');
+      if (i === 0) tower.classList.add('in');
+      else audio.sfx('tick');
+      timer = setTimeout(next, reduced() ? 2600 : 3200);
+    };
+    const finish = () => {
+      clearTimeout(timer);
+      root.removeEventListener('click', next);
+      showStarterReward(); // dựng màn quà ngay dưới lớp cutscene, rồi mờ cutscene
+      root.classList.add('out');
+      setTimeout(() => root.remove(), reduced() ? 50 : 750);
+    };
+    root.addEventListener('click', next);
+    next();
+  }
+
   // Sau tutorial: AIDA tặng 10 vé, người chơi bấm để triệu hồi.
   function showStarterReward() {
     audio.playMusic?.('hub');
@@ -131,5 +167,5 @@ export function install(app) {
     // không gỡ class bằng timer: gỡ giữa chừng làm lớp compositor bị vẽ lại → nháy 1 khung; screen() sẽ gỡ khi sang màn khác
   }
 
-  return { showPrologue, showStarterReward, showCutscene };
+  return { showPrologue, showTutorialDone, showStarterReward, showCutscene };
 }

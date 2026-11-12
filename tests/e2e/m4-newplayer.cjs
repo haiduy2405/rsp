@@ -15,7 +15,7 @@ const { chromium } = require('playwright');
   console.log('hub spirit:', await p.textContent('#spirit'));
   await p.click('#b-summon'); await p.waitForSelector('#rates');
   console.log('rates:', (await p.textContent('#rates')).replace(/\s+/g,' '));
-  await p.click('#pull-10'); await p.waitForSelector('#confirm'); await p.click('#confirm-yes');
+  await p.click('#pull-10'); await p.waitForSelector('#confirm'); await p.click('#confirm-yes'); await p.waitForSelector('#lp-orb'); await p.click('#lp-orb', { force: true });
   await p.click('#reveal-all'); if ((await p.textContent('#screen')).includes('null')) throw new Error('kết quả triệu hồi chứa "null"'); console.log('cards:', await p.locator('.sumcard').count());
   await p.click('#sum-done'); console.log('spirit after:', await p.textContent('#spirit'));
   await p.click('#b-history'); console.log('hist rows:', await p.locator('.card').count()); await p.click('#back');
