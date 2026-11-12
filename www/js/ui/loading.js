@@ -38,6 +38,12 @@ export function createLoading({ t, title, subtitle, auto = false }) {
   box.className = 'ld-box';
   const h1 = document.createElement('h1');
   h1.textContent = title;
+  // Logo thật; nếu ảnh không tải được thì giữ chữ tiêu đề.
+  const logo = new Image();
+  logo.className = 'ld-logo';
+  logo.alt = title;
+  logo.onload = () => h1.replaceChildren(logo);
+  logo.src = 'assets/ui/logo.webp';
   const sub = document.createElement('div');
   sub.className = 'ld-sub';
   sub.textContent = subtitle;

@@ -304,6 +304,7 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 .loading .ld-gem { animation: crystal 3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; filter: drop-shadow(0 0 8px #ffe9ad); }
 .loading .ld-glow { animation: halo 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 .loading .ld-box { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 28px calc(28px + var(--sat, 0px)); text-align: center; background: linear-gradient(0deg, rgba(10, 10, 12, .95) 55%, transparent); }
+.loading .ld-logo { display: block; width: min(86%, 340px); height: auto; margin: 0 auto 6px; }
 .loading h1 { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; color: #ffd98a; font-size: 34px; letter-spacing: .04em; }
 .loading .ld-sub { color: #aab3ff; font-size: 13px; letter-spacing: .12em; margin: 2px 0 16px; }
 .loading .ld-track { height: 6px; max-width: 280px; margin: 0 auto 6px; background: #1e2025; border-radius: 3px; overflow: hidden; }

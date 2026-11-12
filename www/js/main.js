@@ -140,47 +140,18 @@ const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } 
 // Cảnh chính: Tòa Tháp giữa các đảo nổi. Mỗi khu mở là một viên ngọc phát sáng trên đảo (chạm để vào khu).
 function hubScene() {
   const zones = ctx.zoneList;
-  const pos = [[62, 300], [92, 430], [60, 560], [338, 290], [310, 420], [340, 550]];
+  // Vị trí ngọc khu trên các đảo nổi của ảnh nền bg/hub.webp (viewBox 400 rộng, ảnh 400x711).
+  const pos = [[122, 316], [43, 262], [74, 108], [287, 362], [365, 320], [342, 148]];
   const NS = 'http://www.w3.org/2000/svg';
-  let tiers = '';
-  for (let i = 0; i < 7; i++) {
-    const y1 = 575 - i * 50;
-    const y0 = y1 - 50;
-    const w1 = 66 - i * 6;
-    const w0 = 66 - (i + 1) * 6;
-    tiers += `<path d="M${200 - w1} ${y1} L${200 - w0} ${y0} L${200 + w0} ${y0} L${200 + w1} ${y1}Z" fill="url(#tw)" stroke="#05060a" stroke-width="1.5"/>`;
-    tiers += `<ellipse cx="200" cy="${y0}" rx="${w0 + 9}" ry="5" fill="#262a38" stroke="#b3ac98" stroke-width="1.4"/>`;
-    for (const dx of [-0.45, 0, 0.45]) tiers += `<rect x="${200 + dx * w0 - 3}" y="${y0 + 14}" width="6" height="14" rx="3" fill="#ffd98a" class="win" style="animation-delay:${(i * 0.37 + dx).toFixed(2)}s"/>`;
-  }
-  let isl = '';
   const orbs = zones.map((z, i) => {
     const [x, y] = pos[i % pos.length];
     const open = progress.unlocked.includes(z.id);
     const col = COLORS[z.element];
-    isl += `<g class="isl" style="animation-delay:${(i * 0.7).toFixed(1)}s"><ellipse cx="${x}" cy="${y + 34}" rx="38" ry="9" fill="#3b4151"/><path d="M${x - 38} ${y + 34} Q${x} ${y + 92} ${x + 38} ${y + 34}Z" fill="url(#rk)"/><ellipse cx="${x}" cy="${y + 33}" rx="38" ry="8" fill="#5b6478" opacity=".7"/></g>`;
     return `<g class="zorb${open ? ' open' : ''}" ${open ? `data-zone="${z.id}" role="button" tabindex="0" aria-label="${t(`zone.${z.id}`)}"` : ''} style="animation-delay:${(i * 0.7).toFixed(1)}s;--c:${col}"><circle cx="${x}" cy="${y}" r="${open ? 22 : 17}" fill="${col}" opacity="${open ? 0.28 : 0.1}" class="halo"/><circle cx="${x}" cy="${y}" r="${open ? 14 : 11}" fill="${open ? col : '#5b6090'}" stroke="#fff" stroke-opacity="${open ? 0.9 : 0.35}" stroke-width="2"/>${open ? `<circle cx="${x - 4}" cy="${y - 5}" r="4" fill="#fff" opacity=".7"/>` : `<path d="M${x - 4} ${y + 1}h8v6h-8zM${x - 2.5} ${y + 1}v-3a2.5 2.5 0 0 1 5 0v3" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.5"/>`}</g>`;
   }).join('');
-  const cloud = (x, y, r, o) => `<g opacity="${o}"><ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.3}"/><ellipse cx="${x - r * 0.5}" cy="${y + 4}" rx="${r * 0.6}" ry="${r * 0.22}"/><ellipse cx="${x + r * 0.55}" cy="${y + 3}" rx="${r * 0.65}" ry="${r * 0.24}"/></g>`;
-  let stars = '';
-  for (let i = 0; i < 46; i++) stars += `<circle cx="${(i * 137.5) % 400}" cy="${(i * 71.3) % 300}" r="${0.6 + (i % 3) * 0.5}" fill="#fff" opacity="${0.25 + (i % 5) * 0.12}"/>`;
-  const svg = `<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="${NS}" aria-hidden="true">
-<defs>
-<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05060b"/><stop offset=".45" stop-color="#11141f"/><stop offset=".78" stop-color="#2b1b27"/><stop offset="1" stop-color="#6a2f2a"/></linearGradient>
-<linearGradient id="tw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0f1118"/><stop offset=".5" stop-color="#3b3f4e"/><stop offset="1" stop-color="#121420"/></linearGradient>
-<linearGradient id="rk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#343947"/><stop offset="1" stop-color="#0a0c12"/></linearGradient>
-<linearGradient id="bm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff8a70" stop-opacity=".7"/><stop offset="1" stop-color="#ff8a70" stop-opacity="0"/></linearGradient>
-<radialGradient id="gl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff7b6a" stop-opacity=".5"/><stop offset="1" stop-color="#ff7b6a" stop-opacity="0"/></radialGradient>
-</defs>
-<rect width="400" height="800" fill="url(#sky)"/>${stars}
-<circle cx="200" cy="260" r="190" fill="url(#gl)" class="breathe"/>
-<g fill="#8d93aa" opacity=".3" class="cl cl1">${cloud(80, 640, 110, 0.5)}${cloud(330, 610, 120, 0.45)}</g>
-<rect x="188" y="-20" width="24" height="270" fill="url(#bm)" class="beam"/>
-${isl}
-<g class="isl main"><ellipse cx="200" cy="582" rx="108" ry="19" fill="#3b4151"/><path d="M92 582 Q200 700 308 582Z" fill="url(#rk)"/><ellipse cx="200" cy="580" rx="108" ry="16" fill="#6a7388" opacity=".6"/></g>
-${tiers}
-<path d="M200 190 L226 238 L174 238Z" fill="#262a38" stroke="#b3ac98" stroke-width="1.6"/>
-<g class="crystal"><path d="M200 120 L214 156 L200 186 L186 156Z" fill="#ff7b6a" stroke="#fff4ea" stroke-width="1.5"/><path d="M200 120 L200 186" stroke="#d4413a" stroke-width="1"/></g>
-<g fill="#a7adc4" class="cl cl2">${cloud(60, 700, 130, 0.5)}${cloud(350, 690, 140, 0.42)}${cloud(200, 730, 160, 0.5)}</g>
+  const svg = `<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice" xmlns="${NS}" aria-hidden="true">
+<rect width="400" height="800" fill="#150f3a"/>
+<image href="assets/bg/hub.webp" x="0" y="0" width="400" height="711" preserveAspectRatio="xMidYMin slice"/>
 ${orbs}
 </svg>`;
   const box = h('div', { class: 'hub-scene' + (DEBUG ? ' static' : '') });

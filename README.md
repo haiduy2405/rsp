@@ -165,4 +165,9 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - Toàn bộ 27 quái (512×512) dùng art thật, sinh bằng ChatGPT cùng phong cách viền mực đậm + tô phẳng. Còn lại: nền hub/battle và logo.
 
 ## v0.25.2 – Art nền và logo
-- Thay `bg/battle.webp` (đang dùng trong trận), `bg/hub.webp` và `ui/logo.webp` bằng art thật. Hub (cảnh SVG có ngọc tương tác) và logo chưa được nối vào UI; ảnh đã nằm sẵn trong manifest.
+- Thay `bg/battle.webp` (đang dùng trong trận), `bg/hub.webp` và `ui/logo.webp` bằng art thật.
+
+## v0.26.0 – Hub và logo dùng art thật, quái trong suốt
+- Màn chính: ảnh `bg/hub.webp` làm nền, ngọc khu đặt trên các đảo nổi (`pos` trong `hubScene`, `main.js`). Bỏ tháp/đảo/mây SVG cũ.
+- Màn tải: logo `ui/logo.webp` thay chữ tiêu đề (tải lỗi thì giữ chữ).
+- Quái và logo đã tách nền phẳng thành alpha bằng `tools/cut-bg.py <file.webp>...` (flood-fill từ viền, mép làm mềm). Ảnh quái chưa tách thì chạy lại công cụ này.
