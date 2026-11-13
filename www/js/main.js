@@ -1602,6 +1602,7 @@ Object.assign(app, ui);
 if ('serviceWorker' in navigator && !DEBUG && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 
 if (DEBUG) {
+  window.__showSkillAsk = (i, f, d, du) => showSkillAsk(i, f, d, du);
   window.__ctx = ctx;
   window.__progress = () => progress;
   window.__cheat = (ids = []) => {

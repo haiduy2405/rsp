@@ -1383,3 +1383,22 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .mapcap > span { padding: 2px 14px; border-radius: 999px; background: rgba(23, 58, 108, .82); border: 1.5px solid #f3c64e; font-size: 18px; }
 .mapscreen .hold-hint { align-self: center; padding: 2px 12px; border-radius: 999px; background: rgba(23, 58, 108, .7); color: #fff3d6; }
 .mapcap::before, .mapcap::after { background: linear-gradient(90deg, transparent, #f3c64e); }
+/* v0.96.3: bảng kỹ năng thu nhỏ thêm */
+.infobox.sk-ask { width: min(100%, 270px); border-width: 2px; border-radius: 14px; padding-bottom: 8px; }
+.sk-hero { height: 88px; }
+.sk-art { width: 62px; height: 62px; margin-top: -31px; left: 9px; border-radius: 12px; border-width: 2px; }
+.sk-who { left: 82px; }
+.sk-who b { font-size: 15px; }
+.sk-who small { font-size: 10px; }
+.sk-ready { right: 52px; font-size: 9.5px; padding: 2px 8px; top: 6px; }
+.sk-gem { width: 30px; height: 30px; right: 8px; top: 5px; border-width: 2px; } .sk-gem img { width: 20px; height: 20px; }
+.sk-name { font-size: 17px; margin: 6px 10px 3px; }
+.sk-fx, .sk-kw, .infobox.sk-ask .duo-ask { margin-left: 10px; margin-right: 10px; }
+.sk-fx { gap: 4px; }
+.sk-row { font-size: 11.5px; padding: 4px 7px; border-radius: 8px; }
+.sk-kw { margin-top: 5px; padding: 3px 7px; font-size: 11px; }
+.sk-btns { margin: 8px 10px 0; gap: 5px; }
+.sk-btns .primary { min-height: 36px; font-size: 14px; }
+.sk-btns button { min-height: 32px; font-size: 13px; }
+.sk-btns button { min-height: 0 !important; padding: 7px 10px !important; }
+.sk-btns .primary { padding: 9px 10px !important; }
