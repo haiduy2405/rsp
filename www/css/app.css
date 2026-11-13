@@ -1271,3 +1271,5 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .loading .ld-art.hub-scene { inset: -4%; background: none; }
 .ob-tower.hub-scene, .cut-tower.hub-scene { position: relative; inset: auto; background: #7ac8f8; }
 .cut { background: linear-gradient(180deg, rgba(23, 58, 108, .15), rgba(23, 58, 108, .05) 40%, rgba(23, 58, 108, .85)), linear-gradient(180deg, #3b97e6, #7ac8f8 55%, #bfe8ff); }
+/* v0.91.2: bong bóng "Giờ tự do" bấm ▶ phải trôi đi (trước đó rule .on.last đè .go nên kẹt giữa bàn, che hàng tướng và chặn kéo ngọc hàng trên) */
+#coach.on.go, #coach.on.last.go { animation: coachAway 1s cubic-bezier(.4, 0, .2, 1) forwards; pointer-events: none; }

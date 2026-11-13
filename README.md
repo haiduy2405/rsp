@@ -552,6 +552,10 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.91.2
+- Sửa lỗi tutorial đoạn tự do: bong bóng "Giờ tự do" bấm ▶ không biến mất, kẹt giữa màn che hàng tướng và chặn kéo ngọc hàng trên (CSS `.on.last` đè `.go`).
+- Câu hướng dẫn đoạn tự do thêm gợi ý: càng nhiều combo sát thương càng lớn.
+
 ## v0.91.1
 - Màn tải, cắt cảnh và màn mở đầu dùng cùng cảnh SVG động (trời, cầu vồng, Tháp 6 tầng) với màn chính, thay cho tranh cũ. Hàm dùng chung: `sceneEl()` trong `ui/hub-art.js`.
 - Rollback cục bộ: tag `pre-sync-v0.91.0`.
