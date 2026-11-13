@@ -1319,6 +1319,15 @@ function effectRows(effects, holder) {
     return h('div', { class: 'muted fxrow' }, h('img', { class: 'fxico', src: `assets/ui/fx/${e.key}.webp`, alt: '' }), h('div', { style: 'flex:1;min-width:0' }, h('b', {}, t(`effect.${e.key}.name`)), ` (${extra.join(', ')}): `, t(`effect.${e.key}.desc`)));
   });
 }
+// Nội tại của quái: hiệu ứng áp lên đội mỗi lần quái đánh (đọc từ data/monsters.json)
+function passiveRows(list) {
+  return list.map((u) => {
+    const extra = [t('info.passiveTurns', { n: u.turns })];
+    if (u.key === 'lock') extra.push(t('info.cells', { n: u.value }));
+    else if (u.value) extra.push(`${pct(u.value)}%`);
+    return h('div', { class: 'muted fxrow' }, h('img', { class: 'fxico', src: `assets/ui/fx/${u.key}.webp`, alt: '' }), h('div', { style: 'flex:1;min-width:0' }, h('b', {}, t(`effect.${u.key}.name`)), ` (${extra.join(', ')}): `, t(`effect.${u.key}.desc`)));
+  });
+}
 // Khung giới thiệu Duo trong hộp hỏi dùng skill: hai tướng, hệ số, hiệu ứng riêng của cặp.
 function duoAskCard(d, st) {
   const def = ctx.duos[d.id];
@@ -1388,6 +1397,7 @@ function showInspect(kind, idx) {
       h('div', { class: 'charrow' }, im ? h('img', { src: im.src, alt: '', style: 'width:96px;height:96px;flex:none' }) : null, h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`monster.${e.id}`)), h('div', {}, h('span', { class: 'chip', style: `background:${COLORS[e.element]}` }, el(e.element)), ' ', h('small', {}, t(`info.kind.${mk}`))))),
       h('div', { class: 'row' }, h('span', { class: 'res' }, t('info.hpNow', { hp: Math.max(0, Math.round(e.hp)), max: e.maxHp })), h('span', { class: 'res' }, t('info.attack', { atk: e.atk, n: e.every }))),
       e.hp > 0 ? h('div', { class: 'muted' }, off ? t('info.stunnedNow') : t('info.cdNow', { n: e.cd })) : null,
+      (ctx.monsters[e.id]?.onAttack || []).length ? h('div', { class: 'card' }, h('b', {}, t('info.passive')), h('div', { class: 'muted' }, t('info.passiveNote')), passiveRows(ctx.monsters[e.id].onAttack)) : null,
       h('div', { class: 'card' }, h('b', {}, t('info.effects')), effectRows(e.effects)),
     ];
   }
