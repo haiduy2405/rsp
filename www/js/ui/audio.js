@@ -18,11 +18,12 @@ export function createAudio(cfg, settings) {
   const Ctor = typeof window !== 'undefined' ? window.AudioContext || window.webkitAudioContext : null;
 
   const vol = () => Math.max(0, Math.min(1, (settings.volume ?? 80) / 100));
+  const sub = (v) => Math.max(0, Math.min(1, (typeof v === 'number' ? v : 100) / 100)); // âm lượng riêng nhạc / hiệu ứng (0..100, mặc định 100)
   function applyGains() {
     if (!ac) return;
     master.gain.value = cfg.master * vol();
-    musicBus.gain.value = settings.music === false ? 0 : cfg.musicGain;
-    sfxBus.gain.value = settings.sfx === false ? 0 : cfg.sfxGain;
+    musicBus.gain.value = settings.music === false ? 0 : cfg.musicGain * sub(settings.musicVol);
+    sfxBus.gain.value = settings.sfx === false ? 0 : cfg.sfxGain * sub(settings.sfxVol);
   }
 
   // Gọi trong handler của cử chỉ người dùng.

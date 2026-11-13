@@ -36,9 +36,48 @@ export function install(app) {
       const target = 360 * 5 - (r.slice + 0.5) * step;
       const done = () => { const g = slices[r.slice].give; app.rewardPop([{ k: ICON[g.kind] || 'generic', n: r.prize.count ?? g.count }], wheel, { big: tierOf(slices[r.slice]) >= 2 }); showWish(t('wish.got', { x: full(r.prize.kind === 'hero' ? { ...slices[r.slice].give } : slices[r.slice].give, r.prize.hero) })); };
       if (reduced()) { done(); return; }
+      const wrap = wheel.parentElement;
+      const sfx = (n, r) => app.audio?.sfx?.(n, r);
+      wrap.classList.add('spinning');
+      sfx('whoosh');
       wheel.style.transition = 'transform 4.2s cubic-bezier(.12,.7,.12,1)';
       requestAnimationFrame(() => { wheel.style.transform = `rotate(${target}deg)`; });
-      setTimeout(done, 4400);
+      // Mỗi lần kim lướt qua một múi: tiếng "tách" (cao độ theo tốc độ quay) và kim giật nhẹ.
+      const angle = () => { const m = new DOMMatrix(getComputedStyle(wheel).transform); return (Math.atan2(m.b, m.a) * 180) / Math.PI; };
+      let lastIdx = null, lastA = 0, lastT = 0, alive = true;
+      const loop = (now) => {
+        if (!alive || !wheel.isConnected) return;
+        const a = ((angle() % 360) + 360) % 360;
+        const idx = Math.floor((((360 - a) % 360)) / step);
+        if (lastIdx !== null && idx !== lastIdx && now - lastT > 40) {
+          const speed = Math.min(1, Math.abs(((a - lastA + 540) % 360) - 180) / 14); // độ/khung hình → 0..1
+          sfx('tick', 0.85 + speed * 0.6);
+          pointer.classList.remove('clack'); void pointer.offsetWidth; pointer.classList.add('clack');
+          lastT = now;
+        }
+        lastIdx = idx; lastA = a;
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+      setTimeout(() => {
+        alive = false;
+        wrap.classList.remove('spinning');
+        wrap.classList.add('landed');
+        const tier = tierOf(slices[r.slice]);
+        sfx(tier >= 2 ? 'rare' : 'win');
+        if (tier >= 3) setTimeout(() => sfx('fanfare'), 250);
+        const col = TIER_COL[tier] === TIER_COL[0] ? '#ffd24a' : TIER_COL[tier];
+        wrap.style.setProperty('--wc', col);
+        for (let i = 0; i < 16 + tier * 6; i++) { // tia lấp lánh bắn ra quanh vòng xoay
+          const sp = document.createElement('i');
+          sp.className = 'wspark';
+          const a = (i / (16 + tier * 6)) * Math.PI * 2 + Math.random() * 0.3;
+          const d = 120 + Math.random() * 60;
+          sp.style.cssText = `--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d}px;animation-delay:${(Math.random() * 0.15).toFixed(2)}s`;
+          wrap.append(sp);
+        }
+      }, 4250);
+      setTimeout(done, 5400);
     }, used ? '' : 'primary', { id: 'wish-go', ...(used ? { disabled: '' } : {}) });
     const back = btn(t('back'), showHub, '', { id: 'back' });
     const legend = [...slices].sort((a, b) => b.weight - a.weight).map((s) => h('div', { class: 'wl-row' }, itemIcon(ICON[s.give.kind], 'sm'), h('span', {}, full(s.give)), h('b', {}, `${Math.round((1000 * s.weight) / total) / 10}%`)));

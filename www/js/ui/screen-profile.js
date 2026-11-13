@@ -137,6 +137,14 @@ export function install(app) {
         $('vol-l').textContent = t('set.volume', { n: app.progress.settings.volume });
         audio.applyGains();
       }, onchange: () => save() })),
+      ...[['musicVol', 'set.musicVol', 'vol-m'], ['sfxVol', 'set.sfxVol', 'vol-s']].map(([k, label, id]) => {
+        const cur = () => (typeof app.progress.settings[k] === 'number' ? app.progress.settings[k] : 100);
+        return h('label', {}, h('span', { id: `${id}-l` }, t(label, { n: cur() })), h('input', { id, type: 'range', min: '0', max: '100', value: String(cur()), oninput: (e) => {
+          app.progress.settings[k] = Number(e.target.value);
+          $(`${id}-l`).textContent = t(label, { n: cur() });
+          audio.applyGains();
+        }, onchange: () => { save(); if (k === 'sfxVol') audio.sfx('coinGet'); } }));
+      }),
       ...[['music', 'set.music'], ['sfx', 'set.sfx'], ['haptic', 'set.haptic']].map(([k, label]) =>
         h('label', { style: 'flex-direction:row;gap:10px' }, h('input', { type: 'checkbox', id: `opt-${k}`, ...(app.progress.settings[k] !== false ? { checked: '' } : {}), onchange: (e) => {
           app.progress.settings[k] = e.target.checked;

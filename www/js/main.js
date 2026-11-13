@@ -72,6 +72,8 @@ let notice = null;
 for (const f of ['650 20px Fraunces', '600 14px "Be Vietnam Pro"', '700 20px Oswald']) document.fonts?.load(f, 'Aáảạ');
 const audio = createAudio(audioCfg, {
   get volume() { return progress.settings.volume; },
+  get musicVol() { return progress.settings.musicVol; },
+  get sfxVol() { return progress.settings.sfxVol; },
   get music() { return progress.settings.music; },
   get sfx() { return progress.settings.sfx; },
   get haptic() { return progress.settings.haptic; },
