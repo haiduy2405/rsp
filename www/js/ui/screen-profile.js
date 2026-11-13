@@ -168,7 +168,7 @@ export function install(app) {
     screen(
       h('h2', {}, t('set.title')),
       msg ? h('div', { class: 'notice' }, msg) : null,
-      app.isStandalone() ? null : installBtn(),
+      installBtn(),
       h('label', {}, t('hub.lang'), h('select', { id: 'lang', onchange: (e) => setLang(e.target.value) }, h('option', { value: 'vi' }, 'Tiếng Việt'), h('option', { value: 'en' }, 'English'))),
       ...audioControls(),
       h('p', { class: 'muted' }, t('set.volumeNote')),
