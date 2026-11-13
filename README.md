@@ -503,3 +503,9 @@ Biểu tượng giữa ngọc (giọt nước, lửa, lá, sao, âm dương, d�
 
 ## v0.75.0 — Ánh sáng chạy trên ngọc
 Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dưới phải (~3,2s, nghỉ ~4s) như nguồn sáng di chuyển; (2) thỉnh thoảng từng viên lóe một vệt chéo riêng (~0,7s mỗi ~9s, lệch pha theo vị trí). Vệt sáng tô lên đúng phần hình của ngọc (`orbSheen` trong render.js, canvas phụ dùng chung, chỉ vẽ viên đang được chạm sáng), tắt khi `prefers-reduced-motion`. Hoàn tác: `git checkout pre-sheen-v0.74.0 -- www/js/ui/render.js`.
+
+## v0.76.0 — Ngọc sáng hơn + biểu tượng động
+- Ngọc tách 2 lớp: ngọc trống (`blank{i}.webp`, `blank{i}e.webp`, đã nâng sáng ~12%) + biểu tượng riêng (`emb{i}.webp`). Manifest key `blank:`, `blankE:`, `emb:`.
+- Biểu tượng thở nhẹ (±4%, chu kỳ 2,6s) và nảy lên một cái mỗi ~4,8s; mọi viên cùng pha (`embPose` trong `render.js`). Tôn trọng `prefers-reduced-motion`.
+- Art cũ `orb{i}.webp`/`orb{i}e.webp` giữ làm fallback và cho icon hệ nhỏ ở hero.
+- Hoàn tác: `git checkout pre-emblem-anim-v0.75.0 -- www tools tests package.json README.md`
