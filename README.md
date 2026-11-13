@@ -774,3 +774,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 ## v0.106.4
 - SỬA LỖI nặng: vào trận bị màn xanh trống khi đội có cặp Duo kề nhau (`duoReady` gọi trước khi khai báo trong game.js). Lỗi này có từ v0.71 nhưng chỉ lộ ra khi tự lập đội kiểu Duo (v0.101). Đã tái hiện bằng đội Sơn Tinh + Thủy Tinh: bản cũ nổ, bản mới chạy.
 - Rollback: tag local `pre-duofix-v0.106.3`.
+
+## v0.106.5
+- Chi tiết tướng trong trận (ấn giữ): hiện đủ mô tả Skill Duo thay vì chỉ tên cặp. Rollback: tag local `pre-duodetail-v0.106.4`.

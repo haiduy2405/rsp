@@ -1475,7 +1475,7 @@ function showInspect(kind, idx) {
       heroUI.activeBox(m.id, { skillLv: m.skillLv, awaken: m.awaken, cooldown: m.skillMax, status: m.skillCd === 0 ? t('info.skillReady') : t('info.skillWait', { n: m.skillCd }) }),
       idx === 0 && c.leader ? heroUI.leaderBox(m.id, m.skillLv, m.awaken) : null,
       heroUI.passiveBox(m.id, m.skillLv, m.awaken),
-      heroUI.duoBox(m.id, false),
+      heroUI.duoBox(m.id),
       h('div', { class: 'card' }, h('b', {}, t('info.teamEffects')), effectRows(st.team.effects)),
     ];
   } else {
