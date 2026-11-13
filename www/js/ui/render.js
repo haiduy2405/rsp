@@ -257,6 +257,55 @@ export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
 }
 
 // Thanh máu: rãnh tối, viền, thân có độ bóng và vạch chia.
+// KHUNG VÀNG GOLD hoa văn + đèn quét ngang. Một "đèn" chạy qua cả màn (cùng pha mọi khung): chỉ phần viền nằm trong dải sáng mới lóe.
+// opts: { orn: vẽ hoa văn góc (mặc định khi đủ rộng), lw: độ dày viền }
+let goldCv = null;
+function goldFrame(g, x, y, w, h, opts = {}) {
+  const lw = opts.lw ?? 3;
+  const orn = opts.orn ?? (w >= 90 && h >= 28);
+  const gg = g.createLinearGradient(0, y, 0, y + h);
+  gg.addColorStop(0, '#fff0a8'); gg.addColorStop(0.38, '#e8b13a'); gg.addColorStop(0.62, '#8a5a14'); gg.addColorStop(1, '#f3c64e');
+  g.save();
+  g.strokeStyle = gg;
+  g.lineWidth = lw;
+  g.strokeRect(x + lw / 2, y + lw / 2, w - lw, h - lw);
+  g.lineWidth = 1;
+  g.strokeStyle = 'rgba(50,25,4,0.85)';
+  g.strokeRect(x + lw + 0.5, y + lw + 0.5, w - lw * 2 - 1, h - lw * 2 - 1);
+  g.strokeStyle = 'rgba(255,236,170,0.5)';
+  g.strokeRect(x + lw + 1.5, y + lw + 1.5, w - lw * 2 - 3, h - lw * 2 - 3);
+  if (orn) {
+    // hoa văn: thoi vàng ở 4 góc + vệt cong ngắn dọc hai cạnh, thoi nhỏ giữa cạnh trên/dưới
+    const dm = (cx, cy, s) => { g.beginPath(); g.moveTo(cx, cy - s); g.lineTo(cx + s, cy); g.lineTo(cx, cy + s); g.lineTo(cx - s, cy); g.closePath(); g.fill(); };
+    g.fillStyle = '#ffe9a0'; g.strokeStyle = '#6b410a';
+    g.lineWidth = 1;
+    for (const [cx, cy, sx, sy] of [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]]) {
+      dm(cx + sx * 4, cy + sy * 4, 4.2);
+      g.strokeStyle = '#f3c64e'; g.lineWidth = 1.4;
+      g.beginPath(); g.moveTo(cx + sx * 10, cy + sy * 4); g.quadraticCurveTo(cx + sx * 15, cy + sy * 4, cx + sx * 17, cy + sy * 8); g.moveTo(cx + sx * 4, cy + sy * 10); g.quadraticCurveTo(cx + sx * 4, cy + sy * 15, cx + sx * 8, cy + sy * 17); g.stroke();
+    }
+    g.fillStyle = '#ffd96a';
+    if (w >= 120) { dm(x + w / 2, y + 1.5, 3.2); dm(x + w / 2, y + h - 1.5, 3.2); }
+  }
+  // đèn quét: dải sáng nghiêng, chạy từ trái sang phải toàn màn mỗi ~4,4s (cắt theo vành viền)
+  if (!REDUCED) {
+    const t = performance.now();
+    const bx = -140 + ((t % 4400) / 4400) * (W + 280);
+    if (bx + 70 > x && bx - 70 < x + w) {
+      g.beginPath();
+      g.rect(x, y, w, h);
+      g.rect(x + lw + 1, y + lw + 1, w - (lw + 1) * 2, h - (lw + 1) * 2);
+      g.clip('evenodd');
+      g.globalCompositeOperation = 'lighter';
+      const sg = g.createLinearGradient(bx - 40, y + h, bx + 40, y);
+      sg.addColorStop(0, 'rgba(255,255,255,0)'); sg.addColorStop(0.5, 'rgba(255,255,235,0.95)'); sg.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = sg;
+      g.fillRect(x - 2, y - 2, w + 4, h + 4);
+    }
+  }
+  g.restore();
+}
+
 function bar(g, x, y, w, h, frac, color, light) {
   g.fillStyle = 'rgba(28,16,9, 0.85)';
   g.fillRect(x - 1, y - 1, w + 2, h + 2);
@@ -273,9 +322,7 @@ function bar(g, x, y, w, h, frac, color, light) {
   }
   g.fillStyle = 'rgba(28,16,9, 0.3)';
   for (let k = 1; k < 10; k++) g.fillRect(x + (w * k) / 10 - 0.5, y, 1, h);
-  g.strokeStyle = 'rgba(240,185,74,0.7)';
-  g.lineWidth = 1;
-  g.strokeRect(x - 0.5, y - 0.5, w + 1, h + 1);
+  goldFrame(g, x - 3, y - 3, w + 6, h + 6, h >= 14 ? { lw: 2.5, orn: w >= 120 } : { lw: 1.5, orn: false });
 }
 
 // Bốn góc vàng: dấu hiệu "điểm dị" của UI.
@@ -303,9 +350,7 @@ function panel(g, x, y, w, h, accent) {
   g.fillStyle = gr;
   g.fillRect(x, y, w, h);
   g.restore();
-  g.strokeStyle = 'rgba(211,154,94,0.95)';
-  g.lineWidth = 1;
-  g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+  goldFrame(g, x, y, w, h, { lw: 2.5, orn: w >= 120 });
   if (accent) {
     // viền neon theo màu hệ: một nét sáng trong + quầng mờ ngoài
     g.save();
@@ -314,24 +359,24 @@ function panel(g, x, y, w, h, accent) {
     g.strokeStyle = accent;
     g.globalAlpha = 0.85;
     g.lineWidth = 1.5;
-    g.strokeRect(x + 1, y + 1, w - 2, h - 2);
+    g.strokeRect(x + 4, y + 4, w - 8, h - 8);
     g.restore();
     const hl = g.createLinearGradient(x, 0, x + w, 0);
     hl.addColorStop(0, 'rgba(255,255,255,0)');
     hl.addColorStop(0.5, accent);
     hl.addColorStop(1, 'rgba(255,255,255,0)');
     g.fillStyle = accent;
-    g.fillRect(x + 1, y + 1, w - 2, 3);
+    g.fillRect(x + 4, y + 4, w - 8, 3);
     g.fillStyle = hl;
     g.globalAlpha = 0.5;
-    g.fillRect(x + 1, y + 4, w - 2, 5);
+    g.fillRect(x + 4, y + 7, w - 8, 5);
     g.globalAlpha = 1;
   } else {
     // panel không thuộc hệ nào: điểm xuyết một vệt băng xanh #9DF1FF → trắng ở mép trên
     const ic = g.createLinearGradient(x, 0, x + w, 0);
     ic.addColorStop(0, 'rgba(157,241,255,0)'); ic.addColorStop(0.3, 'rgba(157,241,255,0.9)'); ic.addColorStop(0.7, 'rgba(255,255,255,0.9)'); ic.addColorStop(1, 'rgba(255,255,255,0)');
     g.fillStyle = ic;
-    g.fillRect(x + 6, y + 1, w - 12, 2);
+    g.fillRect(x + 8, y + 4, w - 16, 2);
   }
 }
 
@@ -387,9 +432,7 @@ function plaque(g, x, y, w, h) {
   g.roundRect ? g.roundRect(x, y, w, h, 10) : g.rect(x, y, w, h);
   g.fillStyle = gr;
   g.fill();
-  g.lineWidth = 1.5;
-  g.strokeStyle = 'rgba(211, 154, 94, 0.9)';
-  g.stroke();
+  goldFrame(g, x, y, w, h, { lw: 2.5, orn: true });
   g.beginPath();
   g.moveTo(x + 8, y + 2.5);
   g.lineTo(x + w - 8, y + 2.5);

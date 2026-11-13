@@ -1146,6 +1146,17 @@ button.primary::after { content: ''; position: absolute; top: 0; bottom: 0; widt
 .loading .ld-track i { background: linear-gradient(90deg, var(--ice), var(--ice-2)); }
 button:focus-visible { outline: 2px solid var(--ice); outline-offset: 2px; }
 button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgba(157, 241, 255, .55); }
-.card::after { content: ''; position: absolute; left: 12px; right: 12px; top: 0; height: 2px; pointer-events: none; background: linear-gradient(90deg, transparent, var(--ice), var(--ice-2), transparent); opacity: .75; }
 .cur-pill { box-shadow: inset 0 1px 0 rgba(157, 241, 255, .35), 0 0 10px rgba(157, 241, 255, .2), 0 3px 8px rgba(0, 0, 0, .45); }
 .loading .ld-sub { color: var(--ice); }
+
+/* ===== v0.81: viền vàng gold hoa văn + ánh đèn quét ngang cho các khung ===== */
+.card, .tile, .hp-head, .slot, .hp-skill { --gf: 2px; }
+.card::after, .tile::after, .hp-head::after, .slot::after, .hp-skill::after { content: ''; position: absolute; inset: -1px; padding: var(--gf); border-radius: inherit; pointer-events: none; z-index: 2;
+  background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, .95) 50%, transparent 58%) 0 0 / 300% 100% no-repeat, linear-gradient(180deg, #fff0a8 0%, #eab73f 38%, #b8801f 62%, #f6cf5a 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); mask-composite: exclude;
+  animation: frameSweep 4.4s linear infinite; }
+.tile::after { --gf: 2px; }
+.hp-skill::after { --gf: 1.5px; }
+.slot::after { --gf: 2px; }
+@keyframes frameSweep { 0% { background-position: 130% 0, 0 0; } 100% { background-position: -30% 0, 0 0; } }
+@media (prefers-reduced-motion: reduce) { .card::after, .tile::after, .hp-head::after, .slot::after, .hp-skill::after { animation: none; } }

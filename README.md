@@ -536,3 +536,8 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Tên game (màn tải, onboarding) là chữ vàng gold 3D (`.gold3d`: gradient vàng, độ dày bằng drop-shadow chồng, viền nâu đậm) có ánh đèn quét ngang (`goldSweep`). Tôn trọng `prefers-reduced-motion`.
 - Theme băng #9DF1FF → trắng không còn phủ toàn game: quay lại bảng màu vàng/nâu, màu vốn có (lá xanh, lửa đỏ...) giữ nguyên, băng chỉ điểm xuyết (vệt mép panel/thẻ, thanh tải, focus/nhấn nút, viền ô tiền).
 - Giữ nguyên bóng biểu tượng và nhịp thở của ngọc. Hoàn tác: tag `pre-gold-title-v0.79.2`.
+
+## v0.81.0 — Viền vàng gold hoa văn + đèn quét ngang
+- Canvas (`goldFrame` trong `render.js`): thanh máu người chơi/quái, bảng Lượt/Tầng, bảng quái, ô thẻ tướng trong trận có viền vàng gradient, vạch đen/sáng phụ, thoi vàng và vệt cong ở 4 góc. Một "đèn" chạy ngang toàn màn mỗi ~4,4s (cùng pha mọi khung), chỉ viền trong dải sáng mới lóe.
+- DOM (CSS, `frameSweep`): `.card`, `.tile`, `.slot`, `.hp-head`, `.hp-skill` có viền vàng + dải sáng quét ngang. Tôn trọng `prefers-reduced-motion`.
+- Chưa áp: infobox/dialog cuộn được, nút bấm, nhiều màn phụ khác. Hoàn tác: tag `pre-goldframes-v0.80.0`.
