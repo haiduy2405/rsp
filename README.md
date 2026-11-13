@@ -552,6 +552,10 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.102.0
+
+- Hộp chi tiết cửa (ấn giữ cửa) làm lại: huy hiệu cửa có hào quang, tiêu đề, thẻ quái lớn có chấm hệ, loại quái, nội tại kèm tỉ lệ; nút Vào cửa nổi bật. Tag rollback cục bộ: `pre-doordetail-v0.101.0`.
+
 ## v0.101.0
 
 - **Sửa lỗi đội hình**: màn Đội hình bị đứng khi đội trưởng là tướng không có kỹ năng đội trưởng (lỗi JS khiến chọn/bỏ tướng không phản hồi). Giờ hiện "Tướng này không có kỹ năng đội trưởng".

@@ -1056,18 +1056,36 @@ function showDoorDetail(i) {
   const d = NODE[k] || NODE.normal;
   const foes = run.preview?.[i];
   const close = () => $('info')?.remove();
-  const ico = h('span', { class: 'dl-ico big', style: `--c:${d.col}` });
-  ico.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d.icon}</svg>`;
-  const rows = foes ? foes.map((m) => {
+  const ico = h('span', { class: 'dd-medal' });
+  ico.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d.icon}</svg>`;
+  const foeCard = (m, n) => {
     const im = getImg(`monster:${m}`);
     const mo = ctx.monsters[m];
-    return h('div', { class: 'dd-foe' }, im ? h('img', { src: im.src, alt: '' }) : null, h('div', {}, h('b', {}, t(`monster.${m}`)), h('div', { class: 'muted' }, h('span', { class: 'chip', style: `background:${COLORS[mo?.element ?? 0]}` }, t(`element.${mo?.element ?? 0}`)), ' ', t(`info.kind.${mo?.kind || 'normal'}`), mo?.attackEvery ? ` · ${t('info.every', { n: mo.attackEvery })}` : '')));
-  }) : [h('div', { class: 'muted' }, t(`door.desc.${k}`))];
-  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox doordetail' },
-    h('div', { class: 'charrow' }, ico, h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`door.${k}`)), h('small', { class: 'muted' }, t(`door.desc.${k}`)))),
-    h('div', { class: 'card' }, h('b', {}, foes ? t('run.foes') : t('run.reward')), rows),
-    h('div', { class: 'row' }, btn(t('info.close'), close, '', { id: 'info-close' }), btn(t('run.enterDoor'), () => { close(); act({ type: 'door', index: i }); }, 'primary', { id: 'door-enter' })))));
+    const el = mo?.element ?? 0;
+    const kind = mo?.kind || 'normal';
+    const pas = (mo?.onAttack || []).map((u) => {
+      const ch = u.chance ?? ctx.config.monsterPassive.chance[kind] ?? 1;
+      return h('span', { class: 'dd-pas', title: `${t(`effect.${u.key}.name`)} ${Math.round(ch * 100)}%` }, h('img', { src: `assets/ui/fx/${u.key}.webp`, alt: t(`effect.${u.key}.name`) }), h('i', {}, `${Math.round(ch * 100)}%`));
+    });
+    return h('div', { class: 'dd-card', style: `--el:${COLORS[el]};--i:${n}` },
+      h('div', { class: 'dd-art' }, im ? h('img', { src: im.src, alt: '' }) : null, h('span', { class: 'dd-el' }, el_orb(el))),
+      h('b', { class: 'dd-name' }, t(`monster.${m}`)),
+      h('small', { class: 'dd-meta' }, t(`info.kind.${kind}`), mo?.attackEvery ? ` · ${t('info.every', { n: mo.attackEvery })}` : ''),
+      pas.length ? h('div', { class: 'dd-pass' }, pas) : null);
+  };
+  const body = foes ? h('div', { class: 'dd-foes n' + foes.length }, foes.map((m, n) => foeCard(m, n))) : h('div', { class: 'dd-plain' }, h('p', {}, t(`door.desc.${k}`)));
+  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() },
+    h('div', { class: 'doordetail dd', style: `--c:${d.col};--ring:${d.ring}` },
+      h('div', { class: 'dd-head' }, h('div', { class: 'dd-halo' }), ico, h('div', { class: 'dd-title' }, h('h3', {}, t(`door.${k}`)), h('small', {}, t(`door.desc.${k}`)))),
+      foes ? h('div', { class: 'dd-sec' }, t('run.foes')) : null,
+      body,
+      h('div', { class: 'dd-btns' }, btn(t('info.close'), close, '', { id: 'info-close' }), btn(t('run.enterDoor'), () => { close(); act({ type: 'door', index: i }); }, 'primary', { id: 'door-enter' })))));
   if (doorHint) { doorHint = false; guidePoint('#door-enter', 'guide.enter', 250); }
+}
+// chấm hệ nhỏ (icon ngọc hệ) cho thẻ quái
+function el_orb(e) {
+  const s = h('span', { class: 'dd-orb', style: `--el:${COLORS[e]}` });
+  return s;
 }
 
 function showRules() {
