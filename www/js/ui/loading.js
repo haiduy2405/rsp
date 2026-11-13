@@ -24,7 +24,8 @@ export function createLoading({ t, title, subtitle, version = '', auto = false }
   tap.className = 'ld-tap';
   const art = sceneEl('0 0 400 800', 'ld-art'); // cảnh Tòa Tháp động (cùng màn chính), trôi chậm
   el.append(art);
-  arcTitle(art.querySelector('svg'), title, subtitle);
+  const viFirst = /[^\x00-\x7F]/.test(title) || !/[^\x00-\x7F]/.test(subtitle || ''); // tên tiếng Việt luôn ở trên
+  arcTitle(art.querySelector('svg'), viFirst ? title : subtitle, viFirst ? subtitle : title);
   const rays = document.createElement('div'); // tia sáng xoay chậm sau Tòa Tháp
   rays.className = 'ld-rays';
   el.append(rays);
@@ -96,7 +97,7 @@ function arcTitle(svg, main, sub) {
   [['0', '#fff6c0'], ['.5', '#ffd75a'], ['1', '#e8921c']].forEach(([o, c]) => grad.append(mk('stop', { offset: o, 'stop-color': c })));
   defs.append(grad);
   const arc = (id, r) => mk('path', { id, d: `M${200 - r} 330A${r} ${r} 0 0 1 ${200 + r} 330`, fill: 'none' });
-  defs.append(arc('arcA', 204), arc('arcB', 244));
+  defs.append(arc('arcA', 164), arc('arcB', 135));
   svg.append(defs);
   const g = mk('g', { class: 'arc-title' });
   const rows = [];
@@ -107,9 +108,10 @@ function arcTitle(svg, main, sub) {
     g.append(shadow, body);
     rows.push({ nodes: [shadow, body], size, budget });
   };
-  line('arcA', main.toUpperCase(), 36, 335);
-  if (sub) line('arcB', sub.toUpperCase(), 20, 250);
-  svg.append(g);
+  line('arcA', main.toUpperCase(), 36, 372);
+  if (sub) line('arcB', sub.toUpperCase(), 19, 262);
+  const tw = svg.querySelector('.tower'); // chữ nằm dưới Tháp để đỉnh Tháp đè lên chữ, không bị chữ che
+  if (tw) tw.parentNode.insertBefore(g, tw); else svg.append(g);
   const fit = () => rows.forEach((r) => {
     r.nodes.forEach((n) => n.setAttribute('font-size', r.size));
     const w = r.nodes[1].getComputedTextLength?.() || 0;

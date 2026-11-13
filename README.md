@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.93.2
+- Màn tải: tên game đè lên dải cầu vồng, cong theo vòm; tên tiếng Việt ở trên, tên tiếng Anh nhỏ hơn bên dưới; đỉnh Tháp nằm đè lên chữ. Rollback cục bộ: tag `pre-arc2-v0.93.1`.
+
 ## v0.93.1
 - Tutorial: khi người chơi làm đúng chỉ dẫn (kéo ngọc, khóa quái, dùng kỹ năng), lớp tối, đèn rọi và đường chấm gợi ý tắt ngay để thấy trọn màn hình trong lúc đòn diễn ra. Rollback cục bộ: tag `pre-dimoff-v0.93.0`.
 
