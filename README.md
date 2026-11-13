@@ -747,3 +747,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Shop: bấm thẳng vào ô miễn phí là nhận (có hiệu ứng thưởng như trong game). Bỏ thanh chi tiết + nút dưới.
 - Ô mua: bấm ra hộp nhỏ giữa màn "Mua với giá …?", Không (trái) / Có (phải).
 - Rollback: tag local `pre-shoptap-v0.104.0` (chỉ trên máy).
+
+## v0.105.1
+- Thẻ quái trong hộp thoại cửa: chấm tròn màu hệ đổi thành ngọc hệ thật (cùng hình ngọc trong trận), to hơn.

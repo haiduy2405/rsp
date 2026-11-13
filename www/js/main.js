@@ -24,6 +24,7 @@ import { preloadAssets, getImg } from './ui/assets.js';
 import { createLoading } from './ui/loading.js';
 import { hubSky, ZONE_POS } from './ui/hub-art.js';
 import { createHeroUI, COLORS } from './ui/hero-ui.js';
+import { drawOrb } from './ui/render.js';
 import { resolveKit, maxSkillLevel, SKILL_KINDS, formOf } from './core/kit.js';
 import * as offline from './ui/offline.js';
 import { VERSION, BUILD, BUILD_DATE } from './version.js';
@@ -1102,6 +1103,9 @@ function showDoorDetail(i) {
 // chấm hệ nhỏ (icon ngọc hệ) cho thẻ quái
 function el_orb(e) {
   const s = h('span', { class: 'dd-orb', style: `--el:${COLORS[e]}` });
+  const c = h('canvas', { width: 96, height: 96 });
+  drawOrb(c.getContext('2d'), e, 48, 48, 42);
+  s.append(c);
   return s;
 }
 
