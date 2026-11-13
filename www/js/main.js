@@ -43,6 +43,23 @@ import { wishAvailable } from './core/wish.js';
 
 let fxl = null;
 const celebrate = () => (fxl ||= createFxLayer($('fx'))).celebrate();
+// Hộp báo lỗi nhỏ: nếu có lỗi JS (ví dụ vào trận bị màn trống) thì hiện nội dung lỗi để chụp gửi, bấm để tắt.
+{
+  const showErr = (msg) => {
+    try {
+      let b = document.getElementById('errbox');
+      if (!b) {
+        b = document.createElement('div');
+        b.id = 'errbox';
+        b.addEventListener('click', () => b.remove());
+        (document.getElementById('wrap') || document.body).appendChild(b);
+      }
+      b.textContent = `⚠ ${String(msg).slice(0, 280)}`;
+    } catch { /* bỏ qua */ }
+  };
+  addEventListener('error', (e) => showErr(`${e.message} @ ${(e.filename || '').split('/').slice(-2).join('/')}:${e.lineno}`));
+  addEventListener('unhandledrejection', (e) => showErr(e.reason?.stack?.split('\n').slice(0, 2).join(' ') || e.reason));
+}
 // Chiều cao app theo viewport thật: sau khi vào/thoát toàn màn hình, 100dvh trên Android đôi khi giữ giá trị cũ làm màn tràn.
 {
   const fitH = () => {

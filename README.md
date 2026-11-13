@@ -766,3 +766,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 ## v0.106.2
 - Màn chọn ải vừa đúng một trang (không cuộn cả màn); chỉ đường ải bên trong cuộn như cũ. Đo ở cao 667/800/900: không tràn. Thêm hook debug `__showStages`.
 - Rollback: tag local `pre-stagefit-v0.106.1`.
+
+## v0.106.3
+- Thêm hộp báo lỗi đỏ nhỏ ở đáy màn: nếu lỗi JS xảy ra (vd vào trận bị màn xanh trống) thì hiện nội dung lỗi để chụp gửi; bấm để tắt. Chưa tái hiện được lỗi vào trận trên máy dev (đã thử Khó, ải 7, đủ 28 Di Vật, đủ vật phẩm).
+- Rollback: tag local `pre-greenfix-v0.106.2`.
