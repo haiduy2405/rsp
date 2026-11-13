@@ -1090,5 +1090,11 @@
   "summon.ritual10": "Chạm vào pháp trận để triệu hồi {n} lần!",
   "summon.skip": "Bỏ qua",
   "battle.strong": "Khắc hệ!",
-  "battle.weak": "Bị kháng"
+  "battle.weak": "Bị kháng",
+  "set.gift.title": "Mã quà tặng",
+  "set.gift.placeholder": "Nhập mã",
+  "set.gift.btn": "Nhận quà",
+  "set.gift.ok": "Đã nhận: {gold} Vàng, {spirit} Linh Thạch, {tickets} Vé Triệu Hồi.",
+  "set.gift.bad": "Mã không đúng.",
+  "set.gift.used": "Mã này đã dùng rồi."
 }

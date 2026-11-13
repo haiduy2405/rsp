@@ -1090,5 +1090,11 @@
   "summon.ritual10": "Touch the circle to summon {n} times!",
   "summon.skip": "Skip",
   "battle.strong": "Super effective!",
-  "battle.weak": "Resisted"
+  "battle.weak": "Resisted",
+  "set.gift.title": "Gift code",
+  "set.gift.placeholder": "Enter code",
+  "set.gift.btn": "Redeem",
+  "set.gift.ok": "Received: {gold} Gold, {spirit} Spirit Gems, {tickets} Summon Tickets.",
+  "set.gift.bad": "Invalid code.",
+  "set.gift.used": "This code was already used."
 }

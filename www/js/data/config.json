@@ -3,7 +3,10 @@
     "allowDiagonal": true
   },
   "dragTimeMs": 5000,
-  "hint": { "maxCombos": 3, "maxSteps": 3 },
+  "hint": {
+    "maxCombos": 3,
+    "maxSteps": 3
+  },
   "elements": [
     "water",
     "fire",
@@ -56,19 +59,77 @@
     "stages": 7,
     "layouts": {
       "mini": [
-        { "pool": "fightA", "doors": 3 },
-        { "pool": "eventsA", "doors": 3, "distinct": true },
-        { "pool": "fightB", "doors": 3 }
+        {
+          "pool": "fightA",
+          "doors": 3
+        },
+        {
+          "pool": "eventsA",
+          "doors": 3,
+          "distinct": true
+        },
+        {
+          "pool": "fightB",
+          "doors": 3
+        }
       ],
       "boss": [
-        { "pool": "fightA", "doors": 3 },
-        { "pool": "eventsB", "doors": 3, "distinct": true },
-        { "pool": "elite", "doors": 3 },
-        { "pool": "boss", "doors": 1 }
+        {
+          "pool": "fightA",
+          "doors": 3
+        },
+        {
+          "pool": "eventsB",
+          "doors": 3,
+          "distinct": true
+        },
+        {
+          "pool": "elite",
+          "doors": 3
+        },
+        {
+          "pool": "boss",
+          "doors": 1
+        }
       ]
     },
-    "stageScale": { "hp": { "from": 0.8, "to": 1.45, "values": [0.8, 1.0, 1.2, 1.4, 1.55, 1.65, 0.75] }, "atk": { "from": 0.8, "to": 1.35, "values": [0.8, 0.95, 1.1, 1.3, 1.45, 1.55, 0.75] } },
-    "stageReward": [0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 1.0],
+    "stageScale": {
+      "hp": {
+        "from": 0.8,
+        "to": 1.45,
+        "values": [
+          0.8,
+          1.0,
+          1.2,
+          1.4,
+          1.55,
+          1.65,
+          0.75
+        ]
+      },
+      "atk": {
+        "from": 0.8,
+        "to": 1.35,
+        "values": [
+          0.8,
+          0.95,
+          1.1,
+          1.3,
+          1.45,
+          1.55,
+          0.75
+        ]
+      }
+    },
+    "stageReward": [
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      1.0
+    ],
     "pools": {
       "fightA": {
         "normal": 70,
@@ -121,11 +182,28 @@
       }
     },
     "zoneScale": {
-      "hp": [1.2, 1.35, 1.35, 1.85, 2.35, 2.7],
-      "atk": [1.05, 1.3, 1.55, 2.2, 3.2, 3.8]
+      "hp": [
+        1.2,
+        1.35,
+        1.35,
+        1.85,
+        2.35,
+        2.7
+      ],
+      "atk": [
+        1.05,
+        1.3,
+        1.55,
+        2.2,
+        3.2,
+        3.8
+      ]
     },
     "kindScale": {
-      "boss": { "hp": 1.25, "atk": 1.0 },
+      "boss": {
+        "hp": 1.25,
+        "atk": 1.0
+      },
       "swarm": {
         "hp": 0.7,
         "atk": 0.8
@@ -139,9 +217,17 @@
         300,
         600
       ],
-      "fragment": { "chance": 0.02 },
+      "fragment": {
+        "chance": 0.02
+      },
       "elixir": {
-        "1": { "chance": 0.25, "count": [1, 2] }
+        "1": {
+          "chance": 0.25,
+          "count": [
+            1,
+            2
+          ]
+        }
       },
       "stone": {
         "normalChance": 0.35,
@@ -179,10 +265,24 @@
         700,
         1200
       ],
-      "fragment": { "chance": 0.12 },
+      "fragment": {
+        "chance": 0.12
+      },
       "elixir": {
-        "1": { "chance": 0.6, "count": [1, 2] },
-        "2": { "chance": 0.15, "count": [1, 1] }
+        "1": {
+          "chance": 0.6,
+          "count": [
+            1,
+            2
+          ]
+        },
+        "2": {
+          "chance": 0.15,
+          "count": [
+            1,
+            1
+          ]
+        }
       },
       "stone": {
         "normalChance": 0.6,
@@ -220,11 +320,31 @@
         1200,
         2000
       ],
-      "fragment": { "chance": 0.3 },
+      "fragment": {
+        "chance": 0.3
+      },
       "elixir": {
-        "1": { "chance": 0.8, "count": [2, 3] },
-        "2": { "chance": 0.4, "count": [1, 1] },
-        "3": { "chance": 0.03, "count": [1, 1] }
+        "1": {
+          "chance": 0.8,
+          "count": [
+            2,
+            3
+          ]
+        },
+        "2": {
+          "chance": 0.4,
+          "count": [
+            1,
+            1
+          ]
+        },
+        "3": {
+          "chance": 0.03,
+          "count": [
+            1,
+            1
+          ]
+        }
       },
       "stone": {
         "normalChance": 0.9,
@@ -262,10 +382,24 @@
         600,
         1200
       ],
-      "fragment": { "chance": 0.15 },
+      "fragment": {
+        "chance": 0.15
+      },
       "elixir": {
-        "1": { "chance": 0.5, "count": [1, 3] },
-        "2": { "chance": 0.25, "count": [1, 1] }
+        "1": {
+          "chance": 0.5,
+          "count": [
+            1,
+            3
+          ]
+        },
+        "2": {
+          "chance": 0.25,
+          "count": [
+            1,
+            1
+          ]
+        }
       },
       "stone": {
         "normalChance": 0.7,
@@ -303,10 +437,24 @@
         1500,
         2500
       ],
-      "fragment": { "chance": 0.4 },
+      "fragment": {
+        "chance": 0.4
+      },
       "elixir": {
-        "2": { "chance": 0.7, "count": [1, 2] },
-        "3": { "chance": 0.1, "count": [1, 1] }
+        "2": {
+          "chance": 0.7,
+          "count": [
+            1,
+            2
+          ]
+        },
+        "3": {
+          "chance": 0.1,
+          "count": [
+            1,
+            1
+          ]
+        }
       },
       "stone": {
         "normalChance": 1.0,
@@ -336,9 +484,17 @@
         450,
         900
       ],
-      "fragment": { "chance": 0.02 },
+      "fragment": {
+        "chance": 0.02
+      },
       "elixir": {
-        "1": { "chance": 0.35, "count": [1, 2] }
+        "1": {
+          "chance": 0.35,
+          "count": [
+            1,
+            2
+          ]
+        }
       },
       "stone": {
         "normalChance": 0.45,
@@ -378,7 +534,9 @@
     "minCooldown": 2,
     "levelCapForm1": 30,
     "awaken": [
-      { "stat": 0.2 }
+      {
+        "stat": 0.2
+      }
     ]
   },
   "budget": {
@@ -408,7 +566,12 @@
         "5": 2
       },
       "stages": [
-        { "shards": 20, "stone": "rare", "stones": 3, "gold": 30000 }
+        {
+          "shards": 20,
+          "stone": "rare",
+          "stones": 3,
+          "gold": 30000
+        }
       ]
     }
   },
@@ -422,27 +585,264 @@
     "guarantee4Every": 10,
     "ticketsPerPull": 1,
     "ticketPacks": [
-      { "tickets": 1, "spirit": 100 },
-      { "tickets": 10, "spirit": 900 }
+      {
+        "tickets": 1,
+        "spirit": 100
+      },
+      {
+        "tickets": 10,
+        "spirit": 900
+      }
     ],
     "multiCount": 10,
     "redeemShards": 200,
     "historyMax": 100,
-    "starter": { "four": 1, "three": 9 }
+    "starter": {
+      "four": 1,
+      "three": 9
+    }
   },
   "tutorial": {
     "seed": 20260101,
-    "team": ["coc_kien_troi", "bennu", "fenrir", "heimdall", "eir"],
-    "enemies": ["tut_slime_fire", "tut_slime_water", "tut_gnome_dark"],
-    "scale": { "hp": 0.3, "atk": 0.35 },
-    "hint": { "maxCombos": 2, "maxSteps": 2 },
+    "team": [
+      "coc_kien_troi",
+      "bennu",
+      "fenrir",
+      "heimdall",
+      "eir"
+    ],
+    "enemies": [
+      "tut_slime_fire",
+      "tut_slime_water",
+      "tut_gnome_dark"
+    ],
+    "scale": {
+      "hp": 0.3,
+      "atk": 0.35
+    },
+    "hint": {
+      "maxCombos": 2,
+      "maxSteps": 2
+    },
     "lessons": [
-      { "id": "horizontal", "kind": "move", "path": [28, 27], "coach": "tut.l1", "board": [3, 3, 5, 3, 0, 3, 3, 2, 2, 5, 2, 4, 4, 0, 1, 1, 2, 2, 3, 3, 2, 5, 4, 4, 1, 0, 0, 3, 0, 3] },
-      { "id": "vertical", "kind": "move", "path": [23, 17], "coach": "tut.l2", "board": [2, 2, 1, 2, 2, 0, 5, 5, 2, 2, 4, 0, 1, 2, 3, 0, 5, 2, 1, 3, 4, 0, 2, 0, 3, 2, 0, 4, 4, 5] },
-      { "id": "long", "kind": "move", "path": [18, 19, 20], "coach": "tut.l3", "board": [4, 5, 4, 0, 2, 2, 0, 5, 4, 3, 1, 4, 3, 2, 0, 4, 0, 4, 0, 4, 5, 4, 5, 1, 5, 4, 0, 5, 3, 3] },
-      { "id": "skill", "kind": "skill", "index": 0, "lock": true, "coachLock": "tut.l4lock", "coach": "tut.l4" },
-      { "id": "diagonal", "kind": "move", "path": [19, 14], "coach": "tut.l5", "board": [5, 3, 3, 5, 2, 5, 2, 0, 4, 4, 1, 2, 5, 2, 3, 1, 1, 4, 4, 1, 1, 3, 2, 0, 2, 1, 0, 5, 1, 0] },
-      { "id": "combo", "kind": "move", "path": [2, 3, 10, 17, 16, 15], "coach": "tut.l6", "board": [1, 1, 3, 5, 3, 4, 0, 3, 1, 3, 3, 1, 0, 1, 2, 5, 0, 3, 1, 1, 4, 3, 5, 0, 3, 4, 1, 0, 5, 0] }
+      {
+        "id": "horizontal",
+        "kind": "move",
+        "path": [
+          28,
+          27
+        ],
+        "coach": "tut.l1",
+        "board": [
+          3,
+          3,
+          5,
+          3,
+          0,
+          3,
+          3,
+          2,
+          2,
+          5,
+          2,
+          4,
+          4,
+          0,
+          1,
+          1,
+          2,
+          2,
+          3,
+          3,
+          2,
+          5,
+          4,
+          4,
+          1,
+          0,
+          0,
+          3,
+          0,
+          3
+        ]
+      },
+      {
+        "id": "vertical",
+        "kind": "move",
+        "path": [
+          23,
+          17
+        ],
+        "coach": "tut.l2",
+        "board": [
+          2,
+          2,
+          1,
+          2,
+          2,
+          0,
+          5,
+          5,
+          2,
+          2,
+          4,
+          0,
+          1,
+          2,
+          3,
+          0,
+          5,
+          2,
+          1,
+          3,
+          4,
+          0,
+          2,
+          0,
+          3,
+          2,
+          0,
+          4,
+          4,
+          5
+        ]
+      },
+      {
+        "id": "long",
+        "kind": "move",
+        "path": [
+          18,
+          19,
+          20
+        ],
+        "coach": "tut.l3",
+        "board": [
+          4,
+          5,
+          4,
+          0,
+          2,
+          2,
+          0,
+          5,
+          4,
+          3,
+          1,
+          4,
+          3,
+          2,
+          0,
+          4,
+          0,
+          4,
+          0,
+          4,
+          5,
+          4,
+          5,
+          1,
+          5,
+          4,
+          0,
+          5,
+          3,
+          3
+        ]
+      },
+      {
+        "id": "skill",
+        "kind": "skill",
+        "index": 0,
+        "lock": true,
+        "coachLock": "tut.l4lock",
+        "coach": "tut.l4"
+      },
+      {
+        "id": "diagonal",
+        "kind": "move",
+        "path": [
+          19,
+          14
+        ],
+        "coach": "tut.l5",
+        "board": [
+          5,
+          3,
+          3,
+          5,
+          2,
+          5,
+          2,
+          0,
+          4,
+          4,
+          1,
+          2,
+          5,
+          2,
+          3,
+          1,
+          1,
+          4,
+          4,
+          1,
+          1,
+          3,
+          2,
+          0,
+          2,
+          1,
+          0,
+          5,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "combo",
+        "kind": "move",
+        "path": [
+          2,
+          3,
+          10,
+          17,
+          16,
+          15
+        ],
+        "coach": "tut.l6",
+        "board": [
+          1,
+          1,
+          3,
+          5,
+          3,
+          4,
+          0,
+          3,
+          1,
+          3,
+          3,
+          1,
+          0,
+          1,
+          2,
+          5,
+          0,
+          3,
+          1,
+          1,
+          4,
+          3,
+          5,
+          0,
+          3,
+          4,
+          1,
+          0,
+          5,
+          0
+        ]
+      }
     ]
   },
   "onboarding": {
@@ -452,36 +852,431 @@
     "hometownMax": 24
   },
   "quests": {
-    "daily": { "fixed": ["login"], "pick": 4 },
-    "bonus": { "spirit": 20, "tickets": 1 },
+    "daily": {
+      "fixed": [
+        "login"
+      ],
+      "pick": 4
+    },
+    "bonus": {
+      "spirit": 20,
+      "tickets": 1
+    },
     "pool": [
-      { "kind": "login", "goal": 1, "reward": { "spirit": 10 } },
-      { "kind": "win_battle", "goal": 5, "reward": { "spirit": 15 } },
-      { "kind": "win_stage", "goal": 1, "reward": { "spirit": 20 } },
-      { "kind": "summon", "goal": 1, "reward": { "spirit": 15 } },
-      { "kind": "shop_free", "goal": 1, "reward": { "spirit": 10 } },
-      { "kind": "level_up", "goal": 1, "reward": { "spirit": 15 } },
-      { "kind": "skill_up", "goal": 1, "reward": { "spirit": 20 } }
+      {
+        "kind": "login",
+        "goal": 1,
+        "reward": {
+          "spirit": 10
+        }
+      },
+      {
+        "kind": "win_battle",
+        "goal": 5,
+        "reward": {
+          "spirit": 15
+        }
+      },
+      {
+        "kind": "win_stage",
+        "goal": 1,
+        "reward": {
+          "spirit": 20
+        }
+      },
+      {
+        "kind": "summon",
+        "goal": 1,
+        "reward": {
+          "spirit": 15
+        }
+      },
+      {
+        "kind": "shop_free",
+        "goal": 1,
+        "reward": {
+          "spirit": 10
+        }
+      },
+      {
+        "kind": "level_up",
+        "goal": 1,
+        "reward": {
+          "spirit": 15
+        }
+      },
+      {
+        "kind": "skill_up",
+        "goal": 1,
+        "reward": {
+          "spirit": 20
+        }
+      }
     ]
   },
-  "achievements": [{"id":"wins","metric":"wins","tiers":[{"goal":1,"reward":{"spirit":20}},{"goal":10,"reward":{"spirit":40}},{"goal":50,"reward":{"spirit":80}},{"goal":200,"reward":{"spirit":150,"tickets":1}}]},{"id":"battles","metric":"battles","tiers":[{"goal":10,"reward":{"spirit":20}},{"goal":100,"reward":{"spirit":50}},{"goal":500,"reward":{"spirit":120}},{"goal":2000,"reward":{"spirit":250,"tickets":2}}]},{"id":"zonesEasy","metric":"zonesEasy","tiers":[{"goal":1,"reward":{"spirit":30}},{"goal":3,"reward":{"spirit":60}},{"goal":6,"reward":{"spirit":120,"tickets":1}}]},{"id":"zonesHard","metric":"zonesHard","tiers":[{"goal":1,"reward":{"spirit":60}},{"goal":3,"reward":{"spirit":120}},{"goal":6,"reward":{"spirit":250,"tickets":2}}]},{"id":"pulls","metric":"pulls","tiers":[{"goal":1,"reward":{"spirit":10}},{"goal":10,"reward":{"spirit":30}},{"goal":50,"reward":{"spirit":80}},{"goal":200,"reward":{"spirit":200,"tickets":1}}]},{"id":"heroes","metric":"heroes","tiers":[{"goal":8,"reward":{"spirit":20}},{"goal":20,"reward":{"spirit":50}},{"goal":40,"reward":{"spirit":120}},{"goal":60,"reward":{"spirit":250,"tickets":1}}]},{"id":"fiveStar","metric":"fiveStar","tiers":[{"goal":1,"reward":{"spirit":40}},{"goal":5,"reward":{"spirit":100}},{"goal":15,"reward":{"spirit":250,"tickets":1}}]},{"id":"maxLevel","metric":"maxLevel","tiers":[{"goal":10,"reward":{"spirit":20}},{"goal":30,"reward":{"spirit":60}},{"goal":50,"reward":{"spirit":150}}]},{"id":"awakened","metric":"awakened","tiers":[{"goal":1,"reward":{"spirit":40}},{"goal":5,"reward":{"spirit":100}},{"goal":15,"reward":{"spirit":250,"tickets":1}}]}],
-  "wish": {"slices": [{"weight":21,"give":{"kind":"gold","count":600}},
-    {"weight":10,"give":{"kind":"generic","star":3,"count":2}},
-    {"weight":17,"give":{"kind":"spirit","count":15}},
-    {"weight":4,"give":{"kind":"hero","star":4,"count":1}},
-    {"weight":14,"give":{"kind":"gold","count":2500}},
-    {"weight":5,"give":{"kind":"soulTicket","count":1}},
-    {"weight":10,"give":{"kind":"spirit","count":40}},
-    {"weight":5,"give":{"kind":"generic","star":4,"count":1}},
-    {"weight":7,"give":{"kind":"hero","star":3,"count":1}},
-    {"weight":4,"give":{"kind":"ticket","count":1}},
-    {"weight":1.5,"give":{"kind":"generic","star":5,"count":1}},
-    {"weight":1.5,"give":{"kind":"hero","star":5,"count":1}}]},
+  "achievements": [
+    {
+      "id": "wins",
+      "metric": "wins",
+      "tiers": [
+        {
+          "goal": 1,
+          "reward": {
+            "spirit": 20
+          }
+        },
+        {
+          "goal": 10,
+          "reward": {
+            "spirit": 40
+          }
+        },
+        {
+          "goal": 50,
+          "reward": {
+            "spirit": 80
+          }
+        },
+        {
+          "goal": 200,
+          "reward": {
+            "spirit": 150,
+            "tickets": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "battles",
+      "metric": "battles",
+      "tiers": [
+        {
+          "goal": 10,
+          "reward": {
+            "spirit": 20
+          }
+        },
+        {
+          "goal": 100,
+          "reward": {
+            "spirit": 50
+          }
+        },
+        {
+          "goal": 500,
+          "reward": {
+            "spirit": 120
+          }
+        },
+        {
+          "goal": 2000,
+          "reward": {
+            "spirit": 250,
+            "tickets": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "zonesEasy",
+      "metric": "zonesEasy",
+      "tiers": [
+        {
+          "goal": 1,
+          "reward": {
+            "spirit": 30
+          }
+        },
+        {
+          "goal": 3,
+          "reward": {
+            "spirit": 60
+          }
+        },
+        {
+          "goal": 6,
+          "reward": {
+            "spirit": 120,
+            "tickets": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "zonesHard",
+      "metric": "zonesHard",
+      "tiers": [
+        {
+          "goal": 1,
+          "reward": {
+            "spirit": 60
+          }
+        },
+        {
+          "goal": 3,
+          "reward": {
+            "spirit": 120
+          }
+        },
+        {
+          "goal": 6,
+          "reward": {
+            "spirit": 250,
+            "tickets": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "pulls",
+      "metric": "pulls",
+      "tiers": [
+        {
+          "goal": 1,
+          "reward": {
+            "spirit": 10
+          }
+        },
+        {
+          "goal": 10,
+          "reward": {
+            "spirit": 30
+          }
+        },
+        {
+          "goal": 50,
+          "reward": {
+            "spirit": 80
+          }
+        },
+        {
+          "goal": 200,
+          "reward": {
+            "spirit": 200,
+            "tickets": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "heroes",
+      "metric": "heroes",
+      "tiers": [
+        {
+          "goal": 8,
+          "reward": {
+            "spirit": 20
+          }
+        },
+        {
+          "goal": 20,
+          "reward": {
+            "spirit": 50
+          }
+        },
+        {
+          "goal": 40,
+          "reward": {
+            "spirit": 120
+          }
+        },
+        {
+          "goal": 60,
+          "reward": {
+            "spirit": 250,
+            "tickets": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "fiveStar",
+      "metric": "fiveStar",
+      "tiers": [
+        {
+          "goal": 1,
+          "reward": {
+            "spirit": 40
+          }
+        },
+        {
+          "goal": 5,
+          "reward": {
+            "spirit": 100
+          }
+        },
+        {
+          "goal": 15,
+          "reward": {
+            "spirit": 250,
+            "tickets": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "maxLevel",
+      "metric": "maxLevel",
+      "tiers": [
+        {
+          "goal": 10,
+          "reward": {
+            "spirit": 20
+          }
+        },
+        {
+          "goal": 30,
+          "reward": {
+            "spirit": 60
+          }
+        },
+        {
+          "goal": 50,
+          "reward": {
+            "spirit": 150
+          }
+        }
+      ]
+    },
+    {
+      "id": "awakened",
+      "metric": "awakened",
+      "tiers": [
+        {
+          "goal": 1,
+          "reward": {
+            "spirit": 40
+          }
+        },
+        {
+          "goal": 5,
+          "reward": {
+            "spirit": 100
+          }
+        },
+        {
+          "goal": 15,
+          "reward": {
+            "spirit": 250,
+            "tickets": 1
+          }
+        }
+      ]
+    }
+  ],
+  "wish": {
+    "slices": [
+      {
+        "weight": 21,
+        "give": {
+          "kind": "gold",
+          "count": 600
+        }
+      },
+      {
+        "weight": 10,
+        "give": {
+          "kind": "generic",
+          "star": 3,
+          "count": 2
+        }
+      },
+      {
+        "weight": 17,
+        "give": {
+          "kind": "spirit",
+          "count": 15
+        }
+      },
+      {
+        "weight": 4,
+        "give": {
+          "kind": "hero",
+          "star": 4,
+          "count": 1
+        }
+      },
+      {
+        "weight": 14,
+        "give": {
+          "kind": "gold",
+          "count": 2500
+        }
+      },
+      {
+        "weight": 5,
+        "give": {
+          "kind": "soulTicket",
+          "count": 1
+        }
+      },
+      {
+        "weight": 10,
+        "give": {
+          "kind": "spirit",
+          "count": 40
+        }
+      },
+      {
+        "weight": 5,
+        "give": {
+          "kind": "generic",
+          "star": 4,
+          "count": 1
+        }
+      },
+      {
+        "weight": 7,
+        "give": {
+          "kind": "hero",
+          "star": 3,
+          "count": 1
+        }
+      },
+      {
+        "weight": 4,
+        "give": {
+          "kind": "ticket",
+          "count": 1
+        }
+      },
+      {
+        "weight": 1.5,
+        "give": {
+          "kind": "generic",
+          "star": 5,
+          "count": 1
+        }
+      },
+      {
+        "weight": 1.5,
+        "give": {
+          "kind": "hero",
+          "star": 5,
+          "count": 1
+        }
+      }
+    ]
+  },
   "balance": {
     "secondsPerTurn": 8,
-    "stageWin": { "first": [0.9, 1.0] },
+    "stageWin": {
+      "first": [
+        0.9,
+        1.0
+      ]
+    },
     "pacing": {
-      "form2Runs": { "3": [3, 10], "5": [8, 24] }
+      "form2Runs": {
+        "3": [
+          3,
+          10
+        ],
+        "5": [
+          8,
+          24
+        ]
+      }
     },
     "runMinutes": [
       8,
@@ -579,39 +1374,202 @@
     }
   },
   "fragments": {
-    "heroCost": { "3": 3, "4": 4, "5": 5 },
-    "genericCost": { "3": 6, "4": 8, "5": 10 },
-    "dupGeneric": { "3": 3, "4": 4, "5": 5 },
+    "heroCost": {
+      "3": 3,
+      "4": 4,
+      "5": 5
+    },
+    "genericCost": {
+      "3": 6,
+      "4": 8,
+      "5": 10
+    },
+    "dupGeneric": {
+      "3": 3,
+      "4": 4,
+      "5": 5
+    },
     "dropRarity": 3
   },
-  "soulTicket": { "star2Chance": 0.15 },
+  "soulTicket": {
+    "star2Chance": 0.15
+  },
   "shop": {
     "freeSpirit": 50,
     "offers": [
-      { "id": "free", "give": { "kind": "spirit", "count": 50 }, "price": { "cur": "free", "amount": 0 }, "stock": 1 },
-      { "id": "el1", "give": { "kind": "elixir", "key": "1", "count": 1 }, "price": { "cur": "gold", "amount": 800 }, "stock": 5 },
-      { "id": "el2", "give": { "kind": "elixir", "key": "2", "count": 1 }, "price": { "cur": "gold", "amount": 3500 }, "stock": 2 },
-      { "id": "el3", "give": { "kind": "elixir", "key": "3", "count": 1 }, "price": { "cur": "gold", "amount": 15000 }, "stock": 1 },
-      { "id": "soul", "give": { "kind": "soulTicket", "count": 1 }, "price": { "cur": "gold", "amount": 400 }, "stock": 5 },
-      { "id": "stoneN", "give": { "kind": "stoneN", "pick": "element", "count": 5 }, "price": { "cur": "gold", "amount": 2500 }, "stock": 2 },
-      { "id": "stoneR", "give": { "kind": "stoneR", "pick": "element", "count": 1 }, "price": { "cur": "gold", "amount": 9000 }, "stock": 1 },
-      { "id": "off1", "give": { "kind": "offering", "pick": "race", "tier": 1, "count": 3 }, "price": { "cur": "gold", "amount": 2000 }, "stock": 2 },
-      { "id": "off2", "give": { "kind": "offering", "pick": "race", "tier": 2, "count": 2 }, "price": { "cur": "gold", "amount": 6000 }, "stock": 1 },
-      { "id": "frag3", "give": { "kind": "fragment", "pick": "hero", "rarity": 3, "count": 1 }, "price": { "cur": "spirit", "amount": 80 }, "stock": 3 },
-      { "id": "frag4", "give": { "kind": "fragment", "pick": "hero", "rarity": 4, "count": 1 }, "price": { "cur": "spirit", "amount": 400 }, "stock": 2 }
+      {
+        "id": "free",
+        "give": {
+          "kind": "spirit",
+          "count": 50
+        },
+        "price": {
+          "cur": "free",
+          "amount": 0
+        },
+        "stock": 1
+      },
+      {
+        "id": "el1",
+        "give": {
+          "kind": "elixir",
+          "key": "1",
+          "count": 1
+        },
+        "price": {
+          "cur": "gold",
+          "amount": 800
+        },
+        "stock": 5
+      },
+      {
+        "id": "el2",
+        "give": {
+          "kind": "elixir",
+          "key": "2",
+          "count": 1
+        },
+        "price": {
+          "cur": "gold",
+          "amount": 3500
+        },
+        "stock": 2
+      },
+      {
+        "id": "el3",
+        "give": {
+          "kind": "elixir",
+          "key": "3",
+          "count": 1
+        },
+        "price": {
+          "cur": "gold",
+          "amount": 15000
+        },
+        "stock": 1
+      },
+      {
+        "id": "soul",
+        "give": {
+          "kind": "soulTicket",
+          "count": 1
+        },
+        "price": {
+          "cur": "gold",
+          "amount": 400
+        },
+        "stock": 5
+      },
+      {
+        "id": "stoneN",
+        "give": {
+          "kind": "stoneN",
+          "pick": "element",
+          "count": 5
+        },
+        "price": {
+          "cur": "gold",
+          "amount": 2500
+        },
+        "stock": 2
+      },
+      {
+        "id": "stoneR",
+        "give": {
+          "kind": "stoneR",
+          "pick": "element",
+          "count": 1
+        },
+        "price": {
+          "cur": "gold",
+          "amount": 9000
+        },
+        "stock": 1
+      },
+      {
+        "id": "off1",
+        "give": {
+          "kind": "offering",
+          "pick": "race",
+          "tier": 1,
+          "count": 3
+        },
+        "price": {
+          "cur": "gold",
+          "amount": 2000
+        },
+        "stock": 2
+      },
+      {
+        "id": "off2",
+        "give": {
+          "kind": "offering",
+          "pick": "race",
+          "tier": 2,
+          "count": 2
+        },
+        "price": {
+          "cur": "gold",
+          "amount": 6000
+        },
+        "stock": 1
+      },
+      {
+        "id": "frag3",
+        "give": {
+          "kind": "fragment",
+          "pick": "hero",
+          "rarity": 3,
+          "count": 1
+        },
+        "price": {
+          "cur": "spirit",
+          "amount": 80
+        },
+        "stock": 3
+      },
+      {
+        "id": "frag4",
+        "give": {
+          "kind": "fragment",
+          "pick": "hero",
+          "rarity": 4,
+          "count": 1
+        },
+        "price": {
+          "cur": "spirit",
+          "amount": 400
+        },
+        "stock": 2
+      }
     ]
   },
   "firstClear": {
-    "spirit": { "easy": 60, "normal": 100, "hard": 150 },
+    "spirit": {
+      "easy": 60,
+      "normal": 100,
+      "hard": 150
+    },
     "zoneGrowth": 0.1
   },
   "elixir": {
-    "1": { "exp": 100 },
-    "2": { "exp": 500 },
-    "3": { "exp": 2500 }
+    "1": {
+      "exp": 100
+    },
+    "2": {
+      "exp": 500
+    },
+    "3": {
+      "exp": 2500
+    }
   },
   "exp": {
-    "battle": { "normal": 12, "swarm": 10, "elite": 25, "boss": 50 },
+    "battle": {
+      "normal": 12,
+      "swarm": 10,
+      "elite": 25,
+      "boss": 50
+    },
     "battleZoneGrowth": 0.25,
     "base": 40,
     "growth": 0.1,
@@ -697,6 +1655,14 @@
         "2": 40,
         "3": 10
       }
+    }
+  },
+  "giftcodes": {
+    "dluma": {
+      "once": true,
+      "gold": 8500000,
+      "spirit": 30000,
+      "tickets": 1000
     }
   }
 }

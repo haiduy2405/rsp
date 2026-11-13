@@ -479,3 +479,6 @@ Giá vé/Linh Thạch xếp hai dòng trong nút, nút Miễn phí hẹp lại, 
 
 ## v0.68.0 — Mũi tên khắc hệ trên ô tướng
 Mỗi ô tướng so với quái đang bị nhắm: mũi tên xanh lục lao lên (khắc), mũi tên đỏ lao xuống (bị khắc), ba mũi tên lệch pha mờ dần rồi lặp, viền nâu + phát sáng. Cập nhật mục Trợ giúp (khắc hệ, nghi thức triệu hồi).
+
+## v0.69.0 — Mã quà tặng (Cài đặt)
+Ô nhập mã trong Cài đặt. Bảng mã nằm ở `config.giftcodes`; mã `dluma` (không phân biệt hoa thường) = 8.500.000 Vàng + 30.000 Linh Thạch + 1.000 Vé Triệu Hồi, mỗi save dùng 1 lần (đặt `"once": false` để dùng lặp). Logic ở `core/giftcode.js`, đã dùng lưu `progress.redeemed`. Chỉ kiểm tra phía máy khách: ai đọc file dữ liệu cũng thấy mã, gỡ trước khi phát hành thật.

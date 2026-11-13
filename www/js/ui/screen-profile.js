@@ -4,6 +4,7 @@ import { zoneClears } from '../core/stage.js';
 import { avatarNode, photoFromFile } from '../ui/avatar.js';
 import { finishOnboarding, storyUnlocked, updateProfile } from '../core/onboarding.js';
 import { newProgress } from '../core/progress.js';
+import { redeemGift } from '../core/giftcode.js';
 import * as offline from '../ui/offline.js';
 import { flagPicker } from './flags.js';
 import { TOWER } from './tower-art.js';
@@ -157,6 +158,16 @@ export function install(app) {
       ...audioControls(),
       h('p', { class: 'muted' }, t('set.volumeNote')),
       offlineSection(),
+      h('div', { class: 'card', id: 'gift' }, h('b', {}, t('set.gift.title')),
+        h('div', { class: 'row' }, h('input', { id: 'gift-input', type: 'text', placeholder: t('set.gift.placeholder'), autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', maxlength: '40' }),
+          btn(t('set.gift.btn'), () => {
+            const r = redeemGift(ctx, app.progress, $('gift-input').value);
+            if (!r.ok) return showSettings(t(`set.gift.${r.reason === 'used' ? 'used' : 'bad'}`));
+            app.progress = r.progress;
+            save();
+            audio.sfx('reveal');
+            showSettings(t('set.gift.ok', { gold: r.reward.gold.toLocaleString(), spirit: r.reward.spirit.toLocaleString(), tickets: r.reward.tickets.toLocaleString() }));
+          }, 'primary', { id: 'gift-btn' }))),
       btn(t('hub.export'), () => (exportBox.value = storage.exportText(app.progress)), '', { id: 'export' }),
       exportBox,
       importBox,
