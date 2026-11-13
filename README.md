@@ -497,3 +497,6 @@ Duo không còn hồi chiêu riêng: sẵn sàng khi hai tướng liền ô thu�
 
 ## v0.73.0 — Bộ ngọc 3D mới
 Thay 12 ảnh ngọc (`assets/orbs/orb0-5.webp` + `orb0-5e.webp`) bằng bộ 3D sinh bằng ChatGPT: Nước/Hỏa/Mộc/Ám chung khối lục giác khía cạnh, Quang hình thoi, Hồi hình tim; ngọc Nâng Cấp = cùng ngọc đó trong khung vàng có cánh, vương miện nhỏ, viên đá đáy. Bỏ lớp bóng kính/neon/lấp lánh vẽ bằng code của v0.72 (art đã có sẵn), chỉ giữ bóng chạm đất `orbShadow`. Ngọc Nâng Cấp vẽ cùng cỡ ngọc thường. Hoàn tác: `git checkout pre-orb3d-v0.72.0 -- www/assets/orbs www/js/ui/render.js` rồi tăng phiên bản.
+
+## v0.74.0 — Biểu tượng ngọc nhỏ lại
+Biểu tượng giữa ngọc (giọt nước, lửa, lá, sao, âm dương, dấu cộng) thu còn ~1/2 mỗi chiều (1/4 diện tích) để lộ mặt ngọc khía cạnh; 12 ảnh `assets/orbs/` thay mới, khung ngọc Nâng Cấp mảnh hơn. Hoàn tác: `git checkout pre-orb-small-emblem-v0.73.0 -- www/assets/orbs` rồi tăng phiên bản.
