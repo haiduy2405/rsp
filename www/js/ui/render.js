@@ -109,6 +109,12 @@ function orbSheen(g, im, x, y, r) {
 // Biểu tượng (giọt nước, ngọn lửa, lá...) là lớp riêng đặt lên ngọc trống, cử động CHUNG cho mọi viên (cùng pha) để bàn không rối:
 // thở nhẹ liên tục (±4%), mỗi ~4,8s nảy lên một cái (kéo giãn rồi dẹt khi chạm).
 const EMB_FRAC = 0.33 / 0.97;
+// Ngọc "thở" như nhịp tim 100 nhịp/phút (600ms/nhịp), mọi viên cùng pha, biên độ ±2,5%.
+const BEAT_MS = 600;
+function gemBreath() {
+  if (REDUCED) return 1;
+  return 1 + 0.025 * Math.sin((performance.now() / BEAT_MS) * Math.PI * 2);
+}
 function embPose(r) {
   if (REDUCED) return { sx: 1, sy: 1, dy: 0 };
   const t = performance.now();
@@ -163,7 +169,7 @@ export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
   // Ngọc Nâng Cấp có art riêng (huy hiệu viền vàng, cánh, miện); chưa có art thì vẽ ngọc thường + hào quang.
   const bkE = enhanced ? getImg(`blankE:${type}`) : null;
   if (bkE && getImg(`emb:${type}`)) {
-    const R = r * 1.04;
+    const R = r * 1.04 * gemBreath();
     if (r >= 14) orbShadow(g, x, y, r);
     g.drawImage(bkE, x - R, y - R, R * 2, R * 2);
     if (r >= 20) orbSheen(g, bkE, x, y, R);
@@ -182,10 +188,11 @@ export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
   }
   const bk = getImg(`blank:${type}`);
   if (bk && getImg(`emb:${type}`)) {
+    const rb = r * gemBreath();
     if (r >= 14) orbShadow(g, x, y, r);
-    g.drawImage(bk, x - r, y - r, r * 2, r * 2);
-    if (r >= 20) orbSheen(g, bk, x, y, r);
-    drawEmblem(g, type, x, y, r);
+    g.drawImage(bk, x - rb, y - rb, rb * 2, rb * 2);
+    if (r >= 20) orbSheen(g, bk, x, y, rb);
+    drawEmblem(g, type, x, y, rb);
     if (enhanced) enhancedAura(g, x, y, r);
     g.restore();
     return;

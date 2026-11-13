@@ -523,3 +523,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Art nền `bg/hub.webp`, `bg/battle.webp`, `ui/logo.webp` được nhuộm lại cùng hue.
 - Biểu tượng trên ngọc có bóng đổ chếch xuống-phải (đèn phía trước-trên-trái); khi nảy bóng ở lại mặt ngọc, nhạt và nhỏ lại (`emblemShadow` trong `render.js`).
 - Hoàn tác theme: `git checkout pre-icetheme-v0.77.0 -- www package.json README.md`; chỉ bóng: tag `pre-embshadow-v0.77.0`.
+
+## v0.79.0 — Ngọc thở như nhịp tim
+- Thân ngọc phình/xẹp ±2,5% theo nhịp 100 nhịp/phút (600ms, `BEAT_MS`, `gemBreath` trong `render.js`), mọi viên cùng pha; biểu tượng và ánh sáng đi theo kích thước ngọc. Tôn trọng `prefers-reduced-motion`.
+- Hoàn tác: tag `pre-gembreath-v0.78.0`.
