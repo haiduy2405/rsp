@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.93.1
+- Tutorial: khi người chơi làm đúng chỉ dẫn (kéo ngọc, khóa quái, dùng kỹ năng), lớp tối, đèn rọi và đường chấm gợi ý tắt ngay để thấy trọn màn hình trong lúc đòn diễn ra. Rollback cục bộ: tag `pre-dimoff-v0.93.0`.
+
 ## v0.93.0
 - Làm lại hiệu ứng đòn đánh: đạn là sao chổi màu hệ bay theo đường cong, có đuôi sáng; khi trúng có chớp sáng, tia nhọn tỏa ra, vòng sóng, vết chém chéo; khắc hệ và hệ Ánh sáng thêm sao 4 cánh, hệ Bóng tối thêm xoáy tím.
 - Khi quái đánh ta: đạn màu hệ quái lao xuống đội, rồi 3 vết vuốt chém ngang hàng tướng + nổ + rung màn (cùng slow-motion cũ).

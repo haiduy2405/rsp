@@ -1115,6 +1115,8 @@ function startTutorial(retry = false) {
     bubble.classList.add('on');
     audio.sfx('tick');
   };
+  // Người chơi làm đúng chỉ dẫn → bỏ lớp tối/đèn rọi và đường gợi ý ngay để thấy trọn màn hình trong lúc đòn diễn ra.
+  const guard = (fn) => (a) => { const ok = fn(a); if (ok) { game.setDim(false); game.hideHint?.(); } return ok; };
   const samePath = (a, b) => a.length === b.length && a.every((c, i) => c === b[i]);
   let lockIdx = -1;
   const startLesson = (i) => {
@@ -1132,16 +1134,16 @@ function startTutorial(retry = false) {
       const low = st.enemies.reduce((b, e, k) => (e.hp > 0 && (b < 0 || e.hp < st.enemies[b].hp) ? k : b), -1);
       if (L.lock && st.focus !== low) {
         lockIdx = low;
-        game.setGuide({ title, board: L.board || null, enemy: low, spot: { k: 'enemy', i: low }, allow: (a) => a.type === 'target' && a.index === low });
+        game.setGuide({ title, board: L.board || null, enemy: low, spot: { k: 'enemy', i: low }, allow: guard((a) => a.type === 'target' && a.index === low) });
         coach(L.coachLock);
       } else {
         lockIdx = -1;
-        game.setGuide({ title, board: L.board || null, spot: { k: 'skill', i: L.index }, allow: (a) => a.type === 'skill' && a.index === L.index && (!L.lock || game.getState().focus === low) });
+        game.setGuide({ title, board: L.board || null, spot: { k: 'skill', i: L.index }, allow: guard((a) => a.type === 'skill' && a.index === L.index && (!L.lock || game.getState().focus === low)) });
         coach(L.coach);
       }
       return;
     } else {
-      game.setGuide({ title, board: L.board, path: L.path, spot: { k: 'path', path: L.path }, text: t('tut.guide'), allow: (a) => a.type === 'move' && samePath(a.path, L.path) });
+      game.setGuide({ title, board: L.board, path: L.path, spot: { k: 'path', path: L.path }, text: t('tut.guide'), allow: guard((a) => a.type === 'move' && samePath(a.path, L.path)) });
     }
     coach(L.coach);
   };
