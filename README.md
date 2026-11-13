@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.90.4
+- Khi người chơi bị quái đánh trúng: slow-motion ngắn (chậm còn 35% trong ~0,5s rồi trả về tốc độ thường trong ~0,25s), kèm vignette sẵn có, để kịp nhìn cú đánh. Tag lùi: `pre-slowhit-v0.90.3`.
+
 ## v0.90.3
 - Hướng dẫn (tutorial): bong bóng chỉ dẫn nằm giữa bàn ngọc, nền tối khi đọc, người chơi bấm nút ▶ trong khung thì bong bóng mới trôi lên và mờ đi (không còn tự trôi). Sau đó phần còn lại của màn hình tối đi, chỉ chừa vùng cần thao tác (đường kéo / quái cần khóa / ô tướng dùng skill) có viền vàng. Tag lùi: `pre-tut-v0.90.2`.
 

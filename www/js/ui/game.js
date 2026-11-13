@@ -467,7 +467,13 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
           view.hp = Math.max(0, view.hp - e.amount);
           floater(`-${e.amount}`, W / 2, 350, '#ff6b6b', 30);
         }
-        await sleep(350);
+        if (e.amount > 0) {
+          // người chơi trúng đòn: slow-motion ngắn để kịp nhìn thấy cú đánh (chậm còn 35%, rồi trả về tốc độ thường)
+          view.slow = 0.35;
+          await sleep(520);
+          await sleep(260, (k) => (view.slow = 0.35 + 0.65 * easeOut(k)));
+          view.slow = 1;
+        } else await sleep(350);
         view.shake = null;
       } else if (e.type === 'effect') {
         if (e.applied) fx.sfx('debuff');
