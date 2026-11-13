@@ -1106,6 +1106,34 @@ export function draw(g, view, t) {
   }
   g.restore();
 
+  // Bài hướng dẫn: làm tối phần còn lại của màn hình, chỉ chừa vùng cần thao tác (đường kéo / quái cần khóa / ô tướng dùng skill)
+  view.guideDimA = (view.guideDimA || 0) + ((view.guideDim && view.guideSpot ? 1 : 0) - (view.guideDimA || 0)) * 0.14;
+  if (view.guideDimA > 0.02 && view.guideSpot) {
+    const sp = view.guideSpot;
+    let rx, ry, rw, rh, rr = 18;
+    if (sp.k === 'path') {
+      const cs = sp.path.map(cellCenter);
+      const x0 = Math.min(...cs.map((c) => c[0] ?? c.x)), x1 = Math.max(...cs.map((c) => c[0] ?? c.x));
+      const y0 = Math.min(...cs.map((c) => c[1] ?? c.y)), y1 = Math.max(...cs.map((c) => c[1] ?? c.y));
+      rx = x0 - 54; ry = y0 - 54; rw = x1 - x0 + 108; rh = y1 - y0 + 108;
+    } else if (sp.k === 'enemy') {
+      const sl = W / Math.max(1, view.enemies.length);
+      rx = sl * sp.i + 6; ry = 40; rw = sl - 12; rh = 250; rr = 26;
+    } else { rx = 12 + sp.i * 104 - 5; ry = 466 - (sp.i === 0 ? 84 : 76) - 5; rw = 108; rh = (sp.i === 0 ? 84 : 76) + 10; }
+    g.save();
+    g.fillStyle = `rgba(6, 18, 44, ${0.62 * view.guideDimA})`;
+    g.beginPath();
+    g.rect(0, 0, W, H);
+    g.roundRect(rx, ry, rw, rh, rr);
+    g.fill('evenodd');
+    g.globalAlpha = view.guideDimA;
+    g.strokeStyle = '#ffd978';
+    g.lineWidth = 3;
+    g.roundRect(rx, ry, rw, rh, rr);
+    g.stroke();
+    g.restore();
+  }
+
   if (view.hint && !view.drag) {
     const pts = view.hint.path.map(cellCenter);
     g.strokeStyle = 'rgba(255,255,255,0.8)';

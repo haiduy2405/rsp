@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.90.3
+- Hướng dẫn (tutorial): bong bóng chỉ dẫn nằm giữa bàn ngọc, nền tối khi đọc, người chơi bấm nút ▶ trong khung thì bong bóng mới trôi lên và mờ đi (không còn tự trôi). Sau đó phần còn lại của màn hình tối đi, chỉ chừa vùng cần thao tác (đường kéo / quái cần khóa / ô tướng dùng skill) có viền vàng. Tag lùi: `pre-tut-v0.90.2`.
+
 ## v0.90.2
 - Cắt cảnh (dạo đầu, kết hướng dẫn, triệu hồi tướng): làm lại theo giao diện sáng mới (nền tranh Tháp, phủ xanh trời, tia sáng kem, tháp tranh trong khung vòm vàng, lời thoại trong bảng xanh viền vàng); bỏ tháp khối nâu cũ.
 - Số damage: màu theo hệ tướng tấn công (chữ màu hệ sáng, viền đậm cùng hệ), không còn trắng; khắc hệ/bị kháng chỉ đổi kích thước. Tag lùi: `pre-cut2-v0.90.1`, `pre-dmgcolor-v0.90.1`.

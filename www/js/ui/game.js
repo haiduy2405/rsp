@@ -855,7 +855,8 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     },
     hideHint() { view.hint = null; view.hintKeep = null; },
     // Bài hướng dẫn: đặt bàn cố định, đường chỉ định và bộ lọc nước đi.
-    setGuide({ board = null, path = null, text = '', allow = null, title = null, enemy = null }) {
+    setGuide({ board = null, path = null, text = '', allow = null, title = null, enemy = null, spot = null }) {
+      view.guideSpot = spot;
       if (title !== null) view.titleText = title;
       view.guideEnemy = enemy;
       if (board) { const same = state.board.cells.every((c, i) => c === board[i]); state.board = { cells: board.slice(), enh: new Array(board.length).fill(0) }; sync(); if (!same) view.boardIn = 0; }
@@ -863,6 +864,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       view.hint = path ? { path: path.slice(), text } : null;
       view.hintKeep = view.hint;
     },
+    setDim(on) { view.guideDim = !!on; }, // bật/tắt lớp tối quanh vùng hướng dẫn
     getHint: () => (view.hint ? view.hint.path.slice() : null),
     getDragPath: () => (drag ? drag.path.slice() : null),
     getState: () => state,

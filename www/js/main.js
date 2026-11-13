@@ -1094,19 +1094,28 @@ function startTutorial(retry = false) {
   $('coach')?.remove();
   const bubble = h('div', { id: 'coach' });
   $('wrap').appendChild(bubble);
-  let dimTimer = 0;
+  // Lớp tối phủ khi đang đọc chỉ dẫn; bong bóng nằm giữa bàn ngọc, người chơi bấm mũi tên ▶ thì bong bóng trôi lên và mờ đi.
+  $('coach-dim')?.remove();
+  const veil = h('div', { id: 'coach-dim' });
+  $('wrap').insertBefore(veil, bubble);
   const coach = (key) => {
-    if (!key) { bubble.classList.remove('on'); return; }
-    bubble.classList.remove('on');
+    if (!key) { bubble.classList.remove('on', 'go'); veil.classList.remove('on'); game?.setDim(false); return; }
+    bubble.classList.remove('on', 'go');
     void bubble.offsetWidth;
     // Câu đầu (tới dấu chấm đầu tiên) là tiêu đề to màu vàng, phần còn lại là chỉ dẫn nhỏ hơn.
     const full = t(key);
     const cut = full.indexOf('. ');
-    bubble.replaceChildren(h('div', { class: 'co-h' }, cut > 0 ? full.slice(0, cut + 1) : full), ...(cut > 0 ? [h('div', { class: 'co-b' }, full.slice(cut + 2))] : []));
-    // Hiện giữa bàn ngọc, rồi mờ dần và trôi lên khỏi bàn để người chơi thấy ngọc mà xoay.
-    bubble.classList.toggle('last', key === 'tut.free');
-    const wrapH = bubble.parentElement?.clientHeight || 600;
-    bubble.style.setProperty('--dy', `${Math.round(wrapH * 0.75 - (bubble.offsetTop + bubble.offsetHeight / 2))}px`);
+    const last = key === 'tut.free';
+    const go = h('button', { class: 'co-go', 'aria-label': t('ob.next'), onclick: () => {
+      bubble.classList.add('go');
+      veil.classList.remove('on');
+      game?.setDim(!last);
+      audio.sfx('ui');
+    } }, '▶');
+    bubble.replaceChildren(h('div', { class: 'co-h' }, cut > 0 ? full.slice(0, cut + 1) : full), ...(cut > 0 ? [h('div', { class: 'co-b' }, full.slice(cut + 2))] : []), go);
+    bubble.classList.toggle('last', last);
+    game?.setDim(false);
+    veil.classList.add('on');
     bubble.classList.add('on');
     audio.sfx('tick');
   };
@@ -1127,20 +1136,20 @@ function startTutorial(retry = false) {
       const low = st.enemies.reduce((b, e, k) => (e.hp > 0 && (b < 0 || e.hp < st.enemies[b].hp) ? k : b), -1);
       if (L.lock && st.focus !== low) {
         lockIdx = low;
-        game.setGuide({ title, board: L.board || null, enemy: low, allow: (a) => a.type === 'target' && a.index === low });
+        game.setGuide({ title, board: L.board || null, enemy: low, spot: { k: 'enemy', i: low }, allow: (a) => a.type === 'target' && a.index === low });
         coach(L.coachLock);
       } else {
         lockIdx = -1;
-        game.setGuide({ title, board: L.board || null, allow: (a) => a.type === 'skill' && a.index === L.index && (!L.lock || game.getState().focus === low) });
+        game.setGuide({ title, board: L.board || null, spot: { k: 'skill', i: L.index }, allow: (a) => a.type === 'skill' && a.index === L.index && (!L.lock || game.getState().focus === low) });
         coach(L.coach);
       }
       return;
     } else {
-      game.setGuide({ title, board: L.board, path: L.path, text: t('tut.guide'), allow: (a) => a.type === 'move' && samePath(a.path, L.path) });
+      game.setGuide({ title, board: L.board, path: L.path, spot: { k: 'path', path: L.path }, text: t('tut.guide'), allow: (a) => a.type === 'move' && samePath(a.path, L.path) });
     }
     coach(L.coach);
   };
-  const done = () => { clearTimeout(dimTimer); bubble.remove(); $('pause-btn')?.remove(); $('hint-btn')?.remove(); };
+  const done = () => { veil.remove(); bubble.remove(); $('pause-btn')?.remove(); $('hint-btn')?.remove(); };
   audio.playMusic('tutorial');
   $('screen').classList.remove('show');
   game?.destroy();
