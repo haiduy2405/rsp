@@ -546,3 +546,8 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Tên game gom một hàng (`white-space: nowrap`, cỡ chữ co theo màn), font graffiti/ma quái **Sedgwick Ave Display** (OFL, `www/fonts/sedgwick-ave-display-*.woff2`, có bộ chữ tiếng Việt).
 - Màu vàng gold iron (vàng kim loại cũ, tối hơn, có vệt sắt), đổ bóng giảm còn viền mảnh + bóng mềm nhỏ; đèn quét ngang giữ nguyên. Phụ đề "Rift Spire: Pantheon" cũng cùng màu.
 - Hoàn tác: tag `pre-title2-v0.81.0`.
+
+## v0.83.0 — Khung phục hưng cho thẻ tướng
+- Thẻ tướng trong trận (`renaissanceFrame` trong `render.js`): viền vàng bọc cả ô (ảnh + tên), hàng hạt ngọc cạnh trên/dưới, xoắn volute kèm lá acanthus ở 4 góc, vỏ sò giữa cạnh trên, nút thoi giữa cạnh dưới; đội trưởng viền lớn hơn. Đèn quét ngang dùng chung với `goldFrame`.
+- Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
+- Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.

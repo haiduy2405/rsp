@@ -306,6 +306,60 @@ function goldFrame(g, x, y, w, h, opts = {}) {
   g.restore();
 }
 
+// KHUNG PHỤC HƯNG cho thẻ tướng: viền vàng bọc cả ô (ảnh + tên), hàng hạt ngọc dọc cạnh trên/dưới, xoắn volute ở 4 góc kèm lá acanthus,
+// vỏ sò (scallop) ở giữa cạnh trên và nút thoi ở giữa cạnh dưới. Đèn quét ngang dùng chung với goldFrame.
+function renaissanceFrame(g, x, y, w, h, strong) {
+  goldFrame(g, x, y, w, h, { lw: 3, orn: false });
+  g.save();
+  const gold = '#f3c64e', hi = '#fff0a8', dk = '#6b410a';
+  // hạt ngọc dọc cạnh trên và dưới (nằm trong dải viền)
+  g.fillStyle = hi;
+  for (let px = x + 18; px <= x + w - 18; px += 6) {
+    if (Math.abs(px - (x + w / 2)) < 9) continue;
+    g.beginPath(); g.arc(px, y + 1.5, 1, 0, 6.283); g.fill();
+    g.beginPath(); g.arc(px, y + h - 1.5, 1, 0, 6.283); g.fill();
+  }
+  // volute 4 góc
+  const volute = (cx, cy, sx, sy) => {
+    g.save();
+    g.translate(cx, cy); g.scale(sx, sy);
+    g.strokeStyle = dk; g.lineWidth = 3.2; g.lineCap = 'round';
+    for (let pass = 0; pass < 2; pass++) {
+      g.beginPath();
+      // xoắn ốc: từ cạnh ra ngoài rồi cuộn vào
+      let a = 0, r = 7.5;
+      g.moveTo(14, 2);
+      g.quadraticCurveTo(7, 0.5, 4, 4);
+      for (let k = 0; k <= 22; k++) { a = 0.5 + k * 0.3; r = 6 - k * 0.22; g.lineTo(5 + Math.cos(a + 3.3) * r, 5 + Math.sin(a + 3.3) * r); }
+      g.stroke();
+      g.strokeStyle = pass ? gold : dk; g.lineWidth = pass ? 1.5 : 3.2;
+      if (!pass) { g.strokeStyle = dk; }
+      if (pass === 0) { g.strokeStyle = gold; g.lineWidth = 1.6; }
+    }
+    // chấm tâm + lá acanthus dọc cạnh
+    g.fillStyle = hi; g.beginPath(); g.arc(5.5, 5, 1.3, 0, 6.283); g.fill();
+    g.fillStyle = gold; g.strokeStyle = dk; g.lineWidth = 0.8;
+    g.beginPath(); g.moveTo(14, 2.5); g.quadraticCurveTo(19, -1, 24, 2.5); g.quadraticCurveTo(19, 5.5, 14, 2.5); g.fill(); g.stroke();
+    g.beginPath(); g.moveTo(2.5, 14); g.quadraticCurveTo(-1, 19, 2.5, 24); g.quadraticCurveTo(5.5, 19, 2.5, 14); g.fill(); g.stroke();
+    g.restore();
+  };
+  const k = strong ? 1.1 : 1;
+  volute(x - 1, y - 1, k, k); volute(x + w + 1, y - 1, -k, k); volute(x - 1, y + h + 1, k, -k); volute(x + w + 1, y + h + 1, -k, -k);
+  // vỏ sò giữa cạnh trên
+  const mx = x + w / 2;
+  g.fillStyle = gold; g.strokeStyle = dk; g.lineWidth = 0.9;
+  g.beginPath(); g.moveTo(mx - 9, y + 4); g.quadraticCurveTo(mx - 10, y - 5, mx, y - 6); g.quadraticCurveTo(mx + 10, y - 5, mx + 9, y + 4); g.closePath(); g.fill(); g.stroke();
+  g.strokeStyle = dk; g.lineWidth = 0.7;
+  for (let r = -3; r <= 3; r++) { g.beginPath(); g.moveTo(mx, y + 3.5); g.lineTo(mx + r * 2.8, y - 4.2 + Math.abs(r) * 0.6); g.stroke(); }
+  g.fillStyle = hi; g.beginPath(); g.arc(mx, y + 4.5, 2, 0, 6.283); g.fill();
+  // nút thoi giữa cạnh dưới + hai vệt cuộn nhỏ
+  g.fillStyle = gold; g.strokeStyle = dk; g.lineWidth = 0.9;
+  g.beginPath(); g.moveTo(mx, y + h - 5); g.lineTo(mx + 6, y + h); g.lineTo(mx, y + h + 5); g.lineTo(mx - 6, y + h); g.closePath(); g.fill(); g.stroke();
+  g.strokeStyle = gold; g.lineWidth = 1.3;
+  g.beginPath(); g.moveTo(mx + 8, y + h); g.quadraticCurveTo(mx + 14, y + h - 4, mx + 18, y + h - 1); g.moveTo(mx - 8, y + h); g.quadraticCurveTo(mx - 14, y + h - 4, mx - 18, y + h - 1); g.stroke();
+  g.restore();
+}
+
 function bar(g, x, y, w, h, frac, color, light) {
   g.fillStyle = 'rgba(28,16,9, 0.85)';
   g.fillRect(x - 1, y - 1, w + 2, h + 2);
@@ -339,7 +393,7 @@ function brackets(g, x, y, w, h, len, color, lw = 2) {
   g.stroke();
   g.restore();
 }
-function panel(g, x, y, w, h, accent) {
+function panel(g, x, y, w, h, accent, ren) {
   const gr = g.createLinearGradient(0, y, 0, y + h);
   gr.addColorStop(0, 'rgba(84, 52, 30, 0.9)');
   gr.addColorStop(1, 'rgba(34,20,12, 0.94)');
@@ -350,7 +404,8 @@ function panel(g, x, y, w, h, accent) {
   g.fillStyle = gr;
   g.fillRect(x, y, w, h);
   g.restore();
-  goldFrame(g, x, y, w, h, { lw: 2.5, orn: w >= 120 });
+  if (ren) renaissanceFrame(g, x, y, w, h, ren === 2);
+  else goldFrame(g, x, y, w, h, { lw: 2.5, orn: w >= 120 });
   if (accent) {
     // viền neon theo màu hệ: một nét sáng trong + quầng mờ ngoài
     g.save();
@@ -807,7 +862,7 @@ export function draw(g, view, t) {
     const th = lead ? 84 : 76; // đáy hai loại ô thẳng hàng ở 466; đội trưởng cao hơn 8px
     const y = 466 - th;
     const ready = m.skillCd === 0;
-    panel(g, x, y, 98, th, lead ? '#ffd24a' : COLORS[m.element]);
+    panel(g, x, y, 98, th, lead ? '#ffd24a' : COLORS[m.element], lead ? 2 : 1);
     if (lead) {
       g.save();
       g.globalAlpha = 0.7 + 0.3 * Math.sin(t * 0.004);
