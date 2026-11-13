@@ -552,6 +552,10 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.90.2
+- Cắt cảnh (dạo đầu, kết hướng dẫn, triệu hồi tướng): làm lại theo giao diện sáng mới (nền tranh Tháp, phủ xanh trời, tia sáng kem, tháp tranh trong khung vòm vàng, lời thoại trong bảng xanh viền vàng); bỏ tháp khối nâu cũ.
+- Số damage: màu theo hệ tướng tấn công (chữ màu hệ sáng, viền đậm cùng hệ), không còn trắng; khắc hệ/bị kháng chỉ đổi kích thước. Tag lùi: `pre-cut2-v0.90.1`, `pre-dmgcolor-v0.90.1`.
+
 ## v0.89.7
 - Số damage khắc hệ / bị kháng có hoạt ảnh: sau cú nảy đầu, số to dần tới x1,35 (khắc hệ) hoặc nhỏ dần tới x0,7 (bị kháng) trong ~0,65s (giảm chuyển động: nhảy thẳng tới cỡ cuối). Tag lùi: `pre-grow-v0.89.6`.
 

@@ -1174,7 +1174,7 @@ export function draw(g, view, t) {
     g.globalAlpha = k < 0.7 ? 1 : 1 - (k - 0.7) / 0.3;
     g.translate(f.x, f.y - rise);
     g.scale(sc, sc);
-    if (f.kind === 'dmg') outlined(g, f.s, 0, 0, f.size || 40, '#ffffff', f.color, NUM, Math.max(4, (f.size || 40) * 0.13));
+    if (f.kind === 'dmg') outlined(g, f.s, 0, 0, f.size || 40, f.color, f.color2 || f.color, NUM, Math.max(4, (f.size || 40) * 0.13));
     else outlined(g, f.s, 0, 0, f.size || 24, f.color, f.color, SANS, 4, '800');
     g.restore();
   }

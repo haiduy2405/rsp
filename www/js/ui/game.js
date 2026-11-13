@@ -4,7 +4,7 @@ import { areAdjacent } from '../core/board.js';
 import { elementMultiplier } from '../core/damage.js';
 import { step as coreStep } from '../core/battle.js';
 import { findHintAsync } from './hint.js';
-import { W, H, CELL, cellAt, cellCenter, draw } from './render.js';
+import { W, H, CELL, cellAt, cellCenter, draw, COLORS } from './render.js';
 
 const sleep = (ms, fn) =>
   new Promise((res) => {
@@ -110,7 +110,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     else if (el === 4) add(16, () => ({ shape: 'wisp', x: R() * W, y: 200 + R() * 400, vx: (R() - 0.5) * 0.03, vy: -0.02 - R() * 0.04, g: 0, size: 14 + R() * 16, color: R() < 0.5 ? '#8a4cff' : '#4b2a8a', life: 1100 + R() * 500 }));
     else add(14, () => ({ shape: 'heart', x: 40 + R() * (W - 80), y: 520 + R() * 380, vx: (R() - 0.5) * 0.03, vy: -0.07 - R() * 0.08, g: 0, size: 12 + R() * 10, color: R() < 0.5 ? '#ff8fba' : '#ffc2d8', life: 1100 + R() * 400 }));
   };
-  const floater = (s, x, y, color, size = 26, kind = 'text', life = 1000, grow = 1) => view.floaters.push({ grow, s, x: Math.max(70, Math.min(W - 70, x)), y, color, size, kind, age: 0, life });
+  const floater = (s, x, y, color, size = 26, kind = 'text', life = 1000, grow = 1, color2 = null) => view.floaters.push({ grow, color2, s, x: Math.max(70, Math.min(W - 70, x)), y, color, size, kind, age: 0, life });
   const nf = new Intl.NumberFormat(typeof document !== 'undefined' ? document.documentElement.lang || 'vi' : 'vi');
   const fmt = (n) => nf.format(n);
   const LIGHT = ['#9fd2ff', '#ffb098', '#a6f0b4', '#fff0a0', '#d2b0ff', '#ffc0da']; // màu số theo hệ
@@ -147,7 +147,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
           const em = h.amount > 0 ? elementMultiplier(src.el, en.element, ctx.config) : 1;
           const strong = em > 1; const weak = em < 1;
           const lbl = h.amount === 0 && h.absorbed ? t('battle.blocked') : `${strong ? '▲' : weak ? '▼' : ''}${fmt(h.amount)}`;
-          floater(lbl, ex + ((n % 3) - 1) * 40, 128 - Math.min(3, n) * 26, strong ? '#ffd84a' : weak ? '#b9b2a8' : LIGHT[src.el] || '#ffd84a', h.amount === 0 ? 24 : Math.round(dmgSize(h.amount, en.maxHp)), 'dmg', strong ? 1300 : 1100, strong ? 1.35 : weak ? 0.7 : 1); // số bắt đầu cỡ thường rồi to dần (khắc hệ) / nhỏ dần (bị kháng)
+          floater(lbl, ex + ((n % 3) - 1) * 40, 128 - Math.min(3, n) * 26, LIGHT[src.el] || '#ffd84a', h.amount === 0 ? 24 : Math.round(dmgSize(h.amount, en.maxHp)), 'dmg', strong ? 1300 : 1100, strong ? 1.35 : weak ? 0.7 : 1, COLORS[src.el]); // màu số = màu hệ tướng tấn công; số bắt đầu cỡ thường rồi to dần (khắc hệ) / nhỏ dần (bị kháng)
           if (strong && n === 0) {
             view.rings.push({ x: ex, y: 160, col: src.el, age: 0, life: 520 });
             view.rings.push({ x: ex, y: 160, col: 3, age: 0, life: 380 });
