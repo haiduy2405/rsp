@@ -545,6 +545,7 @@
   "battle.locked": "Mục tiêu",
   "battle.lockHint": "Chạm quái để khóa mục tiêu",
   "app.update": "Có bản mới · chạm để cập nhật",
+  "app.updating": "Đang cập nhật…",
   "app.install": "Cài app ra màn hình",
   "app.fullscreen": "Toàn màn hình",
   "app.helpIOS": "Trên iPhone/iPad: mở bằng Safari, bấm nút Chia sẻ rồi chọn 'Thêm vào Màn hình chính'. Mở từ biểu tượng đó game sẽ chạy toàn màn hình.",

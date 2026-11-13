@@ -552,6 +552,10 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.103.0
+
+- Có bản mới: thanh thông báo vàng hiện ngay ở đầu màn hình ở mọi màn (kể cả giữa trận). Chạm một nút là game tự nạp lại thành bản mới. Nạp lại giữa trận sẽ quay về cửa gần nhất đã lưu. Debug: `__showUpdate()`. Tag rollback cục bộ: `pre-update-pill-v0.102.0`.
+
 ## v0.102.0
 
 - Hộp chi tiết cửa (ấn giữ cửa) làm lại: huy hiệu cửa có hào quang, tiêu đề, thẻ quái lớn có chấm hệ, loại quái, nội tại kèm tỉ lệ; nút Vào cửa nổi bật. Tag rollback cục bộ: `pre-doordetail-v0.101.0`.

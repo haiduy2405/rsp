@@ -229,10 +229,12 @@ function hubScene() {
 }
 
 let updateReady = false;
-// Có bản mới: hiện nút nhỏ ở Hub, người chơi tự chạm để nạp lại (không tự đá về màn tải giữa chừng).
+// Có bản mới: hiện thông báo ở mọi màn (kể cả giữa trận); người chơi chạm thì game tự nạp lại thành bản mới.
 function showUpdatePill() {
-  if (!updateReady || $('upd-pill') || !$('screen')) return;
-  $('screen').appendChild(h('button', { id: 'upd-pill', class: 'upd-pill', onclick: () => location.reload() }, t('app.update')));
+  if (!updateReady || $('upd-pill') || !$('wrap')) return;
+  const b = h('button', { id: 'upd-pill', class: 'upd-pill', onclick: () => { b.disabled = true; b.textContent = t('app.updating'); audio.sfx('confirm'); setTimeout(() => location.reload(), 150); } }, h('i', { 'aria-hidden': 'true' }, '⟳'), h('span', {}, t('app.update')));
+  $('wrap').appendChild(b);
+  audio.sfx('reveal');
 }
 function showHub() {
   run = null;
@@ -268,7 +270,6 @@ function showHub() {
   $('screen').classList.add('hub');
   atHub = true;
   notice = null;
-  showUpdatePill();
   const nEl = document.querySelector('#screen .hub-notice'); // thông báo tự mờ rồi biến mất sau vài giây
   if (nEl) setTimeout(() => { nEl.classList.add('fade'); setTimeout(() => nEl.remove(), 600); }, 4000);
   // Hướng dẫn tân thủ: shop (quà miễn phí) → Chiến đấu → ải 1 → Vào trận → luật chọn đường
@@ -1681,7 +1682,7 @@ Object.assign(app, ui);
 if ('serviceWorker' in navigator && !DEBUG && location.protocol.startsWith('http')) {
   // Bản mới: SW mới chiếm quyền → đánh dấu, tự nạp lại ở lần vào Hub kế tiếp (không ngắt giữa trận).
   const hadSW = !!navigator.serviceWorker.controller;
-  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadSW) { updateReady = true; if (atHub) showUpdatePill(); } });
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadSW) { updateReady = true; showUpdatePill(); } });
   navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => { setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000); document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); }); }).catch(() => {});
 }
 
@@ -1689,6 +1690,7 @@ if (DEBUG) {
   window.__showSkillAsk = (i, f, d, du) => showSkillAsk(i, f, d, du);
   window.__ctx = ctx;
   window.__ui = ui;
+  window.__showUpdate = () => { updateReady = true; showUpdatePill(); };
   window.__showTeam = (...a) => showTeam(...a);
   window.__startRun = (o) => startRun(o);
   window.__runItems = (o) => { Object.assign(run.items, o); render(); };

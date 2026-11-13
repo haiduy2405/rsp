@@ -545,6 +545,7 @@
   "battle.locked": "Target",
   "battle.lockHint": "Tap a monster to lock target",
   "app.update": "New version · tap to update",
+  "app.updating": "Updating…",
   "app.install": "Install app",
   "app.fullscreen": "Fullscreen",
   "app.helpIOS": "On iPhone/iPad: open in Safari, tap Share, then 'Add to Home Screen'. Launch from that icon for fullscreen.",
