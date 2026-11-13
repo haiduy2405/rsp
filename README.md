@@ -552,6 +552,10 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.100.2
+
+- Bỏ ô chọn quê hương (cờ) ở màn tạo nhân vật và màn Hồ sơ. Dữ liệu `player.hometown` vẫn giữ trong save để không hỏng bản lưu cũ. Tag rollback cục bộ: `pre-nohome-v0.100.1`.
+
 ## v0.100.1
 
 - Nút Cài app ngoài Hub vẫn ẩn khi đang fullscreen/đã cài; nút Cài app trong Cài đặt luôn hiện.

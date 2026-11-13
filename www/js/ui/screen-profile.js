@@ -6,7 +6,6 @@ import { finishOnboarding, storyUnlocked, updateProfile } from '../core/onboardi
 import { newProgress } from '../core/progress.js';
 import { redeemGift } from '../core/giftcode.js';
 import * as offline from '../ui/offline.js';
-import { flagPicker } from './flags.js';
 import { sceneEl } from './hub-art.js';
 
 export function install(app) {
@@ -33,7 +32,7 @@ export function install(app) {
       showProfile(t('profile.saved'));
     };
     const keep = (e, k) => { d[k] = e.target.value; };
-    const dirty = d.name !== app.progress.player.name || (d.hometown || '') !== (app.progress.player.hometown || '') || d.avatar !== app.progress.player.avatar || (d.photo || null) !== (app.progress.player.photo || null);
+    const dirty = d.name !== app.progress.player.name || d.avatar !== app.progress.player.avatar || (d.photo || null) !== (app.progress.player.photo || null);
     screen(
       h('h2', {}, t('profile.title')),
       h('div', { class: 'prof-head' }, h('div', { class: 'avatar big' }, avatarNode(d))),
@@ -41,7 +40,6 @@ export function install(app) {
       h('div', { class: 'row' }, av),
       photoPicker(d, () => showProfile(), 'pf'),
       h('label', {}, t('ob.name'), h('input', { id: 'pf-name', maxlength: String(o.nameMax), value: d.name, oninput: (e) => keep(e, 'name') })),
-      h('label', {}, t('ob.hometown')), flagPicker(ctx, t, d.hometown || '', (c) => keep({ target: { value: c } }, 'hometown'), 'pf'),
       btn(t('profile.save'), save1, 'primary', { id: 'pf-save' }),
       h('h3', {}, t('profile.stats')),
       stat(t('profile.runs'), st.runs),
@@ -237,7 +235,6 @@ export function install(app) {
           h('div', { class: 'ob-me-row' }, preview, h('label', { class: 'ob-name' }, t('ob.name'), h('input', { id: 'ob-name', maxlength: String(o.nameMax), value: ob.name, autocomplete: 'off', oninput: (e) => (ob.name = e.target.value) }))),
           h('div', { class: 'ob-avs' }, av),
           photoPicker(ob, () => showOnboarding(2, err), 'ob'),
-          h('details', { class: 'ob-flag' }, h('summary', {}, t('ob.hometown')), flagPicker(ctx, t, ob.hometown, (c) => (ob.hometown = c), 'ob'), h('p', { class: 'muted' }, t('ob.hometownHint'))),
           btn(t('ob.start'), () => {
             const r = finishOnboarding(ctx, app.progress, { name: ob.name, hometown: ob.hometown, avatar: ob.avatar, photo: ob.photo });
             if (!r.ok) {
