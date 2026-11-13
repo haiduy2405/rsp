@@ -1,4 +1,7 @@
 {
+  "run.bag.items": "Items",
+  "run.bag.relics": "Relics",
+  "app.updateSub": "Tap to update",
   "game.title": "Rift Spire: Pantheon",
   "game.subtitle": "Thiên Tháp Dị Điểm",
   "menu.start": "Start battle",
@@ -544,7 +547,7 @@
   "info.teamEffects": "Team effects",
   "battle.locked": "Target",
   "battle.lockHint": "Tap a monster to lock target",
-  "app.update": "New version · tap to update",
+  "app.update": "New version",
   "app.updating": "Updating…",
   "app.install": "Install app",
   "app.fullscreen": "Fullscreen",

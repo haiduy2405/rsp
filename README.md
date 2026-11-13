@@ -736,3 +736,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Bỏ các thử nghiệm graffiti/hộp/luxury (v0.82–v0.86). Logo mới (`goldTitle` trong `www/js/ui/title.js`, CSS `.lg*`): tên chính chữ serif Fraunces đậm, vàng-kem gradient, viền nâu đậm, khối 3D nâu nhẹ, đèn quét ngang; ruy băng nâu đất viền vàng có đuôi nhạn cho tên còn lại (giống dải băng tranh logo gốc); hàng 6 ngọc hệ của game lơ lửng nhẹ bên dưới.
 - Hai ngôn ngữ: tên chính theo ngôn ngữ đang chọn, ruy băng là tên ngôn ngữ kia (key i18n mới `game.subtitle`). Áp ở màn tải và màn giới thiệu.
 - Đã xóa font Bungee/Sedgwick và `diamond.webp`. Hoàn tác: tag `pre-logo-redesign-v0.86.0`.
+
+## v0.104.0
+- Icon riêng cho cả 28 Di Vật (`www/js/ui/relic-icons.js`, SVG vẽ bằng code, thay bằng art thật sau).
+- Túi đồ trong chuyến trình bày như hòm đồ: tab Tất cả/Vật phẩm/Di Vật, lưới ô, thẻ chi tiết có icon. Thẻ Di Vật ở màn chọn/cửa hàng cũng có icon.
+- Banner "Có bản mới" thiết kế lại: to, căn giữa, nút đỏ rượu vang.
+- Rollback: tag local `pre-relicicons-v0.103.0` (tag chỉ có trên máy, không lên GitHub).

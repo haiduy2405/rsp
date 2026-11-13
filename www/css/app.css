@@ -1527,3 +1527,16 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .upd-pill { box-shadow: 0 3px 10px rgba(6, 14, 50, .5), 0 0 18px rgba(255, 210, 90, .7); }
 @keyframes updSpin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .upd-pill i { animation: none; } }
+
+/* v0.104.0: túi đồ kiểu hòm đồ, icon Di Vật, banner cập nhật to */
+.bagbox .row.tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 10px; }
+.bagbox .item-grid { margin-bottom: 10px; }
+.slot .bag-on { position: absolute; left: 3px; top: 2px; font: 900 13px/1 system-ui; font-style: normal; color: #6be39a; text-shadow: 0 1px 2px #000; }
+.rc-ic { width: 46px; height: 46px; flex: none; padding: 5px; border-radius: 8px; background: linear-gradient(160deg, color-mix(in srgb, var(--rc) 50%, #10131c), #173a6c); box-sizing: border-box; }
+.card.relic .col, .item-detail .col { display: flex; flex-direction: column; }
+.upd-pill { top: calc(10px + var(--sat, 0px)); width: calc(100% - 28px); max-width: 360px; left: 0; right: 0; margin: 0 auto; justify-content: center; gap: 12px; padding: 12px 18px; border-radius: 18px; color: #fff; border: 2px solid #f0a0b0; background: linear-gradient(180deg, #a8203c, #6e0f26); box-shadow: 0 4px 14px rgba(20, 0, 10, .6), 0 0 18px rgba(168, 32, 60, .6); text-align: left; }
+.upd-pill i { font-size: 28px; color: #ffd0d8; }
+.upd-pill span { display: flex; flex-direction: column; gap: 1px; }
+.upd-pill span b { font-size: 17px; font-weight: 800; }
+.upd-pill span small { font-size: 12px; font-weight: 600; opacity: .85; }
+.upd-pill span small { color: #ffd9e0; }

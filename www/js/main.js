@@ -32,6 +32,7 @@ import { installRewardFx } from './ui/rewardfx.js';
 import { createAudio } from './ui/audio.js';
 import { $, h, btn } from './ui/dom.js';
 import { itemIcon, rewardIcon, REWARD_ICON } from './ui/icons.js';
+import { relicIconSvg } from './ui/relic-icons.js';
 import { install as installItems } from './ui/screen-items.js';
 import { install as installSummon } from './ui/screen-summon.js';
 import { install as installProfile } from './ui/screen-profile.js';
@@ -232,7 +233,7 @@ let updateReady = false;
 // Có bản mới: hiện thông báo ở mọi màn (kể cả giữa trận); người chơi chạm thì game tự nạp lại thành bản mới.
 function showUpdatePill() {
   if (!updateReady || $('upd-pill') || !$('wrap')) return;
-  const b = h('button', { id: 'upd-pill', class: 'upd-pill', onclick: () => { b.disabled = true; b.textContent = t('app.updating'); audio.sfx('confirm'); setTimeout(() => location.reload(), 150); } }, h('i', { 'aria-hidden': 'true' }, '⟳'), h('span', {}, t('app.update')));
+  const b = h('button', { id: 'upd-pill', class: 'upd-pill', onclick: () => { b.disabled = true; b.textContent = t('app.updating'); audio.sfx('confirm'); setTimeout(() => location.reload(), 150); } }, h('i', { 'aria-hidden': 'true' }, '⟳'), h('span', {}, h('b', {}, t('app.update')), h('small', {}, t('app.updateSub'))));
   $('wrap').appendChild(b);
   audio.sfx('reveal');
 }
@@ -967,27 +968,40 @@ function showBag(selKey) {
   for (const it of ['potion', 'shield', 'time']) if (run.items[it] > 0 || run.armed[it]) entries.push({ key: it, kind: 'item', it, name: t(`item.${it}`), n: run.items[it], col: ITEM_COL[it], armed: !!run.armed[it] });
   for (const id of run.relics) entries.push({ key: `r_${id}`, kind: 'relic', id, name: relicName(id), n: 0, col: RELIC_COL[ctx.relics[id].rarity] });
   const close = () => $('info')?.remove();
-  const sel = entries.find((e) => e.key === selKey) || entries[0];
-  const cells = entries.map((e, i) => {
-    const c = h('button', { class: 'bag-cell' + (e === sel ? ' sel' : ''), 'data-bag': e.key, style: `--ic:${e.col};--i:${i}`, onclick: () => { audio.sfx('tick'); showBag(e.key); } });
-    c.innerHTML = e.kind === 'item' ? `<svg viewBox="0 0 24 24" aria-hidden="true">${ITEM_ICON[e.it]}</svg>` : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 6-7 12L5 9zM5 9h14M9 9l3 12 3-12M12 3l-3 6M12 3l3 6"/></svg>';
-    if (e.n > 0) c.append(h('i', { class: 'bag-n' }, `×${e.n}`));
+  const tabs = [['all', t('items.all')], ['item', t('run.bag.items')], ['relic', t('run.bag.relics')]];
+  if (!tabs.some(([k]) => k === bagTab)) bagTab = 'all';
+  const shown = entries.filter((e) => bagTab === 'all' || e.kind === bagTab);
+  const sel = shown.find((e) => e.key === selKey) || shown[0];
+  const tabRow = h('div', { class: 'row tabs' }, tabs.map(([k, label]) => btn(label, () => { bagTab = k; showBag(); }, bagTab === k ? 'primary' : '', { 'data-tab': k })));
+  const cells = shown.map((e) => {
+    const ic = h('span', { class: 'ricon icon-lg' });
+    ic.innerHTML = e.kind === 'item' ? `<svg viewBox="0 0 24 24" aria-hidden="true" style="fill:none;stroke:${e.col};stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round">${ITEM_ICON[e.it]}</svg>` : relicIconSvg(e.id);
+    const c = h('button', { class: 'slot' + (e === sel ? ' sel' : ''), 'data-bag': e.key, style: `--rc:${e.col}`, onclick: () => { audio.sfx('tick'); showBag(e.key); } }, ic);
+    if (e.n > 0) c.append(h('b', {}, `×${e.n}`));
     if (e.armed) c.append(h('em', { class: 'bag-on' }, '✓'));
     return c;
   });
   let detail = null;
   if (sel) {
+    const ic = h('span', { class: 'ricon icon-lg' });
+    ic.innerHTML = sel.kind === 'item' ? `<svg viewBox="0 0 24 24" aria-hidden="true" style="fill:none;stroke:${sel.col};stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round">${ITEM_ICON[sel.it]}</svg>` : relicIconSvg(sel.id);
+    let body;
     if (sel.kind === 'item') {
       const off = run.items[sel.it] <= 0 || (sel.it === 'potion' && run.hp >= run.maxHp) || run.armed[sel.it];
-      detail = h('div', { class: 'bag-detail', style: `--ic:${sel.col}` }, h('b', {}, `${sel.name} ×${run.items[sel.it]}`), h('small', { class: 'muted' }, desc[sel.it]),
-        btn(run.armed[sel.it] ? t('run.armed') : t('bag.use'), () => { act({ type: 'useItem', item: sel.it }); showBag(run.items[sel.it] > 0 || run.armed[sel.it] ? sel.key : undefined); }, off ? '' : 'primary', { id: 'bag-use', ...(off ? { disabled: '' } : {}) }));
-    } else detail = h('div', { class: 'bag-detail', style: `--ic:${sel.col}` }, relicCard(sel.id));
+      body = [h('b', {}, `${sel.name} ×${run.items[sel.it]}`), h('small', { class: 'muted' }, desc[sel.it]),
+        btn(run.armed[sel.it] ? t('run.armed') : t('bag.use'), () => { act({ type: 'useItem', item: sel.it }); showBag(run.items[sel.it] > 0 || run.armed[sel.it] ? sel.key : undefined); }, off ? '' : 'primary', { id: 'bag-use', ...(off ? { disabled: '' } : {}) })];
+    } else {
+      const r = ctx.relics[sel.id];
+      body = [h('b', {}, sel.name, ' ', h('small', { style: `color:${sel.col}` }, t(`relic.rarity.${r.rarity}`))), modLines(sel.id).map((l) => h('div', { class: 'muted' }, l))];
+    }
+    detail = h('div', { class: 'card item-detail', id: 'bag-detail', 'data-relic': sel.kind === 'relic' ? sel.id : null, style: `--rc:${sel.col}` }, h('div', { class: 'row', style: 'gap:12px;align-items:center' }, ic, h('div', { class: 'col', style: 'gap:4px;flex:1' }, body)));
   }
   $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() },
-    h('div', { class: 'infobox bagbox' }, h('h3', {}, t('run.bag')),
-      entries.length ? h('div', { class: 'bag-grid' }, cells) : h('div', { class: 'muted bag-empty' }, t('run.bagEmpty')),
+    h('div', { class: 'infobox bagbox' }, h('h3', {}, t('run.bag')), tabRow,
+      shown.length ? h('div', { class: 'item-grid', id: 'bag-grid' }, cells) : h('div', { class: 'muted bag-empty' }, t('run.bagEmpty')),
       detail, btn(t('info.close'), close, '', { id: 'info-close' }))));
 }
+let bagTab = 'all';
 
 // ---- Di Vật
 const RELIC_COL = { 1: '#9fb0ff', 2: '#c58bff', 3: '#ffd24a' };
@@ -1002,7 +1016,9 @@ const modLines = (id) => {
 };
 function relicCard(id, extra) {
   const r = ctx.relics[id];
-  return h('div', { class: 'card relic', 'data-relic': id, style: `border-color:${RELIC_COL[r.rarity]}` }, h('b', {}, relicName(id), ' ', h('small', { style: `color:${RELIC_COL[r.rarity]}` }, t(`relic.rarity.${r.rarity}`))), modLines(id).map((l) => h('div', { class: 'muted' }, l)), extra);
+  const ic = h('span', { class: 'ricon icon-lg rc-ic', style: `--rc:${RELIC_COL[r.rarity]}` });
+  ic.innerHTML = relicIconSvg(id);
+  return h('div', { class: 'card relic', 'data-relic': id, style: `border-color:${RELIC_COL[r.rarity]}` }, h('div', { class: 'row', style: 'gap:10px;align-items:center;text-align:left' }, ic, h('div', { class: 'col', style: 'gap:3px;flex:1' }, h('b', {}, relicName(id), ' ', h('small', { style: `color:${RELIC_COL[r.rarity]}` }, t(`relic.rarity.${r.rarity}`))), modLines(id).map((l) => h('div', { class: 'muted' }, l)))), extra);
 }
 // Hàng chip Di Vật đang giữ; bấm một chip xem chi tiết.
 const relicStrip = () =>
@@ -1694,6 +1710,7 @@ if (DEBUG) {
   window.__showTeam = (...a) => showTeam(...a);
   window.__startRun = (o) => startRun(o);
   window.__runItems = (o) => { Object.assign(run.items, o); render(); };
+  window.__runRelics = (ids) => { run.relics.push(...ids); render(); };
   window.__progress = () => progress;
   window.__cheat = (ids = []) => {
     const p = structuredClone(progress);

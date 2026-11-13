@@ -1,4 +1,7 @@
 {
+  "run.bag.items": "Vật phẩm",
+  "run.bag.relics": "Di Vật",
+  "app.updateSub": "Chạm để cập nhật",
   "game.title": "Thiên Tháp Dị Điểm",
   "game.subtitle": "Rift Spire: Pantheon",
   "menu.start": "Bắt đầu trận",
@@ -544,7 +547,7 @@
   "info.teamEffects": "Hiệu ứng của cả đội",
   "battle.locked": "Mục tiêu",
   "battle.lockHint": "Chạm quái để khóa mục tiêu",
-  "app.update": "Có bản mới · chạm để cập nhật",
+  "app.update": "Có bản mới",
   "app.updating": "Đang cập nhật…",
   "app.install": "Cài app ra màn hình",
   "app.fullscreen": "Toàn màn hình",
