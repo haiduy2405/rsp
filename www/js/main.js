@@ -9,7 +9,6 @@ import { stageInfo } from './core/stageinfo.js';
 import { applyRunResult, firstClearStageSpirit } from './core/progress.js';
 import { browserAdapter } from './save/storage.js';
 import { createSlots } from './save/slots.js';
-import { hubSky, ZONE_POS } from './ui/hub-art.js';
 import { install as installSlots } from './ui/screen-slots.js';
 import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useElixir, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
@@ -202,17 +201,24 @@ const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } 
 // Cảnh chính: Tòa Tháp giữa các đảo nổi. Mỗi khu mở là một viên ngọc phát sáng trên đảo (chạm để vào khu).
 function hubScene() {
   const zones = ctx.zoneList;
-  const pos = ZONE_POS; // đảo khu vực đối xứng hai bên Tháp (ui/hub-art.js)
+  // Ảnh nền bg/hub.webp (400x711) đặt giữa khung 440x880 (rộng hơn ảnh 20 mỗi bên nên không bị cắt hai đảo sát mép); hai dải dư trên/dưới tô đúng màu mép ảnh (trời đào / mây kem) và hòa dần vào ảnh.
+  const OY = 84;
+  const pos = [[205, 412], [66, 188], [338, 178], [36, 288], [362, 286], [330, 372]].map(([x, y]) => [x, y - 40 + OY]);
   const NS = 'http://www.w3.org/2000/svg';
   const orbs = zones.map((z, i) => {
     const [x, y] = pos[i % pos.length];
     const open = progress.unlocked.includes(z.id);
     const col = COLORS[z.element];
-    const S = open ? 88 : 80;
+    const S = open ? 66 : 60;
     const lock = open ? '' : `<g transform="translate(${x - 9} ${y - 8})"><rect x="0" y="7" width="18" height="13" rx="3" fill="#2b66aa" stroke="#fff8e6" stroke-width="1.8"/><path d="M4 7V4.5a5 5 0 0 1 10 0V7" fill="none" stroke="#fff8e6" stroke-width="2"/></g>`;
     return `<g class="zorb${open ? ' open' : ''}" ${open ? `data-zone="${z.id}" role="button" tabindex="0" aria-label="${t(`zone.${z.id}`)}"` : ''} style="animation-delay:${(i * 0.7).toFixed(1)}s;--c:${col}">${open ? `<ellipse cx="${x}" cy="${y + S * 0.34}" rx="${S * 0.46}" ry="${S * 0.12}" fill="${col}" opacity=".35" class="halo"/>` : ''}<image href="assets/ui/zones/${z.id}.webp" x="${x - S / 2}" y="${y - S / 2}" width="${S}" height="${S}" ${open ? '' : 'filter="url(#zlock)" opacity=".7"'}/>${lock}</g>`;
   }).join('');
-  const svg = `<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="${NS}" aria-hidden="true">${hubSky()}${orbs}</svg>`;
+  const svg = `<svg viewBox="-20 0 440 880" preserveAspectRatio="xMidYMid slice" xmlns="${NS}" aria-hidden="true">
+<defs><filter id="zlock"><feColorMatrix type="saturate" values="0.1"/></filter></defs>
+<image href="assets/bg/hub-blur.webp" x="-20" y="0" width="440" height="880" preserveAspectRatio="none"/>
+<image href="assets/bg/hub.webp" x="0" y="${OY}" width="400" height="711" preserveAspectRatio="none"/>
+${orbs}
+</svg>`;
   const box = h('div', { class: 'hub-scene' + (DEBUG ? ' static' : '') });
   box.innerHTML = svg;
   if (!DEBUG) for (let i = 0; i < 12; i++) box.appendChild(h('i', { class: 'spark', style: `left:${(i * 37 + 11) % 92 + 3}%;top:${(i * 53 + 17) % 62 + 8}%;animation-delay:${(i * 0.83).toFixed(2)}s;animation-duration:${(5 + (i % 4)).toFixed(0)}s` })); // đom đóm bay quanh Tháp

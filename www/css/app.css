@@ -57,7 +57,7 @@ b { font-weight: 700; }
 button { font: inherit; font-weight: 600; color: var(--text); min-height: 46px; padding: 10px 18px; border-radius: 6px; border: 1px solid var(--line-hi); background: linear-gradient(180deg, #4a8dd2, var(--ink2)); box-shadow: inset 0 1px 0 rgba(255,230,190, .22), 0 2px 6px rgba(0, 0, 12, .4); transition: transform .08s, filter .12s; cursor: pointer; }
 button:active { transform: scale(.97); filter: brightness(1.25); }
 button.primary { color: #2a1503; border: 0; min-width: 160px; font-weight: 800; letter-spacing: .01em; text-shadow: 0 1px 0 rgba(255, 240, 200, .55);
-  background: linear-gradient(180deg, var(--amber-hi) 0%, var(--amber) 52%, var(--amber-lo) 100%); box-shadow: inset 0 1px 0 rgba(255, 255, 230, .7), inset 0 -2px 0 rgba(70, 35, 4, .55), 0 0 18px rgba(240, 185, 74, .25);
+  background: linear-gradient(180deg, var(--amber-hi) 0%, var(--amber) 52%, var(--amber-lo) 100%); box-shadow: inset 0 1px 0 rgba(255, 255, 230, .7), inset 0 -2px 0 rgba(20, 56, 108, .55), 0 0 18px rgba(240, 185, 74, .25);
   clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px); }
 button.primary:active { filter: brightness(1.1); }
 button[disabled] { opacity: .4; filter: grayscale(.6); }
@@ -219,7 +219,7 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 .tile.in > div:first-child { opacity: .45; }
 
 /* ---- Màn chính kiểu cảnh toàn màn hình */
-#screen.hub { padding: 0; gap: 0; overflow: hidden; background: #7ac8f8; display: block; position: absolute; }
+#screen.hub { padding: 0; gap: 0; overflow: hidden; background: #fbd9a8; display: block; position: absolute; }
 #screen.hub > * { max-width: none; }
 .hub-scene { position: absolute; inset: 0; z-index: 0; }
 .hub-scene svg { width: 100%; height: 100%; display: block; }
@@ -252,7 +252,7 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 .hub-foot .credit { opacity: .75; font-size: 11px; }
 #screen.hub .dock { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; width: auto; margin: 0; grid-template-columns: 1fr 1fr 1.6fr 1fr 1fr; padding: 22px 10px calc(8px + var(--sab)); background: linear-gradient(180deg, transparent, rgba(30, 78, 140, .9) 42%); }
 .dock button.battle { width: 104px; height: 104px; min-height: 0; margin: -42px auto 0; border-radius: 50%; display: grid; place-items: center; color: #fff4ea; font-family: var(--serif); font-size: 17px; font-weight: 800; line-height: 1; text-transform: uppercase; letter-spacing: .04em; background: radial-gradient(circle at 35% 25%, var(--seal-hi), var(--seal) 52%, var(--seal-lo)); border: 3px solid var(--bone); box-shadow: 0 0 0 4px rgba(7, 8, 14, .85), 0 0 0 5px var(--bone-dim), 0 0 30px rgba(212, 65, 58, .65), 0 6px 16px rgba(0, 0, 0, .7); animation: mainglow 2.4s ease-in-out infinite; }
-.dock button.battle span { display: block; max-width: 78px; text-shadow: 0 2px 0 rgba(70, 8, 6, .8); }
+.dock button.battle span { display: block; max-width: 78px; text-shadow: 0 2px 0 rgba(20, 56, 108, .8); }
 .dock button.battle:active { transform: scale(.95); }
 .dock button.sub { width: 56px; height: 56px; min-height: 0; margin: -8px auto 0; border-radius: 50%; background: rgba(12, 10, 40, .9); border: 1.5px solid var(--bone-dim); color: var(--bone); box-shadow: 0 0 0 3px rgba(12, 10, 40, .8); }
 .dock button.main { }
@@ -303,10 +303,10 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 /* Màn hình tải: cùng tranh Tòa Tháp với màn chính và biểu tượng app (liền mạch với màn chờ của hệ điều hành) */
 .loading { position: fixed; inset: 0; background: #fb9b6f; overflow: hidden; }
 .loading .ld-art { position: absolute; inset: -4%; background: url(../assets/bg/hub.webp) center top / cover no-repeat; animation: ldDrift 14s ease-in-out infinite alternate; }
-.loading::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 80% at 50% 38%, transparent 55%, rgba(60, 28, 14, .35)); }
+.loading::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 80% at 50% 38%, transparent 55%, rgba(20, 56, 108, .35)); }
 .loading .ld-top { position: absolute; left: 0; right: 0; bottom: calc(228px + var(--sat, 0px)); z-index: 1; text-align: center; padding: 0 20px; }
-.loading .ld-logo { display: block; width: min(74%, 320px); height: auto; margin: 0 auto; filter: drop-shadow(0 4px 10px rgba(80, 36, 14, .45)); animation: ldPop .7s cubic-bezier(.2, .9, .25, 1.2) both; }
-.loading h1 { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; color: #fff3d6; font-size: 34px; letter-spacing: .04em; text-shadow: 0 2px 6px rgba(80, 36, 14, .6); }
+.loading .ld-logo { display: block; width: min(74%, 320px); height: auto; margin: 0 auto; filter: drop-shadow(0 4px 10px rgba(20, 56, 108, .45)); animation: ldPop .7s cubic-bezier(.2, .9, .25, 1.2) both; }
+.loading h1 { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; color: #fff3d6; font-size: 34px; letter-spacing: .04em; text-shadow: 0 2px 6px rgba(20, 56, 108, .6); }
 .loading .ld-box { position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; padding: 56px 28px calc(28px + var(--sat, 0px)); text-align: center; background: linear-gradient(0deg, rgba(30, 76, 138, .92) 50%, transparent); }
 .loading .ld-sub { color: #ffd9a8; font-size: 13px; letter-spacing: .12em; margin: 0 0 14px; }
 .loading .ld-track { height: 8px; max-width: 280px; margin: 0 auto 6px; background: rgba(255, 233, 190, .18); border: 1px solid rgba(255, 217, 138, .35); border-radius: 5px; overflow: hidden; }
@@ -442,7 +442,7 @@ details.card[open] > summary { margin-bottom: 8px; }
 
 #screen > h2 { padding: 0 52px; text-align: center; }
 .hub-foot .credit { opacity: 1; color: #4a8dd2; }
-.hub-foot .credit b { color: #7a3f12; text-shadow: 0 1px 0 rgba(255, 240, 210, .6); }
+.hub-foot .credit b { color: #b8650f; text-shadow: 0 1px 0 rgba(255, 240, 210, .6); }
 
 /* ----- thẻ tướng: chỉ số gọn ----- */
 .mini-stats { display: flex; gap: 12px; margin-top: 3px; font-size: 12px; color: var(--mute); }
@@ -453,7 +453,7 @@ details.card[open] > summary { margin-bottom: 8px; }
 .diffdots span.on { color: #2a1503; border-color: var(--amber); background: linear-gradient(180deg, var(--amber-hi), var(--amber)); font-weight: 700; }
 /* ----- màn kết quả: con dấu, đội hình hiện lần lượt, huy hiệu lên cấp ----- */
 .end-title { text-align: center; animation: stamp .5s cubic-bezier(.2, 1.4, .4, 1) both; }
-.end-title.won { color: var(--gold-hi); text-shadow: 0 2px 0 #7a3f12, 0 0 24px rgba(240, 185, 74, .5); }
+.end-title.won { color: var(--gold-hi); text-shadow: 0 2px 0 #b8650f, 0 0 24px rgba(240, 185, 74, .5); }
 .end-title.lost { color: var(--bone-dim); }
 @keyframes stamp { from { opacity: 0; transform: scale(1.7) rotate(-5deg); } to { opacity: 1; transform: none; } }
 .endteam { display: flex; justify-content: center; gap: 8px; }
@@ -484,7 +484,7 @@ details.card[open] > summary { margin-bottom: 8px; }
 .sm-cur .ricon.icon-sm { width: 24px; height: 24px; }
 .banner-tabs button { border-radius: 999px; }
 .sm-stage { position: relative; width: 100%; padding: 14px 12px 14px; border-radius: 12px; border: 2px solid var(--line-hi); overflow: hidden; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;
-  background: radial-gradient(90% 70% at 50% 38%, #f6c98a 0%, #d98b4f 55%, #7a3f12 100%); box-shadow: inset 0 0 0 3px rgba(22, 58, 108, .35), 0 6px 0 rgba(22, 58, 108, .5); }
+  background: radial-gradient(90% 70% at 50% 38%, #f6c98a 0%, #d98b4f 55%, #b8650f 100%); box-shadow: inset 0 0 0 3px rgba(22, 58, 108, .35), 0 6px 0 rgba(22, 58, 108, .5); }
 .sm-circle { position: absolute; left: 50%; top: 18px; width: 250px; height: 250px; margin-left: -125px; border-radius: 50%; border: 3px solid rgba(22, 58, 108, .5); background: repeating-conic-gradient(from 0deg, rgba(22, 58, 108, .16) 0 10deg, transparent 10deg 20deg); animation: spinSlow 60s linear infinite; pointer-events: none; }
 .sm-circle::after { content: ''; position: absolute; inset: 30px; border-radius: 50%; border: 3px dashed rgba(22, 58, 108, .45); }
 @keyframes spinSlow { to { transform: rotate(360deg); } }
@@ -1037,27 +1037,27 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 
 /* v0.65 nút ải: huy hiệu nét viền nâu, bóng đổ, ruy băng nhãn, đường mòn có viền */
 .sp-inner { background: linear-gradient(180deg, rgba(22, 58, 108, .06), rgba(22, 58, 108, .30)), var(--zbgt) center bottom / cover no-repeat, rgba(22, 58, 108, .5); }
-.sp-bg { fill: none; stroke: #3b2314; stroke-width: 12; stroke-linecap: round; opacity: .55; vector-effect: non-scaling-stroke; }
+.sp-bg { fill: none; stroke: #1f4a82; stroke-width: 12; stroke-linecap: round; opacity: .55; vector-effect: non-scaling-stroke; }
 .sp-seg { stroke: #fff1cf; stroke-width: 6; stroke-dasharray: 0.1 14; opacity: .95; }
 .sp-seg.lit { stroke: #ffd35e; stroke-width: 7; stroke-dasharray: none; filter: drop-shadow(0 0 4px rgba(255, 200, 90, .9)); }
 .snode { gap: 2px; }
-.snode .sn-orb { width: 68px; height: 68px; border: 4px solid #3b2314; background: radial-gradient(circle at 50% 30%, #fff4d0, #e0a64a 55%, #b0701f 100%); box-shadow: 0 0 0 3px #f2cf86, 0 0 0 6px #3b2314, 0 9px 10px -2px rgba(0, 0, 0, .55), inset 0 -6px 8px rgba(120, 60, 10, .45), inset 0 3px 4px rgba(255, 255, 255, .6); animation: snBob 3.2s ease-in-out infinite; }
+.snode .sn-orb { width: 68px; height: 68px; border: 4px solid #1f4a82; background: radial-gradient(circle at 50% 30%, #fff4d0, #e0a64a 55%, #b0701f 100%); box-shadow: 0 0 0 3px #f2cf86, 0 0 0 6px #1f4a82, 0 9px 10px -2px rgba(0, 0, 0, .55), inset 0 -6px 8px rgba(120, 60, 10, .45), inset 0 3px 4px rgba(255, 255, 255, .6); animation: snBob 3.2s ease-in-out infinite; }
 .snode .sn-orb::after { content: ''; position: absolute; left: 14%; top: 8%; width: 46%; height: 28%; border-radius: 50%; background: linear-gradient(180deg, rgba(255, 255, 255, .75), rgba(255, 255, 255, 0)); pointer-events: none; }
 .snode .sn-num { font: 800 30px var(--serif, Georgia, serif); color: #5a2f0c; text-shadow: 0 2px 0 rgba(255, 240, 200, .8), 0 0 1px #fff; }
-.snode.ready .sn-orb { background: radial-gradient(circle at 50% 30%, #fffbe0, #ffc94d 52%, #e07d1c 100%); box-shadow: 0 0 0 3px #fff0b0, 0 0 0 6px #3b2314, 0 0 22px 6px color-mix(in srgb, var(--zc, #ffb25a) 70%, #ffd35e), 0 9px 10px -2px rgba(0, 0, 0, .55), inset 0 -6px 8px rgba(160, 70, 0, .4), inset 0 3px 4px rgba(255, 255, 255, .7); animation: snBob 3.2s ease-in-out infinite, snGlow 1.8s ease-in-out infinite; }
-.snode.clear .sn-orb { background: radial-gradient(circle at 50% 30%, #eaffd0, #6cc65a 55%, #2d7a36 100%); box-shadow: 0 0 0 3px #d6f5a8, 0 0 0 6px #3b2314, 0 9px 10px -2px rgba(0, 0, 0, .55), inset 0 -6px 8px rgba(10, 70, 20, .45), inset 0 3px 4px rgba(255, 255, 255, .6); }
+.snode.ready .sn-orb { background: radial-gradient(circle at 50% 30%, #fffbe0, #ffc94d 52%, #e07d1c 100%); box-shadow: 0 0 0 3px #fff0b0, 0 0 0 6px #1f4a82, 0 0 22px 6px color-mix(in srgb, var(--zc, #ffb25a) 70%, #ffd35e), 0 9px 10px -2px rgba(0, 0, 0, .55), inset 0 -6px 8px rgba(160, 70, 0, .4), inset 0 3px 4px rgba(255, 255, 255, .7); animation: snBob 3.2s ease-in-out infinite, snGlow 1.8s ease-in-out infinite; }
+.snode.clear .sn-orb { background: radial-gradient(circle at 50% 30%, #eaffd0, #6cc65a 55%, #2d7a36 100%); box-shadow: 0 0 0 3px #d6f5a8, 0 0 0 6px #1f4a82, 0 9px 10px -2px rgba(0, 0, 0, .55), inset 0 -6px 8px rgba(10, 70, 20, .45), inset 0 3px 4px rgba(255, 255, 255, .6); }
 .snode.clear .sn-num { color: #fff; font-size: 34px; text-shadow: 0 2px 0 #1d5a26, 0 0 6px rgba(0, 60, 10, .6); }
-.sn-stars { position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); font: normal 13px var(--sans); letter-spacing: 1px; color: #ffd84a; -webkit-text-stroke: .6px #5a3510; text-shadow: 0 1px 0 #3b2314; white-space: nowrap; }
+.sn-stars { position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); font: normal 13px var(--sans); letter-spacing: 1px; color: #ffd84a; -webkit-text-stroke: .6px #5a3510; text-shadow: 0 1px 0 #1f4a82; white-space: nowrap; }
 .snode.clear .sn-label { margin-top: 12px; }
-.snode.locked .sn-orb { background: radial-gradient(circle at 50% 30%, #9a9288, #5f574e 60%, #3d3731); box-shadow: 0 0 0 3px #7d756b, 0 0 0 6px #3b2314, 0 8px 9px -2px rgba(0, 0, 0, .5), inset 0 -5px 7px rgba(0, 0, 0, .4); animation: none; }
+.snode.locked .sn-orb { background: radial-gradient(circle at 50% 30%, #9a9288, #5f574e 60%, #3d3731); box-shadow: 0 0 0 3px #7d756b, 0 0 0 6px #1f4a82, 0 8px 9px -2px rgba(0, 0, 0, .5), inset 0 -5px 7px rgba(0, 0, 0, .4); animation: none; }
 .snode.locked .sn-num { font-size: 24px; opacity: .8; text-shadow: none; }
-.snode .sn-label { margin-top: 8px; padding: 3px 14px 4px; border-radius: 8px; background: linear-gradient(180deg, #fff3d4, #e9c98d); border: 2px solid #3b2314; box-shadow: 0 3px 0 #3b2314, 0 5px 6px rgba(0, 0, 0, .35); color: #4a2a10; text-shadow: none; position: relative; }
+.snode .sn-label { margin-top: 8px; padding: 3px 14px 4px; border-radius: 8px; background: linear-gradient(180deg, #fff3d4, #e9c98d); border: 2px solid #1f4a82; box-shadow: 0 3px 0 #1f4a82, 0 5px 6px rgba(0, 0, 0, .35); color: #4a2a10; text-shadow: none; position: relative; }
 .snode .sn-label small { color: #8a5a22; font-weight: 700; }
 .snode.locked .sn-label { background: linear-gradient(180deg, #cfc6b8, #a79d8d); color: #5b5348; opacity: .85; }
-.snode.boss .sn-orb { width: 96px; height: 96px; background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--zc, #ffb25a) 45%, #fff2d0), color-mix(in srgb, var(--zc, #ffb25a) 70%, #20120a) 80%); box-shadow: 0 0 0 4px #f2cf86, 0 0 0 8px #3b2314, 0 11px 12px -2px rgba(0, 0, 0, .6), inset 0 -8px 10px rgba(0, 0, 0, .35); }
-.snode.boss.clear .sn-orb { box-shadow: 0 0 0 4px #d6f5a8, 0 0 0 8px #3b2314, 0 11px 12px -2px rgba(0, 0, 0, .6), inset 0 -8px 10px rgba(0, 0, 0, .35); }
-.snode.boss.locked .sn-orb { box-shadow: 0 0 0 4px #7d756b, 0 0 0 8px #3b2314, 0 11px 12px -2px rgba(0, 0, 0, .6); background: radial-gradient(circle at 50% 35%, #6d665d, #2b2622 80%); }
-.sn-crown { top: -22px; width: 30px; height: 30px; border: 2px solid #3b2314; font-size: 16px; }
+.snode.boss .sn-orb { width: 96px; height: 96px; background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--zc, #ffb25a) 45%, #fff2d0), color-mix(in srgb, var(--zc, #ffb25a) 70%, #20120a) 80%); box-shadow: 0 0 0 4px #f2cf86, 0 0 0 8px #1f4a82, 0 11px 12px -2px rgba(0, 0, 0, .6), inset 0 -8px 10px rgba(0, 0, 0, .35); }
+.snode.boss.clear .sn-orb { box-shadow: 0 0 0 4px #d6f5a8, 0 0 0 8px #1f4a82, 0 11px 12px -2px rgba(0, 0, 0, .6), inset 0 -8px 10px rgba(0, 0, 0, .35); }
+.snode.boss.locked .sn-orb { box-shadow: 0 0 0 4px #7d756b, 0 0 0 8px #1f4a82, 0 11px 12px -2px rgba(0, 0, 0, .6); background: radial-gradient(circle at 50% 35%, #6d665d, #2b2622 80%); }
+.sn-crown { top: -22px; width: 30px; height: 30px; border: 2px solid #1f4a82; font-size: 16px; }
 @keyframes snBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 @keyframes snGlow { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.12); } }
 @media (prefers-reduced-motion: reduce) { .snode .sn-orb { animation: none !important; } }
@@ -1079,7 +1079,7 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .row.pulls button.pull b { font-size: 13px; }
 /* v0.70 nhận thưởng: chip +N nổi lên */
 #rw-layer { position: absolute; inset: 0; pointer-events: none; z-index: 32; overflow: hidden; }
-.rw-chip { position: absolute; transform: translate(-50%, 0); display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px 5px 8px; border-radius: 20px; font: 800 20px var(--sans); color: #fff6d8; background: linear-gradient(180deg, rgba(60, 36, 20, .95), rgba(30, 17, 9, .95)); border: 2px solid #ffd35e; box-shadow: 0 4px 14px rgba(0, 0, 0, .55), 0 0 16px rgba(255, 210, 100, .55); text-shadow: 0 2px 0 #3b2314; opacity: 0; animation: rwUp 1.9s cubic-bezier(.2, .9, .3, 1) both; white-space: nowrap; }
+.rw-chip { position: absolute; transform: translate(-50%, 0); display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px 5px 8px; border-radius: 20px; font: 800 20px var(--sans); color: #fff6d8; background: linear-gradient(180deg, rgba(20, 56, 1080, .95), rgba(30, 17, 9, .95)); border: 2px solid #ffd35e; box-shadow: 0 4px 14px rgba(0, 0, 0, .55), 0 0 16px rgba(255, 210, 100, .55); text-shadow: 0 2px 0 #1f4a82; opacity: 0; animation: rwUp 1.9s cubic-bezier(.2, .9, .3, 1) both; white-space: nowrap; }
 .rw-chip .ricon { width: 26px; height: 26px; }
 .rw-chip.k-spirit { border-color: #5ee6d0; box-shadow: 0 4px 14px rgba(0, 0, 0, .55), 0 0 16px rgba(94, 230, 208, .6); }
 .rw-chip.k-ticket { border-color: #ffb25a; box-shadow: 0 4px 14px rgba(0, 0, 0, .55), 0 0 16px rgba(255, 178, 90, .6); }
@@ -1101,7 +1101,7 @@ h1 { text-shadow: 0 2px 0 rgba(16, 44, 88, .8), 0 0 16px rgba(255, 138, 114, .55
 button { box-shadow: inset 0 1px 0 rgba(255, 230, 190, .26), inset 0 -2px 0 rgba(16, 44, 88, .35), 0 3px 0 rgba(16, 44, 88, .5), 0 8px 14px rgba(0, 0, 0, .35); }
 button:active { box-shadow: inset 0 1px 0 rgba(255, 230, 190, .2), 0 0 12px rgba(211, 154, 94, .5); }
 /* nút chính: quầng vàng thở nhẹ + vệt sáng quét qua */
-button.primary { position: relative; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255, 255, 230, .75), inset 0 -2px 0 rgba(70, 35, 4, .55), 0 0 18px rgba(240, 185, 74, .35); animation: neonBreath 2.6s ease-in-out infinite; }
+button.primary { position: relative; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255, 255, 230, .75), inset 0 -2px 0 rgba(20, 56, 108, .55), 0 0 18px rgba(240, 185, 74, .35); animation: neonBreath 2.6s ease-in-out infinite; }
 button.primary::after { content: ''; position: absolute; top: 0; bottom: 0; width: 34%; left: -50%; transform: skewX(-20deg); pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent); animation: sheen 3.8s ease-in-out infinite; }
 @keyframes neonBreath { 50% { filter: drop-shadow(0 0 7px rgba(255, 200, 90, .7)) brightness(1.06); } }
 @keyframes sheen { 0%, 55% { left: -50%; } 100% { left: 130%; } }
@@ -1161,7 +1161,7 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .lg-main { position: relative; display: inline-block; white-space: nowrap; font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif; font-weight: 900; text-transform: uppercase; letter-spacing: .03em; line-height: 1.15; font-size: 32px; color: #3a2010;
   /* viền nâu đậm quanh chữ + khối 3D nâu dày 5 lớp + bóng mềm */
   text-shadow: 2px 0 0 #2a1408, -2px 0 0 #2a1408, 0 -2px 0 #2a1408, 1.5px 1.5px 0 #2a1408, -1.5px -1.5px 0 #2a1408, 1.5px -1.5px 0 #2a1408, -1.5px 1.5px 0 #2a1408,
-    0 3px 0 #6a3a12, 0 4px 0 #5a3010, 0 5px 0 #4a260d, 0 6px 0 #3a1e0a, 0 7px 0 #2a1408, 0 12px 12px rgba(16, 44, 88, .55); }
+    0 3px 0 #6a3a12, 0 4px 0 #173a6c, 0 5px 0 #4a260d, 0 6px 0 #3a1e0a, 0 7px 0 #2a1408, 0 12px 12px rgba(16, 44, 88, .55); }
 .lg-main::before, .lg-main::after { content: attr(data-t); position: absolute; inset: 0; pointer-events: none; font: inherit; letter-spacing: inherit; line-height: inherit; white-space: nowrap; color: transparent; text-shadow: none; }
 .lg-main::before { background: linear-gradient(180deg, #fffbe6 0%, #ffe9a0 26%, #ffd05a 48%, #e49a24 58%, #f4c24c 80%, #ffe08a 100%); -webkit-background-clip: text; background-clip: text; }
 .lg-main::after { background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .95) 49%, rgba(255, 255, 255, .8) 52%, transparent 62%) no-repeat; background-size: 260% 100%; background-position: 125% 0; -webkit-background-clip: text; background-clip: text; animation: lgSweep 3.6s ease-in-out infinite; }
@@ -1187,7 +1187,7 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .lg-name .lg-main { line-height: 1.12; letter-spacing: .02em; }
 .lg-main.small { letter-spacing: .08em; }
 .lg-div { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 12px auto 6px; width: 70%; }
-.lg-div i { flex: 1; height: 2px; background: linear-gradient(90deg, transparent, #c58a24 55%, #7a3f12); border-radius: 2px; }
+.lg-div i { flex: 1; height: 2px; background: linear-gradient(90deg, transparent, #c58a24 55%, #b8650f); border-radius: 2px; }
 .lg-div i:last-child { transform: scaleX(-1); }
 .lg-div b { width: 9px; height: 9px; background: linear-gradient(135deg, #fff1c9, #e49a24); transform: rotate(45deg); box-shadow: 0 0 0 1.5px #2a1408, 0 0 8px rgba(255, 215, 120, .7); }
 
@@ -1217,15 +1217,12 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 /* v0.90: màn mở đầu: bỏ tên game; Tòa Tháp là tranh vẽ trong khung vòm vàng, gọn một màn không phải cuộn */
 .ob-story { gap: 12px; padding: 10px 8px 12px; }
 .ob-tower { position: relative; height: clamp(170px, 34vh, 300px); width: auto; aspect-ratio: 760 / 1100; border-radius: 999px 999px 18px 18px; overflow: hidden;
-  background: url(../assets/bg/hub.webp) 52% 0 / 135% auto no-repeat, #fb9b6f; border: 3px solid #f3c64e; outline: 2px solid #5a3010; outline-offset: -1px;
-  box-shadow: 0 0 0 3px #3b2314, 0 0 28px rgba(255, 200, 90, .55), 0 10px 22px rgba(0, 0, 0, .55); }
+  background: url(../assets/bg/hub.webp) 52% 0 / 135% auto no-repeat, #fb9b6f; border: 3px solid #f3c64e; outline: 2px solid #173a6c; outline-offset: -1px;
+  box-shadow: 0 0 0 3px #1f4a82, 0 0 28px rgba(255, 200, 90, .55), 0 10px 22px rgba(0, 0, 0, .55); }
 .ob-glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 12%, rgba(255, 246, 200, .55), transparent 55%), linear-gradient(180deg, transparent 70%, rgba(16, 44, 88, .45)); animation: obEye 3.2s ease-in-out infinite; }
 .ob-lines { gap: 8px; min-height: 0; font-size: 15px; line-height: 1.4; }
 .ob-lines .ob-line { min-height: 2.8em; }
 
-/* ---- Màn chính sáng: chữ chân trang tối trên nền mây, cờ phấp phới */
-@keyframes wave { 0%, 100% { transform: skewY(0) scaleX(1); } 50% { transform: skewY(-8deg) scaleX(.86); } }
-.hub-scene .flag { transform-box: fill-box; transform-origin: left center; animation: wave 1.6s ease-in-out infinite; }
-.hub-foot .credit { opacity: 1; color: #2b5d94; text-shadow: 0 1px 0 rgba(255, 255, 255, .85); }
-.hub-foot .credit b { color: #d2641a; text-shadow: 0 1px 0 rgba(255, 255, 255, .9); }
-.hub-foot .credit { padding: 4px 14px 5px; border-radius: 999px; background: rgba(255, 255, 255, .62); box-shadow: 0 2px 8px rgba(30, 80, 140, .18); }
+/* ---- Màn chính: chữ chân trang đọc được trên mây/đá */
+.hub-foot .credit { opacity: 1; padding: 4px 14px 5px; border-radius: 999px; background: rgba(255, 255, 255, .6); box-shadow: 0 2px 8px rgba(30, 80, 140, .18); color: #2b5d94; text-shadow: 0 1px 0 rgba(255, 255, 255, .85); }
+.hub-foot .credit b { color: #c2570f; }
