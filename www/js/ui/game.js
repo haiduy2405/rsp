@@ -143,21 +143,18 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
           en.hp -= h.amount;
           en.hit = 1;
           const big = h.amount / Math.max(1, en.maxHp) >= 0.3;
-          // khắc hệ: số to + màu nóng + chữ "Khắc!" + vòng sáng; bị kháng: số nhỏ, xám, chữ "Kháng"
+          // khắc hệ: số to hơn + màu nóng + vòng sáng; bị kháng: số nhỏ hơn, xám (không còn chữ, đỡ rối)
           const em = h.amount > 0 ? elementMultiplier(src.el, en.element, ctx.config) : 1;
           const strong = em > 1; const weak = em < 1;
           const lbl = h.amount === 0 && h.absorbed ? t('battle.blocked') : `${strong ? '▲' : weak ? '▼' : ''}${fmt(h.amount)}`;
           floater(lbl, ex + ((n % 3) - 1) * 40, 128 - Math.min(3, n) * 26, strong ? '#ffd84a' : weak ? '#b9b2a8' : LIGHT[src.el] || '#ffd84a', h.amount === 0 ? 24 : Math.round(dmgSize(h.amount, en.maxHp) * (strong ? 1.25 : weak ? 0.8 : 1)), 'dmg', strong ? 1300 : 1100);
           if (strong && n === 0) {
-            floater(t('battle.strong'), ex, 92, '#ff9a3c', 22, 'text', 1000);
             view.rings.push({ x: ex, y: 160, col: src.el, age: 0, life: 520 });
             view.rings.push({ x: ex, y: 160, col: 3, age: 0, life: 380 });
             for (let p = 0; p < 12; p++) { const a = (p / 12) * 6.283; view.particles.push({ x: ex, y: 160, vx: Math.cos(a) * 0.28, vy: Math.sin(a) * 0.28, color: p % 2 ? '#fff0a0' : '#ffb347', age: 0, life: 520 }); }
             view.camShake = Math.max(view.camShake || 0, 5);
             en.hit = 1.4;
             fx.sfx('combo', 1.15);
-          } else if (weak && n === 0) {
-            floater(t('battle.weak'), ex, 92, '#9a948a', 18, 'text', 900);
           }
           if (big) {
             view.rings.push({ x: ex, y: 160, col: src.el, age: 0, life: 420 });

@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.89.4
+- Khắc hệ / bị kháng: bỏ chữ "Khắc!" và "Kháng"; chỉ còn số damage to hơn (x1,25, vàng, vòng sáng) hoặc nhỏ hơn (x0,8, xám) cùng mũi tên ▲▼. Tag lùi: `pre-dmgsize-v0.89.3`.
+
 ## v0.89.3
 - Bỏ khung hoa văn quanh tên game; bỏ hoa văn góc kiểu ảnh ở thẻ tướng (trận + đội hình).
 - Viền thẻ tướng mới: thoi nhỏ ở 4 góc và giữa cạnh + khung góc vát mảnh, nằm gọn trong dải viền, không lấn vào nội dung. Tag lùi: `pre-ornament-v0.89.2`.
