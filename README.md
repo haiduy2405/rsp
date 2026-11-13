@@ -777,3 +777,8 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.106.5
 - Chi tiết tướng trong trận (ấn giữ): hiện đủ mô tả Skill Duo thay vì chỉ tên cặp. Rollback: tag local `pre-duodetail-v0.106.4`.
+
+## v0.107.0
+- AOE (nhóm 5 ngọc): các đòn của cùng một tướng vào nhiều quái bắn CÙNG LÚC (trước đây lần lượt từng con), kèm sóng màu hệ quét ngang hàng quái, tia sáng, rung, âm thanh; quả cầu AOE to hơn. Tướng khác nhau vẫn lệch nhịp.
+- Phần thừa trên/dưới màn trận (điện thoại dài hơn 9:16) dùng nền trận mờ thay vì xanh trơn.
+- Rollback: tags local `pre-aoe-v0.106.5`, `pre-letterbox-v0.107.0`.

@@ -132,13 +132,20 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     let k = 0;
     const stack = {};
     const life = finalKill ? 300 : 260;
+    // AOE: mọi đòn của CÙNG một tướng (đánh nhiều quái) bắn cùng lúc; chỉ các tướng khác nhau mới lệch nhịp.
+    const slot = new Map();
+    const tgt = new Map();
+    for (const h of hits) if (h.kind === 'damage') { if (!slot.has(h.from)) slot.set(h.from, slot.size); tgt.set(h.from, (tgt.get(h.from) || 0) + 1); }
+    const swept = new Set();
     for (const h of hits) {
       if (h.kind === 'damage') {
         const src = memberPos(h.from);
+        const aoe = tgt.get(h.from) > 1;
         const ex = enemyX(h.enemy);
         const n = (stack[h.enemy] = (stack[h.enemy] || 0) + 1) - 1;
-        view.shots.push({ x0: src.x, y0: src.y, x1: ex, y1: 160, col: src.el, delay: k * stagger, life, age: 0, done: false, onHit: () => {
+        view.shots.push({ x0: src.x, y0: src.y, x1: ex, y1: 160, col: src.el, delay: slot.get(h.from) * stagger, life, age: 0, done: false, aoe, onHit: () => {
           fx.sfx('hit');
+          if (aoe && !swept.has(h.from)) { swept.add(h.from); aoeSweep(src.el); }
           view.fxs.push({ kind: 'hit', x: ex, y: 160, col: src.el, tier: h.amount > 0 && elementMultiplier(src.el, view.enemies[h.enemy].element, ctx.config) > 1 ? 2 : h.amount / Math.max(1, view.enemies[h.enemy].maxHp) >= 0.3 ? 1 : 0, ang: Math.random() * 6.283, age: 0, life: 520 });
           const en = view.enemies[h.enemy];
           const before = en.hp;
@@ -180,7 +187,21 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         floater(`+${fmt(h.amount)}`, W / 2, 352, '#7dffa0', 38, 'dmg');
       }
     }
-    return k ? (k - 1) * stagger + life : 0; // thời gian cần chờ
+    return slot.size ? (slot.size - 1) * stagger + life : 0; // thời gian cần chờ
+  }
+  // AOE: một đợt sóng màu hệ quét ngang cả hàng quái + tia sáng, báo hiệu đòn đánh toàn bộ.
+  function aoeSweep(col) {
+    const R = Math.random, P = view.particles;
+    view.rings.push({ x: W / 2, y: 160, col, age: 0, life: 520, r0: 20, r1: 300 });
+    view.rings.push({ x: W / 2, y: 160, col: 3, age: 0, life: 380, r0: 10, r1: 220 });
+    for (let i = 0; i < 26; i++) {
+      const dir = i % 2 ? 1 : -1;
+      P.push({ shape: 'glint', x: W / 2 + (R() - 0.5) * 40, y: 150 + R() * 30, vx: dir * (0.5 + R() * 0.5), vy: (R() - 0.5) * 0.05, g: 0, size: 6 + R() * 7, color: i % 3 ? '#ffffff' : '#fff0a0', age: 0, life: 380 + R() * 220 });
+    }
+    view.whiteFlash = Math.max(view.whiteFlash || 0, 0.25);
+    view.camShake = Math.max(view.camShake || 0, 7);
+    fx.sfx('enhance', 0.9);
+    fx.vibrate?.(18);
   }
   // Quái chết: nổ hạt theo hệ, rung; đòn làm quái cuối chết thì dừng hình ngắn rồi chuyển slow-motion (từ đúng đòn đó).
   function killEnemy(i, finalKill) {

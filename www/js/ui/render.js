@@ -1478,11 +1478,11 @@ function drawShot(g, sh) {
       const f = 1 - j / 17;
       g.globalAlpha = 0.55 * f;
       g.fillStyle = col;
-      g.beginPath(); g.arc(tx, ty, 3 + 13 * f, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.arc(tx, ty, (3 + 13 * f) * (sh.aoe ? 1.25 : 1), 0, Math.PI * 2); g.fill();
     }
     g.globalAlpha = 1;
-    glow(g, x, y, 34, col, 0.9);
-    g.fillStyle = '#fff'; g.beginPath(); g.arc(x, y, 6.5, 0, Math.PI * 2); g.fill();
+    glow(g, x, y, sh.aoe ? 46 : 34, col, 0.9);
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(x, y, sh.aoe ? 8 : 6.5, 0, Math.PI * 2); g.fill();
   });
 }
 // Hiệu ứng nổi: 'hit' (đòn trúng quái), 'claw' (vuốt chém lên đội), 'burst' (nổ tại điểm).

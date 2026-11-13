@@ -1,4 +1,6 @@
 {
+  "cl.0_107.1": "AOE hits strike all enemies at once, with a sweeping shockwave",
+  "cl.0_107.2": "Extra space above/below the battle now shows a blurred battle backdrop",
   "cl.0_106.4": "Fixed a blank screen when entering battle with a Duo pair on the team",
   "cl.0_106.3": "Fixed the screen overflowing after entering the game (fullscreen)",
   "cl.0_106.1": "Release notes now appear together with \"Tap to enter\"",
