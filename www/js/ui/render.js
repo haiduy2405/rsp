@@ -112,13 +112,13 @@ const EMB_FRAC = 0.33 / 0.97;
 // Ngọc "thở" tự nhiên: hít chậm dần-nhanh dần (ease in-out), nghỉ một thoáng, thở ra dài hơn. Mọi viên cùng pha.
 // Trả về -1..1. Chu kỳ 3,4s: hít 38%, nghỉ 6%, thở ra 50%, nghỉ 6%.
 const BREATH_MS = 3400;
-const ease = (k) => k * k * (3 - 2 * k);
+const smooth = (k) => k * k * (3 - 2 * k);
 function breathCurve() {
   const k = (performance.now() % BREATH_MS) / BREATH_MS;
   let v;
-  if (k < 0.38) v = ease(k / 0.38);
+  if (k < 0.38) v = smooth(k / 0.38);
   else if (k < 0.44) v = 1;
-  else if (k < 0.94) v = 1 - ease((k - 0.44) / 0.5);
+  else if (k < 0.94) v = 1 - smooth((k - 0.44) / 0.5);
   else v = 0;
   return v * 2 - 1;
 }
