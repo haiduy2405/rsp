@@ -1277,3 +1277,7 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .loading .ld-top { bottom: auto; top: calc(7% + var(--sat, 0px)); }
 .loading .ld-top { top: calc(3.5% + var(--sat, 0px)); }
 .loading .ld-top .lg { width: min(86%, 330px); margin: 0 auto; }
+/* v0.91.4: tên game uốn theo vòm cầu vồng (SVG textPath) */
+.arc-title text { font-family: Fraunces, 'Cormorant Garamond', Georgia, serif; font-weight: 900; letter-spacing: .04em; }
+.arc-title .arc-tx { fill: url(#arcGold); stroke: #5a3210; stroke-width: 3.2px; paint-order: stroke fill; stroke-linejoin: round; }
+.arc-title .arc-sh { fill: #5a3210; stroke: #5a3210; stroke-width: 3.2px; stroke-linejoin: round; }

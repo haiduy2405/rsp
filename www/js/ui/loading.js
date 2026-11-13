@@ -1,4 +1,3 @@
-import { goldTitle } from './title.js';
 // Màn hình tải: Tòa Tháp sáng dần từng tầng theo tiến độ, mẹo xoay vòng, chạm để vào.
 // Dùng cả để che thời gian tải lẫn dạy luật chơi / giới thiệu thế giới (tips) và mở khóa âm thanh bằng cái chạm đầu tiên.
 const TIP_COUNT = 8;
@@ -25,6 +24,7 @@ export function createLoading({ t, title, subtitle, version = '', auto = false }
   tap.className = 'ld-tap';
   const art = sceneEl('0 0 400 800', 'ld-art'); // cảnh Tòa Tháp động (cùng màn chính), trôi chậm
   el.append(art);
+  arcTitle(art.querySelector('svg'), title, subtitle);
   const rays = document.createElement('div'); // tia sáng xoay chậm sau Tòa Tháp
   rays.className = 'ld-rays';
   el.append(rays);
@@ -36,21 +36,14 @@ export function createLoading({ t, title, subtitle, version = '', auto = false }
   }
   const box = document.createElement('div');
   box.className = 'ld-box';
-  const h1 = document.createElement('h1');
-  h1.textContent = title;
-  // Tên game: chữ vàng gold 3D, có ánh đèn quét ngang (CSS .gold3d)
-  goldTitle(h1, title, subtitle);
   const sub = document.createElement('div');
   sub.className = 'ld-sub';
   sub.textContent = subtitle;
   const track = document.createElement('div');
   track.className = 'ld-track';
   track.append(bar);
-  const top = document.createElement('div');
-  top.className = 'ld-top';
-  top.append(h1);
   box.append(track, pct, tip, tap);
-  el.append(top, box);
+  el.append(box);
   if (version) {
     const ver = document.createElement('div');
     ver.className = 'ld-ver';
@@ -92,4 +85,40 @@ export function createLoading({ t, title, subtitle, version = '', auto = false }
     addEventListener('keydown', go);
   });
   return { el, setProgress, ready };
+}
+
+// Tên game uốn theo vòm cầu vồng (tâm 200,330 trong viewBox cảnh): tên chính chữ vàng viền nâu, tên phụ nhỏ hơn ở vòng ngoài.
+function arcTitle(svg, main, sub) {
+  const NS = 'http://www.w3.org/2000/svg';
+  const mk = (tag, attrs, txt) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (txt) e.textContent = txt; return e; };
+  const defs = mk('defs', {});
+  const grad = mk('linearGradient', { id: 'arcGold', x1: 0, y1: 0, x2: 0, y2: 1 });
+  [['0', '#fff6c0'], ['.5', '#ffd75a'], ['1', '#e8921c']].forEach(([o, c]) => grad.append(mk('stop', { offset: o, 'stop-color': c })));
+  defs.append(grad);
+  const arc = (id, r) => mk('path', { id, d: `M${200 - r} 330A${r} ${r} 0 0 1 ${200 + r} 330`, fill: 'none' });
+  defs.append(arc('arcA', 204), arc('arcB', 244));
+  svg.append(defs);
+  const g = mk('g', { class: 'arc-title' });
+  const rows = [];
+  const line = (id, txt, size, budget) => {
+    const mkText = (cls, extra) => { const t = mk('text', { class: cls, 'font-size': size, 'text-anchor': 'middle', ...extra }); const tp = mk('textPath', { href: `#${id}`, startOffset: '50%' }, txt); t.append(tp); return t; };
+    const shadow = mkText('arc-sh', { dy: 3 });
+    const body = mkText('arc-tx', {});
+    g.append(shadow, body);
+    rows.push({ nodes: [shadow, body], size, budget });
+  };
+  line('arcA', main.toUpperCase(), 36, 335);
+  if (sub) line('arcB', sub.toUpperCase(), 20, 250);
+  svg.append(g);
+  const fit = () => rows.forEach((r) => {
+    r.nodes.forEach((n) => n.setAttribute('font-size', r.size));
+    const w = r.nodes[1].getComputedTextLength?.() || 0;
+    if (!w) return;
+    const k = Math.min(1.5, r.budget / w);
+    r.nodes.forEach((n) => n.setAttribute('font-size', (r.size * k).toFixed(1)));
+  });
+  requestAnimationFrame(fit);
+  document.fonts?.ready.then(fit);
+  document.fonts?.load?.("900 34px Fraunces").then(fit).catch(() => {});
+  setTimeout(fit, 600);
 }

@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.91.4
+- Màn tải: tên game uốn cong theo vòm cầu vồng (SVG textPath, tự co theo độ dài chữ); tên chính ở vòng trong, tên phụ vòng ngoài. Bỏ hàng ngọc 6 hệ ở màn này. Rollback cục bộ: tag `pre-arc-title-v0.91.3`.
+
 ## v0.91.3
 - Màn tải: tên game chuyển lên phía trên vòm cầu vồng, lộ trọn Tháp. Rollback cục bộ: tag `pre-logo-top-v0.91.2`.
 
