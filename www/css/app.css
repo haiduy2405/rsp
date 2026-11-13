@@ -1266,3 +1266,8 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
     linear-gradient(180deg, #2f86d6 0%, #3f97e2 40%, #5aaae8 75%, #7cc0f0 100%);
   background-attachment: local;
 }
+/* v0.91.1: màn tải, cắt cảnh, mở đầu dùng cùng cảnh SVG động với màn chính */
+.loading { background: #7ac8f8; }
+.loading .ld-art.hub-scene { inset: -4%; background: none; }
+.ob-tower.hub-scene, .cut-tower.hub-scene { position: relative; inset: auto; background: #7ac8f8; }
+.cut { background: linear-gradient(180deg, rgba(23, 58, 108, .15), rgba(23, 58, 108, .05) 40%, rgba(23, 58, 108, .85)), linear-gradient(180deg, #3b97e6, #7ac8f8 55%, #bfe8ff); }

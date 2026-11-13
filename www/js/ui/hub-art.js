@@ -109,3 +109,11 @@ ${islet(34, 560, 0.62, 0.95, 0.9)}${islet(372, 552, 0.55, 0.95, 1.6)}
 ${cloud(56, 640, 1.5, '#fff', 0.95, 'cl1')}${cloud(344, 650, 1.6, '#fff', 0.95, 'cl2')}${cloud(200, 700, 2.4, '#fffaf0', 1, 'cl1')}
 ${cloud(20, 740, 2.1, '#fff', 1, 'cl2')}${cloud(380, 748, 2.2, '#fff', 1, 'cl1')}${cloud(200, 790, 3, '#ffe9c4', 1, '')}`;
 }
+
+// Phông cảnh dùng lại ở màn tải, cắt cảnh, mở đầu: cùng bầu trời/Tháp với màn chính, cắt theo viewBox.
+export function sceneEl(vb = '0 0 400 800', cls = 'scene-art') {
+  const d = document.createElement('div');
+  d.className = `${cls} hub-scene`;
+  d.innerHTML = `<svg viewBox="${vb}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${hubSky()}</svg>`;
+  return d;
+}

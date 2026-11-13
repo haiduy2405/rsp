@@ -7,6 +7,7 @@ import { newProgress } from '../core/progress.js';
 import { redeemGift } from '../core/giftcode.js';
 import * as offline from '../ui/offline.js';
 import { flagPicker } from './flags.js';
+import { sceneEl } from './hub-art.js';
 
 export function install(app) {
   const { audio, ctx, dicts, music, save, screen, setLang, showHub, storage, t } = app;
@@ -202,7 +203,7 @@ export function install(app) {
     const o = ctx.config.onboarding;
     if (step === 1) {
       const lines = ['ob.alarm1', 'ob.alarm2', 'ob.alarm3'].map((k) => h('p', { class: 'ob-line' }, t(k)));
-      const tower = h('div', { class: 'ob-tower' });
+      const tower = sceneEl('27 120 345 500', 'ob-tower');
       tower.append(h('i', { class: 'ob-glow' }));
       music('title');
       screen(

@@ -2,6 +2,7 @@
 import { $, h, btn } from './dom.js';
 import { itemIcon } from './icons.js';
 import { starterSummon } from '../core/summon.js';
+import { sceneEl } from './hub-art.js';
 
 export function install(app) {
   const { audio, ctx, portrait, save, screen, t } = app;
@@ -12,7 +13,7 @@ export function install(app) {
     $('cut')?.remove();
     const lines = ['pro.1', 'pro.2', 'pro.3'].map((k) => t(k));
     const text = h('p', { class: 'cut-line' });
-    const tower = h('div', { class: 'cut-tower' });
+    const tower = sceneEl('27 120 345 500', 'cut-tower');
     tower.append(h('i', { class: 'ob-glow' }));
     const root = h('div', { id: 'cut', class: 'cut' }, h('div', { class: 'cut-rays' }), h('div', { class: 'cut-glow' }), tower, text, h('div', { class: 'cut-tap' }, t('pro.tap')));
     $('wrap').appendChild(root);
@@ -48,7 +49,7 @@ export function install(app) {
     const name = app.progress.player.name;
     const lines = ['tut.done.1', 'tut.done.2', 'tut.done.3'].map((k) => t(k, { name }));
     const text = h('p', { class: 'cut-line' });
-    const tower = h('div', { class: 'cut-tower' });
+    const tower = sceneEl('27 120 345 500', 'cut-tower');
     tower.append(h('i', { class: 'ob-glow' }));
     const root = h('div', { id: 'cut', class: 'cut' }, h('div', { class: 'cut-rays' }), h('div', { class: 'cut-glow' }), tower, text, h('div', { class: 'cut-tap' }, t('pro.tap')));
     $('wrap').appendChild(root);

@@ -12,6 +12,8 @@ function enterFullscreen() {
 }
 
 // Trả { el, setProgress(0..1), ready(): Promise } — ready() hiện lời nhắc "chạm để vào" và resolve khi người chơi chạm.
+import { sceneEl } from './hub-art.js';
+
 export function createLoading({ t, title, subtitle, version = '', auto = false }) {
   const el = document.createElement('div');
   el.className = 'loading';
@@ -21,8 +23,7 @@ export function createLoading({ t, title, subtitle, version = '', auto = false }
   tip.className = 'ld-tip';
   const tap = document.createElement('p');
   tap.className = 'ld-tap';
-  const art = document.createElement('div'); // tranh Tòa Tháp toàn màn, trôi chậm
-  art.className = 'ld-art';
+  const art = sceneEl('0 0 400 800', 'ld-art'); // cảnh Tòa Tháp động (cùng màn chính), trôi chậm
   el.append(art);
   const rays = document.createElement('div'); // tia sáng xoay chậm sau Tòa Tháp
   rays.className = 'ld-rays';
