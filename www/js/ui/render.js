@@ -782,27 +782,7 @@ export function draw(g, view, t) {
   });
 
   g.globalAlpha = 1;
-  for (const sh of view.shots || []) {
-    const k = (sh.age - sh.delay) / sh.life;
-    if (k < 0) continue;
-    const x = sh.x0 + (sh.x1 - sh.x0) * k;
-    const y = sh.y0 + (sh.y1 - sh.y0) * k - Math.sin(k * Math.PI) * 40;
-    for (let j = 3; j >= 0; j--) {
-      const kk = Math.max(0, k - j * 0.05);
-      const tx = sh.x0 + (sh.x1 - sh.x0) * kk;
-      const ty = sh.y0 + (sh.y1 - sh.y0) * kk - Math.sin(kk * Math.PI) * 40;
-      g.globalAlpha = 0.18 * (4 - j);
-      g.fillStyle = COLORS[sh.col];
-      g.beginPath();
-      g.arc(tx, ty, 14 - j * 2, 0, Math.PI * 2);
-      g.fill();
-    }
-    g.globalAlpha = 1;
-    g.fillStyle = '#ffffff';
-    g.beginPath();
-    g.arc(x, y, 7, 0, Math.PI * 2);
-    g.fill();
-  }
+  for (const sh of view.shots || []) drawShot(g, sh);
   g.globalAlpha = 1;
   // HUD
   hud(g, view);
@@ -1217,6 +1197,7 @@ export function draw(g, view, t) {
     g.arc(r.x, r.y, (r.r0 ?? 20) + easeOut(k) * ((r.r1 ?? 140) - (r.r0 ?? 20)), 0, Math.PI * 2);
     g.stroke();
   }
+  for (const f of view.fxs || []) drawFx(g, f);
   // Ngọc đang nổ: phình to + mờ dần, lóe sáng trắng-màu (cộng sáng), rồi mảnh vỡ/tia (particles) bay ra
   for (const b of view.blasts || []) {
     const a = b.age - b.delay;
@@ -1384,5 +1365,122 @@ function drawIntro(g, view) {
     g.scale(0.6 + 0.5 * pop, 0.6 + 0.5 * pop);
     outlined(g, it.go, 0, 0, 62, '#ffffff', '#ffd24a', SERIF, 8, '700');
     g.restore();
+  }
+}
+
+
+// ---- Hiệu ứng đòn đánh (v0.93) ----
+const LIGHTER = (g, fn) => { g.save(); g.globalCompositeOperation = 'lighter'; fn(); g.restore(); };
+const glow = (g, x, y, r, col, a) => {
+  const gr = g.createRadialGradient(x, y, 0, x, y, r);
+  gr.addColorStop(0, `rgba(255,255,255,${a})`);
+  gr.addColorStop(0.3, hexA(col, a * 0.85));
+  gr.addColorStop(1, hexA(col, 0));
+  g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+};
+function hexA(hex, a) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`;
+}
+const bez = (sh, k) => { // đường bay cong: nhấc lên giữa đường, lệch ngang theo hash của đòn
+  const sway = ((sh.x0 * 7 + sh.y1) % 3 - 1) * 28;
+  const x = sh.x0 + (sh.x1 - sh.x0) * k + Math.sin(k * Math.PI) * sway;
+  const y = sh.y0 + (sh.y1 - sh.y0) * k - Math.sin(k * Math.PI) * 70;
+  return [x, y];
+};
+// Đạn: sao chổi hệ màu (lõi trắng, vệt sáng thon dần, tia lửa rơi) bay theo đường cong.
+function drawShot(g, sh) {
+  const k = (sh.age - sh.delay) / sh.life;
+  if (k < 0) return;
+  const col = COLORS[sh.col];
+  const [x, y] = bez(sh, Math.min(1, k));
+  LIGHTER(g, () => {
+    for (let j = 16; j >= 1; j--) {
+      const kk = Math.max(0, k - j * 0.028);
+      const [tx, ty] = bez(sh, kk);
+      const f = 1 - j / 17;
+      g.globalAlpha = 0.55 * f;
+      g.fillStyle = col;
+      g.beginPath(); g.arc(tx, ty, 3 + 13 * f, 0, Math.PI * 2); g.fill();
+    }
+    g.globalAlpha = 1;
+    glow(g, x, y, 34, col, 0.9);
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(x, y, 6.5, 0, Math.PI * 2); g.fill();
+  });
+}
+// Hiệu ứng nổi: 'hit' (đòn trúng quái), 'claw' (vuốt chém lên đội), 'burst' (nổ tại điểm).
+function drawFx(g, f) {
+  const k = Math.min(1, f.age / f.life);
+  const col = COLORS[f.col] ?? '#ffffff';
+  if (f.kind === 'hit') {
+    const e = easeOut(k);
+    LIGHTER(g, () => {
+      g.globalAlpha = Math.pow(1 - k, 1.4);
+      glow(g, f.x, f.y, 30 + 60 * e * (1 + f.tier * 0.3), col, 0.8);
+      // tia nhọn tỏa ra, thon dần
+      const n = 9 + f.tier * 4;
+      for (let i = 0; i < n; i++) {
+        const a = f.ang + (i / n) * Math.PI * 2 + (i % 2 ? 0.08 : -0.08);
+        const len = (22 + (i % 3) * 18 + f.tier * 14) * (0.4 + e) * (i % 2 ? 1 : 1.35);
+        const r0 = 8 + 18 * e, w = 5 * (1 - k) + 1;
+        g.fillStyle = i % 3 ? col : '#ffffff';
+        g.beginPath();
+        g.moveTo(f.x + Math.cos(a) * r0 - Math.sin(a) * w, f.y + Math.sin(a) * r0 + Math.cos(a) * w);
+        g.lineTo(f.x + Math.cos(a) * (r0 + len), f.y + Math.sin(a) * (r0 + len));
+        g.lineTo(f.x + Math.cos(a) * r0 + Math.sin(a) * w, f.y + Math.sin(a) * r0 - Math.cos(a) * w);
+        g.closePath(); g.fill();
+      }
+      // vòng sốc mỏng
+      g.globalAlpha = (1 - k) * 0.8;
+      g.strokeStyle = '#fff'; g.lineWidth = 3 * (1 - k) + 0.5;
+      g.beginPath(); g.arc(f.x, f.y, 14 + 78 * e, 0, Math.PI * 2); g.stroke();
+    });
+    // vết chém chéo (lưỡi liềm trắng-màu) lướt qua rồi tắt nhanh
+    if (k < 0.55) {
+      const sk = k / 0.55, sw = easeOut(Math.min(1, sk * 1.6));
+      g.save(); g.translate(f.x, f.y); g.rotate(f.ang * 0.3 - 0.6);
+      for (const [off, c, wd] of [[0, '#ffffff', 5], [5, col, 11]]) {
+        g.globalAlpha = (1 - sk) * (off ? 0.7 : 1);
+        g.strokeStyle = c; g.lineCap = 'round'; g.lineWidth = wd * (1 - sk * 0.6);
+        g.beginPath(); g.moveTo(-70 * sw, -52 * sw + off); g.quadraticCurveTo(0, -8 + off, 70 * sw, 52 * sw + off); g.stroke();
+      }
+      g.restore();
+    }
+    // dấu riêng từng hệ
+    if (f.col === 3 || f.tier > 1) LIGHTER(g, () => { // ánh sáng: sao 4 cánh; đòn khắc hệ cũng có
+      g.globalAlpha = (1 - k) * 0.9; g.fillStyle = '#fffbe0';
+      const L = 70 * e + 10, W2 = 6 * (1 - k);
+      g.beginPath(); g.moveTo(f.x, f.y - L); g.lineTo(f.x + W2, f.y); g.lineTo(f.x, f.y + L); g.lineTo(f.x - W2, f.y); g.closePath(); g.fill();
+      g.beginPath(); g.moveTo(f.x - L, f.y); g.lineTo(f.x, f.y + W2); g.lineTo(f.x + L, f.y); g.lineTo(f.x, f.y - W2); g.closePath(); g.fill();
+    });
+    if (f.col === 4) { // bóng tối: xoáy tím thu vào rồi nổ
+      g.globalAlpha = (1 - k) * 0.55; g.fillStyle = '#2a1050';
+      g.beginPath(); g.arc(f.x, f.y, 34 * (1 - Math.abs(k - 0.35) * 1.2) + 6, 0, Math.PI * 2); g.fill();
+    }
+  } else if (f.kind === 'claw') {
+    // 3 vết vuốt chéo quét qua hàng tướng, trễ nhịp nhau
+    for (let i = 0; i < 3; i++) {
+      const t0 = i * 0.14, kk = Math.max(0, Math.min(1, (k - t0) / 0.5));
+      if (kk <= 0 || kk >= 1) continue;
+      const sw = easeOut(Math.min(1, kk * 1.8));
+      const x0 = f.x - 130 + i * 78, y0 = f.y - 70, x1 = x0 + 70 * sw, y1 = y0 + 150 * sw;
+      g.save(); g.lineCap = 'round'; g.globalCompositeOperation = 'lighter';
+      g.globalAlpha = (1 - kk);
+      g.strokeStyle = col; g.lineWidth = 16 * (1 - kk * 0.7); g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+      g.strokeStyle = '#ffffff'; g.lineWidth = 6 * (1 - kk * 0.7); g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+      g.restore();
+    }
+    LIGHTER(g, () => { g.globalAlpha = Math.pow(1 - k, 2); glow(g, f.x, f.y + 10, 150 * easeOut(Math.min(1, k * 2.4)) + 20, '#ff3b30', 0.75); });
+  } else if (f.kind === 'bolt') {
+    // đạn của quái bay xuống đội: sao chổi màu hệ lao thẳng
+    const x = f.x0 + (f.x1 - f.x0) * easeOut(k), y = f.y0 + (f.y1 - f.y0) * easeOut(k);
+    LIGHTER(g, () => {
+      for (let j = 12; j >= 1; j--) {
+        const kk = Math.max(0, k - j * 0.035), tx = f.x0 + (f.x1 - f.x0) * easeOut(kk), ty = f.y0 + (f.y1 - f.y0) * easeOut(kk), q = 1 - j / 13;
+        g.globalAlpha = 0.5 * q; g.fillStyle = col; g.beginPath(); g.arc(tx, ty, 3 + 14 * q, 0, Math.PI * 2); g.fill();
+      }
+      g.globalAlpha = 1; glow(g, x, y, 40, col, 0.9);
+      g.fillStyle = '#fff'; g.beginPath(); g.arc(x, y, 7, 0, Math.PI * 2); g.fill();
+    });
   }
 }

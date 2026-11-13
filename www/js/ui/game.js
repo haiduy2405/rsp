@@ -59,6 +59,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     particles: [],
     hint: null,
     shots: [],
+    fxs: [],
     rings: [],
     blasts: [], // ngọc đang nổ: bóng ngọc phình + lóe sáng
     tint: null, // lóe màu hệ phủ cả màn khi tung kỹ năng
@@ -138,6 +139,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         const n = (stack[h.enemy] = (stack[h.enemy] || 0) + 1) - 1;
         view.shots.push({ x0: src.x, y0: src.y, x1: ex, y1: 160, col: src.el, delay: k * stagger, life, age: 0, done: false, onHit: () => {
           fx.sfx('hit');
+          view.fxs.push({ kind: 'hit', x: ex, y: 160, col: src.el, tier: h.amount > 0 && elementMultiplier(src.el, view.enemies[h.enemy].element, ctx.config) > 1 ? 2 : h.amount / Math.max(1, view.enemies[h.enemy].maxHp) >= 0.3 ? 1 : 0, ang: Math.random() * 6.283, age: 0, life: 520 });
           const en = view.enemies[h.enemy];
           const before = en.hp;
           en.hp -= h.amount;
@@ -457,6 +459,11 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       } else if (e.type === 'enemyAttack') {
         view.shake = { enemy: e.enemy };
         view.lunge = { enemy: e.enemy, age: 0 }; // quái lao về phía đội khi tấn công
+        if (e.amount > 0) {
+          const ex0 = enemyX(e.enemy), ecol = view.enemies[e.enemy]?.element ?? 1;
+          view.fxs.push({ kind: 'bolt', x0: ex0, y0: 200, x1: W / 2, y1: 420, col: ecol, age: 0, life: 260 });
+          sleep(240).then(() => { view.fxs.push({ kind: 'claw', x: W / 2, y: 410, col: ecol, age: 0, life: 620 }); view.fxs.push({ kind: 'hit', x: W / 2, y: 420, col: ecol, tier: 1, ang: Math.random() * 6.283, age: 0, life: 520 }); view.camShake = Math.max(view.camShake || 0, 10); });
+        }
         if (e.amount > 0) {
           view.hurt = 1;
           fx.sfx('hurt');
@@ -827,6 +834,8 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.blasts = view.blasts.filter((b) => b.age < b.delay + b.life);
     if (view.blastFlash && (view.blastFlash.age += dt) > view.blastFlash.life) view.blastFlash = null;
     for (const r of view.rings) r.age += dt;
+    for (const f of view.fxs) f.age += dt;
+    view.fxs = view.fxs.filter((f) => f.age < f.life);
     view.rings = view.rings.filter((r) => r.age < r.life);
     for (const sh of view.shots) {
       sh.age += dt;
