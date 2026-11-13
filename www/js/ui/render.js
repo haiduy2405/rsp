@@ -316,32 +316,14 @@ function renaissanceFrame(g, x, y, w, h, strong) {
     g.beginPath(); g.arc(px, y + 1.5, 1, 0, 6.283); g.fill();
     g.beginPath(); g.arc(px, y + h - 1.5, 1, 0, 6.283); g.fill();
   }
-  // volute 4 góc
-  const volute = (cx, cy, sx, sy) => {
-    g.save();
-    g.translate(cx, cy); g.scale(sx, sy);
-    g.strokeStyle = dk; g.lineWidth = 3.2; g.lineCap = 'round';
-    for (let pass = 0; pass < 2; pass++) {
-      g.beginPath();
-      // xoắn ốc: từ cạnh ra ngoài rồi cuộn vào
-      let a = 0, r = 7.5;
-      g.moveTo(14, 2);
-      g.quadraticCurveTo(7, 0.5, 4, 4);
-      for (let k = 0; k <= 22; k++) { a = 0.5 + k * 0.3; r = 6 - k * 0.22; g.lineTo(5 + Math.cos(a + 3.3) * r, 5 + Math.sin(a + 3.3) * r); }
-      g.stroke();
-      g.strokeStyle = pass ? gold : dk; g.lineWidth = pass ? 1.5 : 3.2;
-      if (!pass) { g.strokeStyle = dk; }
-      if (pass === 0) { g.strokeStyle = gold; g.lineWidth = 1.6; }
+  // hoa văn góc cổ điển (ảnh ui:corner), lấn nhẹ ra ngoài viền
+  const cim = getImg('ui:corner');
+  if (cim) {
+    const cs = strong ? 30 : 26;
+    for (const [cx, cy, sx, sy] of [[x - 3, y - 3, 1, 1], [x + w + 3, y - 3, -1, 1], [x - 3, y + h + 3, 1, -1], [x + w + 3, y + h + 3, -1, -1]]) {
+      g.save(); g.translate(cx, cy); g.scale(sx, sy); g.drawImage(cim, 0, 0, cs, cs); g.restore();
     }
-    // chấm tâm + lá acanthus dọc cạnh
-    g.fillStyle = hi; g.beginPath(); g.arc(5.5, 5, 1.3, 0, 6.283); g.fill();
-    g.fillStyle = gold; g.strokeStyle = dk; g.lineWidth = 0.8;
-    g.beginPath(); g.moveTo(14, 2.5); g.quadraticCurveTo(19, -1, 24, 2.5); g.quadraticCurveTo(19, 5.5, 14, 2.5); g.fill(); g.stroke();
-    g.beginPath(); g.moveTo(2.5, 14); g.quadraticCurveTo(-1, 19, 2.5, 24); g.quadraticCurveTo(5.5, 19, 2.5, 14); g.fill(); g.stroke();
-    g.restore();
-  };
-  const k = strong ? 1.1 : 1;
-  volute(x - 1, y - 1, k, k); volute(x + w + 1, y - 1, -k, k); volute(x - 1, y + h + 1, k, -k); volute(x + w + 1, y + h + 1, -k, -k);
+  }
   // vỏ sò giữa cạnh trên
   const mx = x + w / 2;
   g.fillStyle = gold; g.strokeStyle = dk; g.lineWidth = 0.9;
