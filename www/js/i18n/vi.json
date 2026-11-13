@@ -1088,5 +1088,7 @@
   "help.tips.3": "Chạm khóa quái ít máu nhất trước để giảm số đòn bạn phải chịu.",
   "summon.ritual": "Chạm vào pháp trận để triệu hồi!",
   "summon.ritual10": "Chạm vào pháp trận để triệu hồi {n} lần!",
-  "summon.skip": "Bỏ qua"
+  "summon.skip": "Bỏ qua",
+  "battle.strong": "Khắc hệ!",
+  "battle.weak": "Bị kháng"
 }

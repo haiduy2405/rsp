@@ -1088,5 +1088,7 @@
   "help.tips.3": "Lock the weakest enemy first to take fewer hits.",
   "summon.ritual": "Touch the circle to summon!",
   "summon.ritual10": "Touch the circle to summon {n} times!",
-  "summon.skip": "Skip"
+  "summon.skip": "Skip",
+  "battle.strong": "Super effective!",
+  "battle.weak": "Resisted"
 }
