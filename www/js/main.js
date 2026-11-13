@@ -1011,12 +1011,6 @@ function showRules() {
 
 function showDoors() {
   saveActiveRun();
-  const rc = ctx.config.run.items;
-  const desc = {
-    potion: t('item.desc.potion', { n: Math.round(rc.potion.healPct * 100) }),
-    shield: t('item.desc.shield', { n: Math.round(rc.shield.pct * 100) }),
-    time: t('item.desc.time', { n: rc.time.bonusMs / 1000 }),
-  };
   const items = h('div', { class: 'itembar' }, ['potion', 'shield', 'time'].map((it) => {
     const off = run.items[it] <= 0 || (it === 'potion' && run.hp >= run.maxHp) || run.armed[it];
     const b = h('button', { class: 'itm' + (run.armed[it] ? ' armed' : ''), 'data-item': it, title: t(`item.${it}`), 'aria-label': `${t(`item.${it}`)} ×${run.items[it]}`, onclick: () => act({ type: 'useItem', item: it }), ...(off ? { disabled: '' } : {}) });
@@ -1025,13 +1019,8 @@ function showDoors() {
     if (run.armed[it]) b.append(h('small', {}, t('run.armed')));
     return b;
   }));
-  // Bảng thông tin (ẩn mặc định): quái từng cửa + mô tả vật phẩm
-  const itemInfo = h('div', { class: 'iteminfo' }, ['potion', 'shield', 'time'].map((it) => {
-    const ic = h('span', { class: 'ii-ico', 'data-item': it });
-    ic.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ITEM_ICON[it]}</svg>`;
-    return h('div', { class: 'ii' }, ic, h('div', {}, h('b', {}, `${t(`item.${it}`)} ×${run.items[it]}`), h('small', {}, desc[it])));
-  }));
-  const infoPanel = h('div', { class: 'infopanel' }, h('div', { class: 'ip-in' }, doorList(), itemInfo));
+  // Bảng thông tin (ẩn mặc định): quái từng cửa
+  const infoPanel = h('div', { class: 'infopanel' }, h('div', { class: 'ip-in' }, doorList()));
   const infoBtn = h('button', { class: 'infobtn', id: 'door-info', 'aria-label': t('run.info'), 'aria-expanded': 'false', onclick: () => { const on = infoPanel.classList.toggle('open'); infoBtn.setAttribute('aria-expanded', String(on)); infoBtn.classList.toggle('on', on); audio.sfx('tick'); setTimeout(focusMap, 380); } }, 'i');
   const map = h('div', { class: 'runmap' + (DEBUG ? ' static' : '') });
   map.innerHTML = runMapSVG();

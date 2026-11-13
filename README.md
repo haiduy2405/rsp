@@ -552,6 +552,10 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.96.4
+
+- Màn chọn cửa: bỏ phần liệt kê mô tả 3 vật phẩm trong bảng thông tin (nút ×N vẫn dùng được). Tag rollback cục bộ: `pre-door-noitems-v0.96.3`.
+
 ## v0.96.3
 - Bảng xác nhận kỹ năng thu nhỏ thêm (rộng tối đa 270px, ảnh/chữ/nút gọn hơn). Rollback cục bộ: tag `pre-sk-small-v0.96.2`. Debug: `window.__showSkillAsk(idx, fn)` để xem bảng.
 
