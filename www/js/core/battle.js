@@ -265,6 +265,9 @@ function enemyAttack(ctx, s, rng, i, events) {
   }
   for (const u of ctx.monsters[e.id].onAttack || []) {
     if (s.hp <= 0) break;
+    // Debuff của quái trúng theo xác suất (theo loại quái trong config.monsterPassive.chance, hoặc u.chance riêng); trượt thì không áp.
+    const chance = u.chance ?? ctx.config.monsterPassive.chance[ctx.monsters[e.id].kind || 'normal'] ?? 1;
+    if (chance < 1 && rng.next() >= chance) { events.push({ type: 'effect', target: 'team', key: u.key, applied: false, missed: true }); continue; }
     // Hiệu ứng do quái áp trong pha quái tính từ lượt sau (+1).
     const res = applyToTeam(s, rng, u, 1);
     events.push({ type: 'effect', target: 'team', key: u.key, applied: res.applied });

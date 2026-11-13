@@ -16,7 +16,9 @@ const ctx = {
   monsters: {
     ...base.monsters,
     t_dummy: { id: 't_dummy', element: 4, hp: 100000, atk: 100, attackEvery: 1 },
-    t_locker: { id: 't_locker', element: 4, hp: 100000, atk: 100, attackEvery: 1, onAttack: [{ key: 'lock', turns: 2, value: 3 }, { key: 'burn', turns: 2, value: 0.05 }] },
+    t_miss: { id: 't_miss', element: 4, hp: 100000, atk: 100, attackEvery: 1, onAttack: [{ key: 'burn', turns: 2, value: 0.05, chance: 0 }] },
+    t_half: { id: 't_half', element: 4, hp: 100000, atk: 100, attackEvery: 1, onAttack: [{ key: 'burn', turns: 1, value: 0.01 }] },
+    t_locker: { id: 't_locker', element: 4, hp: 100000, atk: 100, attackEvery: 1, onAttack: [{ key: 'lock', turns: 2, value: 3, chance: 1 }, { key: 'burn', turns: 2, value: 0.05, chance: 1 }] },
   },
 };
 // Bàn cố định không có nhóm nào sau khi hoán đổi ô 0 và 1.
@@ -251,4 +253,27 @@ test('trận: Tăng công của đội tăng sát thương ngọc', () => {
   const plain = run({});
   const buffed = run({ startEffects: [{ key: 'atkUp', turns: 9, value: 1 }] });
   assert.ok(buffed >= plain * 1.9, `${buffed} vs ${plain}`);
+});
+
+test('trận: debuff quái trúng theo xác suất — chance 0 luôn trượt, mặc định theo loại quái (creep 50%) lúc trúng lúc trượt, xác định theo seed', () => {
+  let s = mk(['t_miss']);
+  s.hp = s.maxHp = 1e6; s.team.maxHp = 1e6;
+  const r = step(ctx, s, mv);
+  assert.ok(!hasEffect(r.state.team, 'burn'));
+  assert.ok(r.events.some((e) => e.type === 'effect' && e.missed));
+  const run = () => {
+    let st = mk(['t_half']);
+    st.hp = st.maxHp = 1e6; st.team.maxHp = 1e6;
+    const out = [];
+    for (let i = 0; i < 30; i++) {
+      st.board = structuredClone(flat);
+      const q = step(ctx, st, mv);
+      st = q.state;
+      out.push(...q.events.filter((e) => e.type === 'effect').map((e) => !!e.applied));
+    }
+    return out;
+  };
+  const a = run();
+  assert.ok(a.includes(true) && a.includes(false));
+  assert.deepEqual(run(), a);
 });

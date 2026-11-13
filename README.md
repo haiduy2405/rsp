@@ -552,6 +552,12 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.100.0
+
+- Debuff của quái giờ có tỉ lệ trúng: creep 50%, elite 65%, boss 80% (`config.monsterPassive.chance`, mỗi hiệu ứng có thể ghi `chance` riêng trong `monsters.json`). Trượt thì hiện "Né ...!" trên màn, bảng chi tiết quái ghi rõ tỉ lệ. Xác suất qua `core/rng.js`, xác định theo seed; thêm test.
+- Buff tự áp của quái: để mốc sau.
+- Tag rollback cục bộ: `pre-chance-v0.99.3`.
+
 ## v0.99.3
 
 - Đổi chữ "ván lưu" thành "sao lưu" (màn chọn và nút Đổi sao lưu).

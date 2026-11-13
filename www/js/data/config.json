@@ -602,6 +602,9 @@
       "three": 9
     }
   },
+  "monsterPassive": {
+    "chance": { "normal": 0.5, "elite": 0.65, "boss": 0.8 }
+  },
   "tutorial": {
     "seed": 20260101,
     "team": [

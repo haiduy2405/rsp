@@ -524,6 +524,8 @@
   "info.passiveNote": "Áp lên đội mỗi khi quái này đánh.",
   "info.passiveTurns": "{n} lượt",
   "info.cells": "{n} ô",
+  "info.chance": "tỉ lệ {n}%",
+  "battle.debuffMiss": "Né {name}!",
   "info.effects": "Trạng thái hiện tại",
   "info.skillReady": "Kỹ năng sẵn sàng",
   "info.skillWait": "Kỹ năng còn {n} lượt hồi",

@@ -408,3 +408,4 @@ Các rủi ro cần theo dõi:
 - Không có thể lực ở v1.
 - Máu đội giữ qua các tầng (đã chốt).
 - Giá 3 gói ủng hộ: 50.000đ, 200.000đ, 500.000đ (đã chốt); quà cụ thể cân bằng ở M5 đến M6.
+- Nội tại quái (onAttack): debuff áp lên đội mỗi lần quái đánh, trúng theo xác suất theo loại quái (creep 50%, elite 65%, boss 80%, trong config.monsterPassive.chance; từng hiệu ứng có thể đặt `chance` riêng). Độ mạnh/số lượt tăng dần creep < elite < boss. Buff tự áp của quái để mốc sau (đã chốt với Duy).

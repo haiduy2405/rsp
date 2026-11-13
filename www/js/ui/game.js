@@ -485,6 +485,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         view.shake = null;
       } else if (e.type === 'effect') {
         if (e.applied) fx.sfx('debuff');
+        else if (e.missed) { floater(t('battle.debuffMiss', { name: t(`effect.${e.key}.name`) }), W / 2, 318, '#9ad0ff', 20); await sleep(300); }
       } else if (e.type === 'reflect') {
         fx.sfx('reflect');
         if (e.to === 'enemy') {

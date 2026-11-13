@@ -524,6 +524,8 @@
   "info.passiveNote": "Applied to your team each time this monster attacks.",
   "info.passiveTurns": "{n} turns",
   "info.cells": "{n} cells",
+  "info.chance": "{n}% chance",
+  "battle.debuffMiss": "{name} missed!",
   "info.effects": "Current status",
   "info.skillReady": "Skill ready",
   "info.skillWait": "Skill ready in {n} turns",
