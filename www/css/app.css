@@ -1443,3 +1443,22 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 
 /* v0.97.1 lớp tối tutorial không chặn chạm: bấm đúng chỉ dẫn là đi tiếp, không cần bấm ▶ */
 #coach-dim.on { pointer-events: none; }
+
+/* v0.99.0 Túi đồ trong chuyến + hàng nút cuối bản đồ */
+.mapfoot { display: flex; align-items: center; gap: 12px; width: 100%; }
+.bagbtn { position: relative; flex: none; width: 58px; height: 58px; min-height: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; color: #fff0b0; border: 2.5px solid #f5cf6a; background: radial-gradient(circle at 35% 28%, #7a6bff, #2a2f8f 70%); box-shadow: 0 4px 12px rgba(6, 14, 50, .55), inset 0 2px 0 rgba(255, 255, 255, .4), 0 0 16px rgba(255, 206, 100, .35); transition: transform .15s; }
+.bagbtn svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .5)); }
+.bagbtn b { position: absolute; right: -4px; top: -4px; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 11px; display: grid; place-items: center; font: 800 12px/1 system-ui, sans-serif; color: #fff; background: #e8475b; border: 2px solid #fff3d0; }
+.bagbtn:active, .leavebtn:active { transform: scale(.95); }
+.mapfoot button#leave-run { flex: 1; min-width: 0; width: auto; align-self: stretch; min-height: 58px; padding: 0 16px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; font-weight: 800; color: #3a2208; border: 2.5px solid #fff0b0; border-radius: 29px; background: linear-gradient(180deg, #ffe58a, #f1b93a 55%, #d99a22); box-shadow: 0 5px 14px rgba(6, 14, 50, .6), inset 0 2px 0 rgba(255, 255, 255, .65), inset 0 -3px 0 rgba(150, 90, 10, .35); text-shadow: 0 1px 0 rgba(255, 255, 255, .5); }
+.leavebtn svg { width: 24px; height: 24px; flex: none; fill: none; stroke: #3a2208; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.bagbox { max-width: 380px; }
+.bag-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+.bag-cell { position: relative; aspect-ratio: 1; min-height: 0; padding: 0; display: grid; place-items: center; border-radius: 12px; border: 2px solid color-mix(in srgb, var(--ic) 70%, #fff 15%); background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--ic) 45%, #28508c), #12275c 80%); animation: shopPop .35s cubic-bezier(.2, 1.3, .4, 1) both; animation-delay: calc(var(--i) * 50ms); }
+.bag-cell svg { width: 58%; height: 58%; fill: none; stroke: var(--ic); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 6px var(--ic)); }
+.bag-cell .bag-n { position: absolute; right: 5px; bottom: 3px; font: 800 13px/1 Oswald, system-ui, sans-serif; font-style: normal; color: #fff; text-shadow: 0 1px 3px #000; }
+.bag-cell .bag-on { position: absolute; left: 0; top: 0; width: 20px; height: 20px; display: grid; place-items: center; font: 900 12px/1 system-ui; font-style: normal; color: #123; background: #7dffa0; border-bottom-right-radius: 10px; }
+.bag-cell.sel { transform: translateY(-2px) scale(1.05); box-shadow: 0 0 0 2px #ffd24a, 0 0 16px rgba(255, 210, 90, .65); }
+.bag-detail { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; text-align: left; border-radius: 12px; border: 1.5px solid color-mix(in srgb, var(--ic) 60%, transparent); background: rgba(14, 34, 80, .6); }
+.bag-detail .card { margin: 0; }
+.bag-empty { text-align: center; padding: 18px 8px; }

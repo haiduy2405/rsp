@@ -919,6 +919,55 @@ function runMapSVG() {
 <rect width="400" height="600" fill="url(#rg)"/><rect width="400" height="600" fill="url(#tg)"/>${stars}${cols}${faint}${gold}${nodes}</svg>`;
 }
 
+
+// ---- Túi đồ trong chuyến: vật phẩm + Di Vật đang giữ, lưới ô như hòm đồ ngoài
+const ITEM_COL = { potion: '#6be39a', shield: '#6bb7ff', time: '#c58bff' };
+const BAG_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V5.5A2.5 2.5 0 0 1 10.500 3h3A2.500 2.500 0 0 1 16 5.500V7"/><path d="M6.500 7h11A2.500 2.500 0 0 1 20 9.500v9A2.500 2.500 0 0 1 17.500 21h-11A2.500 2.500 0 0 1 4 18.500v-9A2.500 2.500 0 0 1 6.500 7z"/><path d="M4 13h16M10.500 13v2h3v-2"/></svg>';
+const HOME_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7M6 10v10h4v-6h4v6h4V10"/></svg>';
+function mapFoot() {
+  const n = run.items.potion + run.items.shield + run.items.time + run.relics.length;
+  const bag = h('button', { class: 'bagbtn', id: 'bag-btn', 'aria-label': t('run.bag'), onclick: () => showBag() });
+  bag.innerHTML = BAG_SVG;
+  if (n > 0) bag.append(h('b', {}, String(n)));
+  const leave = h('button', { class: 'leavebtn', id: 'leave-run', onclick: leaveRun });
+  leave.innerHTML = HOME_SVG;
+  leave.append(h('span', {}, t('run.leave')));
+  return h('div', { class: 'mapfoot' }, bag, leave);
+}
+function showBag(selKey) {
+  $('info')?.remove();
+  const rc = ctx.config.run.items;
+  const desc = {
+    potion: t('item.desc.potion', { n: Math.round(rc.potion.healPct * 100) }),
+    shield: t('item.desc.shield', { n: Math.round(rc.shield.pct * 100) }),
+    time: t('item.desc.time', { n: rc.time.bonusMs / 1000 }),
+  };
+  const entries = [];
+  for (const it of ['potion', 'shield', 'time']) if (run.items[it] > 0 || run.armed[it]) entries.push({ key: it, kind: 'item', it, name: t(`item.${it}`), n: run.items[it], col: ITEM_COL[it], armed: !!run.armed[it] });
+  for (const id of run.relics) entries.push({ key: `r_${id}`, kind: 'relic', id, name: relicName(id), n: 0, col: RELIC_COL[ctx.relics[id].rarity] });
+  const close = () => $('info')?.remove();
+  const sel = entries.find((e) => e.key === selKey) || entries[0];
+  const cells = entries.map((e, i) => {
+    const c = h('button', { class: 'bag-cell' + (e === sel ? ' sel' : ''), 'data-bag': e.key, style: `--ic:${e.col};--i:${i}`, onclick: () => { audio.sfx('tick'); showBag(e.key); } });
+    c.innerHTML = e.kind === 'item' ? `<svg viewBox="0 0 24 24" aria-hidden="true">${ITEM_ICON[e.it]}</svg>` : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 6-7 12L5 9zM5 9h14M9 9l3 12 3-12M12 3l-3 6M12 3l3 6"/></svg>';
+    if (e.n > 0) c.append(h('i', { class: 'bag-n' }, `×${e.n}`));
+    if (e.armed) c.append(h('em', { class: 'bag-on' }, '✓'));
+    return c;
+  });
+  let detail = null;
+  if (sel) {
+    if (sel.kind === 'item') {
+      const off = run.items[sel.it] <= 0 || (sel.it === 'potion' && run.hp >= run.maxHp) || run.armed[sel.it];
+      detail = h('div', { class: 'bag-detail', style: `--ic:${sel.col}` }, h('b', {}, `${sel.name} ×${run.items[sel.it]}`), h('small', { class: 'muted' }, desc[sel.it]),
+        btn(run.armed[sel.it] ? t('run.armed') : t('bag.use'), () => { act({ type: 'useItem', item: sel.it }); showBag(run.items[sel.it] > 0 || run.armed[sel.it] ? sel.key : undefined); }, off ? '' : 'primary', { id: 'bag-use', ...(off ? { disabled: '' } : {}) }));
+    } else detail = h('div', { class: 'bag-detail', style: `--ic:${sel.col}` }, relicCard(sel.id));
+  }
+  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() },
+    h('div', { class: 'infobox bagbox' }, h('h3', {}, t('run.bag')),
+      entries.length ? h('div', { class: 'bag-grid' }, cells) : h('div', { class: 'muted bag-empty' }, t('run.bagEmpty')),
+      detail, btn(t('info.close'), close, '', { id: 'info-close' }))));
+}
+
 // ---- Di Vật
 const RELIC_COL = { 1: '#9fb0ff', 2: '#c58bff', 3: '#ffd24a' };
 const relicName = (id) => t(`relic.${id}`);
@@ -1013,14 +1062,6 @@ function showRules() {
 
 function showDoors() {
   saveActiveRun();
-  const items = h('div', { class: 'itembar' }, ['potion', 'shield', 'time'].map((it) => {
-    const off = run.items[it] <= 0 || (it === 'potion' && run.hp >= run.maxHp) || run.armed[it];
-    const b = h('button', { class: 'itm' + (run.armed[it] ? ' armed' : ''), 'data-item': it, title: t(`item.${it}`), 'aria-label': `${t(`item.${it}`)} ×${run.items[it]}`, onclick: () => act({ type: 'useItem', item: it }), ...(off ? { disabled: '' } : {}) });
-    b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ITEM_ICON[it]}</svg>`;
-    b.append(h('b', {}, `×${run.items[it]}`));
-    if (run.armed[it]) b.append(h('small', {}, t('run.armed')));
-    return b;
-  }));
   // Bảng thông tin (ẩn mặc định): quái từng cửa
   const infoPanel = h('div', { class: 'infopanel' }, h('div', { class: 'ip-in' }, doorList()));
   const infoBtn = h('button', { class: 'infobtn', id: 'door-info', 'aria-label': t('run.info'), 'aria-expanded': 'false', onclick: () => { const on = infoPanel.classList.toggle('open'); infoBtn.setAttribute('aria-expanded', String(on)); infoBtn.classList.toggle('on', on); audio.sfx('tick'); setTimeout(focusMap, 380); } }, 'i');
@@ -1040,9 +1081,7 @@ function showDoors() {
     h('p', { class: 'sub mapcap' }, h('span', {}, run.doors.length > 1 ? t('run.chooseDoor') : t('run.finalDoor')), infoBtn),
     run.doors.length > 1 ? h('div', { class: 'muted hold-hint' }, t('run.holdHint')) : null,
     infoPanel,
-    relicStrip(),
-    items,
-    btn(t('run.leave'), leaveRun, 'ghost', { id: 'leave-run' }),
+    mapFoot(),
   );
   $('screen').classList.add('mapscreen');
   if (guideStep() === 'doors') { guideSet(null); showRules(); }
@@ -1605,6 +1644,8 @@ if (DEBUG) {
   window.__showSkillAsk = (i, f, d, du) => showSkillAsk(i, f, d, du);
   window.__ctx = ctx;
   window.__ui = ui;
+  window.__startRun = (o) => startRun(o);
+  window.__runItems = (o) => { Object.assign(run.items, o); render(); };
   window.__progress = () => progress;
   window.__cheat = (ids = []) => {
     const p = structuredClone(progress);

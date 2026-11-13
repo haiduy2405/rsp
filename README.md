@@ -552,6 +552,12 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.99.0
+
+- Màn chọn cửa: bỏ 3 nút vật phẩm; thay bằng nút Túi đồ (huy hiệu số món) mở bảng lưới vật phẩm + Di Vật đang giữ trong chuyến, chọn ô để xem chi tiết/dùng. Nút "Về màn chính" làm lại dạng viên thuốc vàng nổi trên nền.
+- Debug (`?debug`): `__startRun`, `__runItems`.
+- Tag rollback cục bộ: `pre-bag-v0.98.0`.
+
 ## v0.98.0
 
 - Cửa hàng dạng lưới: tab loại hàng xếp dọc bên trái (Tất cả / Tiền tệ / Thuốc / Vật liệu / Mảnh tướng, chỉ lọc các món có sẵn trong ngày), ô vật phẩm bên phải theo màu độ hiếm, chọn ô rồi mua ở thanh chi tiết phía dưới. Có hiệu ứng nảy lần lượt, ô chọn phát sáng, ruy-băng FREE và vệt sáng.
