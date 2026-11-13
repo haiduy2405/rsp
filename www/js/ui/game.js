@@ -123,7 +123,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     return { x: 12 + i * 104 + 49, y: 466 - 48, el: state.members[i]?.element ?? 3 };
   };
   // cỡ số theo tỉ lệ máu quái bị mất: đòn nhỏ vẫn đọc được, đòn lớn nổi bật nhưng không tràn màn
-  const duoReady = (d) => !!d && state.members[d.slot]?.skillCd === 0 && state.members[d.slot + 1]?.skillCd === 0 && state.members[d.slot]?.skillMax > 0 && state.members[d.slot + 1]?.skillMax > 0;
+  function duoReady(d) { return !!d && state.members[d.slot]?.skillCd === 0 && state.members[d.slot + 1]?.skillCd === 0 && state.members[d.slot]?.skillMax > 0 && state.members[d.slot + 1]?.skillMax > 0; } // function: được hoist, sync() gọi được trước dòng này
   const duoOf = (idx) => state.duos.find((d) => d.slot === idx || d.slot + 1 === idx);
   const dmgSize = (a, maxHp) => 34 + Math.min(1, (a / Math.max(1, maxHp)) * 3) * 34;
 

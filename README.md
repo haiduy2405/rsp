@@ -770,3 +770,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 ## v0.106.3
 - Thêm hộp báo lỗi đỏ nhỏ ở đáy màn: nếu lỗi JS xảy ra (vd vào trận bị màn xanh trống) thì hiện nội dung lỗi để chụp gửi; bấm để tắt. Chưa tái hiện được lỗi vào trận trên máy dev (đã thử Khó, ải 7, đủ 28 Di Vật, đủ vật phẩm).
 - Rollback: tag local `pre-greenfix-v0.106.2`.
+
+## v0.106.4
+- SỬA LỖI nặng: vào trận bị màn xanh trống khi đội có cặp Duo kề nhau (`duoReady` gọi trước khi khai báo trong game.js). Lỗi này có từ v0.71 nhưng chỉ lộ ra khi tự lập đội kiểu Duo (v0.101). Đã tái hiện bằng đội Sơn Tinh + Thủy Tinh: bản cũ nổ, bản mới chạy.
+- Rollback: tag local `pre-duofix-v0.106.3`.
