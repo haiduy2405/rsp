@@ -251,3 +251,25 @@ test('migrate v7 → v8: Thức tỉnh thành Form 2; vượt cấp 30 cũng lê
   assert.deepEqual([out.characters.a.awaken, out.characters.b.awaken, out.characters.c.awaken], [1, 1, 0]);
   assert.equal(out.version, SAVE_VERSION);
 });
+
+test('auto lập đội: 4 kiểu đều ra đội hợp lệ, không trùng, tất định; duo ≥ số Duo của kiểu power', async () => {
+  const { AUTO_MODES: modes } = await import('../www/js/core/upgrade.js');
+  assert.deepEqual(modes, ['power', 'balance', 'duo', 'sustain']);
+  let p = newProgress(ctx);
+  for (const c of ctx.characterList) {
+    const r = grantCharacter(ctx, p, c.id);
+    if (r.ok) p = r.progress;
+  }
+  const duos = (team) => team.slice(0, -1).filter((id, i) => id && team[i + 1] && ctx.duoByPair[`${id}|${team[i + 1]}`]).length;
+  const res = {};
+  for (const m of modes) {
+    const r = autoTeam(ctx, p, m);
+    assert.ok(r.ok, m);
+    const ids = r.progress.team.filter(Boolean);
+    assert.equal(new Set(ids).size, ids.length, m);
+    assert.equal(ids.length, 5, m);
+    assert.deepEqual(autoTeam(ctx, p, m).progress.team, r.progress.team, m);
+    res[m] = duos(r.progress.team);
+  }
+  assert.ok(res.duo >= res.power, JSON.stringify(res));
+});

@@ -215,50 +215,74 @@ export function charPower(ctx, progress, id) {
   const st = statsFor(ctx, id, c.level, c.awaken);
   return st.atk + st.hp * 0.2 + st.heal * 0.5;
 }
-// Tự lập đội mạnh nhất từ bộ sưu tập: chọn theo điểm, giảm điểm khi trùng hệ (đủ hệ thì đánh được nhiều ngọc hơn),
-// đội trưởng là người mạnh nhất, các ô còn lại xếp để mở nhiều Duo nhất.
-export function autoTeam(ctx, progress) {
-  const ids = Object.keys(progress.characters).filter((id) => ctx.characters[id]);
-  const score = Object.fromEntries(ids.map((id) => [id, charPower(ctx, progress, id)]));
-  const picked = [];
-  const perEl = {};
-  while (picked.length < 5 && picked.length < ids.length) {
-    let best = null;
-    let bv = -1;
-    for (const id of ids) {
-      if (picked.includes(id)) continue;
-      const v = score[id] * 0.8 ** (perEl[ctx.characters[id].element] || 0);
-      if (v > bv || (v === bv && id < best)) {
-        bv = v;
-        best = id;
+// Tự lập đội theo kiểu chọn. mode: 'power' (chỉ số công cao nhất, mặc kệ hệ) · 'balance' (giảm điểm khi trùng hệ, đủ hệ thì kéo được nhiều ngọc) ·
+// 'duo' (ưu tiên đội mở nhiều Duo nhất trong nhóm tướng mạnh) · 'sustain' (máu và hồi phục: trụ lâu).
+// Đội trưởng là người điểm cao nhất; các ô còn lại xếp để mở nhiều Duo nhất. Tất định.
+export const AUTO_MODES = ['power', 'balance', 'duo', 'sustain'];
+export function autoTeam(ctx, progress, mode = 'balance') {
+  const cfg = ctx.config.autoTeam;
+  const ids = Object.keys(progress.characters).filter((id) => ctx.characters[id]).sort();
+  const power = Object.fromEntries(ids.map((id) => [id, charPower(ctx, progress, id)]));
+  const score = mode === 'sustain'
+    ? Object.fromEntries(ids.map((id) => { const c = progress.characters[id]; const st = statsFor(ctx, id, c.level, c.awaken); return [id, st.atk * cfg.sustain.atk + st.hp * cfg.sustain.hp + st.heal * cfg.sustain.heal]; }))
+    : power;
+  const decay = mode === 'power' || mode === 'duo' ? 1 : mode === 'sustain' ? cfg.sustainDecay : cfg.balanceDecay;
+  const duoCount = (seq) => { let d = 0; for (let i = 0; i + 1 < seq.length; i++) if (ctx.duoByPair[`${seq[i]}|${seq[i + 1]}`]) d++; return d; };
+  const orderBest = (picked) => {
+    const lead = picked.slice().sort((a, b) => score[b] - score[a] || (a < b ? -1 : 1))[0];
+    const rest = picked.filter((id) => id !== lead);
+    let bestOrder = rest;
+    let bestDuos = -1;
+    const perm = (arr, cur = []) => {
+      if (!arr.length) {
+        const d = duoCount([lead, ...cur]);
+        if (d > bestDuos) { bestDuos = d; bestOrder = cur; }
+        return;
       }
-    }
-    picked.push(best);
-    const e = ctx.characters[best].element;
-    perEl[e] = (perEl[e] || 0) + 1;
-  }
-  const lead = picked.slice().sort((a, b) => score[b] - score[a] || (a < b ? -1 : 1))[0];
-  const rest = picked.filter((id) => id !== lead);
-  let bestOrder = rest;
-  let bestDuos = -1;
-  const perm = (arr, cur = []) => {
-    if (!arr.length) {
-      const seq = [lead, ...cur];
-      let d = 0;
-      for (let i = 0; i + 1 < seq.length; i++) if (ctx.duoByPair[`${seq[i]}|${seq[i + 1]}`]) d++;
-      if (d > bestDuos) {
-        bestDuos = d;
-        bestOrder = cur;
-      }
-      return;
-    }
-    arr.forEach((x, i) => perm([...arr.slice(0, i), ...arr.slice(i + 1)], [...cur, x]));
+      arr.forEach((x, i) => perm([...arr.slice(0, i), ...arr.slice(i + 1)], [...cur, x]));
+    };
+    perm(rest);
+    return { seq: [lead, ...bestOrder], duos: bestDuos };
   };
-  perm(rest);
-  const team = [lead, ...bestOrder];
+  let seq;
+  if (mode === 'duo') {
+    // Trong nhóm mạnh nhất (duoPool), thử mọi tổ hợp 5 người, lấy tổ hợp có nhiều Duo nhất, hòa thì tổng điểm cao hơn.
+    const pool = ids.slice().sort((a, b) => score[b] - score[a] || (a < b ? -1 : 1)).slice(0, cfg.duoPool);
+    const k = Math.min(5, pool.length);
+    let best = null;
+    const combo = (start, cur) => {
+      if (cur.length === k) {
+        const o = orderBest(cur);
+        const sum = cur.reduce((x, id) => x + score[id], 0);
+        if (!best || o.duos > best.duos || (o.duos === best.duos && sum > best.sum)) best = { seq: o.seq, duos: o.duos, sum };
+        return;
+      }
+      for (let i = start; i < pool.length; i++) combo(i + 1, [...cur, pool[i]]);
+    };
+    combo(0, []);
+    seq = best ? best.seq : [];
+  } else {
+    const picked = [];
+    const perEl = {};
+    while (picked.length < 5 && picked.length < ids.length) {
+      let best = null;
+      let bv = -1;
+      for (const id of ids) {
+        if (picked.includes(id)) continue;
+        const v = score[id] * decay ** (perEl[ctx.characters[id].element] || 0);
+        if (v > bv || (v === bv && id < best)) { bv = v; best = id; }
+      }
+      picked.push(best);
+      const e = ctx.characters[best].element;
+      perEl[e] = (perEl[e] || 0) + 1;
+    }
+    seq = orderBest(picked).seq;
+  }
+  const team = seq.slice();
   while (team.length < 5) team.push(null);
   return setTeam(progress, team);
 }
+
 
 // Đội chuẩn bị vào trận: [{id, level, awaken}].
 export const teamRoster = (progress) => progress.team.filter((id) => id !== null).map((id) => ({ id, level: progress.characters[id].level, awaken: progress.characters[id].awaken, skillLv: progress.characters[id].skillLv }));

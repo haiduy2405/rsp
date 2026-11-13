@@ -1479,3 +1479,11 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .shop-cell .sc-ribbon { right: -22px; top: 5px; width: 64px; font-size: 7px; }
 .shop-cell.sel { transform: translateY(-2px) scale(1.06); }
 .shop-cell.sel::after { width: 14px; height: 14px; font-size: 9px; border-bottom-right-radius: 7px; }
+
+/* v0.101.0 chọn kiểu tự lập đội */
+.auto-opt { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; text-align: left; padding: 10px 14px; min-height: 0; border-radius: 12px; border: 1.5px solid var(--line-hi); background: linear-gradient(180deg, rgba(40, 90, 170, .85), rgba(20, 48, 110, .9)); }
+.auto-opt b { font-size: 15px; color: #ffe9a0; }
+.auto-opt small { font-size: 12px; color: #cfe0ff; line-height: 1.3; font-weight: 500; }
+
+/* nút cập nhật bản mới ở Hub */
+.upd-pill { position: absolute; z-index: 6; left: 50%; transform: translateX(-50%); top: calc(110px + var(--sat, 0px)); min-height: 0; width: auto; padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 800; color: #3a2208; border: 2px solid #fff0b0; background: linear-gradient(180deg, #ffe58a, #f1b93a); box-shadow: 0 3px 10px rgba(6, 14, 50, .5); animation: shopPop .35s both; white-space: nowrap; }

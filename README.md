@@ -552,6 +552,16 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.101.0
+
+- **Sửa lỗi đội hình**: màn Đội hình bị đứng khi đội trưởng là tướng không có kỹ năng đội trưởng (lỗi JS khiến chọn/bỏ tướng không phản hồi). Giờ hiện "Tướng này không có kỹ năng đội trưởng".
+- Chạm tướng đã trong đội = bỏ ra khỏi đội (trước đó nút Bỏ ra hay bị mờ vì ô chọn tự nhảy sang ô trống).
+- Màn hình nào hiện ra cũng dọn lớp chỉ dẫn tutorial còn sót (nếu còn sẽ chặn chạm).
+- **Tự lập đội** hỏi kiểu: Công cao nhất / Cân bằng hệ / Nhiều Duo / Trụ lâu (`autoTeam(ctx, progress, mode)`, số liệu trong `config.autoTeam`); thêm test.
+- Bản mới: không còn tự nạp lại khi về Hub (bị nhảy ra màn tải); thay bằng nút "Có bản mới · chạm để cập nhật" ở Hub.
+- Màn chọn cửa: bỏ dòng "Chọn một cánh cửa" và nút thông tin; xem chi tiết bằng cách ấn giữ cửa.
+- Tag rollback cục bộ: `pre-team-fix-v0.100.3`, `pre-nocap-v0.100.3`.
+
 ## v0.100.3
 
 - Shop gọn hơn: 5 ô mỗi hàng, tab dọc hẹp lại. Tag rollback cục bộ: `pre-shop-small-v0.100.2`.

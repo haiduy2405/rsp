@@ -23,7 +23,7 @@ export function createHeroUI({ h, T, ctx }) {
     const val = u.value ? `, ${pct(u.value)}%` : '';
     return T('unit.apply', { effect: T(`effect.${u.key}.name`), target: T(`target.${u.target}`), turns: u.turns, value: val });
   }
-  const leaderText = (l) => T(`leader.${l.template}`, { pct: pct(l.pct || 0), element: l.element != null ? el(l.element) : '', sec: ((l.ms || 0) / 1000).toFixed(1).replace(/\.0$/, ''), mult: l.mult ?? '' });
+  const leaderText = (l) => !l ? T('team.noLeaderSkill') : T(`leader.${l.template}`, { pct: pct(l.pct || 0), element: l.element != null ? el(l.element) : '', sec: ((l.ms || 0) / 1000).toFixed(1).replace(/\.0$/, ''), mult: l.mult ?? '' });
   const keysOf = (units) => [...new Set(units.filter((u) => u.type === 'applyEffect').map((u) => u.key))];
   const keywordBlock = (keys) => keys.map((k) => h('div', { class: 'muted fxrow' }, h('img', { class: 'fxico', src: `assets/ui/fx/${k}.webp`, alt: '' }), h('div', { style: 'flex:1;min-width:0' }, h('b', {}, T(`effect.${k}.name`)), ': ', T(`effect.${k}.desc`))));
 

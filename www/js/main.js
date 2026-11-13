@@ -10,7 +10,7 @@ import { applyRunResult, firstClearStageSpirit } from './core/progress.js';
 import { browserAdapter } from './save/storage.js';
 import { createSlots } from './save/slots.js';
 import { install as installSlots } from './ui/screen-slots.js';
-import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useElixir, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
+import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useElixir, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam, AUTO_MODES } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
 import { KEYS } from './core/effects.js';
 import { avatarNode, photoFromFile } from './ui/avatar.js';
@@ -106,6 +106,8 @@ let sceneTrack = null; // bài nhạc cho màn sắp dựng (đặt NGAY TRƯỚ
 const music = (name) => { sceneTrack = name; };
 const screen = (...kids) => {
   $('info')?.remove();
+  $('coach')?.remove(); // lớp chỉ dẫn tutorial còn sót (vd thoát giữa chừng) sẽ chặn chạm ở mọi màn
+  $('coach-dim')?.remove();
   $('pause-btn')?.remove();
   $('hint-btn')?.remove();
   guide.clear();
@@ -227,8 +229,12 @@ function hubScene() {
 }
 
 let updateReady = false;
+// Có bản mới: hiện nút nhỏ ở Hub, người chơi tự chạm để nạp lại (không tự đá về màn tải giữa chừng).
+function showUpdatePill() {
+  if (!updateReady || $('upd-pill') || !$('screen')) return;
+  $('screen').appendChild(h('button', { id: 'upd-pill', class: 'upd-pill', onclick: () => location.reload() }, t('app.update')));
+}
 function showHub() {
-  if (updateReady) { location.reload(); return; }
   run = null;
   record = null;
   { const before = progress; track('login'); if (progress !== before) save(); }
@@ -262,6 +268,7 @@ function showHub() {
   $('screen').classList.add('hub');
   atHub = true;
   notice = null;
+  showUpdatePill();
   const nEl = document.querySelector('#screen .hub-notice'); // thông báo tự mờ rồi biến mất sau vài giây
   if (nEl) setTimeout(() => { nEl.classList.add('fade'); setTimeout(() => nEl.remove(), 600); }, 4000);
   // Hướng dẫn tân thủ: shop (quà miễn phí) → Chiến đấu → ải 1 → Vào trận → luật chọn đường
@@ -617,6 +624,17 @@ function tile(id, slotNo) {
   );
 }
 
+// Chọn kiểu tự lập đội: mỗi kiểu một cách xếp (core/upgrade.js autoTeam).
+function showAutoPicker(stage) {
+  if ($('info')) return;
+  const close = () => $('info')?.remove();
+  const go = (mode) => { const r = autoTeam(ctx, progress, mode); if (r.ok) { progress = r.progress; save(); } close(); showTeam(0, undefined, stage); };
+  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() },
+    h('div', { class: 'infobox' }, h('h3', {}, t('team.auto.title')),
+      AUTO_MODES.map((m) => h('button', { class: 'auto-opt', 'data-auto': m, onclick: () => go(m) }, h('b', {}, t(`team.auto.${m}`)), h('small', {}, t(`team.auto.${m}.d`)))),
+      btn(t('info.close'), close, '', { id: 'info-close' }))));
+}
+
 // Màn đội hình: dùng cả ở menu (Đội hình) lẫn trước khi vào trận (stage = { zoneId, diff } có giá trị).
 function showTeam(slot, msg, stage) {
   const gt = stage && ['stage', 'team'].includes(guideStep());
@@ -637,6 +655,8 @@ function showTeam(slot, msg, stage) {
   };
   const again = (sl) => showTeam(sl, undefined, stage);
   const pick = (id) => {
+    const at = team.indexOf(id);
+    if (at >= 0) { apply(placeInSlot(progress, at, null)); return again(at); } // chạm tướng đã trong đội = bỏ ra khỏi đội
     const wasEmpty = team[slot] === null;
     if (!apply(placeInSlot(progress, slot, id))) return again(slot);
     // lấp ô trống xong thì nhảy sang ô trống kế tiếp để chọn liền tay
@@ -666,7 +686,7 @@ function showTeam(slot, msg, stage) {
     h(
       'div',
       { class: 'tm-tools' },
-      btn(t('team.auto'), () => { apply(autoTeam(ctx, progress)); again(0); }, '', { id: 'team-auto' }),
+      btn(t('team.auto'), () => showAutoPicker(stage), '', { id: 'team-auto' }),
       btn(t('team.remove'), () => { apply(placeInSlot(progress, slot, null)); again(slot); }, '', { id: 'team-remove', ...(team[slot] === null ? { disabled: '' } : {}) }),
       btn(t('team.clear'), () => { apply(clearTeam(progress)); again(0); }, '', { id: 'team-clear', ...(members.length ? {} : { disabled: '' }) }),
       slot > 0 && team[slot] ? btn(t('team.makeLeader', { name: t(`char.${team[slot]}`) }), () => { apply(makeLeader(progress, slot)); again(0); }, '', { id: 'make-leader' }) : null,
@@ -1062,9 +1082,6 @@ function showRules() {
 
 function showDoors() {
   saveActiveRun();
-  // Bảng thông tin (ẩn mặc định): quái từng cửa
-  const infoPanel = h('div', { class: 'infopanel' }, h('div', { class: 'ip-in' }, doorList()));
-  const infoBtn = h('button', { class: 'infobtn', id: 'door-info', 'aria-label': t('run.info'), 'aria-expanded': 'false', onclick: () => { const on = infoPanel.classList.toggle('open'); infoBtn.setAttribute('aria-expanded', String(on)); infoBtn.classList.toggle('on', on); audio.sfx('tick'); setTimeout(focusMap, 380); } }, 'i');
   const map = h('div', { class: 'runmap' + (DEBUG ? ' static' : '') });
   map.innerHTML = runMapSVG();
   map.querySelectorAll('[data-door]').forEach((nd) => {
@@ -1078,9 +1095,7 @@ function showDoors() {
   screen(
     mapHeader(),
     map,
-    h('p', { class: 'sub mapcap' }, h('span', {}, run.doors.length > 1 ? t('run.chooseDoor') : t('run.finalDoor')), infoBtn),
     run.doors.length > 1 ? h('div', { class: 'muted hold-hint' }, t('run.holdHint')) : null,
-    infoPanel,
     mapFoot(),
   );
   $('screen').classList.add('mapscreen');
@@ -1648,7 +1663,7 @@ Object.assign(app, ui);
 if ('serviceWorker' in navigator && !DEBUG && location.protocol.startsWith('http')) {
   // Bản mới: SW mới chiếm quyền → đánh dấu, tự nạp lại ở lần vào Hub kế tiếp (không ngắt giữa trận).
   const hadSW = !!navigator.serviceWorker.controller;
-  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadSW) { updateReady = true; if (atHub) location.reload(); } });
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadSW) { updateReady = true; if (atHub) showUpdatePill(); } });
   navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => { setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000); document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); }); }).catch(() => {});
 }
 
@@ -1656,6 +1671,7 @@ if (DEBUG) {
   window.__showSkillAsk = (i, f, d, du) => showSkillAsk(i, f, d, du);
   window.__ctx = ctx;
   window.__ui = ui;
+  window.__showTeam = (...a) => showTeam(...a);
   window.__startRun = (o) => startRun(o);
   window.__runItems = (o) => { Object.assign(run.items, o); render(); };
   window.__progress = () => progress;
