@@ -1067,3 +1067,7 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 @keyframes rtShake { 0%, 100% { transform: none; } 15% { transform: translate(-5px, 3px); } 30% { transform: translate(6px, -3px); } 45% { transform: translate(-4px, -2px); } 60% { transform: translate(3px, 3px); } 80% { transform: translate(-2px, 1px); } }
 @media (prefers-reduced-motion: reduce) { .rt-tip, .sm-res.rt-shake { animation: none !important; } }
 .sm-res.anim .row { visibility: hidden; }
+.pl-cost { flex-direction: column; gap: 1px; font-size: 12px; }
+.pl-cost .pl-c { display: inline-flex; align-items: center; gap: 3px; }
+.row.pulls button.free { flex: .8; padding: 8px 4px; font-size: 12px; }
+.row.pulls button.pull b { font-size: 13px; }

@@ -54,7 +54,7 @@ export function install(app) {
       return h('div', { class: `fan-card r${c.rarity} pos${fan.length === 3 ? i : i + 1}` }, art ? h('img', { src: art.src, alt: '', draggable: 'false' }) : portrait(c.id, 96), h('b', {}, '★'.repeat(c.rarity)));
     };
     // Giá: số vé, hoặc số Linh Thạch nếu thiếu vé (hai biểu tượng, không chữ).
-    const costLine = (tickets, spirit) => h('span', { class: 'pl-cost' }, itemIcon('ticket', 'sm'), String(tickets), h('i', { class: 'pl-sep' }, '/'), itemIcon('spirit', 'sm'), String(spirit));
+    const costLine = (tickets, spirit) => h('span', { class: 'pl-cost' }, h('span', { class: 'pl-c' }, itemIcon('ticket', 'sm'), String(tickets)), h('span', { class: 'pl-c' }, itemIcon('spirit', 'sm'), String(spirit)));
     const pityPct = Math.min(100, (sm.pity5 / cfg.pity5) * 100);
     music('summon');
     screen(

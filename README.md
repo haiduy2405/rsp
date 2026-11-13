@@ -470,3 +470,6 @@ Nút ải thành huy hiệu viền nâu dày + vòng vàng, bóng đổ, nhấp 
 
 ## v0.66.0 — Nghi thức triệu hồi: cổng + pháp trận
 Thay bệ phóng pháo bằng pháp trận phát sáng: chạm để kích hoạt -> nạp năng lượng (màu ánh sáng báo trước độ hiếm), cột sáng + sóng + rung màn, cổng thu nhỏ lên đỉnh rồi nhả từng thẻ (thấp -> cao, 5★ ra cuối, có nhịp chờ riêng) và tự lật thẻ. Lần xem đầu đủ, từ lần sau có nút Bỏ qua (nhớ bằng localStorage); 5★ vẫn giữ nhịp khi bỏ qua. Code: ui/portal.js (bỏ fireworks.js). Id #lp-orb giữ nguyên cho test.
+
+## v0.66.1 — Sửa nút Triệu hồi ×10 tràn chữ
+Giá vé/Linh Thạch xếp hai dòng trong nút, nút Miễn phí hẹp lại, không còn bị cắt số.
