@@ -1553,3 +1553,10 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .buybox .bb-btns button, .buybox .bb-btns button.primary { min-width: 0; width: 100%; }
 .dd-orb { width: 30px; height: 30px; right: 4px; top: 4px; background: none; border: 0; box-shadow: none; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .6)); }
 .dd-orb canvas { width: 100%; height: 100%; display: block; }
+
+/* v0.105.2: chống nhảy bố cục khi đổi món được chọn */
+#item-detail { min-height: 200px; box-sizing: border-box; }
+#item-detail:not(.card) { display: grid; place-items: center; border: 1px dashed rgba(255, 255, 255, .25); border-radius: 8px; }
+.item-detail .row { align-items: center; }
+#bag-detail { min-height: 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; }
+.bagbox .item-grid { min-height: 172px; align-content: start; }

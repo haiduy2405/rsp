@@ -750,3 +750,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.105.1
 - Thẻ quái trong hộp thoại cửa: chấm tròn màu hệ đổi thành ngọc hệ thật (cùng hình ngọc trong trận), to hơn.
+
+## v0.105.2
+- Hòm đồ + túi đồ trong chuyến: thẻ chi tiết có chiều cao cố định, chọn món khác không làm lưới nhảy lên xuống (đo 12 món liên tiếp, lưới đứng yên ở y=381).
+- Rollback: tag local `pre-nojump-v0.105.1`.
