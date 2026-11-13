@@ -876,15 +876,15 @@ function runMapSVG() {
   // đường tới các cửa đang chọn (sáng nhẹ)
   const curRow = rows.find((x) => x.cur);
   if (curRow) curRow.xs.forEach((x, i) => (gold += link(last, [x, curRow.y], 'lk now')));
-  let nodes = `<g class="nd start"><circle cx="${start.x}" cy="${start.y}" r="15" fill="#191b20" stroke="#e2b75a" stroke-width="2"/><path d="M${start.x - 6} ${start.y + 7}v-8a6 6 0 0 1 12 0v8z" fill="none" stroke="#e2b75a" stroke-width="1.8"/></g>`;
-  const label = (x, y, k, strong) => `<text x="${x}" y="${y}" text-anchor="middle" class="nl${strong ? ' strong' : ''}">${k === '?' || k === 'f?' ? '' : t(`door.${k}`)}</text>`;
+  let nodes = `<g class="nd start"><circle cx="${start.x}" cy="${start.y}" r="26" fill="url(#zg)" class="torchglow"/><circle cx="${start.x}" cy="${start.y}" r="18" fill="url(#rimG)" stroke="#7a4a12" stroke-width="1.2"/><circle cx="${start.x}" cy="${start.y}" r="14.500" fill="#173a6c"/><path d="M${start.x - 7} ${start.y + 8}v-9a7 7 0 0 1 14 0v9z" fill="#ffe9ad" stroke="#fff8e6" stroke-width="1.2"/><path d="M${start.x - 3.500} ${start.y + 8}v-6a3.500 3.500 0 0 1 7 0v6z" fill="#3a2410"/></g>`;
+  const label = (x, y, k, strong) => { if (k === '?' || k === 'f?') return ''; const tx = t(`door.${k}`); const w = Math.max(50, tx.length * 7.4 + 18); return `<g class="lab${strong ? ' strong' : ''}"><rect x="${x - w / 2}" y="${y - 12}" width="${w}" height="20" rx="10" class="lbg"/><text x="${x}" y="${y + 2.5}" text-anchor="middle" class="nl${strong ? ' strong' : ''}">${tx}</text></g>`; };
   for (const row of rows) {
     row.kinds.forEach((k, i) => {
       const [x, y] = pos(row, i);
       const big = k === 'boss' || (row.r === n - 1);
       const rad = big ? 30 : 23;
       if (k === '?' || k === 'f?') {
-        nodes += `<g class="nd ghost"><circle cx="${x}" cy="${y}" r="${rad - 3}" fill="#16181c" stroke="#606570" stroke-width="1.6" stroke-dasharray="3 4"/>${k === 'f?' ? `<g transform="translate(${x - 9} ${y - 9}) scale(.75)" fill="none" stroke="#8f95a2" stroke-width="2" stroke-linecap="round">${NODE.normal.icon}</g>` : `<text x="${x}" y="${y + 6}" text-anchor="middle" class="q">?</text>`}</g>`;
+        nodes += `<g class="nd ghost"><circle cx="${x}" cy="${y}" r="${rad - 1}" class="gbub"/><circle cx="${x - rad * 0.3}" cy="${y - rad * 0.35}" r="${rad * 0.18}" fill="#fff" opacity=".6"/>${k === 'f?' ? `<g transform="translate(${x - 9} ${y - 9}) scale(.75)" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="2" stroke-linecap="round">${NODE.normal.icon}</g>` : `<text x="${x}" y="${y + 7}" text-anchor="middle" class="q">?</text>`}</g>`;
         return;
       }
       const d = NODE[k];
@@ -892,7 +892,10 @@ function runMapSVG() {
       const skipped = row.past && row.pick !== i;
       const cls = 'nd' + (row.cur ? ' cur' : '') + (taken ? ' taken' : '') + (skipped ? ' skipped' : '') + (big ? ' big' : '');
       const attr = row.cur ? ` data-door="${i}" role="button" tabindex="0" aria-label="${t(`door.${k}`)}"` : '';
-      nodes += `<g class="${cls}"${attr} style="--c:${d.col}">${row.cur ? `<circle class="pulse" cx="${x}" cy="${y}" r="${rad + 8}" fill="${d.col}"/>` : ''}<circle cx="${x}" cy="${y}" r="${rad + 3}" fill="none" stroke="#9fd4ff" stroke-opacity="${row.cur || taken ? 0.85 : 0.35}" stroke-width="1.4"/><circle cx="${x}" cy="${y}" r="${rad}" fill="#1d120b" stroke="${taken || row.cur ? d.ring : d.col}" stroke-width="${row.cur ? 3 : 2}"/><circle cx="${x}" cy="${y}" r="${rad - 5}" fill="${d.col}" opacity="${skipped ? 0.1 : taken ? 0.55 : 0.3}"/><g transform="translate(${x - 12 * (rad / 23)} ${y - 12 * (rad / 23)}) scale(${rad / 23})" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="${skipped ? 0.35 : 1}">${d.icon}</g>${row.cur || big ? label(x, y + rad + 17, k, row.cur) : ''}</g>`;
+      const ic = `<g transform="translate(${x - 12 * (rad / 23)} ${y - 12 * (rad / 23)}) scale(${rad / 23})" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${skipped ? 0.4 : 1}" class="ico">${d.icon}</g>`;
+      const spikes = big && !skipped ? `<g class="spikes" style="transform-origin:${x}px ${y}px">${Array.from({ length: 12 }, (_, q) => `<path d="M${x} ${y - rad - 4}l3.4 -9 3.4 9z" transform="rotate(${q * 30} ${x} ${y})" fill="${d.col}" opacity=".85"/>`).join('')}</g>` : '';
+      const check = taken ? `<g transform="translate(${x + rad * 0.62} ${y - rad * 0.62})"><circle r="9" fill="#2fbf6a" stroke="#fff8e6" stroke-width="2"/><path d="M-4 0l3 3.2 5-6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>` : '';
+      nodes += `<g class="${cls}"${attr} style="--c:${d.col}">${row.cur ? `<circle class="pulse" cx="${x}" cy="${y}" r="${rad + 12}" fill="${d.col}"/><circle class="spin" cx="${x}" cy="${y}" r="${rad + 8}" fill="none" stroke="#fff6c0" stroke-width="2" stroke-dasharray="3 7" stroke-linecap="round" style="transform-origin:${x}px ${y}px"/>` : ''}${spikes}<circle cx="${x}" cy="${y}" r="${rad + 3.5}" fill="${skipped ? '#9aa6b8' : 'url(#rimG)'}" stroke="#7a4a12" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="${rad}" fill="url(#nb-${k})" stroke="#173a6c" stroke-width="2"/><path d="M${x - rad * 0.78} ${y - rad * 0.25}A${rad * 0.82} ${rad * 0.82} 0 0 1 ${x + rad * 0.78} ${y - rad * 0.25}Q${x} ${y - rad * 0.75} ${x - rad * 0.78} ${y - rad * 0.25}z" fill="#fff" opacity="${skipped ? 0.1 : 0.28}"/>${ic}${check}${row.cur || big ? label(x, y + rad + 15, k, row.cur) : ''}</g>`;
     });
   }
   if (curRow || true) {
@@ -900,16 +903,17 @@ function runMapSVG() {
     nodes += `<g class="you"><circle cx="${last[0] + 26}" cy="${last[1] - 4}" r="6" fill="#ffe9ad"/><circle cx="${last[0] + 26}" cy="${last[1] - 4}" r="11" fill="#ffe9ad" opacity=".25"/></g>`;
   }
   let stars = '';
-  for (let i = 0; i < 40; i++) stars += `<circle cx="${(i * 97.3) % 400}" cy="${(i * 53.7) % 600}" r="${0.6 + (i % 3) * 0.4}" fill="#fff" opacity="${0.15 + (i % 4) * 0.1}"/>`;
+  for (let i = 0; i < 26; i++) stars += `<path class="tw" style="animation-delay:${((i * 0.37) % 3).toFixed(2)}s" transform="translate(${(i * 97.3) % 400} ${(i * 53.7) % 600}) scale(${0.5 + (i % 3) * 0.35})" d="M0 -5L1.300 -1.300L5 0L1.300 1.300L0 5L-1.300 1.300L-5 0L-1.300 -1.300z" fill="#fff" opacity=".7"/>`;
   let cols = '';
   for (const x of [26, 374]) {
-    cols += `<g class="pillar"><rect x="${x - 13}" y="62" width="26" height="520" fill="url(#col)" stroke="#5d9fe0" stroke-opacity=".7"/><rect x="${x - 19}" y="52" width="38" height="12" rx="2" fill="#4a2f1c" stroke="#9fd4ff" stroke-opacity=".6"/><rect x="${x - 19}" y="578" width="38" height="12" rx="2" fill="#4a2f1c" stroke="#9fd4ff" stroke-opacity=".6"/>`;
-    for (const y of [150, 270, 390, 500]) cols += `<path d="M${x} ${y - 9}l7 9-7 9-7-9z" fill="none" stroke="var(--zc,#ffb25a)" stroke-width="1.4" opacity=".55" class="rune"/>`;
-    cols += `<path d="M${x - 15} 52h30l-4 -9h-22z" fill="#20508c" stroke="#9fd4ff" stroke-opacity=".6"/><g transform="translate(${x} 43) scale(1.7) translate(${-x} -43)"><g class="flame" style="transform-origin:${x}px 43px"><path d="M${x} 14c5 7 8 11 8 17a8 8 0 0 1-16 0c0-4 2-6 4-9 0 3 1 4 2 4-1-4-1-8 2-12z" fill="var(--zc,#ffb25a)"/><path d="M${x} 24c3 4 4 6 4 9a4 4 0 0 1-8 0c0-2 1-3 2-5 0 2 1 2 2 2z" fill="#fff2c4"/></g></g><circle cx="${x}" cy="30" r="34" fill="url(#zg)" class="torchglow"/></g>`;
+    cols += `<g class="pillar"><rect x="${x - 13}" y="62" width="26" height="520" rx="3" fill="url(#col)" stroke="#b98a3a" stroke-width="1.4"/>`;
+    for (const gx of [-6, 0, 6]) cols += `<path d="M${x + gx} 64v516" stroke="#c9a15a" stroke-opacity=".35" stroke-width="1"/>`;
+    cols += `<rect x="${x - 19}" y="52" width="38" height="12" rx="3" fill="url(#rimG)" stroke="#7a4a12"/><rect x="${x - 19}" y="578" width="38" height="12" rx="3" fill="url(#rimG)" stroke="#7a4a12"/>`;
+    for (const y of [150, 270, 390, 500]) cols += `<path d="M${x} ${y - 9}l7 9-7 9-7-9z" fill="var(--zc,#ffb25a)" stroke="#fff8e6" stroke-width="1.2" opacity=".9" class="rune"/>`;
+    cols += `<path d="M${x - 15} 52h30l-4 -9h-22z" fill="url(#rimG)" stroke="#7a4a12"/><g transform="translate(${x} 43) scale(1.7) translate(${-x} -43)"><g class="flame" style="transform-origin:${x}px 43px"><path d="M${x} 14c5 7 8 11 8 17a8 8 0 0 1-16 0c0-4 2-6 4-9 0 3 1 4 2 4-1-4-1-8 2-12z" fill="var(--zc,#ffb25a)"/><path d="M${x} 24c3 4 4 6 4 9a4 4 0 0 1-8 0c0-2 1-3 2-5 0 2 1 2 2 2z" fill="#fff2c4"/></g></g><circle cx="${x}" cy="30" r="40" fill="url(#zg)" class="torchglow"/></g>`;
   }
   return `<svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" aria-hidden="false">
-<defs><linearGradient id="col" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#111216"/><stop offset=".5" stop-color="#424753"/><stop offset="1" stop-color="#111216"/></linearGradient>
-<radialGradient id="zg"><stop offset="0" stop-color="var(--zc,#ffb25a)" stop-opacity=".45"/><stop offset="1" stop-color="var(--zc,#ffb25a)" stop-opacity="0"/></radialGradient><radialGradient id="tg" cx=".5" cy=".12" r=".7"><stop offset="0" stop-color="var(--zc,#ffb25a)" stop-opacity=".22"/><stop offset="1" stop-color="var(--zc,#ffb25a)" stop-opacity="0"/></radialGradient><radialGradient id="rg" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#626878" stop-opacity=".55"/><stop offset="1" stop-color="#626878" stop-opacity="0"/></radialGradient></defs>
+<defs><linearGradient id="col" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e6cf9c"/><stop offset=".45" stop-color="#fff8e2"/><stop offset="1" stop-color="#d4b57a"/></linearGradient><linearGradient id="rimG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset=".5" stop-color="#f3c64e"/><stop offset="1" stop-color="#c77a0e"/></linearGradient><radialGradient id="nb-normal" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="${NODE.normal.ring}"/><stop offset=".55" stop-color="${NODE.normal.col}"/><stop offset="1" stop-color="#173a6c"/></radialGradient><radialGradient id="nb-elite" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="${NODE.elite.ring}"/><stop offset=".55" stop-color="${NODE.elite.col}"/><stop offset="1" stop-color="#173a6c"/></radialGradient><radialGradient id="nb-boss" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="${NODE.boss.ring}"/><stop offset=".55" stop-color="${NODE.boss.col}"/><stop offset="1" stop-color="#173a6c"/></radialGradient><radialGradient id="nb-swarm" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="${NODE.swarm.ring}"/><stop offset=".55" stop-color="${NODE.swarm.col}"/><stop offset="1" stop-color="#173a6c"/></radialGradient><radialGradient id="nb-shrine" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="${NODE.shrine.ring}"/><stop offset=".55" stop-color="${NODE.shrine.col}"/><stop offset="1" stop-color="#173a6c"/></radialGradient><radialGradient id="nb-chest" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="${NODE.chest.ring}"/><stop offset=".55" stop-color="${NODE.chest.col}"/><stop offset="1" stop-color="#173a6c"/></radialGradient><radialGradient id="nb-rest" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="${NODE.rest.ring}"/><stop offset=".55" stop-color="${NODE.rest.col}"/><stop offset="1" stop-color="#173a6c"/></radialGradient><radialGradient id="nb-event" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="${NODE.event.ring}"/><stop offset=".55" stop-color="${NODE.event.col}"/><stop offset="1" stop-color="#173a6c"/></radialGradient><radialGradient id="nb-shop" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="${NODE.shop.ring}"/><stop offset=".55" stop-color="${NODE.shop.col}"/><stop offset="1" stop-color="#173a6c"/></radialGradient><radialGradient id="zg"><stop offset="0" stop-color="var(--zc,#ffb25a)" stop-opacity=".55"/><stop offset="1" stop-color="var(--zc,#ffb25a)" stop-opacity="0"/></radialGradient><radialGradient id="tg" cx=".5" cy=".12" r=".7"><stop offset="0" stop-color="#fff6c0" stop-opacity=".35"/><stop offset="1" stop-color="#fff6c0" stop-opacity="0"/></radialGradient><radialGradient id="rg" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
 <rect width="400" height="600" fill="url(#rg)"/><rect width="400" height="600" fill="url(#tg)"/>${stars}${cols}${faint}${gold}${nodes}</svg>`;
 }
 
@@ -1058,19 +1062,25 @@ function showDoors() {
   focusMap();
   requestAnimationFrame(focusMap);
   $('screen').style.setProperty('--zc', COLORS[ctx.zones[run.zoneId].element] || '#ffb25a');
+  $('screen').style.setProperty('--zbgt', `url(../assets/bg/${run.zoneId}_tall.webp)`);
 }
 
 function battleIntro() {
   const danger = run.node === 'boss' || run.node === 'elite';
   const foes = run.battle.enemies;
   const lead = foes[foes.length - 1];
+  const zc = COLORS[ctx.zones[run.zoneId].element] || '#ffd24a';
   return {
     danger,
     warn: t(run.node === 'boss' ? 'intro.boss' : 'intro.elite'),
-    title: danger ? t(`monster.${lead.id}`) : t(`zone.${run.zoneId}`),
-    sub: t('run.floor', { n: run.floor + 1, total: run.floors }),
+    title: danger ? t(`monster.${lead.id}`) : t(`zone.${run.zoneId}`).toUpperCase(),
+    zone: t(`zone.${run.zoneId}`).toUpperCase(),
+    stage: t('stage.num', { n: run.stage ?? 1 }).toUpperCase(),
+    col: zc,
+    floor: run.floor, floors: run.floors,
+    sub: danger ? `${t(`zone.${run.zoneId}`)} · ${t('stage.num', { n: run.stage ?? 1 })} · ${t('run.floor', { n: run.floor + 1, total: run.floors })}` : t('run.floor', { n: run.floor + 1, total: run.floors }),
     go: t('intro.go'),
-    dur: danger ? 3000 : 2400,
+    dur: danger ? 3000 : 3000,
   };
 }
 

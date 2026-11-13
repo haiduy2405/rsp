@@ -1403,19 +1403,19 @@ function drawIntro(g, view) {
   g.fillRect(0, H - bh, W, 2);
   // biển tên giữa khu che
   const bk = ease((a - 650) / 450) * (1 - ease((a - (T - 900)) / 380));
-  if (bk > 0.01) {
+  if (bk > 0.01 && !it.danger) drawZoneSign(g, it, a, bk);
+  else if (bk > 0.01) {
     const cy = 560;
     g.save();
     g.globalAlpha = bk;
     const lw = 250 * bk;
-    g.fillStyle = it.danger ? '#ff5a6a' : '#cfe6ff';
+    g.fillStyle = '#ff5a6a';
     g.fillRect(W / 2 - lw, cy - 52, lw * 2, 2);
     g.fillRect(W / 2 - lw, cy + 52, lw * 2, 2);
-    if (it.danger) text(g, it.warn, W / 2, cy - 30, 15, '#ff8a96', 'center', '800');
-    else text(g, it.sub, W / 2, cy - 30, 15, '#cfe6ff', 'center', '800');
+    text(g, it.warn, W / 2, cy - 30, 15, '#ff8a96', 'center', '800');
     g.translate((1 - bk) * -40, 0);
-    outlined(g, it.title, W / 2, cy + 8, it.title.length > 16 ? 30 : 38, '#ffffff', it.danger ? '#ff5a6a' : '#ffd24a', SERIF, 6, '700');
-    if (it.danger) text(g, it.sub, W / 2, cy + 38, 13, '#fff8e6', 'center', '700');
+    outlined(g, it.title, W / 2, cy + 8, it.title.length > 16 ? 30 : 38, '#ffffff', '#ff5a6a', SERIF, 6, '700');
+    text(g, it.sub, W / 2, cy + 38, 13, '#fff8e6', 'center', '700');
     g.restore();
   }
   // "Bắt đầu!"
@@ -1546,4 +1546,68 @@ function drawFx(g, f) {
       g.fillStyle = '#fff'; g.beginPath(); g.arc(x, y, 7, 0, Math.PI * 2); g.fill();
     });
   }
+}
+
+// Biển giới thiệu ải: tên khu cỡ lớn chữ vàng phát sáng màu hệ, dải ruy băng "ẢI n", hàng tầng, tia sáng xoay phía sau.
+function drawZoneSign(g, it, a, bk) {
+  const cy = 548, col = it.col;
+  g.save();
+  g.globalAlpha = bk;
+  LIGHTER(g, () => { // tia sáng xoay + quầng màu hệ
+    g.globalAlpha = bk * 0.5;
+    glow(g, W / 2, cy, 260, col, 0.6);
+    g.translate(W / 2, cy); g.rotate(a * 0.0004);
+    g.fillStyle = '#fff6d0';
+    for (let i = 0; i < 14; i++) { g.rotate((Math.PI * 2) / 14); g.beginPath(); g.moveTo(0, 0); g.lineTo(-9, -300); g.lineTo(9, -300); g.closePath(); g.globalAlpha = bk * 0.07; g.fill(); }
+  });
+  // đường vàng + thoi ở giữa
+  const lw = 230 * bk;
+  const goldLine = (y) => {
+    const gr = g.createLinearGradient(W / 2 - lw, 0, W / 2 + lw, 0);
+    gr.addColorStop(0, 'rgba(255,210,74,0)'); gr.addColorStop(0.5, '#ffe9a0'); gr.addColorStop(1, 'rgba(255,210,74,0)');
+    g.fillStyle = gr; g.fillRect(W / 2 - lw, y - 1.5, lw * 2, 3);
+    g.fillStyle = '#fff6c0'; g.beginPath(); g.moveTo(W / 2, y - 8); g.lineTo(W / 2 + 8, y); g.lineTo(W / 2, y + 8); g.lineTo(W / 2 - 8, y); g.closePath(); g.fill();
+  };
+  goldLine(cy - 70);
+  // tên khu: nảy vào từ lớn
+  const sc = 1 + (1 - bk) * 0.35;
+  g.save(); g.translate(W / 2, cy - 22); g.scale(sc, sc);
+  g.font = '700 46px ' + SERIF; // đo để vừa khung
+  const tw = g.measureText(it.zone).width;
+  const fs = Math.min(52, 46 * Math.min(1.3, (W - 70) / Math.max(1, tw)));
+  g.letterSpacing = '3px';
+  outlined(g, it.zone, 0, 0, fs, '#fff6c0', col, SERIF, 8, '700');
+  g.restore();
+  // ruy băng ẢI n
+  const rw = 150 * ease((a - 900) / 400), rh = 40, ry = cy + 30;
+  if (rw > 2) {
+    g.save(); g.translate(W / 2, ry);
+    const rg = g.createLinearGradient(0, -rh / 2, 0, rh / 2);
+    rg.addColorStop(0, '#fff0a8'); rg.addColorStop(0.5, '#f3c64e'); rg.addColorStop(1, '#c77a0e');
+    g.fillStyle = rg; g.strokeStyle = '#5a3210'; g.lineWidth = 3;
+    g.beginPath();
+    g.moveTo(-rw - 24, -rh / 2 + 8); g.lineTo(-rw, -rh / 2 + 8); g.lineTo(-rw, rh / 2 + 8); g.lineTo(-rw - 24, rh / 2 + 8); g.lineTo(-rw - 12, 8); g.closePath(); g.fill(); g.stroke(); // đuôi trái
+    g.beginPath();
+    g.moveTo(rw + 24, -rh / 2 + 8); g.lineTo(rw, -rh / 2 + 8); g.lineTo(rw, rh / 2 + 8); g.lineTo(rw + 24, rh / 2 + 8); g.lineTo(rw + 12, 8); g.closePath(); g.fill(); g.stroke(); // đuôi phải
+    g.beginPath(); g.roundRect(-rw, -rh / 2, rw * 2, rh, 6); g.fill(); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(-rw + 4, -rh / 2 + 3, rw * 2 - 8, 5);
+    g.letterSpacing = '4px';
+    text(g, it.stage, 0, 2, 26, '#3a2410', 'center', '800', SERIF);
+    g.restore();
+  }
+  // hàng tầng: thoi sáng đến tầng hiện tại
+  const n = it.floors || 1;
+  for (let i = 0; i < n; i++) {
+    const px = W / 2 + (i - (n - 1) / 2) * 26, py = cy + 92;
+    g.save(); g.translate(px, py); g.rotate(Math.PI / 4);
+    const cur = i === it.floor, done = i < it.floor;
+    g.fillStyle = cur ? '#fff6c0' : done ? '#f3c64e' : 'rgba(255,255,255,.18)';
+    g.strokeStyle = cur ? '#fff' : '#f3c64e'; g.lineWidth = 2;
+    const sz = cur ? 9 + Math.sin(a * 0.012) * 1.5 : 7;
+    g.fillRect(-sz / 2, -sz / 2, sz, sz); g.strokeRect(-sz / 2, -sz / 2, sz, sz);
+    g.restore();
+  }
+  text(g, it.sub, W / 2, cy + 122, 14, '#fff8e6', 'center', '700');
+  goldLine(cy + 146);
+  g.restore();
 }
