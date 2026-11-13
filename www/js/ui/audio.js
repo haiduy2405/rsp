@@ -326,6 +326,8 @@ export function createAudio(cfg, settings) {
     const bus = outBus;
     if (cfg.music?.[name] && !musicFail.has(name)) {
       fileMode = true;
+      if (bus._src || bus._loading) return; // unlock() chạy ở mỗi lần chạm: không được phát chồng thêm một bản nữa
+      bus._loading = true;
       loadMusic(name).then((buf) => {
         if (track !== name || outBus !== bus || !bus) return; // đã đổi bài trong lúc tải
         const src = ac.createBufferSource();
@@ -339,6 +341,7 @@ export function createAudio(cfg, settings) {
         bus._src = src;
       }).catch(() => {
         musicFail.add(name);
+        bus._loading = false;
         if (track === name) { fileMode = false; schedule(); }
       });
     } else {

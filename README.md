@@ -449,3 +449,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - **Sửa lỗi hiển thị:** vòng sóng và hạt nổ khi ngọc vỡ trước đây vẽ DƯỚI bàn ngọc nên không thấy; nay vẽ sau bàn.
 - Số combo nảy to mỗi lần tăng và ngả nóng dần (vàng → cam từ combo 6 → đỏ từ combo 10).
 - `tests/e2e/castfx.cjs`: chụp 6 hiệu ứng kỹ năng ở màn hướng dẫn (dùng `__game.fxCast`).
+
+### v0.61.1
+- **Sửa lỗi nhạc chồng lớp (nghe ồn, lộn xộn):** `unlock()` được gọi ở mỗi lần chạm nhưng bài nhạc từ file không có `timer`, nên mỗi lần chạm lại phát thêm một bản chồng lên bản đang chạy (8 lần chạm = 8 lớp). Nay `begin()` bỏ qua nếu bus đã có nguồn hoặc đang tải. Kiểm tra: `tests/e2e/music-layers.cjs` (8 lần chạm → đúng 1 nguồn; bản cũ ra 8).
