@@ -1,5 +1,4 @@
 // Màn hình: profile (tách khỏi main.js). Trạng thái dùng chung đi qua `app`.
-import { goldTitle } from './title.js';
 import { $, h, btn } from './dom.js';
 import { zoneClears } from '../core/stage.js';
 import { avatarNode, photoFromFile } from '../ui/avatar.js';
@@ -8,7 +7,6 @@ import { newProgress } from '../core/progress.js';
 import { redeemGift } from '../core/giftcode.js';
 import * as offline from '../ui/offline.js';
 import { flagPicker } from './flags.js';
-import { TOWER } from './tower-art.js';
 
 export function install(app) {
   const { audio, ctx, dicts, music, save, screen, setLang, showHub, storage, t } = app;
@@ -205,10 +203,10 @@ export function install(app) {
     if (step === 1) {
       const lines = ['ob.alarm1', 'ob.alarm2', 'ob.alarm3'].map((k) => h('p', { class: 'ob-line' }, t(k)));
       const tower = h('div', { class: 'ob-tower' });
-      tower.innerHTML = TOWER;
+      tower.append(h('i', { class: 'ob-glow' }));
       music('title');
       screen(
-        h('div', { class: 'ob-story' }, tower, (() => { const e = h('h1', {}); goldTitle(e, t('game.title'), t('game.subtitle')); return e; })(), h('div', { class: 'ob-lines' }, lines),
+        h('div', { class: 'ob-story' }, tower, h('div', { class: 'ob-lines' }, lines),
           h('div', { class: 'ob-actions' }, btn(t('ob.next'), () => showOnboarding(2), 'primary', { id: 'ob-next' }), btn(t('ob.skip'), () => showOnboarding(2), 'ghost', { id: 'ob-skip' }))),
       );
       lines.forEach((l, i) => app.obTimers.push(setTimeout(() => l.classList.add('on'), 500 + i * 2200)));

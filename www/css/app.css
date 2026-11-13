@@ -1209,3 +1209,12 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 /* v0.89.3: bỏ khung hoa văn quanh tên game */
 .lg-frame { background: none; padding: 6px 0 4px; }
 .lg-frame::before, .lg-frame::after, .lg-c { display: none; }
+
+/* v0.90: màn mở đầu: bỏ tên game; Tòa Tháp là tranh vẽ trong khung vòm vàng, gọn một màn không phải cuộn */
+.ob-story { gap: 12px; padding: 10px 8px 12px; }
+.ob-tower { position: relative; height: clamp(170px, 34vh, 300px); width: auto; aspect-ratio: 760 / 1100; border-radius: 999px 999px 18px 18px; overflow: hidden;
+  background: url(../assets/bg/hub.webp) 52% 0 / 135% auto no-repeat, #fb9b6f; border: 3px solid #f3c64e; outline: 2px solid #5a3010; outline-offset: -1px;
+  box-shadow: 0 0 0 3px #3b2314, 0 0 28px rgba(255, 200, 90, .55), 0 10px 22px rgba(0, 0, 0, .55); }
+.ob-glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 12%, rgba(255, 246, 200, .55), transparent 55%), linear-gradient(180deg, transparent 70%, rgba(40, 18, 6, .45)); animation: obEye 3.2s ease-in-out infinite; }
+.ob-lines { gap: 8px; min-height: 0; font-size: 15px; line-height: 1.4; }
+.ob-lines .ob-line { min-height: 2.8em; }
