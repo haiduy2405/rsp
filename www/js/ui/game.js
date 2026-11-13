@@ -223,6 +223,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         if (!alive) return;
         view.rings.push({ x: TALLY.x, y: TALLY.y, col: q.el, age: 0, life: 320 });
         tally(amt);
+        const tl = view.tally; if (!tl.els) tl.els = []; if (!tl.els.includes(q.el)) tl.els.push(q.el); // hệ đã cộng vào số tổng → màu số tổng
       }, q.hold + q.fly);
     }
   }
@@ -518,7 +519,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       if (view.hintKeep) view.hint = view.hintKeep;
       return;
     }
-    view.tally = { shown: 0, target: 0, pulse: 0 };
+    view.tally = { shown: 0, target: 0, pulse: 0, els: [] };
     const hadStep = r.events.some((e) => e.type === 'step');
     if (action.type === 'move' && !hadStep && !(state.freeze > 0)) floater(t('battle.noCombo'), W / 2, 700, '#c8ccff', 30);
     celebrated = false;
@@ -786,7 +787,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       view.timerSec = (view.timer * dragMs) / 1000;
       if (k <= 0) release();
     }
-    if (view.tally) { const ty = view.tally; ty.shown += (ty.target - ty.shown) * Math.min(1, real / 120); if (Math.abs(ty.target - ty.shown) < 1) ty.shown = ty.target; ty.pulse = Math.max(0, ty.pulse - dt / 500); }
+    if (view.tally) { const ty = view.tally; ty.shown += (ty.target - ty.shown) * Math.min(1, real / 120); if (Math.abs(ty.target - ty.shown) < 1) ty.shown = ty.target; if (ty.shown === 0 && ty.target === 0 && ty.els?.length) ty.els = []; ty.pulse = Math.max(0, ty.pulse - dt / 500); }
     if (view.intro) {
       const it = view.intro;
       const prev = it.age;

@@ -436,6 +436,49 @@ function outlined(g, str, x, y, size, top, bottom, family, lw = 5, weight = '700
   g.fillText(str, x, y);
   g.restore();
 }
+// Số tổng nhiều hệ: chữ tô sọc chéo xen kẽ màu các hệ đã cộng vào, sọc trôi liên tục (quấn lấy nhau).
+const stripeCache = new Map();
+function stripePattern(g, els) {
+  const key = els.join(',');
+  let c = stripeCache.get(key);
+  if (!c) {
+    const sw = 14, cv = document.createElement('canvas');
+    cv.width = sw * els.length; cv.height = 8;
+    const cx = cv.getContext('2d');
+    els.forEach((e, i) => {
+      const gr = cx.createLinearGradient(0, 0, 0, 8);
+      gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.25, mixWhite(COLORS[e], 0.25)); gr.addColorStop(1, COLORS[e]);
+      cx.fillStyle = gr; cx.fillRect(i * sw, 0, sw, 8);
+    });
+    c = cv; stripeCache.set(key, c);
+  }
+  return { cv: c, pat: g.createPattern(c, 'repeat') };
+}
+function mixWhite(hex, k) {
+  const n = parseInt(hex.slice(1), 16);
+  const f = (v) => Math.round(v + (255 - v) * k);
+  return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`;
+}
+function outlinedStripes(g, str, x, y, size, els, t, family, lw = 5) {
+  g.save();
+  g.font = `700 ${size}px ${family}`;
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round'; g.miterLimit = 2;
+  const w0 = g.globalAlpha;
+  g.globalAlpha = w0 * 0.4; g.strokeStyle = COLORS[els[0]]; g.lineWidth = lw + size * 0.2; g.strokeText(str, x, y);
+  g.globalAlpha = w0; g.strokeStyle = 'rgba(22, 58, 108, 0.95)'; g.lineWidth = lw; g.strokeText(str, x, y);
+  if (els.length === 1) {
+    const gr = g.createLinearGradient(0, y - size * 0.5, 0, y + size * 0.5);
+    gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.3, mixWhite(COLORS[els[0]], 0.3)); gr.addColorStop(1, COLORS[els[0]]);
+    g.fillStyle = gr;
+  } else {
+    const { pat } = stripePattern(g, els);
+    const m = new DOMMatrix().translate(x + t * 0.035, y).rotate(32).scale(Math.max(0.8, size / 44), Math.max(0.8, size / 44));
+    pat.setTransform(m);
+    g.fillStyle = pat;
+  }
+  g.fillText(str, x, y);
+  g.restore();
+}
 const bounceOut = (x) => {
   const n1 = 7.5625;
   const d1 = 2.75;
@@ -810,7 +853,13 @@ export function draw(g, view, t) {
     outlined(g, `${view.combo}`, W / 2 - 128, 338, Math.round((54 + Math.min(16, view.combo * 2)) * (1 + 0.32 * (view.comboPop || 0))), heat[0], heat[1], NUM, 5);
     text(g, view.t('battle.comboWord'), W / 2 - 128, 364, 13, '#fff8e6', 'center', '700');
   }
-  if (view.tally && view.tally.shown > 0) outlined(g, new Intl.NumberFormat(document.documentElement.lang || 'vi').format(Math.round(view.tally.shown)), W / 2 + 90, 340, Math.round(50 * (1 + 0.4 * Math.min(1, view.tally.pulse))), '#fff0d0', '#ff7a2a', NUM, 5);
+  if (view.tally && view.tally.shown > 0) {
+    const txt = new Intl.NumberFormat(document.documentElement.lang || 'vi').format(Math.round(view.tally.shown));
+    const sz = Math.round(50 * (1 + 0.4 * Math.min(1, view.tally.pulse)));
+    const els = view.tally.els?.length ? view.tally.els : null;
+    if (els) outlinedStripes(g, txt, W / 2 + 90, 340, sz, els, performance.now(), NUM, 5);
+    else outlined(g, txt, W / 2 + 90, 340, sz, '#fff0d0', '#ff7a2a', NUM, 5);
+  }
 
   // máu đội chung
   if (view.hpPulse > 0.01) {
@@ -831,7 +880,7 @@ export function draw(g, view, t) {
     const th = lead ? 84 : 76; // đáy hai loại ô thẳng hàng ở 466; đội trưởng cao hơn 8px
     const y = 466 - th;
     const ready = m.skillCd === 0;
-    panel(g, x, y, 98, th, lead ? '#ffd24a' : COLORS[m.element], lead ? 2 : 1);
+    panel(g, x, y, 98, th, lead ? '#ffd24a' : null, lead ? 2 : 1); // không viền màu hệ: đã có ngọc hệ
     if (lead) {
       g.save();
       g.globalAlpha = 0.7 + 0.3 * Math.sin(t * 0.004);
