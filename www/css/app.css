@@ -1346,3 +1346,7 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .sk-btns { margin: 10px 12px 0; gap: 6px; }
 .sk-btns .primary { min-height: 44px; font-size: 16px; }
 .sk-btns button { min-height: 38px; }
+
+/* v0.95.3: dòng bản quyền + phiên bản màn tải nằm trên lớp nền, đọc rõ */
+.loading .ld-ver { z-index: 3; font-size: 12px; font-weight: 700; color: rgba(255, 244, 214, .9); text-shadow: 0 1px 3px rgba(10, 30, 70, .8); }
+.loading .ld-box { padding-bottom: calc(44px + var(--sat, 0px)); }

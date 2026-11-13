@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.95.3
+- Màn tải: hiện lại dòng "Made by duyluma · phiên bản · build" ở chân màn (trước đó nằm dưới lớp nền nên không thấy). Rollback cục bộ: tag tiền nhiệm `pre-tally-v0.95.0` vẫn dùng được.
+
 ## v0.95.2
 - Số damage tổng: tô sọc chéo xen kẽ màu các hệ của tướng đã cộng vào đòn (1 hệ: màu hệ đó; 2-3 hệ: sọc trôi quấn nhau).
 - Bảng xác nhận kỹ năng nhỏ gọn hơn (rộng tối đa 330px) và hơi trong suốt.
