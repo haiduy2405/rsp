@@ -1,3 +1,4 @@
+import { goldTitle } from './title.js';
 // Màn hình tải: Tòa Tháp sáng dần từng tầng theo tiến độ, mẹo xoay vòng, chạm để vào.
 // Dùng cả để che thời gian tải lẫn dạy luật chơi / giới thiệu thế giới (tips) và mở khóa âm thanh bằng cái chạm đầu tiên.
 const TIP_COUNT = 8;
@@ -28,8 +29,7 @@ export function createLoading({ t, title, subtitle, version = '', auto = false }
   const h1 = document.createElement('h1');
   h1.textContent = title;
   // Tên game: chữ vàng gold 3D, có ánh đèn quét ngang (CSS .gold3d)
-  h1.className = 'gold3d';
-  h1.dataset.t = title;
+  goldTitle(h1, title);
   const sub = document.createElement('div');
   sub.className = 'ld-sub';
   sub.textContent = subtitle;

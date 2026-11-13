@@ -551,3 +551,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Thẻ tướng trong trận (`renaissanceFrame` trong `render.js`): viền vàng bọc cả ô (ảnh + tên), hàng hạt ngọc cạnh trên/dưới, xoắn volute kèm lá acanthus ở 4 góc, vỏ sò giữa cạnh trên, nút thoi giữa cạnh dưới; đội trưởng viền lớn hơn. Đèn quét ngang dùng chung với `goldFrame`.
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
+
+## v0.84.0 — Tên game chữ hộp 3D vàng lấp lánh
+- Theo phác thảo của Duy (chữ khối vuông, graffiti hộp): một hàng, font **Bungee** (OFL, có tiếng Việt) làm chữ hộp; độ dày 6 lớp vàng tối dần, mặt trước gradient vàng gold, đèn quét ngang chỉ ở mặt trước, viền neon xanh băng (#9DF1FF) + quầng sáng ở đáy chữ, 8 ngôi sao lấp lánh nhấp nháy. Helper `goldTitle` (`www/js/ui/title.js`) tự co cỡ chữ để luôn vừa một hàng. Dùng ở màn tải + onboarding.
+- Hoàn tác: tag `pre-box-title-v0.83.0`.
