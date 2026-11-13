@@ -1166,7 +1166,9 @@ export function draw(g, view, t) {
     const k = f.age / f.life;
     const pop = Math.min(1, f.age / 150);
     const back = 1 + 2.2 * Math.pow(pop - 1, 3) + 1.2 * Math.pow(pop - 1, 2); // easeOutBack
-    const sc = f.kind === 'dmg' ? 0.35 + 0.65 * back + (f.age < 150 ? 0.18 * (1 - pop) : 0) : 0.6 + 0.4 * back;
+    let sc = f.kind === 'dmg' ? 0.35 + 0.65 * back + (f.age < 150 ? 0.18 * (1 - pop) : 0) : 0.6 + 0.4 * back;
+    if (f.grow && f.grow !== 1 && !REDUCED) { const gk = Math.min(1, Math.max(0, (f.age - 120) / 650)); sc *= 1 + (f.grow - 1) * (gk * gk * (3 - 2 * gk)); } // to dần / nhỏ dần sau cú nảy đầu
+    else if (f.grow && REDUCED) sc *= f.grow;
     const rise = 46 * (1 - Math.pow(1 - Math.min(1, k * 1.3), 2));
     g.save();
     g.globalAlpha = k < 0.7 ? 1 : 1 - (k - 0.7) / 0.3;
