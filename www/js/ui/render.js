@@ -752,22 +752,6 @@ export function draw(g, view, t) {
       g.restore();
     } else drawOrb(g, e.element, cx + sh, 160, 46 * (1 + 0.12 * (e.hit || 0)));
     if (e.effects?.length && !dead) statusFx(g, e.effects, cx + sh, 160, t);
-    if (!dead && view.actor) { // tướng đang ra đòn: quái hiện lợi thế (xanh ▲) / bất lợi (đỏ ▼) của tướng đó, phía trên bên phải đầu
-      const mult = view.rel2 ? view.rel2(view.actor.el, e.element) : 1;
-      if (mult !== 1) {
-        const up = mult > 1, pk = Math.min(1, view.actor.age / 220);
-        const sc = 0.4 + 0.6 * (1 + 2.2 * Math.pow(pk - 1, 3) + 1.4 * Math.pow(pk - 1, 2));
-        g.save(); g.translate(cx + sh + 56, 96); g.scale(sc, sc); g.globalAlpha = Math.min(1, pk * 1.6);
-        g.fillStyle = up ? '#25b85a' : '#e03a30'; g.strokeStyle = '#fff8e6'; g.lineWidth = 3;
-        g.beginPath(); g.arc(0, 0, 17, 0, Math.PI * 2); g.fill(); g.stroke();
-        g.fillStyle = '#ffffff'; g.beginPath();
-        if (up) { g.moveTo(0, -9); g.lineTo(10, 4); g.lineTo(-10, 4); } else { g.moveTo(0, 9); g.lineTo(10, -4); g.lineTo(-10, -4); }
-        g.closePath(); g.fill();
-        g.fillStyle = COLORS[view.actor.el]; g.strokeStyle = '#fff8e6'; g.lineWidth = 2; // chấm hệ của tướng đang ra đòn
-        g.beginPath(); g.arc(13, 14, 6.5, 0, Math.PI * 2); g.fill(); g.stroke();
-        g.restore();
-      }
-    }
     if (e.hit) {
       g.globalAlpha = 0.55 * e.hit;
       g.fillStyle = '#ffffff';
@@ -897,6 +881,8 @@ export function draw(g, view, t) {
       g.fill();
     }
     const icy = 466 - 48; // tâm ảnh tướng cách đáy 48 (cùng cao ở mọi ô)
+    const rel = view.rel ? view.rel(m.element) : 1; // chỉ có khi đã khóa mục tiêu: lợi (▲ xanh) / bất lợi (▼ đỏ) so với hệ quái bị khóa
+    if (rel !== 1) { relArrows(g, x + 14, icy, rel > 1 ? 1 : -1, t); relArrows(g, x + 84, icy + 4, rel > 1 ? 1 : -1, t + 460); }
     const ic = getImg(`icon:${m.id}`);
     if (ic) {
       const S = 44;

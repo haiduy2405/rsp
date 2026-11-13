@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.96.2
+- Lợi/bất lợi hệ: bỏ icon trên đầu quái (v0.94.0). Quay lại mũi tên xanh ▲ / đỏ ▼ ở ô tướng, nhưng CHỈ hiện khi đã khóa mục tiêu và so với hệ quái bị khóa; chưa khóa thì không báo. Đổi quái khóa thì mũi tên đổi theo. Rollback cục bộ: tag `pre-rel-v0.96.1`.
+
 ## v0.96.0 – v0.96.1
 - Màn chọn cửa: nền là tranh của khu, cột ngà vàng với đuốc màu hệ, cửa là huy hiệu vàng có icon, cửa đang chọn nảy + vòng quay + quầng sáng, cửa Boss/cuối có gai sao, đường đi lấp lánh (vàng cho đoạn đã đi), ô chưa biết là bong bóng mờ "?", nhãn dạng bảng, nút vật phẩm bo tròn viền vàng, tiêu đề khung vàng.
 - Màn giới thiệu ải trước trận thường: tên khu cỡ lớn chữ vàng phát sáng (VD "KHU THỦY"), ruy băng "ẢI 1", hàng thoi biểu thị tầng, tia sáng xoay; Elite/Boss giữ cảnh báo đỏ + tên quái, dòng phụ ghi khu · ải · tầng. Rollback cục bộ: tag `pre-doors-v0.95.3`, `pre-intro-v0.95.3`.
