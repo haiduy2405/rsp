@@ -560,3 +560,8 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - "THIÊN THÁP DỊ ĐIỂM" dựng bằng SVG (`www/js/ui/title-svg.js`), từng chữ vẽ tay theo phác thảo: khối béo, T tràn trái, H/N có nét vươn lên, mỗi chữ lệch cao/nghiêng/cỡ khác nhau, dấu mũ/sắc/hỏi là mảnh rời nổi phía trên, Ị có chấm dưới, Đ có gạch ngang.
 - Hộp 3D (8 lớp vàng tối dần), mặt trước gradient vàng, đèn quét ngang chỉ trên mặt trước (mask theo chữ), viền neon xanh băng ở đáy chữ, sao lấp lánh.
 - Chỉ áp cho tên tiếng Việt; tiếng Anh vẫn dùng chữ Bungee (`goldTitle` trong `title.js`). Hoàn tác: tag `pre-sketch-title-v0.84.0`.
+
+## v0.86.0 — Tên game phong cách luxury graffiti + kim cương trang trí
+- Tên game (SVG, `title-svg.js`): mặt vàng gradient có vết nứt + hoa văn chạm xoắn, khối đen dày có vành vàng, giọt vàng chảy (nhấp nhô) và giọt đen, vương miện vàng ngọc trai phía trên, mực đen bắn quanh, đèn quét ngang mặt trước, viền neon xanh băng mảnh ở đáy, sao lấp lánh.
+- Dưới tên có 5 viên kim cương vàng to nhỏ xen kẽ (`assets/ui/diamond.webp`, tách nền đen từ ảnh Duy cấp), lơ lửng nhấp nhô và tỏa sáng (`.gt-gems`).
+- Hoàn tác: tag `pre-luxury-title-v0.85.0`.

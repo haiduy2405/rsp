@@ -7,6 +7,18 @@ export function goldTitle(el, text) {
   if (isVi(text)) {
     el.classList.add('gt-sketch');
     el.innerHTML = buildTitleSvg();
+    // kim cương vàng trang trí dưới tên: to nhỏ xen kẽ, lơ lửng + lóe sáng
+    const row = document.createElement('div');
+    row.className = 'gt-gems';
+    [[28, 0.2], [42, 0.9], [60, 0], [42, 0.5], [28, 1.2]].forEach(([sz, dl]) => {
+      const im = document.createElement('img');
+      im.src = 'assets/ui/diamond.webp';
+      im.alt = '';
+      im.draggable = false;
+      im.style.cssText = `width:${sz}px;animation-delay:${dl}s`;
+      row.append(im);
+    });
+    el.append(row);
     return;
   }
   el.classList.add('gt3d');
