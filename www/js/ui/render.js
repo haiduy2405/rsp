@@ -50,6 +50,91 @@ function enhancedAura(g, x, y, r) {
   g.restore();
 }
 
+const nowMs = () => (typeof performance !== 'undefined' ? performance.now() : 0);
+
+// Ngọc 2.5D: dựng sẵn một lần cho mỗi art (đổ khối + bóng kính + ánh phản chiếu đáy), vẽ mỗi khung chỉ là drawImage.
+const sprites = new Map();
+function orbSprite(key, im, col, shiny = 1) {
+  if (!im || !im.naturalWidth) return im;
+  const hit = sprites.get(key);
+  if (hit && hit.src === im) return hit.cv;
+  const S = 192;
+  const cv = document.createElement('canvas');
+  cv.width = S; cv.height = S;
+  const c = cv.getContext('2d');
+  c.drawImage(im, 0, 0, S, S);
+  c.globalCompositeOperation = 'source-atop'; // mọi lớp dưới đây chỉ tô lên phần có hình
+  // khối: sáng ở góc trên trái, tối dần về góc dưới phải
+  let gr = c.createRadialGradient(S * 0.36, S * 0.3, S * 0.05, S * 0.5, S * 0.5, S * 0.78);
+  gr.addColorStop(0, 'rgba(255,255,255,0.30)');
+  gr.addColorStop(0.45, 'rgba(255,255,255,0)');
+  gr.addColorStop(1, 'rgba(10,4,0,0.42)');
+  c.fillStyle = gr; c.fillRect(0, 0, S, S);
+  // ánh phản chiếu từ nền, màu của hệ, ở đáy
+  gr = c.createLinearGradient(0, S * 0.62, 0, S);
+  gr.addColorStop(0, col + '00');
+  gr.addColorStop(1, col + '88');
+  c.fillStyle = gr; c.fillRect(0, 0, S, S);
+  // vệt bóng kính lớn (cong, góc trên trái)
+  c.save();
+  c.translate(S * 0.36, S * 0.27);
+  c.rotate(-0.62);
+  gr = c.createLinearGradient(0, -S * 0.12, 0, S * 0.12);
+  gr.addColorStop(0, `rgba(255,255,255,${0.85 * shiny})`);
+  gr.addColorStop(1, 'rgba(255,255,255,0)');
+  c.fillStyle = gr;
+  c.beginPath(); c.ellipse(0, 0, S * 0.2, S * 0.085, 0, 0, Math.PI * 2); c.fill();
+  c.restore();
+  // chấm sáng nhỏ + viền sáng mảnh phía dưới phải
+  c.fillStyle = `rgba(255,255,255,${0.9 * shiny})`;
+  c.beginPath(); c.arc(S * 0.62, S * 0.2, S * 0.022, 0, Math.PI * 2); c.fill();
+  c.globalAlpha = 0.5;
+  c.strokeStyle = '#fff';
+  c.lineWidth = 2;
+  c.beginPath(); c.arc(S * 0.5, S * 0.5, S * 0.44, 0.15 * Math.PI, 0.5 * Math.PI); c.stroke();
+  sprites.set(key, { src: im, cv });
+  return cv;
+}
+
+// Tia lấp lánh bốn cánh, mỗi viên một nhịp riêng (chớp ~0.5s mỗi ~3s).
+function orbTwinkle(g, x, y, r, t) {
+  const k = ((t * 0.001 + x * 0.013 + y * 0.021) % 3.3) / 0.55;
+  if (k >= 1) return;
+  const a = Math.sin(k * Math.PI);
+  const cx = x - r * 0.38, cy = y - r * 0.42, L = r * (0.22 + 0.34 * a);
+  g.save();
+  g.globalCompositeOperation = 'lighter';
+  g.globalAlpha = 0.9 * a;
+  g.fillStyle = '#fff';
+  g.beginPath();
+  g.moveTo(cx, cy - L); g.lineTo(cx + L * 0.16, cy - L * 0.16); g.lineTo(cx + L, cy); g.lineTo(cx + L * 0.16, cy + L * 0.16);
+  g.lineTo(cx, cy + L); g.lineTo(cx - L * 0.16, cy + L * 0.16); g.lineTo(cx - L, cy); g.lineTo(cx - L * 0.16, cy - L * 0.16);
+  g.closePath();
+  g.fill();
+  g.restore();
+}
+
+// Bóng chạm đất mềm dưới ngọc + quầng sáng neon màu hệ phía sau (gradient xuyên tâm, rẻ hơn shadowBlur).
+function orbGlow(g, type, x, y, r) {
+  const sh = g.createRadialGradient(x, y + r * 0.78, 0, x, y + r * 0.78, r * 0.95);
+  sh.addColorStop(0, 'rgba(0,0,0,0.42)');
+  sh.addColorStop(1, 'rgba(0,0,0,0)');
+  g.save();
+  g.translate(0, 0);
+  g.fillStyle = sh;
+  g.beginPath();
+  g.ellipse(x, y + r * 0.78, r * 0.95, r * 0.34, 0, 0, Math.PI * 2);
+  g.fill();
+  const gl = g.createRadialGradient(x, y, r * 0.55, x, y, r * 1.28);
+  gl.addColorStop(0, COLORS[type] + '88');
+  gl.addColorStop(1, COLORS[type] + '00');
+  g.fillStyle = gl;
+  g.beginPath();
+  g.arc(x, y, r * 1.28, 0, Math.PI * 2);
+  g.fill();
+  g.restore();
+}
+
 // Mỗi hệ một hình khác nhau để phân biệt khi mù màu.
 export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
   g.save();
@@ -58,13 +143,17 @@ export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
   const imE = enhanced ? getImg(`orbE:${type}`) : null;
   if (imE) {
     const R = r * 1.14;
-    g.drawImage(imE, x - R, y - R, R * 2, R * 2);
+    if (r >= 14) orbGlow(g, type, x, y, r);
+    g.drawImage(orbSprite(`E${type}`, imE, COLORS[type], 0.7), x - R, y - R, R * 2, R * 2);
+    if (r >= 20) orbTwinkle(g, x, y, R, nowMs());
     g.restore();
     return;
   }
   const im = getImg(`orb:${type}`);
   if (im) {
-    g.drawImage(im, x - r, y - r, r * 2, r * 2);
+    if (r >= 14) orbGlow(g, type, x, y, r);
+    g.drawImage(orbSprite(`N${type}`, im, COLORS[type]), x - r, y - r, r * 2, r * 2);
+    if (r >= 20) orbTwinkle(g, x, y, r, nowMs());
     if (enhanced) enhancedAura(g, x, y, r);
     g.restore();
     return;
@@ -148,14 +237,36 @@ function panel(g, x, y, w, h, accent) {
   const gr = g.createLinearGradient(0, y, 0, y + h);
   gr.addColorStop(0, 'rgba(84, 52, 30, 0.9)');
   gr.addColorStop(1, 'rgba(34,20,12, 0.94)');
+  g.save();
+  g.shadowColor = 'rgba(0,0,0,0.55)'; // bóng đổ xuống nền
+  g.shadowBlur = 10;
+  g.shadowOffsetY = 4;
   g.fillStyle = gr;
   g.fillRect(x, y, w, h);
+  g.restore();
   g.strokeStyle = 'rgba(211,154,94,0.95)';
   g.lineWidth = 1;
   g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
   if (accent) {
+    // viền neon theo màu hệ: một nét sáng trong + quầng mờ ngoài
+    g.save();
+    g.shadowColor = accent;
+    g.shadowBlur = 9;
+    g.strokeStyle = accent;
+    g.globalAlpha = 0.85;
+    g.lineWidth = 1.5;
+    g.strokeRect(x + 1, y + 1, w - 2, h - 2);
+    g.restore();
+    const hl = g.createLinearGradient(x, 0, x + w, 0);
+    hl.addColorStop(0, 'rgba(255,255,255,0)');
+    hl.addColorStop(0.5, accent);
+    hl.addColorStop(1, 'rgba(255,255,255,0)');
     g.fillStyle = accent;
     g.fillRect(x + 1, y + 1, w - 2, 3);
+    g.fillStyle = hl;
+    g.globalAlpha = 0.5;
+    g.fillRect(x + 1, y + 4, w - 2, 5);
+    g.globalAlpha = 1;
   }
 }
 
@@ -442,7 +553,24 @@ export function draw(g, view, t) {
       const bob = dead ? 0 : Math.sin(t * 0.003 + i) * 3 + lk * 46;
       const sz = 150 * sc;
       const br = dead ? 0 : Math.sin(t * 0.0042 + i * 1.7) * 0.025; // thở: co giãn dọc, chân đứng yên
+      // bóng đổ dưới chân (co lại khi quái nhảy lên) + quầng neon màu hệ nhấp nhô quanh hình
+      const gy = 165 + 150 * 0.4 + 6;
+      const sk = 1 - Math.min(0.35, Math.max(0, (bob - 3) / 160));
+      const sg = g.createRadialGradient(cx + sh * 0.4, gy, 0, cx + sh * 0.4, gy, 70 * sk);
+      sg.addColorStop(0, 'rgba(0,0,0,0.55)');
+      sg.addColorStop(1, 'rgba(0,0,0,0)');
+      g.save();
+      g.globalAlpha *= 0.9;
+      g.fillStyle = sg;
+      g.beginPath();
+      g.ellipse(cx + sh * 0.4, gy, 70 * sk, 15 * sk, 0, 0, Math.PI * 2);
+      g.fill();
+      g.restore();
+      g.save();
+      g.shadowColor = COLORS[e.element];
+      g.shadowBlur = dead ? 0 : 14 + 6 * Math.sin(t * 0.004 + i);
       g.drawImage(mi, cx + sh - sz / 2 * (1 - br), 165 - sz / 2 + bob - sz * br, sz * (1 - br), sz * (1 + br));
+      g.restore();
     } else drawOrb(g, e.element, cx + sh, 160, 46 * (1 + 0.12 * (e.hit || 0)));
     if (e.effects?.length && !dead) statusFx(g, e.effects, cx + sh, 160, t);
     if (e.hit) {
@@ -750,6 +878,16 @@ export function draw(g, view, t) {
       g.fillStyle = (r + c) % 2 ? 'rgba(96, 62, 36, 0.6)' : 'rgba(66, 40, 22, 0.6)';
       g.beginPath();
       g.roundRect(BOARD_X + c * CELL + 2, BOARD_Y + r * CELL + 2, CELL - 4, CELL - 4, 8);
+      g.fill();
+      // hốc lõm: bóng tối ở mép trên, vệt sáng mảnh ở mép dưới
+      const hx = BOARD_X + c * CELL + 2, hy = BOARD_Y + r * CELL + 2;
+      const hg = g.createLinearGradient(0, hy, 0, hy + CELL - 4);
+      hg.addColorStop(0, 'rgba(10,4,0,0.38)');
+      hg.addColorStop(0.35, 'rgba(10,4,0,0)');
+      hg.addColorStop(1, 'rgba(255,200,140,0.10)');
+      g.fillStyle = hg;
+      g.beginPath();
+      g.roundRect(hx, hy, CELL - 4, CELL - 4, 8);
       g.fill();
     }
   g.fillStyle = 'rgba(220,195,160,0.55)';

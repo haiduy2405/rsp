@@ -488,3 +488,9 @@ Bấm nhận thưởng/thành tựu/nhiệm vụ, nhận quà Cửa hàng, quay 
 
 ## v0.71.0 — Duo kiểu hợp lực
 Duo không còn hồi chiêu riêng: sẵn sàng khi hai tướng liền ô thuộc cặp định sẵn và CẢ HAI skill đơn đều sẵn sàng (hai ô phát sáng, dây năng lượng nối hai ảnh, nút Duo bật). Chạm tướng hỏi Skill đơn hay Duo. Duo chạy cả hai skill đơn ×`config.duo.mult` (1,5) rồi thêm hiệu ứng riêng của cặp (`duos.json` chỉ còn các hiệu ứng, bỏ sát thương/hồi máu riêng); cả hai tướng vào hồi chiêu. Hiệu ứng: chữ DUO, hai hệ bung cùng lúc, vòng sáng hội tụ, rung màn. Cân bằng: Duo = hy sinh hai lượt skill đơn đổi lấy x1,5 + hiệu ứng, cần theo dõi bằng balance-sim.
+
+## v0.72.0 — Chiều sâu và neon (góp ý từ bạn bè)
+- **Ngọc 2.5D**: mỗi ngọc dựng sẵn một lần (`orbSprite` trong render.js) với đổ khối sáng/tối, vệt bóng kính, ánh phản chiếu đáy màu hệ, viền sáng mảnh; thêm bóng chạm đất, quầng neon màu hệ phía sau và tia lấp lánh bốn cánh chớp lệch pha từng viên. Hốc bàn có bóng lõm. Ngọc Nâng Cấp cũng được phủ bóng kính.
+- **Quái**: bóng đổ dưới chân (co lại khi nhảy) + quầng neon màu hệ nhịp thở.
+- **Ô tướng trong trận**: bóng đổ rơi, viền neon màu hệ, vạch sáng đầu ô.
+- **Giao diện DOM**: tiêu đề phát sáng, nút nổi khối, nút chính có quầng thở + vệt sáng quét, khung thẻ bóng sâu hơn và góc vàng phát sáng, ô tướng/thẻ triệu hồi có viền neon theo hệ (4-5★ sáng mạnh, 5★ nhấp nháy), icon quái/dock có bóng đổ. Tôn trọng `prefers-reduced-motion`.

@@ -609,7 +609,7 @@ function tile(id, slotNo) {
   const c = progress.characters[id];
   return h(
     'div',
-    { class: 'tile' + (slotNo ? ' in' : ''), 'data-char': id },
+    { class: `tile r${def.rarity}` + (slotNo ? ' in' : ''), 'data-char': id, style: `--el:${COLORS[def.element]}` },
     portrait(id, 66),
     h('i', { class: 'tdot', style: `background:${COLORS[def.element]}` }),
     slotNo ? h('b', { class: 'tslot' }, String(slotNo)) : null,

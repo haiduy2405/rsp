@@ -1083,3 +1083,46 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .duo-ask { border-color: #ffd24a; box-shadow: 0 0 14px rgba(255, 210, 74, .35); }
 .duo-plus { font-size: 22px; color: #ffd24a; text-shadow: 0 0 8px rgba(255, 190, 40, .9); }
 button.duo { background: linear-gradient(180deg, #fff0a0, #ffb92e); color: #3a1d00; box-shadow: 0 0 14px rgba(255, 190, 40, .7); }
+
+/* ===== v0.72: chiều sâu + neon. Bóng đổ nhiều lớp, viền sáng theo màu hệ, tiêu đề phát sáng ===== */
+:root { --neon-gold: 0 0 6px rgba(255, 217, 120, .75), 0 0 18px rgba(240, 185, 74, .45); --neon-seal: 0 0 6px rgba(255, 138, 114, .7), 0 0 20px rgba(224, 69, 60, .45); }
+
+/* tiêu đề: bóng đổ + quầng sáng */
+h1, h2 { text-shadow: 0 2px 0 rgba(20, 10, 4, .8), 0 0 14px rgba(255, 190, 110, .28), 0 6px 22px rgba(0, 0, 0, .6); }
+h1 { text-shadow: 0 2px 0 rgba(20, 10, 4, .8), 0 0 16px rgba(255, 138, 114, .55), 0 0 38px rgba(224, 69, 60, .4); }
+
+/* nút thường: nổi khối hơn, viền sáng khi chạm */
+button { box-shadow: inset 0 1px 0 rgba(255, 230, 190, .26), inset 0 -2px 0 rgba(20, 10, 4, .35), 0 3px 0 rgba(20, 10, 4, .5), 0 8px 14px rgba(0, 0, 0, .35); }
+button:active { box-shadow: inset 0 1px 0 rgba(255, 230, 190, .2), 0 0 12px rgba(211, 154, 94, .5); }
+/* nút chính: quầng vàng thở nhẹ + vệt sáng quét qua */
+button.primary { position: relative; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255, 255, 230, .75), inset 0 -2px 0 rgba(70, 35, 4, .55), 0 0 18px rgba(240, 185, 74, .35); animation: neonBreath 2.6s ease-in-out infinite; }
+button.primary::after { content: ''; position: absolute; top: 0; bottom: 0; width: 34%; left: -50%; transform: skewX(-20deg); pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent); animation: sheen 3.8s ease-in-out infinite; }
+@keyframes neonBreath { 50% { filter: drop-shadow(0 0 7px rgba(255, 200, 90, .7)) brightness(1.06); } }
+@keyframes sheen { 0%, 55% { left: -50%; } 100% { left: 130%; } }
+
+/* khung thẻ: bóng đổ sâu hơn, góc vàng phát sáng */
+.card { box-shadow: inset 0 1px 0 rgba(255, 225, 180, .16), inset 0 0 26px rgba(255, 150, 70, .06), 0 2px 0 rgba(20, 10, 4, .6), 0 10px 22px rgba(0, 0, 0, .5); }
+.card::before { filter: drop-shadow(0 0 3px rgba(240, 185, 74, .8)); }
+.card.btn:active:not(.locked) { box-shadow: inset 0 0 26px rgba(255, 150, 70, .1), 0 0 18px rgba(240, 185, 74, .45); }
+
+/* ô tướng: viền neon theo hệ (--el), tướng 4-5 sao sáng mạnh hơn */
+.tile { border: 1px solid color-mix(in srgb, var(--el, #d39a5e) 70%, #000); box-shadow: 0 0 9px color-mix(in srgb, var(--el, #d39a5e) 55%, transparent), 0 6px 10px rgba(0, 0, 0, .5), inset 0 0 12px color-mix(in srgb, var(--el, #d39a5e) 18%, transparent); transition: transform .14s ease-out, box-shadow .2s; }
+.tile > div:first-child { filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .6)); }
+.tile.r4 { box-shadow: 0 0 12px color-mix(in srgb, var(--el, #d39a5e) 75%, transparent), 0 6px 10px rgba(0, 0, 0, .5), inset 0 0 14px color-mix(in srgb, var(--el, #d39a5e) 26%, transparent); }
+.tile.r5 { border-color: var(--gold-hi); animation: tileGlow 2.8s ease-in-out infinite; }
+@keyframes tileGlow { 50% { box-shadow: 0 0 20px var(--el, #ffd978), 0 0 6px var(--gold-hi), 0 6px 10px rgba(0, 0, 0, .5), inset 0 0 16px color-mix(in srgb, var(--el, #ffd978) 35%, transparent); } }
+.tile .tdot { box-shadow: 0 0 7px var(--el), 0 0 2px #fff; }
+.tile .tst { text-shadow: 0 0 6px rgba(255, 217, 120, .8); }
+
+/* thẻ triệu hồi: bóng đổ rơi + quầng hệ */
+.fan-card { box-shadow: 0 8px 14px rgba(0, 0, 0, .55), 0 0 16px color-mix(in srgb, var(--el, #f0b94a) 60%, transparent); }
+.fan-card.r5 { box-shadow: 0 8px 14px rgba(0, 0, 0, .55), 0 0 22px var(--gold), 0 0 8px var(--gold-hi); animation: tileGlow 2.8s ease-in-out infinite; }
+.fan-card img { filter: saturate(1.08) contrast(1.04); }
+
+/* biểu tượng, quái, cổng khu: bóng đổ + quầng */
+.gate img { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .6)) drop-shadow(0 0 9px var(--el)) !important; }
+.dl-foe img, .dd-foe img { filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .65)) drop-shadow(0 0 5px rgba(255, 190, 110, .35)); }
+.dock button img { filter: drop-shadow(0 2px 0 rgba(28, 16, 9, .55)) drop-shadow(0 0 6px rgba(255, 190, 110, .25)); }
+.cur-pill { box-shadow: inset 0 1px 0 rgba(255, 225, 180, .2), 0 0 10px rgba(240, 185, 74, .22), 0 3px 8px rgba(0, 0, 0, .45); }
+
+@media (prefers-reduced-motion: reduce) { button.primary, button.primary::after, .tile.r5, .fan-card.r5 { animation: none; } }

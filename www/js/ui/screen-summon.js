@@ -2,6 +2,7 @@
 import { $, h, btn } from './dom.js';
 import { itemIcon } from './icons.js';
 import { getImg } from './assets.js';
+import { COLORS } from './hero-ui.js';
 import { createRitual, ritualSeen } from './portal.js';
 import { summon, buyTickets, redeemCharacter, effectiveRates } from '../core/summon.js';
 
@@ -51,7 +52,7 @@ export function install(app) {
     const fan = [stars[1], stars[0], stars[2]].filter(Boolean);
     const fanCard = (c, i) => {
       const art = getImg(`card:${c.id}`);
-      return h('div', { class: `fan-card r${c.rarity} pos${fan.length === 3 ? i : i + 1}` }, art ? h('img', { src: art.src, alt: '', draggable: 'false' }) : portrait(c.id, 96), h('b', {}, '★'.repeat(c.rarity)));
+      return h('div', { class: `fan-card r${c.rarity} pos${fan.length === 3 ? i : i + 1}`, style: `--el:${COLORS[c.element]}` }, art ? h('img', { src: art.src, alt: '', draggable: 'false' }) : portrait(c.id, 96), h('b', {}, '★'.repeat(c.rarity)));
     };
     // Giá: số vé, hoặc số Linh Thạch nếu thiếu vé (hai biểu tượng, không chữ).
     const costLine = (tickets, spirit) => h('span', { class: 'pl-cost' }, h('span', { class: 'pl-c' }, itemIcon('ticket', 'sm'), String(tickets)), h('span', { class: 'pl-c' }, itemIcon('spirit', 'sm'), String(spirit)));
