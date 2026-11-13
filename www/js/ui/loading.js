@@ -24,6 +24,15 @@ export function createLoading({ t, title, subtitle, version = '', auto = false }
   const art = document.createElement('div'); // tranh Tòa Tháp toàn màn, trôi chậm
   art.className = 'ld-art';
   el.append(art);
+  const rays = document.createElement('div'); // tia sáng xoay chậm sau Tòa Tháp
+  rays.className = 'ld-rays';
+  el.append(rays);
+  for (let i = 0; i < 16; i++) { // đom đóm vàng bay lên (chỉ UI)
+    const m = document.createElement('i');
+    m.className = 'ld-mote';
+    m.style.cssText = `left:${(i * 61 + 7) % 96 + 2}%;--dx:${((i * 37) % 60) - 30}px;animation-duration:${(7 + (i % 5) * 1.6).toFixed(1)}s;animation-delay:${(-i * 0.9).toFixed(1)}s`;
+    el.append(m);
+  }
   const box = document.createElement('div');
   box.className = 'ld-box';
   const h1 = document.createElement('h1');

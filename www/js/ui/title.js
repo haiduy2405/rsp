@@ -13,18 +13,22 @@ export function goldTitle(el, main, sub) {
   };
   const mk = (txt, cls) => { const m = document.createElement('div'); m.className = `lg-main ${cls}`; m.dataset.t = txt; m.textContent = txt; return m; };
   const mains = split(main).map((x) => mk(x, 'big'));
+  const frame = document.createElement('div');
+  frame.className = 'lg-frame';
+  for (const c of ['tl', 'tr', 'bl', 'br']) { const i = document.createElement('i'); i.className = `lg-c lg-${c}`; frame.append(i); }
   const wrap = document.createElement('div');
   wrap.className = 'lg-name';
   wrap.append(...mains);
-  el.append(wrap);
+  frame.append(wrap);
+  el.append(frame);
   let subEl = null;
   if (sub) {
     const d = document.createElement('div');
     d.className = 'lg-div';
     d.innerHTML = '<i></i><b></b><i></i>';
-    el.append(d);
+    frame.append(d);
     subEl = mk(sub, 'small');
-    el.append(subEl);
+    frame.append(subEl);
   }
   const gems = document.createElement('div');
   gems.className = 'lg-gems';
@@ -36,11 +40,10 @@ export function goldTitle(el, main, sub) {
     im.style.animationDelay = `${i * 0.18}s`;
     gems.append(im);
   }
-  el.append(gems);
+  frame.append(gems);
   const fit = () => {
-    const box = el.parentElement;
-    if (!box) return;
-    const avail = Math.min(box.clientWidth || 340, 420) * 0.9;
+    const box = frame.clientWidth || el.clientWidth || 300;
+    const avail = (box - 44) * 0.98; // trừ phần đệm khung
     const size = (nodes, max) => {
       let k = max;
       nodes.forEach((n) => { n.style.fontSize = '40px'; k = Math.min(k, (40 * avail) / (n.scrollWidth || 1)); });

@@ -1185,3 +1185,22 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .lg-div i { flex: 1; height: 2px; background: linear-gradient(90deg, transparent, #c58a24 55%, #7a3f12); border-radius: 2px; }
 .lg-div i:last-child { transform: scaleX(-1); }
 .lg-div b { width: 9px; height: 9px; background: linear-gradient(135deg, #fff1c9, #e49a24); transform: rotate(45deg); box-shadow: 0 0 0 1.5px #2a1408, 0 0 8px rgba(255, 215, 120, .7); }
+
+/* v0.89: khung logo (hoa văn góc Duy cấp) + căn giữa chắc chắn; màn tải có tia sáng và đom đóm vàng */
+.lg { width: min(92%, 400px); display: flex; flex-direction: column; align-items: center; }
+.lg-frame { position: relative; width: 100%; box-sizing: border-box; padding: 22px 22px 14px; display: flex; flex-direction: column; align-items: center; background: radial-gradient(closest-side, rgba(38, 18, 6, .6), rgba(38, 18, 6, .38) 60%, transparent 100%); }
+.lg-frame::before, .lg-frame::after { content: ''; position: absolute; left: 30px; right: 30px; height: 2px; background: linear-gradient(90deg, transparent, #f3c64e 18%, #fff1c9 50%, #f3c64e 82%, transparent); box-shadow: 0 0 8px rgba(255, 215, 120, .6); }
+.lg-frame::before { top: 6px; } .lg-frame::after { bottom: 2px; }
+.lg-c { position: absolute; width: 38px; height: 38px; background-size: 100% 100%; background-repeat: no-repeat; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .6)); pointer-events: none; }
+.lg-tl { left: 0; top: 0; background-image: url(../assets/ui/corner.webp); } .lg-tr { right: 0; top: 0; background-image: url(../assets/ui/corner-tr.webp); }
+.lg-bl { left: 0; bottom: -4px; background-image: url(../assets/ui/corner-bl.webp); } .lg-br { right: 0; bottom: -4px; background-image: url(../assets/ui/corner-br.webp); }
+.lg-div { width: 80%; }
+.lg-main.small { margin-bottom: 2px; }
+.ld-rays { position: absolute; left: 50%; top: 22%; width: 160vmax; height: 160vmax; margin: -80vmax 0 0 -80vmax; pointer-events: none; z-index: 0; opacity: .5; mix-blend-mode: soft-light;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 244, 200, .9) 0 7deg, transparent 7deg 22deg); -webkit-mask: radial-gradient(circle, #000 0, transparent 38%); mask: radial-gradient(circle, #000 0, transparent 38%); animation: ldSpin 90s linear infinite; }
+@keyframes ldSpin { to { transform: rotate(360deg); } }
+.ld-mote { position: absolute; bottom: -10px; width: 5px; height: 5px; border-radius: 50%; background: radial-gradient(circle, #fff6cf 0, #ffd77a 45%, transparent 72%); pointer-events: none; z-index: 1; animation: ldRise linear infinite; }
+@keyframes ldRise { 0% { transform: translate(0, 0) scale(.6); opacity: 0; } 15% { opacity: .95; } 100% { transform: translate(var(--dx, 20px), -78vh) scale(1.2); opacity: 0; } }
+.loading::before { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(180deg, rgba(40, 18, 6, .45), transparent 22%), radial-gradient(130% 90% at 50% 42%, transparent 50%, rgba(40, 18, 6, .4)); }
+.loading .ld-top { z-index: 2; }
+@media (prefers-reduced-motion: reduce) { .ld-rays, .ld-mote { animation: none; } .ld-mote { display: none; } }
