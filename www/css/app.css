@@ -1129,17 +1129,18 @@ button.primary::after { content: ''; position: absolute; top: 0; bottom: 0; widt
 @media (prefers-reduced-motion: reduce) { button.primary, button.primary::after, .tile.r5, .fan-card.r5 { animation: none; } }
 
 
-/* ===== v0.80: tên game chữ vàng gold 3D + đèn quét ngang ===== */
-.gold3d { position: relative; display: inline-block; margin: 0; font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif; font-weight: 900; text-transform: uppercase; letter-spacing: .02em; line-height: 1.05; text-align: center; font-size: clamp(34px, 11vw, 54px); text-shadow: none; color: transparent;
-  background: linear-gradient(180deg, #fffbe0 0%, #ffe486 24%, #ffc931 48%, #b9770d 56%, #f3b72c 78%, #ffe27a 100%); -webkit-background-clip: text; background-clip: text; background-size: 100% 1.05em; background-repeat: repeat-y;
-  /* khối 3D: các lớp đổ bóng chồng dần xuống-phải tạo độ dày, rồi bóng mềm dưới đáy */
-  filter: drop-shadow(1px 0 0 #3d2204) drop-shadow(-1px 0 0 #3d2204) drop-shadow(0 -1px 0 #3d2204) drop-shadow(0 1px 0 #8a5409) drop-shadow(0 2px 0 #7d4b07) drop-shadow(0 3px 0 #704306) drop-shadow(0 4px 0 #633b05) drop-shadow(0 5px 0 #563304) drop-shadow(0 12px 10px rgba(0, 0, 0, .55)) drop-shadow(0 0 14px rgba(255, 200, 70, .35)); }
-.gold3d::after { content: attr(data-t); position: absolute; inset: 0; color: transparent; pointer-events: none; text-transform: inherit; font: inherit; letter-spacing: inherit; text-align: inherit; line-height: inherit;
-  background: linear-gradient(105deg, transparent 36%, rgba(255, 255, 255, .95) 49%, rgba(200, 245, 255, .9) 52%, transparent 64%) no-repeat; background-size: 280% 100%; background-position: 120% 0;
+/* ===== v0.82: tên game một hàng, chữ graffiti ma quái, vàng gold iron (kim loại cũ), đổ bóng nhẹ + đèn quét ngang ===== */
+.gold3d { position: relative; display: inline-block; margin: 0; white-space: nowrap; font-family: 'Sedgwick Ave Display', 'Fraunces', Georgia, serif; font-weight: 400; text-transform: none; letter-spacing: .03em; line-height: 1.15; text-align: center; font-size: clamp(24px, 8.2vw, 44px); text-shadow: none; color: transparent;
+  background: linear-gradient(180deg, #f1e3ad 0%, #d6b449 28%, #a58223 50%, #5c4513 56%, #b4912e 78%, #dfc366 100%); -webkit-background-clip: text; background-clip: text; background-size: 100% 1.15em; background-repeat: repeat-y;
+  filter: drop-shadow(1px 0 0 #2b2008) drop-shadow(-1px 0 0 #2b2008) drop-shadow(0 -1px 0 #2b2008) drop-shadow(0 1px 0 #4a3810) drop-shadow(0 2px 0 #382a0b) drop-shadow(0 4px 3px rgba(0, 0, 0, .4)); }
+.gold3d::after { content: attr(data-t); position: absolute; inset: 0; color: transparent; pointer-events: none; font: inherit; letter-spacing: inherit; text-align: inherit; line-height: inherit; white-space: nowrap;
+  background: linear-gradient(105deg, transparent 36%, rgba(255, 255, 255, .9) 49%, rgba(235, 240, 245, .8) 52%, transparent 64%) no-repeat; background-size: 280% 100%; background-position: 120% 0;
   -webkit-background-clip: text; background-clip: text; animation: goldSweep 3.6s ease-in-out infinite; }
 @keyframes goldSweep { 0% { background-position: 120% 0; } 55%, 100% { background-position: -20% 0; } }
-.loading h1.gold3d, .ob-story h1.gold3d { font-family: 'Fraunces', serif; color: transparent; text-shadow: none; letter-spacing: .02em; }
+.loading h1.gold3d, .ob-story h1.gold3d { font-family: 'Sedgwick Ave Display', 'Fraunces', serif; color: transparent; text-shadow: none; letter-spacing: .03em; font-weight: 400; }
 .ob-story h1.gold3d { margin: 6px 0 4px; }
+/* phụ đề cũng vàng gold iron */
+.loading .ld-sub { font-family: 'Sedgwick Ave Display', 'Fraunces', serif; font-size: 20px; letter-spacing: .06em; color: transparent; background: linear-gradient(180deg, #f1e3ad 0%, #d6b449 35%, #a58223 55%, #5c4513 62%, #b4912e 85%, #dfc366 100%); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(1px 0 0 #2b2008) drop-shadow(-1px 0 0 #2b2008) drop-shadow(0 1px 0 #3a2c0c) drop-shadow(0 2px 2px rgba(0, 0, 0, .35)); }
 @media (prefers-reduced-motion: reduce) { .gold3d::after { animation: none; opacity: 0; } }
 
 /* ===== v0.80: băng xanh #9DF1FF -> trắng, chỉ điểm xuyết ===== */
@@ -1147,7 +1148,6 @@ button.primary::after { content: ''; position: absolute; top: 0; bottom: 0; widt
 button:focus-visible { outline: 2px solid var(--ice); outline-offset: 2px; }
 button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgba(157, 241, 255, .55); }
 .cur-pill { box-shadow: inset 0 1px 0 rgba(157, 241, 255, .35), 0 0 10px rgba(157, 241, 255, .2), 0 3px 8px rgba(0, 0, 0, .45); }
-.loading .ld-sub { color: var(--ice); }
 
 /* ===== v0.81: viền vàng gold hoa văn + ánh đèn quét ngang cho các khung ===== */
 .card, .tile, .hp-head, .slot, .hp-skill { --gf: 2px; }

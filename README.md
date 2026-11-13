@@ -541,3 +541,8 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Canvas (`goldFrame` trong `render.js`): thanh máu người chơi/quái, bảng Lượt/Tầng, bảng quái, ô thẻ tướng trong trận có viền vàng gradient, vạch đen/sáng phụ, thoi vàng và vệt cong ở 4 góc. Một "đèn" chạy ngang toàn màn mỗi ~4,4s (cùng pha mọi khung), chỉ viền trong dải sáng mới lóe.
 - DOM (CSS, `frameSweep`): `.card`, `.tile`, `.slot`, `.hp-head`, `.hp-skill` có viền vàng + dải sáng quét ngang. Tôn trọng `prefers-reduced-motion`.
 - Chưa áp: infobox/dialog cuộn được, nút bấm, nhiều màn phụ khác. Hoàn tác: tag `pre-goldframes-v0.80.0`.
+
+## v0.82.0 — Tên game một hàng, graffiti, vàng gold iron
+- Tên game gom một hàng (`white-space: nowrap`, cỡ chữ co theo màn), font graffiti/ma quái **Sedgwick Ave Display** (OFL, `www/fonts/sedgwick-ave-display-*.woff2`, có bộ chữ tiếng Việt).
+- Màu vàng gold iron (vàng kim loại cũ, tối hơn, có vệt sắt), đổ bóng giảm còn viền mảnh + bóng mềm nhỏ; đèn quét ngang giữ nguyên. Phụ đề "Rift Spire: Pantheon" cũng cùng màu.
+- Hoàn tác: tag `pre-title2-v0.81.0`.
