@@ -1462,3 +1462,20 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .bag-detail { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; text-align: left; border-radius: 12px; border: 1.5px solid color-mix(in srgb, var(--ic) 60%, transparent); background: rgba(14, 34, 80, .6); }
 .bag-detail .card { margin: 0; }
 .bag-empty { text-align: center; padding: 18px 8px; }
+
+/* v0.100.3 Shop gọn: 5 ô mỗi hàng, tab hẹp */
+.shop2 { gap: 8px; }
+.shop-tabs { width: 62px; gap: 6px; }
+.shop-tab { padding: 6px 2px 5px; font-size: 10px; border-radius: 11px; }
+.shop-tab .ricon.icon-sm { width: 22px; height: 22px; }
+.shop-tab.on { transform: translateX(4px); }
+.shop-tab.on::before { left: -7px; width: 4px; height: 20px; margin-top: -10px; }
+.shop-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.shop-cell { border-radius: 8px; border-width: 1.5px; }
+.shop-cell .sc-art .ricon.icon-lg { width: 74%; height: 74%; }
+.shop-cell .sc-n { right: 3px; bottom: 2px; font-size: 10px; }
+.shop-cell .sc-price { gap: 2px; padding: 3px 1px; font-size: 9.5px; }
+.shop-cell .sc-price .ricon.icon-sm { width: 10px; height: 10px; }
+.shop-cell .sc-ribbon { right: -22px; top: 5px; width: 64px; font-size: 7px; }
+.shop-cell.sel { transform: translateY(-2px) scale(1.06); }
+.shop-cell.sel::after { width: 14px; height: 14px; font-size: 9px; border-bottom-right-radius: 7px; }
