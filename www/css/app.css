@@ -219,7 +219,7 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 .tile.in > div:first-child { opacity: .45; }
 
 /* ---- Màn chính kiểu cảnh toàn màn hình */
-#screen.hub { padding: 0; gap: 0; overflow: hidden; background: #fbd9a8; display: block; position: absolute; }
+#screen.hub { padding: 0; gap: 0; overflow: hidden; background: #7ac8f8; display: block; position: absolute; }
 #screen.hub > * { max-width: none; }
 .hub-scene { position: absolute; inset: 0; z-index: 0; }
 .hub-scene svg { width: 100%; height: 100%; display: block; }
@@ -1253,3 +1253,16 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 @keyframes coachShow { from { opacity: 0; transform: translateY(-40%) scale(.94); } to { opacity: 1; transform: translateY(-50%) scale(1); } }
 @keyframes coachAway { 0% { opacity: 1; transform: translateY(-50%) scale(1); } 100% { opacity: 0; transform: translateY(-300%) scale(.96); } }
 @media (prefers-reduced-motion: reduce) { #coach.go { animation-duration: .01s; } #coach .co-go { animation: none; } }
+
+/* v0.91.0: khôi phục cảnh màn chính SVG động (trời nắng, cầu vồng, Tháp 6 tầng, đảo nổi) */
+@keyframes wave { 0%, 100% { transform: skewY(0) scaleX(1); } 50% { transform: skewY(-8deg) scaleX(.86); } }
+.hub-scene .flag { transform-box: fill-box; transform-origin: left center; animation: wave 1.6s ease-in-out infinite; }
+/* v0.91.0: các màn phụ dùng cùng bầu trời với màn chính (xanh trời + mây trôi nhẹ) */
+#screen:not(.hub) {
+  background:
+    radial-gradient(ellipse 60% 9% at 18% 96%, rgba(255, 255, 255, .55), transparent 70%),
+    radial-gradient(ellipse 55% 8% at 82% 92%, rgba(255, 255, 255, .45), transparent 70%),
+    radial-gradient(ellipse 40% 7% at 50% 99%, rgba(255, 244, 214, .6), transparent 70%),
+    linear-gradient(180deg, #2f86d6 0%, #3f97e2 40%, #5aaae8 75%, #7cc0f0 100%);
+  background-attachment: local;
+}
