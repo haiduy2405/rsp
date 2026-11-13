@@ -3306,6 +3306,31 @@
       "url": "assets/audio/revive.mp3",
       "gain": 0.85,
       "rate": 1
+    },
+    "coinGet": {
+      "url": "assets/audio/coinGet.mp3",
+      "gain": 0.85,
+      "rate": 1
+    },
+    "gemGet": {
+      "url": "assets/audio/gemGet.mp3",
+      "gain": 0.85,
+      "rate": 1
+    },
+    "ticketGet": {
+      "url": "assets/audio/ticketGet.mp3",
+      "gain": 0.85,
+      "rate": 1
+    },
+    "claim": {
+      "url": "assets/audio/claim.mp3",
+      "gain": 0.8,
+      "rate": 1
+    },
+    "bigClaim": {
+      "url": "assets/audio/bigClaim.mp3",
+      "gain": 0.9,
+      "rate": 1
     }
   },
   "variants": {

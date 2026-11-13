@@ -482,3 +482,6 @@ Mỗi ô tướng so với quái đang bị nhắm: mũi tên xanh lục lao lê
 
 ## v0.69.0 — Mã quà tặng (Cài đặt)
 Ô nhập mã trong Cài đặt. Bảng mã nằm ở `config.giftcodes`; mã `dluma` (không phân biệt hoa thường) = 8.500.000 Vàng + 30.000 Linh Thạch + 1.000 Vé Triệu Hồi, mỗi save dùng 1 lần (đặt `"once": false` để dùng lặp). Logic ở `core/giftcode.js`, đã dùng lưu `progress.redeemed`. Chỉ kiểm tra phía máy khách: ai đọc file dữ liệu cũng thấy mã, gỡ trước khi phát hành thật.
+
+## v0.70.0 — Hiệu ứng nhận thưởng
+Bấm nhận thưởng/thành tựu/nhiệm vụ, nhận quà Cửa hàng, quay Cầu nguyện, mua vé bằng Linh Thạch, nhập mã quà: pháo giấy + tia sáng tại điểm chạm, chip "+N <icon>" nổi lên (mỗi loại một màu viền), âm riêng (vàng leng keng, Linh Thạch chuông pha lê, vé xé giấy, nhận chung, thưởng lớn). Thưởng lớn (mã quà, ô hiếm của vòng quay) có thêm pháo hoa. Code: ui/rewardfx.js + fxlayer.burst; âm do tools/build-sfx3.py.

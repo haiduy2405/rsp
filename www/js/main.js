@@ -27,6 +27,7 @@ import { resolveKit, maxSkillLevel, SKILL_KINDS, formOf } from './core/kit.js';
 import * as offline from './ui/offline.js';
 import { VERSION, BUILD, BUILD_DATE } from './version.js';
 import { createFxLayer } from './ui/fxlayer.js';
+import { installRewardFx } from './ui/rewardfx.js';
 import { createAudio } from './ui/audio.js';
 import { $, h, btn } from './ui/dom.js';
 import { itemIcon, rewardIcon, REWARD_ICON } from './ui/icons.js';
@@ -693,21 +694,21 @@ function showQuests() {
   const q = progress.quests;
   const cfg = ctx.config.quests;
   const rewardText = (r) => [r.spirit ? `${r.spirit} ${t('res.spirit')}` : null, r.gold ? `${r.gold} ${t('res.gold')}` : null, r.tickets ? `${r.tickets} ${t('res.ticket')}` : null].filter(Boolean).join(' · ');
-  const claim = (fn) => {
+  const claim = (fn, ev) => {
     const r = fn();
-    if (r.ok) { progress = r.progress; save(); audio.sfx('reveal'); questMsg = `+ ${rewardText(r.reward)}`; } else questMsg = t(`err.${r.reason}`);
+    if (r.ok) { progress = r.progress; save(); rewardPop([{ k: 'spirit', n: r.reward.spirit }, { k: 'gold', n: r.reward.gold }, { k: 'ticket', n: r.reward.tickets }], ev); questMsg = `+ ${rewardText(r.reward)}`; } else questMsg = t(`err.${r.reason}`);
     showQuests();
   };
   const rows = q.list.map((x) => {
     const done = isDone(x);
     return h('div', { class: 'card quest' + (done ? ' done' : '') + (x.claimed ? ' claimed' : ''), 'data-quest': x.id },
       h('div', { class: 'q-info' }, h('b', {}, t(`quest.${x.kind}`, { n: x.goal })), h('div', { class: 'q-bar' }, h('i', { style: `width:${Math.round((100 * x.count) / x.goal)}%` })), h('small', { class: 'muted' }, `${x.count}/${x.goal} · ${rewardText(x.reward)}`)),
-      x.claimed ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), () => claim(() => claimQuest(ctx, progress, day, x.id)), done ? 'primary' : '', { id: `claim-${x.id}`, ...(done ? {} : { disabled: '' }) }));
+      x.claimed ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), (e) => claim(() => claimQuest(ctx, progress, day, x.id), e), done ? 'primary' : '', { id: `claim-${x.id}`, ...(done ? {} : { disabled: '' }) }));
   });
   const all = allClaimed(progress);
   const bonus = h('div', { class: 'card quest bonus' + (all && !q.bonusClaimed ? ' done' : '') + (q.bonusClaimed ? ' claimed' : '') },
     h('div', { class: 'q-info' }, h('b', {}, t('quest.bonus')), h('small', { class: 'muted' }, rewardText(cfg.bonus))),
-    q.bonusClaimed ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), () => claim(() => claimBonus(ctx, progress, day)), all ? 'primary' : '', { id: 'claim-bonus', ...(all ? {} : { disabled: '' }) }));
+    q.bonusClaimed ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), (e) => claim(() => claimBonus(ctx, progress, day), e), all ? 'primary' : '', { id: 'claim-bonus', ...(all ? {} : { disabled: '' }) }));
   const goTab = (tab) => { questTab = tab; questMsg = null; showQuests(); };
   const achvRows = listAchievements(ctx, progress).map((a) => {
     const prev = a.claimed ? a.tiers[a.claimed - 1].goal : 0;
@@ -716,7 +717,7 @@ function showQuests() {
     return h('div', { class: 'card quest achv' + (a.ready ? ' done' : '') + (!a.next ? ' claimed' : ''), 'data-achv': a.id },
       h('div', { class: 'q-info' }, h('b', {}, t(`achv.${a.id}`)), h('div', { class: 'q-bar' }, h('i', { style: `width:${pct}%` })),
         h('small', { class: 'muted' }, a.next ? `${Math.min(a.value, goal)}/${goal} · ${rewardText(a.next.reward)} · ${t('achv.tier', { n: a.claimed + 1, m: a.tiers.length })}` : `${t('achv.max')} · ${a.tiers.length}/${a.tiers.length}`)),
-      !a.next ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), () => claim(() => claimAchievement(ctx, progress, a.id)), a.ready ? 'primary' : '', { id: `claim-achv-${a.id}`, ...(a.ready ? {} : { disabled: '' }) }));
+      !a.next ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), (e) => claim(() => claimAchievement(ctx, progress, a.id), e), a.ready ? 'primary' : '', { id: `claim-achv-${a.id}`, ...(a.ready ? {} : { disabled: '' }) }));
   });
   const dot = (on) => (on ? h('i', { class: 'red-dot' }) : null);
   const dailyDot = hasClaimable(ctx, progress, day), achvDot = hasAchvClaimable(ctx, progress);
@@ -1536,7 +1537,9 @@ function showInstallHelp() {
 }
 // ---- Màn hình tách module: dùng chung trạng thái qua `app`, gọi chéo qua `app.*` / `ui.*`
 const ui = {};
+const rewardPop = installRewardFx({ audio, fxLayer: () => (fxl ||= createFxLayer($('fx'))) });
 const app = {
+  rewardPop,
   startTutorial: () => startTutorial(), enterHub: showHub, guideStep, guideSet, guidePoint, trackQuest: track,
   ctx, audio, music, storage, slots, enterSlot, dicts, h, btn, $, el, chip, portrait, CUR_COL, fodderName, offeringName, pct, save, screen, setLang, showHub,
   t: (...a) => t(...a),

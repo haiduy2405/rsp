@@ -1071,3 +1071,11 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .pl-cost .pl-c { display: inline-flex; align-items: center; gap: 3px; }
 .row.pulls button.free { flex: .8; padding: 8px 4px; font-size: 12px; }
 .row.pulls button.pull b { font-size: 13px; }
+/* v0.70 nhận thưởng: chip +N nổi lên */
+#rw-layer { position: absolute; inset: 0; pointer-events: none; z-index: 32; overflow: hidden; }
+.rw-chip { position: absolute; transform: translate(-50%, 0); display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px 5px 8px; border-radius: 20px; font: 800 20px var(--sans); color: #fff6d8; background: linear-gradient(180deg, rgba(60, 36, 20, .95), rgba(30, 17, 9, .95)); border: 2px solid #ffd35e; box-shadow: 0 4px 14px rgba(0, 0, 0, .55), 0 0 16px rgba(255, 210, 100, .55); text-shadow: 0 2px 0 #3b2314; opacity: 0; animation: rwUp 1.9s cubic-bezier(.2, .9, .3, 1) both; white-space: nowrap; }
+.rw-chip .ricon { width: 26px; height: 26px; }
+.rw-chip.k-spirit { border-color: #5ee6d0; box-shadow: 0 4px 14px rgba(0, 0, 0, .55), 0 0 16px rgba(94, 230, 208, .6); }
+.rw-chip.k-ticket { border-color: #ffb25a; box-shadow: 0 4px 14px rgba(0, 0, 0, .55), 0 0 16px rgba(255, 178, 90, .6); }
+@keyframes rwUp { 0% { opacity: 0; transform: translate(-50%, 14px) scale(.4); } 14% { opacity: 1; transform: translate(-50%, -6px) scale(1.18); } 26% { transform: translate(-50%, -10px) scale(1); } 72% { opacity: 1; transform: translate(-50%, -62px) scale(1); } 100% { opacity: 0; transform: translate(-50%, -96px) scale(.96); } }
+@media (prefers-reduced-motion: reduce) { .rw-chip { animation: rwFade 1.4s both; } @keyframes rwFade { 0%, 80% { opacity: 1; } 100% { opacity: 0; } } }

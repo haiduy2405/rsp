@@ -160,12 +160,12 @@ export function install(app) {
       offlineSection(),
       h('div', { class: 'card', id: 'gift' }, h('b', {}, t('set.gift.title')),
         h('div', { class: 'row' }, h('input', { id: 'gift-input', type: 'text', placeholder: t('set.gift.placeholder'), autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', maxlength: '40' }),
-          btn(t('set.gift.btn'), () => {
+          btn(t('set.gift.btn'), (ev) => {
             const r = redeemGift(ctx, app.progress, $('gift-input').value);
             if (!r.ok) return showSettings(t(`set.gift.${r.reason === 'used' ? 'used' : 'bad'}`));
             app.progress = r.progress;
             save();
-            audio.sfx('reveal');
+            app.rewardPop([{ k: 'gold', n: r.reward.gold }, { k: 'spirit', n: r.reward.spirit }, { k: 'ticket', n: r.reward.tickets }], ev, { big: true });
             showSettings(t('set.gift.ok', { gold: r.reward.gold.toLocaleString(), spirit: r.reward.spirit.toLocaleString(), tickets: r.reward.tickets.toLocaleString() }));
           }, 'primary', { id: 'gift-btn' }))),
       btn(t('hub.export'), () => (exportBox.value = storage.exportText(app.progress)), '', { id: 'export' }),

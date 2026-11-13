@@ -140,6 +140,21 @@ export function createFxLayer(canvas) {
       }
       kick();
     },
+    // vòi pháo giấy nhỏ + tia sáng tại điểm chạm (nhận thưởng): cols = bảng màu
+    burst(x, y, cols = MIX, n = 26) {
+      if (!W) resize();
+      for (let i = 0; i < n; i++) {
+        const a = -Math.PI / 2 + rnd(-0.9, 0.9);
+        const sp = rnd(0.25, 0.62);
+        parts.push({ kind: 'confetti', x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 0.0010, life: rnd(900, 1500), age: 0, col: pick(cols), size: rnd(3, 5.5), rot: rnd(0, 6.3), spin: rnd(-0.012, 0.012), sway: rnd(0, 6.3) });
+      }
+      for (let i = 0; i < Math.round(n * 0.7); i++) {
+        const a = rnd(0, Math.PI * 2);
+        const sp = rnd(0.05, 0.22);
+        parts.push({ kind: 'dot', x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.05, g: 0.00025, life: rnd(400, 800), age: 0, col: pick(cols), size: rnd(1.4, 3) });
+      }
+      kick();
+    },
     celebrate() {
       if (!W) resize();
       const spots = [[0.25, 0.28], [0.75, 0.24], [0.5, 0.18], [0.2, 0.42], [0.8, 0.4]];

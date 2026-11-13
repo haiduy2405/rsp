@@ -34,7 +34,7 @@ export function install(app) {
       if (!r.ok) { status.textContent = t(`err.${r.reason}`); return; }
       app.progress = r.progress; save(); go.disabled = true; back.disabled = true;
       const target = 360 * 5 - (r.slice + 0.5) * step;
-      const done = () => { app.audio.sfx('reveal'); showWish(t('wish.got', { x: full(r.prize.kind === 'hero' ? { ...slices[r.slice].give } : slices[r.slice].give, r.prize.hero) })); };
+      const done = () => { const g = slices[r.slice].give; app.rewardPop([{ k: ICON[g.kind] || 'generic', n: r.prize.count ?? g.count }], wheel, { big: tierOf(slices[r.slice]) >= 2 }); showWish(t('wish.got', { x: full(r.prize.kind === 'hero' ? { ...slices[r.slice].give } : slices[r.slice].give, r.prize.hero) })); };
       if (reduced()) { done(); return; }
       wheel.style.transition = 'transform 4.2s cubic-bezier(.12,.7,.12,1)';
       requestAnimationFrame(() => { wheel.style.transform = `rotate(${target}deg)`; });
