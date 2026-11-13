@@ -656,18 +656,62 @@ export function draw(g, view, t) {
     }
   });
 
-  // nút Duo nằm giữa hai ô liền kề
+  // Duo: khi cả hai skill đơn sẵn sàng thì hai ô cùng phát sáng, dây năng lượng nối hai ảnh tướng, nút DUO nhịp thở + tia lấp lánh
   for (const d of view.duos || []) {
     const cx = 12 + (d.slot + 1) * 104 - 3;
-    const ready = d.cd === 0;
-    g.fillStyle = ready ? '#dcc3a0' : '#444954';
+    const ready = !!d.ready;
+    if (ready) {
+      const pulse = 0.5 + 0.5 * Math.sin(t * 0.006);
+      const icy = 466 - 48;
+      g.save();
+      g.shadowColor = '#ffd24a';
+      g.shadowBlur = 10 + 10 * pulse;
+      g.strokeStyle = `rgba(255, 220, 110, ${0.55 + 0.4 * pulse})`;
+      g.lineWidth = 3;
+      for (const sl of [d.slot, d.slot + 1]) {
+        const lead = sl === 0;
+        const th = lead ? 84 : 76;
+        g.strokeRect(12 + sl * 104 - 1, 466 - th - 1, 100, th + 2);
+      }
+      // dây năng lượng giữa hai ảnh tướng (nét đứt chạy)
+      const x0 = 12 + d.slot * 104 + 49 + 24;
+      const x1 = 12 + (d.slot + 1) * 104 + 49 - 24;
+      g.lineCap = 'round';
+      g.lineWidth = 5;
+      g.setLineDash([8, 7]);
+      g.lineDashOffset = -t * 0.04;
+      const gr = g.createLinearGradient(x0, 0, x1, 0);
+      gr.addColorStop(0, COLORS[view.members[d.slot].element]);
+      gr.addColorStop(0.5, '#fff6c8');
+      gr.addColorStop(1, COLORS[view.members[d.slot + 1].element]);
+      g.strokeStyle = gr;
+      g.beginPath(); g.moveTo(x0, icy); g.lineTo(x1, icy); g.stroke();
+      g.setLineDash([]);
+      // tia lấp lánh quay quanh nút
+      for (let k = 0; k < 4; k++) {
+        const a = t * 0.004 + (k * Math.PI) / 2;
+        g.globalAlpha = 0.5 + 0.5 * Math.sin(t * 0.01 + k);
+        g.fillStyle = '#fff6c8';
+        g.beginPath(); g.arc(cx + Math.cos(a) * 34, 395 + Math.sin(a) * 14, 2.2, 0, 6.3); g.fill();
+      }
+      g.restore();
+    }
+    const sc = ready ? 1 + 0.06 * Math.sin(t * 0.007) : 1;
+    g.save();
+    g.translate(cx, 395);
+    g.scale(sc, sc);
+    g.fillStyle = ready ? '#ffd24a' : '#444954';
+    g.shadowColor = ready ? '#ffb000' : 'transparent';
+    g.shadowBlur = ready ? 14 : 0;
     g.beginPath();
-    g.roundRect(cx - 28, 384, 56, 22, 3);
+    g.roundRect(-28, -11, 56, 22, 5);
     g.fill();
-    g.strokeStyle = ready ? '#fff0bd' : '#9a6a3a';
-    g.lineWidth = 1;
+    g.shadowBlur = 0;
+    g.strokeStyle = ready ? '#fff6c8' : '#9a6a3a';
+    g.lineWidth = 1.5;
     g.stroke();
-    text(g, ready ? view.t('battle.duo') : `${view.t('battle.duo')} ${d.cd}`, cx, 395.5, 12, ready ? '#2a1600' : '#aab0ff', 'center', '800');
+    text(g, view.t('battle.duo'), 0, 0.5, 12, ready ? '#3a1d00' : '#8b90a8', 'center', '800');
+    g.restore();
   }
 
   // đồng hồ kéo

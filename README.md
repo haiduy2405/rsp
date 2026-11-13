@@ -485,3 +485,6 @@ Mỗi ô tướng so với quái đang bị nhắm: mũi tên xanh lục lao lê
 
 ## v0.70.0 — Hiệu ứng nhận thưởng
 Bấm nhận thưởng/thành tựu/nhiệm vụ, nhận quà Cửa hàng, quay Cầu nguyện, mua vé bằng Linh Thạch, nhập mã quà: pháo giấy + tia sáng tại điểm chạm, chip "+N <icon>" nổi lên (mỗi loại một màu viền), âm riêng (vàng leng keng, Linh Thạch chuông pha lê, vé xé giấy, nhận chung, thưởng lớn). Thưởng lớn (mã quà, ô hiếm của vòng quay) có thêm pháo hoa. Code: ui/rewardfx.js + fxlayer.burst; âm do tools/build-sfx3.py.
+
+## v0.71.0 — Duo kiểu hợp lực
+Duo không còn hồi chiêu riêng: sẵn sàng khi hai tướng liền ô thuộc cặp định sẵn và CẢ HAI skill đơn đều sẵn sàng (hai ô phát sáng, dây năng lượng nối hai ảnh, nút Duo bật). Chạm tướng hỏi Skill đơn hay Duo. Duo chạy cả hai skill đơn ×`config.duo.mult` (1,5) rồi thêm hiệu ứng riêng của cặp (`duos.json` chỉ còn các hiệu ứng, bỏ sát thương/hồi máu riêng); cả hai tướng vào hồi chiêu. Hiệu ứng: chữ DUO, hai hệ bung cùng lúc, vòng sáng hội tụ, rung màn. Cân bằng: Duo = hy sinh hai lượt skill đơn đổi lấy x1,5 + hiệu ứng, cần theo dõi bằng balance-sim.

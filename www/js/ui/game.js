@@ -76,7 +76,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.maxHp = state.maxHp;
     view.locked = state.locked.slice();
     view.teamFx = state.team.effects.map((e) => ({ ...e }));
-    view.duos = state.duos.map((d) => ({ ...d }));
+    view.duos = state.duos.map((d) => ({ ...d, ready: duoReady(d) }));
     view.freezeTurns = state.freeze || 0;
     view.focus = Number.isInteger(state.focus) && state.enemies[state.focus]?.hp > 0 ? state.focus : -1;
   }
@@ -115,10 +115,14 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   const LIGHT = ['#9fd2ff', '#ffb098', '#a6f0b4', '#fff0a0', '#d2b0ff', '#ffc0da']; // màu số theo hệ
 
   const memberPos = (id) => {
+    const du = state.duos.find((d) => d.id === id);
+    if (du) return { x: 12 + du.slot * 104 + 49 + 52, y: 466 - 48, el: state.members[du.slot]?.element ?? 3 };
     const i = Math.max(0, state.members.findIndex((m) => m.id === id));
     return { x: 12 + i * 104 + 49, y: 466 - 48, el: state.members[i]?.element ?? 3 };
   };
   // cỡ số theo tỉ lệ máu quái bị mất: đòn nhỏ vẫn đọc được, đòn lớn nổi bật nhưng không tràn màn
+  const duoReady = (d) => !!d && state.members[d.slot]?.skillCd === 0 && state.members[d.slot + 1]?.skillCd === 0 && state.members[d.slot]?.skillMax > 0 && state.members[d.slot + 1]?.skillMax > 0;
+  const duoOf = (idx) => state.duos.find((d) => d.slot === idx || d.slot + 1 === idx);
   const dmgSize = (a, maxHp) => 34 + Math.min(1, (a / Math.max(1, maxHp)) * 3) * 34;
 
   // Mỗi đòn: quả cầu bay từ nhân vật tới quái, tới nơi mới trừ máu + số nổi + rung quái.
@@ -405,7 +409,21 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       } else if (e.type === 'skill' || e.type === 'duo' || e.type === 'passive') {
         // Kỹ năng đúng hệ của tướng tung ra (Duo dùng tiếng kép riêng); thiếu mẫu thì rơi về tiếng chung.
         castFx(state.members[e.type === 'duo' ? e.slot : e.member]?.element ?? 5);
-        fx.sfx(e.type === 'duo' ? 'skill2' : `skill_${SKILL_SFX[state.members[e.member]?.element] ?? 'heart'}`);
+        if (e.type === 'duo') {
+          // hợp lực: hai hệ cùng bung, chữ DUO, vòng sáng hội tụ giữa hai tướng, rung màn
+          setTimeout(() => castFx(state.members[e.slot + 1]?.element ?? 5), 160);
+          const mx = 12 + e.slot * 104 + 101;
+          floater(t('battle.duoCast'), W / 2, 250, '#fff0a0', 46, 'text', 1500);
+          view.rings.push({ x: mx, y: 416, col: 3, age: 0, life: 820 }, { x: mx, y: 416, col: state.members[e.slot]?.element ?? 3, age: 0, life: 640 });
+          for (let q = 0; q < 26; q++) { const a = (q / 26) * 6.283; view.particles.push({ x: mx, y: 416, vx: Math.cos(a) * 0.3, vy: Math.sin(a) * 0.3 - 0.05, color: q % 2 ? '#fff0a0' : '#ffffff', age: 0, life: 650 }); }
+          view.camShake = Math.max(view.camShake || 0, 9);
+          fx.vibrate?.([40, 30, 80]);
+        }
+        if (e.type === 'duo') {
+          fx.sfx(`skill_${SKILL_SFX[state.members[e.slot]?.element] ?? 'heart'}`);
+          setTimeout(() => fx.sfx(`skill_${SKILL_SFX[state.members[e.slot + 1]?.element] ?? 'heart'}`), 150);
+          setTimeout(() => fx.sfx('skill2', 1.1), 320);
+        } else fx.sfx(`skill_${SKILL_SFX[state.members[e.member]?.element] ?? 'heart'}`);
         for (const who of e.type === 'duo' ? [e.slot, e.slot + 1] : [e.member]) {
           const m = state.members[who];
           if (m) view.rings.push({ x: 12 + who * 104 + 49, y: 416, col: m.element, age: 0, life: 600 });
@@ -536,7 +554,9 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     }
     if (moveGuard && !moveGuard({ type: 'skill', index: pr.idx })) { fx.sfx('error'); onReject?.({ type: 'skill', index: pr.idx }); return; }
     if (state.members[pr.idx]?.skillCd === 0) {
-      if (onSkillAsk) onSkillAsk(pr.idx, () => { if (!busy && state.status === 'playing' && state.members[pr.idx]?.skillCd === 0) run({ type: 'skill', index: pr.idx }); });
+      const du = duoOf(pr.idx);
+      const duoGo = du && duoReady(du) ? () => { if (!busy && state.status === 'playing' && duoReady(du)) run({ type: 'duo', index: du.slot }); } : null;
+      if (onSkillAsk) onSkillAsk(pr.idx, () => { if (!busy && state.status === 'playing' && state.members[pr.idx]?.skillCd === 0) run({ type: 'skill', index: pr.idx }); }, duoGo, du);
       else run({ type: 'skill', index: pr.idx });
     }
   }
@@ -560,7 +580,11 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     for (const d of state.duos) {
       const cx = 12 + (d.slot + 1) * 104 - 3;
       if (Math.abs(p.x - cx) <= 30 && p.y >= 380 && p.y <= 406) {
-        if (d.cd === 0) run({ type: 'duo', index: d.slot });
+        if (duoReady(d)) {
+          const go = () => { if (!busy && state.status === 'playing' && duoReady(d)) run({ type: 'duo', index: d.slot }); };
+          if (onSkillAsk) onSkillAsk(d.slot, () => { if (!busy && state.status === 'playing' && state.members[d.slot]?.skillCd === 0) run({ type: 'skill', index: d.slot }); }, go, d);
+          else go();
+        } else fx.sfx?.('error');
         return;
       }
     }

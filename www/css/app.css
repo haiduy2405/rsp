@@ -1079,3 +1079,7 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .rw-chip.k-ticket { border-color: #ffb25a; box-shadow: 0 4px 14px rgba(0, 0, 0, .55), 0 0 16px rgba(255, 178, 90, .6); }
 @keyframes rwUp { 0% { opacity: 0; transform: translate(-50%, 14px) scale(.4); } 14% { opacity: 1; transform: translate(-50%, -6px) scale(1.18); } 26% { transform: translate(-50%, -10px) scale(1); } 72% { opacity: 1; transform: translate(-50%, -62px) scale(1); } 100% { opacity: 0; transform: translate(-50%, -96px) scale(.96); } }
 @media (prefers-reduced-motion: reduce) { .rw-chip { animation: rwFade 1.4s both; } @keyframes rwFade { 0%, 80% { opacity: 1; } 100% { opacity: 0; } } }
+/* Duo v0.71 */
+.duo-ask { border-color: #ffd24a; box-shadow: 0 0 14px rgba(255, 210, 74, .35); }
+.duo-plus { font-size: 22px; color: #ffd24a; text-shadow: 0 0 8px rgba(255, 190, 40, .9); }
+button.duo { background: linear-gradient(180deg, #fff0a0, #ffb92e); color: #3a1d00; box-shadow: 0 0 14px rgba(255, 190, 40, .7); }

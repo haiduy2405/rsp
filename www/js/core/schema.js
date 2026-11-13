@@ -45,7 +45,7 @@ export const skillSchema = {
 export const duoSchema = {
   type: 'object',
   required: ['id', 'a', 'b', 'skill'],
-  properties: { id: { type: 'string' }, a: { type: 'string' }, b: { type: 'string' }, skill: skillSchema },
+  properties: { id: { type: 'string' }, a: { type: 'string' }, b: { type: 'string' }, skill: { type: 'object', required: ['units'], properties: { units: { type: 'array', minItems: 1, items: skillUnit } } } }, // skill.units = hiệu ứng riêng của cặp (cộng thêm vào hai skill đơn ×config.duo.mult)
 };
 
 export const characterSchema = {

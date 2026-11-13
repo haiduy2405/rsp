@@ -1056,7 +1056,7 @@
   "help.heroes.title": "Tướng và kỹ năng",
   "help.heroes.1": "Mỗi tướng có hệ, máu, công và hồi. Tướng đứng đầu là đội trưởng (có vương miện), kỹ năng đội trưởng luôn có hiệu lực.",
   "help.heroes.2": "Khi ô tướng báo \"Sẵn sàng\", chạm nhanh vào đó để dùng kỹ năng chủ động. Dùng xong phải chờ hồi chiêu, mỗi chấm là một lượt.",
-  "help.heroes.3": "Hai tướng đứng liền nhau thuộc một cặp Duo sẽ có nút Duo, một kỹ năng ghép riêng với hồi chiêu riêng.",
+  "help.heroes.3": "Hai tướng đứng liền nhau thuộc một cặp Duo: khi cả hai skill đơn đều sẵn sàng, hai ô cùng phát sáng và nút Duo ✦ giữa hai ô bật lên. Chạm tướng sẽ hỏi dùng Skill đơn hay Duo. Duo cho cả hai skill chạy cùng lúc, sức mạnh ×1,5, thêm hiệu ứng riêng của cặp, nhưng cả hai tướng vào hồi chiêu.",
   "help.heroes.4": "Chạm vào quái để khóa mục tiêu cho cả đội. \"Đánh sau n\" là còn n lượt nữa quái ra đòn.",
   "help.heroes.5": "Nhấn giữ một tướng, quái hoặc cửa để xem chi tiết: chỉ số, kỹ năng, hiệu ứng, vật phẩm có thể rớt.",
   "help.heroes.6": "Hiệu ứng đang có hiện bằng biểu tượng nhỏ kèm số lượt còn lại, viền đỏ là bất lợi, viền xanh là có lợi. Ý nghĩa từng hiệu ứng xem ở mục Từ khóa bên dưới.",
@@ -1096,5 +1096,9 @@
   "set.gift.btn": "Nhận quà",
   "set.gift.ok": "Đã nhận: {gold} Vàng, {spirit} Linh Thạch, {tickets} Vé Triệu Hồi.",
   "set.gift.bad": "Mã không đúng.",
-  "set.gift.used": "Mã này đã dùng rồi."
+  "set.gift.used": "Mã này đã dùng rồi.",
+  "battle.duoCast": "DUO!",
+  "skill.duoOk": "Duo ✦",
+  "skill.single": "Skill đơn",
+  "skill.duoInfo": "Hợp lực hai skill đơn ×{pct}% + hiệu ứng riêng của cặp. Cả hai tướng vào hồi chiêu."
 }

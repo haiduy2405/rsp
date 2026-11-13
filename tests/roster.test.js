@@ -93,19 +93,35 @@ test('Duo: 15 cặp, nhân vật tồn tại, mỗi người tối đa 3 Duo, d�
   assert.ok(duos.find((d) => d.a === 'son_tinh' && d.b === 'thuy_tinh'));
 });
 
-test('Duo: chỉ kích hoạt khi liền ô (không phân biệt thứ tự), dùng riêng hồi chiêu', () => {
+test('Duo: liền ô (không phân biệt thứ tự), cần cả hai skill đơn sẵn sàng, dùng xong cả hai vào hồi chiêu', () => {
   const mk = (team) => createBattle(ctx, { seed: 5, team, enemies: ['water_n1'] });
   assert.equal(mk(['son_tinh', 'thuy_tinh', 'thetis', 'bennu', 'eir']).duos.length, 1);
   assert.equal(mk(['thuy_tinh', 'son_tinh', 'thetis', 'bennu', 'eir']).duos.length, 1);
   assert.equal(mk(['son_tinh', 'thetis', 'thuy_tinh', 'bennu', 'eir']).duos.length, 0);
-  let s = mk(['son_tinh', 'thuy_tinh', 'thetis', 'bennu', 'eir']);
-  assert.equal(step(ctx, s, { type: 'duo', index: 0 }).events[0].reason, 'skill_cooldown');
-  s.duos[0].cd = 0;
+  const s = mk(['son_tinh', 'thuy_tinh', 'thetis', 'bennu', 'eir']);
+  assert.equal(step(ctx, s, { type: 'duo', index: 0 }).events[0].reason, 'skill_cooldown'); // đầu trận skill chưa sẵn sàng
+  s.members[0].skillCd = 0;
+  assert.equal(step(ctx, s, { type: 'duo', index: 0 }).events[0].reason, 'skill_cooldown'); // chỉ một skill sẵn sàng vẫn chưa đủ
+  s.members[1].skillCd = 0;
   const r = step(ctx, s, { type: 'duo', index: 0 });
   assert.equal(r.events[0].type, 'duo');
-  assert.equal(r.state.duos[0].cd, 7);
+  assert.equal(r.state.members[0].skillCd, r.state.members[0].skillMax);
+  assert.equal(r.state.members[1].skillCd, r.state.members[1].skillMax);
   assert.equal(step(ctx, r.state, { type: 'duo', index: 0 }).events[0].reason, 'skill_cooldown');
   assert.equal(step(ctx, s, { type: 'duo', index: 2 }).events[0].reason, 'no_duo');
+});
+
+test('Duo: sức mạnh = (skill A + skill B) × config.duo.mult, cộng hiệu ứng riêng của cặp', () => {
+  const k = ctx.config.duo.mult;
+  const mk = () => { const s = createBattle(ctx, { seed: 5, team: ['coc_kien_troi', 'mai_an_tiem', 'thetis', 'bennu', 'eir'], enemies: ['water_n1'] }); s.members.forEach((m) => (m.skillCd = 0)); return s; };
+  const dmg = (ev) => ev.hits.filter((h) => h.kind === 'damage').reduce((a, h) => a + h.raw, 0);
+  const single = dmg(step(ctx, mk(), { type: 'skill', index: 0 }).events[0]); // Cóc Kiện Trời: sát thương 4×
+  const duo = step(ctx, mk(), { type: 'duo', index: 0 }).events[0];
+  assert.ok(single > 0);
+  assert.ok(Math.abs(dmg(duo) - single * k) <= 1, `sát thương Duo ${dmg(duo)} ≈ ${single} × ${k}`);
+  assert.ok(duo.hits.every((h) => h.kind !== 'damage' || h.from === 'coc_kien_troi'), 'chỉ Cóc có sát thương; Mai An Tiêm và hiệu ứng cặp không thêm');
+  const after = step(ctx, mk(), { type: 'duo', index: 0 }).state;
+  assert.ok(after.team.effects.some((e) => e.key === 'regen'), 'hiệu ứng riêng của cặp (Hồi máu dần) được áp');
 });
 
 test('leader: khuôn mẫu tác động đúng cho ô 1 và không cho ô khác', () => {

@@ -1056,7 +1056,7 @@
   "help.heroes.title": "Heroes and skills",
   "help.heroes.1": "Each hero has an element, HP, attack and heal. The first hero is the leader (crown), and the leader skill is always active.",
   "help.heroes.2": "When a hero tile says \"Ready\", tap it to use the active skill. After use it needs to cool down, one dot per turn.",
-  "help.heroes.3": "Two adjacent heroes that form a Duo pair unlock a Duo button: a joint skill with its own cooldown.",
+  "help.heroes.3": "Two neighbouring heroes forming a Duo pair: when both single skills are ready, both slots glow and the Duo ✦ button lights up. Tapping a hero asks Single skill or Duo. Duo fires both skills together at ×1.5 power plus the pair's own effect, but both heroes go on cooldown.",
   "help.heroes.4": "Tap an enemy to lock the whole team's target. \"Attacks in n\" means n turns until it strikes.",
   "help.heroes.5": "Press and hold a hero, enemy or door to see details: stats, skills, effects, possible drops.",
   "help.heroes.6": "Active effects show as small icons with turns left: red border is harmful, green is helpful. See Effect keywords below for each one.",
@@ -1096,5 +1096,9 @@
   "set.gift.btn": "Redeem",
   "set.gift.ok": "Received: {gold} Gold, {spirit} Spirit Gems, {tickets} Summon Tickets.",
   "set.gift.bad": "Invalid code.",
-  "set.gift.used": "This code was already used."
+  "set.gift.used": "This code was already used.",
+  "battle.duoCast": "DUO!",
+  "skill.duoOk": "Duo ✦",
+  "skill.single": "Single skill",
+  "skill.duoInfo": "Both single skills combine at ×{pct}% plus the pair's own effect. Both heroes go on cooldown."
 }

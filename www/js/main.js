@@ -1271,8 +1271,17 @@ function effectRows(effects, holder) {
     return h('div', { class: 'muted fxrow' }, h('img', { class: 'fxico', src: `assets/ui/fx/${e.key}.webp`, alt: '' }), h('div', { style: 'flex:1;min-width:0' }, h('b', {}, t(`effect.${e.key}.name`)), ` (${extra.join(', ')}): `, t(`effect.${e.key}.desc`)));
   });
 }
+// Khung giới thiệu Duo trong hộp hỏi dùng skill: hai tướng, hệ số, hiệu ứng riêng của cặp.
+function duoAskCard(d, st) {
+  const def = ctx.duos[d.id];
+  const a = st.members[d.slot];
+  const b = st.members[d.slot + 1];
+  return h('div', { class: 'card duo-ask' },
+    h('div', { class: 'charrow' }, portrait(a.id, 48), h('b', { class: 'duo-plus' }, '✦'), portrait(b.id, 48), h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`duo.${d.id}`)), h('div', { class: 'muted' }, t('skill.duoInfo', { pct: Math.round((ctx.config.duo?.mult ?? 1.5) * 100) })))),
+    def.skill.units.map((u) => h('div', { class: 'muted' }, '+ ', unitText(u, a.element))));
+}
 // Chạm tướng đã sẵn sàng: hiện thông tin kỹ năng, chỉ dùng khi người chơi bấm Đồng ý.
-function showSkillAsk(idx, confirm) {
+function showSkillAsk(idx, confirm, duoGo = null, duo = null) {
   const st = game?.getState?.();
   if (!st || $('info')) return;
   const m = st.members[idx];
@@ -1284,7 +1293,8 @@ function showSkillAsk(idx, confirm) {
     h('div', { class: 'charrow' }, portrait(m.id, 72), h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`skill.${m.id}`)), h('div', { class: 'muted' }, t(`char.${m.id}`), ' · ', t('char.cooldown', { n: m.skillMax })))),
     h('div', { class: 'card' }, kit.skill.units.map((u) => h('div', {}, unitText(u, m.element)))),
     keys.length ? h('div', { class: 'card' }, keywordBlock(keys)) : null,
-    h('div', { class: 'row' }, btn(t('skill.ok'), () => { close(); confirm(); }, 'primary', { id: 'skill-ok' }), btn(t('skill.cancel'), close, '', { id: 'skill-cancel' })),
+    duoGo && duo ? duoAskCard(duo, st) : null,
+    h('div', { class: 'row' }, ...(duoGo ? [btn(t('skill.duoOk'), () => { close(); duoGo(); }, 'primary duo', { id: 'duo-ok' }), btn(t('skill.single'), () => { close(); confirm(); }, '', { id: 'skill-ok' })] : [btn(t('skill.ok'), () => { close(); confirm(); }, 'primary', { id: 'skill-ok' })]), btn(t('skill.cancel'), close, '', { id: 'skill-cancel' })),
   ];
   $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox' }, body)));
 }

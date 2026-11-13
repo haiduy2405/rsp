@@ -96,7 +96,7 @@ export function createBattle(ctx, { seed, team, enemies, scale, hp, startEffects
   const duos = [];
   for (let i = 0; i + 1 < members.length; i++) {
     const d = ctx.duoByPair?.[`${members[i].id}|${members[i + 1].id}`];
-    if (d) duos.push({ id: d.id, slot: i, cd: d.skill.startCooldown ?? 0 });
+    if (d) duos.push({ id: d.id, slot: i }); // Duo không có hồi chiêu riêng: sẵn sàng khi cả hai skill đơn sẵn sàng
   }
   const foes = enemies.map((id, i) => {
     const m = ctx.monsters[id];
@@ -195,7 +195,7 @@ function applyToTeam(s, rng, u, extraTurns = 0) {
 }
 
 // Chạy một danh sách đơn vị kỹ năng. caster: { atk, element, id }.
-function runUnits(ctx, s, rng, units, caster) {
+function runUnits(ctx, s, rng, units, caster, scale = 1) {
   const hits = [];
   const teamAtk = atkMult(s.team);
   for (const u of units) {
@@ -204,12 +204,12 @@ function runUnits(ctx, s, rng, units, caster) {
       const el = u.element ?? caster.element;
       for (const i of targets) {
         const mult = elementMultiplier(el, s.enemies[i].element, ctx.config);
-        hitEnemy(s, i, Math.round(caster.atk * teamAtk * u.mult * mult * dmgBoost(s, { skill: true })), hits, caster.id, el);
+        hitEnemy(s, i, Math.round(caster.atk * teamAtk * u.mult * scale * mult * dmgBoost(s, { skill: true })), hits, caster.id, el);
       }
     } else if (u.type === 'heal') {
-      healTeam(s, Math.round(s.maxHp * u.pctMax), hits, caster.id);
+      healTeam(s, Math.round(s.maxHp * u.pctMax * scale), hits, caster.id);
     } else if (u.type === 'convert') {
-      let left = u.count;
+      let left = Math.round(u.count * scale);
       let guard = 0;
       while (left > 0 && guard++ < 1000) {
         const i = rng.int(N);
@@ -227,7 +227,7 @@ function runUnits(ctx, s, rng, units, caster) {
         if (s.board.cells[i] === caster.element && !s.board.enh[i]) own.push(i);
         else if (s.board.cells[i] !== caster.element) other.push(i);
       }
-      let left = u.count;
+      let left = Math.round(u.count * scale);
       while (left > 0 && own.length) {
         const i = own.splice(rng.int(own.length), 1)[0];
         s.board.enh[i] = 1;
@@ -346,15 +346,24 @@ export function step(ctx, state, action) {
   }
 
   if (action.type === 'duo') {
+    // Skill Duo: cả hai skill đơn của cặp chạy cùng lúc, sức mạnh ×config.duo.mult, rồi thêm hiệu ứng riêng của cặp. Cả hai skill đơn vào hồi chiêu.
     const d = s.duos.find((x) => x.slot === action.index);
     if (!d) return invalid('no_duo');
-    if (d.cd > 0) return invalid('skill_cooldown');
-    if (isDisabled(s.team)) return invalid('skill_locked');
-    const def = ctx.duos[d.id];
     const a = s.members[d.slot];
     const b = s.members[d.slot + 1];
-    const hits = runUnits(ctx, s, rng, def.skill.units, { atk: a.atk + b.atk, element: a.element, id: d.id });
-    d.cd = def.skill.cooldown;
+    const ka = resolveKit(ctx, a.id, a.skillLv);
+    const kb = resolveKit(ctx, b.id, b.skillLv);
+    if (!ka?.skill || !kb?.skill) return invalid('no_skill');
+    if (a.skillCd > 0 || b.skillCd > 0) return invalid('skill_cooldown');
+    if (isDisabled(s.team)) return invalid('skill_locked');
+    const k = ctx.config.duo?.mult ?? 1.5;
+    const hits = [
+      ...runUnits(ctx, s, rng, ka.skill.units, { atk: a.atk, element: a.element, id: a.id }, k),
+      ...runUnits(ctx, s, rng, kb.skill.units, { atk: b.atk, element: b.element, id: b.id }, k),
+      ...runUnits(ctx, s, rng, ctx.duos[d.id].skill.units, { atk: a.atk + b.atk, element: a.element, id: d.id }),
+    ];
+    a.skillCd = a.skillMax;
+    b.skillCd = b.skillMax;
     events.push({ type: 'duo', slot: d.slot, hits, board: structuredClone(s.board) });
     checkEnd(s);
     s.rng = rng.state;
@@ -412,7 +421,6 @@ export function step(ctx, state, action) {
 
   if (s.freeze > 0) s.freeze -= 1;
   for (const m of s.members) m.skillCd = Math.max(0, m.skillCd - 1);
-  for (const d of s.duos) d.cd = Math.max(0, d.cd - 1);
   checkEnd(s);
   if (s.status === 'playing') {
     for (const { i, m, p } of triggerPassives(ctx, s, 'turn')) {
