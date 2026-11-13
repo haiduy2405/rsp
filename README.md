@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.89.6
+- Thẻ tướng ở màn Đội hình: bỏ chấm màu hệ (đã có viên ngọc nhận biết hệ). Tag lùi: `pre-tdot-v0.89.5`.
+
 ## v0.89.5
 - Màn mở đầu (cốt truyện): bỏ tên game; hình tháp CSS cũ thay bằng tranh Tòa Tháp trong khung vòm vàng có hào quang; vừa một màn không phải cuộn (kiểm tra 360x640, 411x732). Tag lùi: `pre-intro-v0.89.4`.
 
