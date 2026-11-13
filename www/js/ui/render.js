@@ -373,6 +373,27 @@ function statusFx(g, effects, x, y, t) {
 
 // view: { board:{cells,enh}, enemies:[{id,element,hp,maxHp,cd,every}], hp, maxHp, members:[{id,element,skillCd}],
 //         hl:Set, fall:array|null, fallT:0..1, drag:{path,x,y}|null, timer:0..1|null, floaters:[], shake, combo, turn, flash }
+
+// Mũi tên khắc hệ: xanh lục lao lên (ta khắc quái), đỏ lao xuống (bị quái khắc); ba mũi tên lệch pha, mờ dần rồi lặp.
+function relArrows(g, cx, cy, dir, t) {
+  const col = dir > 0 ? ['#7dffa0', '#2fd16a'] : ['#ff8a7a', '#e23a2e'];
+  for (let k = 0; k < 3; k++) {
+    const p = (t / 1400 + k / 3) % 1;
+    const a = Math.sin(Math.PI * Math.min(1, p * 1.15)) ** 1.3;
+    const y = cy + (dir > 0 ? 15 - 30 * p : -15 + 30 * p);
+    const w = 8 + (dir > 0 ? 0 : 0), h = 6;
+    g.save();
+    g.globalAlpha = a;
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    g.beginPath();
+    if (dir > 0) { g.moveTo(cx - w, y + h / 2); g.lineTo(cx, y - h / 2); g.lineTo(cx + w, y + h / 2); }
+    else { g.moveTo(cx - w, y - h / 2); g.lineTo(cx, y + h / 2); g.lineTo(cx + w, y - h / 2); }
+    g.strokeStyle = 'rgba(40,20,10,.9)'; g.lineWidth = 6.5; g.stroke();
+    g.shadowColor = col[1]; g.shadowBlur = 8;
+    g.strokeStyle = col[0]; g.lineWidth = 3.6; g.stroke();
+    g.restore();
+  }
+}
 export function draw(g, view, t) {
   g.clearRect(0, 0, W, H);
   g.save();
@@ -567,6 +588,8 @@ export function draw(g, view, t) {
       g.fill();
     }
     const icy = 466 - 48; // tâm ảnh tướng cách đáy 48 (cùng cao ở mọi ô)
+    const rel = view.rel ? view.rel(m.element) : 1;
+    if (rel !== 1) { relArrows(g, x + 14, icy, rel > 1 ? 1 : -1, t); relArrows(g, x + 84, icy + 4, rel > 1 ? 1 : -1, t + 460); }
     const ic = getImg(`icon:${m.id}`);
     if (ic) {
       const S = 44;

@@ -476,3 +476,6 @@ Giá vé/Linh Thạch xếp hai dòng trong nút, nút Miễn phí hẹp lại, 
 
 ## v0.67.0 — Hiển thị khắc hệ
 Đánh trúng hệ bị khắc: số ▲ to, vàng, chữ "Khắc hệ!", vòng sáng + tia, rung màn, quái giật mạnh, âm combo. Đánh vào hệ kháng: số ▼ nhỏ, xám, chữ "Bị kháng". Hệ số vẫn do core/damage.js tính (×1,5 / ×0,5 trong config).
+
+## v0.68.0 — Mũi tên khắc hệ trên ô tướng
+Mỗi ô tướng so với quái đang bị nhắm: mũi tên xanh lục lao lên (khắc), mũi tên đỏ lao xuống (bị khắc), ba mũi tên lệch pha mờ dần rồi lặp, viền nâu + phát sáng. Cập nhật mục Trợ giúp (khắc hệ, nghi thức triệu hồi).

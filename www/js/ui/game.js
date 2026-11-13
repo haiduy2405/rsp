@@ -37,6 +37,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
 
   const view = {
     t,
+    rel: (el) => { const e = view.enemies.find((x) => x.hp > 0); return e ? elementMultiplier(el, e.element, ctx.config) : 1; }, // khắc/bị khắc quái đang bị nhắm
     titleText,
     locked: [],
     teamFx: [],
