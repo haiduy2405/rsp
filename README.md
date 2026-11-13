@@ -754,3 +754,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 ## v0.105.2
 - Hòm đồ + túi đồ trong chuyến: thẻ chi tiết có chiều cao cố định, chọn món khác không làm lưới nhảy lên xuống (đo 12 món liên tiếp, lưới đứng yên ở y=381).
 - Rollback: tag local `pre-nojump-v0.105.1`.
+
+## v0.106.0
+- Màn loading: khi tải xong hiện bảng "Có gì mới" cùng "Chạm để vào" (hiệu ứng trượt lên, ánh sáng quét, từng dòng hiện lần lượt; bản mới nhất mở sẵn, "Các bản trước" thu gọn). Nội dung ở `www/js/data/changelog.json` + key `cl.*` trong i18n; mỗi bản mới thêm một mục vào đầu file.
+- Rollback: tag local `pre-notes-v0.105.2`.

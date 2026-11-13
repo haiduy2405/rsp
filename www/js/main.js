@@ -44,7 +44,7 @@ import { wishAvailable } from './core/wish.js';
 let fxl = null;
 const celebrate = () => (fxl ||= createFxLayer($('fx'))).celebrate();
 const load = (f) => fetch(`js/${f}`).then((r) => r.json());
-const [raw, audioCfg, vi, en] = await Promise.all([loadRaw(load), load('data/audio.json'), load('i18n/vi.json'), load('i18n/en.json')]);
+const [raw, audioCfg, changelog, vi, en] = await Promise.all([loadRaw(load), load('data/audio.json'), load('data/changelog.json'), load('i18n/vi.json'), load('i18n/en.json')]);
 const ctx = buildCtx(raw);
 const dicts = { vi, en };
 // 3 ô lưu: `storage` là lớp bọc trỏ tới ô đang chơi (đổi bằng enterSlot).
@@ -1763,7 +1763,8 @@ try {
 }
 document.title = t('game.title');
 document.documentElement.lang = lang;
-const loading = createLoading({ t, title: t('game.title'), subtitle: t('game.subtitle'), version: `${t('hub.credit')} · v${VERSION} · build ${BUILD}`, auto: DEBUG });
+const loading = createLoading({ t, title: t('game.title'), subtitle: t('game.subtitle'), version: `${t('hub.credit')} · v${VERSION} · build ${BUILD}`, auto: DEBUG,
+  notes: changelog.map((e) => ({ version: e.version, date: e.date, items: e.items.map((i) => ({ tag: i.tag, tagText: t(`cl.tag.${i.tag}`), text: t(i.key) })) })), notesTitle: t('cl.title'), notesOlder: t('cl.older'), currentVersion: VERSION });
 screen(loading.el);
 const bootStart = performance.now();
 await preloadAssets((d, n) => loading.setProgress(n ? (d / n) * 0.95 : 0));

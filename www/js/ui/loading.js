@@ -13,7 +13,7 @@ function enterFullscreen() {
 // Trả { el, setProgress(0..1), ready(): Promise } — ready() hiện lời nhắc "chạm để vào" và resolve khi người chơi chạm.
 import { sceneEl } from './hub-art.js';
 
-export function createLoading({ t, title, subtitle, version = '', auto = false }) {
+export function createLoading({ t, title, subtitle, version = '', auto = false, notes = [], notesTitle = '', notesOlder = '', currentVersion = '' }) {
   const el = document.createElement('div');
   el.className = 'loading';
   const bar = document.createElement('i');
@@ -69,9 +69,67 @@ export function createLoading({ t, title, subtitle, version = '', auto = false }
   };
   setProgress(0);
 
+  // Bảng ghi chú phiên bản: hiện cùng lúc với "chạm để vào"; bản mới nhất mở sẵn, các bản trước thu gọn.
+  const notesEl = () => {
+    if (!notes.length) return null;
+    const cur = currentVersion.split('.').slice(0, 2).join('.');
+    const list = [...notes].sort((a, b) => (a.version === cur ? -1 : b.version === cur ? 1 : 0));
+    const card = document.createElement('div');
+    card.className = 'ld-notes';
+    const head = document.createElement('div');
+    head.className = 'ln-head';
+    const star = document.createElement('i');
+    star.textContent = '✦';
+    const ttl = document.createElement('b');
+    ttl.textContent = notesTitle;
+    const chip = document.createElement('em');
+    chip.textContent = `v${currentVersion}`;
+    head.append(star, ttl, chip);
+    card.append(head);
+    const body = document.createElement('div');
+    body.className = 'ln-body';
+    let k = 0;
+    const rel = (e, first) => {
+      const sec = document.createElement('section');
+      sec.className = 'ln-rel' + (first ? ' first' : '');
+      const h = document.createElement('h4');
+      h.textContent = `v${e.version}`;
+      const dt = document.createElement('small');
+      dt.textContent = e.date;
+      h.append(dt);
+      sec.append(h);
+      for (const it of e.items) {
+        const r = document.createElement('div');
+        r.className = 'ln-row';
+        r.style.setProperty('--i', k++);
+        const tg = document.createElement('span');
+        tg.className = `ln-tag ${it.tag}`;
+        tg.textContent = it.tagText;
+        const tx = document.createElement('p');
+        tx.textContent = it.text;
+        r.append(tg, tx);
+        sec.append(r);
+      }
+      return sec;
+    };
+    body.append(rel(list[0], true));
+    if (list.length > 1) {
+      const more = document.createElement('details');
+      const sm = document.createElement('summary');
+      sm.textContent = notesOlder;
+      more.append(sm, ...list.slice(1).map((e) => rel(e, false)));
+      body.append(more);
+    }
+    card.append(body);
+    card.addEventListener('pointerup', (ev) => ev.stopPropagation()); // cuộn/mở bảng không làm vào game
+    return card;
+  };
+
   const ready = () => new Promise((resolve) => {
     setProgress(1);
     if (auto) { clearInterval(timer); resolve(); return; }
+    const nt = notesEl();
+    if (nt) el.append(nt);
     tap.textContent = t('load.tap');
     el.classList.add('done');
     // Phím/chạm bất kỳ: vào game và đẩy toàn màn hình ngay trong cử chỉ của người chơi (pointerup mới tính là kích hoạt trên cảm ứng).
