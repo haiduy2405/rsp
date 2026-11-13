@@ -63,6 +63,48 @@ function orbShadow(g, x, y, r) {
   g.restore();
 }
 
+// Ánh sáng chạy trên ngọc: (1) một chùm sáng chéo quét qua cả bàn như nguồn sáng di chuyển, (2) thỉnh thoảng từng viên lóe một vệt chéo riêng.
+// Vệt sáng chỉ tô lên phần có hình của ngọc (source-atop trên canvas phụ dùng chung), và chỉ vẽ cho viên đang được chạm sáng.
+const SHEEN_DIR = [0.87, 0.49];
+const REDUCED = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+let sheenCv = null;
+function orbSheen(g, im, x, y, r) {
+  if (REDUCED || !im || !im.naturalWidth || typeof document === 'undefined') return;
+  const t = performance.now();
+  // (1) chùm sáng toàn bàn: đi từ góc trên trái sang dưới phải trong ~3,2s, nghỉ ~4s
+  const u = x * SHEEN_DIR[0] + y * SHEEN_DIR[1];
+  const ph = (t % 7200) / 7200;
+  let off = 0, k = 0;
+  if (ph < 0.45) {
+    const bc = -80 + (ph / 0.45) * 780;
+    const d = u - bc;
+    if (Math.abs(d) < 58) { k = 1 - Math.abs(d) / 58; off = -d; }
+  }
+  // (2) vệt riêng của từng viên: ~0,7s mỗi ~9s, lệch pha theo vị trí
+  const q = ((t * 0.001 + ((x * 7.13 + y * 3.71) % 9)) % 9.3) / 0.75;
+  if (q < 1 && k < 0.6) { k = Math.sin(q * Math.PI) * 0.85; off = (q - 0.5) * 2.6 * r; }
+  if (k <= 0.02) return;
+  const S = 128;
+  if (!sheenCv) { sheenCv = document.createElement('canvas'); sheenCv.width = S; sheenCv.height = S; }
+  const c = sheenCv.getContext('2d');
+  c.globalCompositeOperation = 'source-over';
+  c.clearRect(0, 0, S, S);
+  c.drawImage(im, 0, 0, S, S);
+  c.globalCompositeOperation = 'source-atop';
+  const sc = S / (r * 2), cx = S / 2 + off * SHEEN_DIR[0] * sc, cy = S / 2 + off * SHEEN_DIR[1] * sc, w = 20 * sc * 0.55;
+  const gr = c.createLinearGradient(cx - SHEEN_DIR[0] * w, cy - SHEEN_DIR[1] * w, cx + SHEEN_DIR[0] * w, cy + SHEEN_DIR[1] * w);
+  gr.addColorStop(0, 'rgba(255,255,255,0)');
+  gr.addColorStop(0.5, 'rgba(255,255,255,0.55)');
+  gr.addColorStop(1, 'rgba(255,255,255,0)');
+  c.fillStyle = gr;
+  c.fillRect(0, 0, S, S);
+  g.save();
+  g.globalAlpha *= k;
+  g.globalCompositeOperation = 'lighter';
+  g.drawImage(sheenCv, x - r, y - r, r * 2, r * 2);
+  g.restore();
+}
+
 // Mỗi hệ một hình khác nhau để phân biệt khi mù màu.
 export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
   g.save();
@@ -73,6 +115,7 @@ export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
     const R = r * 1.04;
     if (r >= 14) orbShadow(g, x, y, r);
     g.drawImage(imE, x - R, y - R, R * 2, R * 2);
+    if (r >= 20) orbSheen(g, imE, x, y, R);
     g.restore();
     return;
   }
@@ -80,6 +123,7 @@ export function drawOrb(g, type, x, y, r, enhanced = false, alpha = 1) {
   if (im) {
     if (r >= 14) orbShadow(g, x, y, r);
     g.drawImage(im, x - r, y - r, r * 2, r * 2);
+    if (r >= 20) orbSheen(g, im, x, y, r);
     if (enhanced) enhancedAura(g, x, y, r);
     g.restore();
     return;

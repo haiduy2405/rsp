@@ -500,3 +500,6 @@ Thay 12 ảnh ngọc (`assets/orbs/orb0-5.webp` + `orb0-5e.webp`) bằng bộ 3D
 
 ## v0.74.0 — Biểu tượng ngọc nhỏ lại
 Biểu tượng giữa ngọc (giọt nước, lửa, lá, sao, âm dương, dấu cộng) thu còn ~1/2 mỗi chiều (1/4 diện tích) để lộ mặt ngọc khía cạnh; 12 ảnh `assets/orbs/` thay mới, khung ngọc Nâng Cấp mảnh hơn. Hoàn tác: `git checkout pre-orb-small-emblem-v0.73.0 -- www/assets/orbs` rồi tăng phiên bản.
+
+## v0.75.0 — Ánh sáng chạy trên ngọc
+Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dưới phải (~3,2s, nghỉ ~4s) như nguồn sáng di chuyển; (2) thỉnh thoảng từng viên lóe một vệt chéo riêng (~0,7s mỗi ~9s, lệch pha theo vị trí). Vệt sáng tô lên đúng phần hình của ngọc (`orbSheen` trong render.js, canvas phụ dùng chung, chỉ vẽ viên đang được chạm sáng), tắt khi `prefers-reduced-motion`. Hoàn tác: `git checkout pre-sheen-v0.74.0 -- www/js/ui/render.js`.
