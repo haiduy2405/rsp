@@ -758,3 +758,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 ## v0.106.0
 - Màn loading: khi tải xong hiện bảng "Có gì mới" cùng "Chạm để vào" (hiệu ứng trượt lên, ánh sáng quét, từng dòng hiện lần lượt; bản mới nhất mở sẵn, "Các bản trước" thu gọn). Nội dung ở `www/js/data/changelog.json` + key `cl.*` trong i18n; mỗi bản mới thêm một mục vào đầu file.
 - Rollback: tag local `pre-notes-v0.105.2`.
+
+## v0.106.1
+- Sửa màn tràn sau khi chạm vào game (toàn màn hình): chiều cao app đo từ viewport thật (`--app-h`), cập nhật khi resize / đổi toàn màn hình / quay lại app. Chưa kiểm chứng trên điện thoại thật, cần Duy thử.
+- Rollback: tag local `pre-fs-v0.106.0`.

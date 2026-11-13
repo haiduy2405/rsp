@@ -43,6 +43,23 @@ import { wishAvailable } from './core/wish.js';
 
 let fxl = null;
 const celebrate = () => (fxl ||= createFxLayer($('fx'))).celebrate();
+// Chiều cao app theo viewport thật: sau khi vào/thoát toàn màn hình, 100dvh trên Android đôi khi giữ giá trị cũ làm màn tràn.
+{
+  const fitH = () => {
+    const vv = window.visualViewport;
+    const h = Math.round(Math.min(window.innerHeight, vv ? vv.height + vv.offsetTop : Infinity, document.documentElement.clientHeight || Infinity));
+    if (h > 100) document.documentElement.style.setProperty('--app-h', `${h}px`);
+  };
+  const fitSoon = () => { fitH(); for (const ms of [120, 400, 900, 1800]) setTimeout(fitH, ms); };
+  addEventListener('resize', fitH);
+  addEventListener('orientationchange', fitSoon);
+  addEventListener('pageshow', fitSoon);
+  document.addEventListener('fullscreenchange', fitSoon);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) fitSoon(); });
+  window.visualViewport?.addEventListener('resize', fitH);
+  addEventListener('pointerup', () => setTimeout(fitH, 350), { capture: true }); // sau cái chạm đầu (vào toàn màn hình)
+  fitSoon();
+}
 const load = (f) => fetch(`js/${f}`).then((r) => r.json());
 const [raw, audioCfg, changelog, vi, en] = await Promise.all([loadRaw(load), load('data/audio.json'), load('data/changelog.json'), load('i18n/vi.json'), load('i18n/en.json')]);
 const ctx = buildCtx(raw);

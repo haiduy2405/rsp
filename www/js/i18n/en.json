@@ -1,4 +1,5 @@
 {
+  "cl.0_106.3": "Fixed the screen overflowing after entering the game (fullscreen)",
   "cl.0_106.1": "Release notes now appear together with \"Tap to enter\"",
   "cl.0_106.2": "Tap \"Earlier versions\" to see the update history",
   "cl.0_105.1": "Shop: tap the free tile to claim it instantly; other tiles open a small Yes / No confirm",
