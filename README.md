@@ -742,3 +742,8 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Túi đồ trong chuyến trình bày như hòm đồ: tab Tất cả/Vật phẩm/Di Vật, lưới ô, thẻ chi tiết có icon. Thẻ Di Vật ở màn chọn/cửa hàng cũng có icon.
 - Banner "Có bản mới" thiết kế lại: to, căn giữa, nút đỏ rượu vang.
 - Rollback: tag local `pre-relicicons-v0.103.0` (tag chỉ có trên máy, không lên GitHub).
+
+## v0.105.0
+- Shop: bấm thẳng vào ô miễn phí là nhận (có hiệu ứng thưởng như trong game). Bỏ thanh chi tiết + nút dưới.
+- Ô mua: bấm ra hộp nhỏ giữa màn "Mua với giá …?", Không (trái) / Có (phải).
+- Rollback: tag local `pre-shoptap-v0.104.0` (chỉ trên máy).

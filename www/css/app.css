@@ -1540,3 +1540,14 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .upd-pill span b { font-size: 17px; font-weight: 800; }
 .upd-pill span small { font-size: 12px; font-weight: 600; opacity: .85; }
 .upd-pill span small { color: #ffd9e0; }
+
+/* v0.105.0: shop bấm ô là nhận/mua, hộp xác nhận nhỏ */
+.buybox { max-width: 260px; padding: 16px 16px 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; border: 2px solid var(--rc); }
+.buybox .bb-ic { position: relative; width: 72px; height: 72px; display: grid; place-items: center; border-radius: 10px; background: linear-gradient(160deg, color-mix(in srgb, var(--rc) 55%, #10131c), #173a6c); }
+.buybox .bb-ic .ricon { width: 70%; height: 70%; }
+.buybox .bb-price { display: flex; align-items: center; gap: 5px; font-size: 14px; }
+.buybox .bb-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 4px; }
+.buybox .bb-btns button { min-height: 0; padding: 9px 4px; width: 100%; }
+.buybox { max-width: 240px; }
+.buybox .bb-btns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.buybox .bb-btns button, .buybox .bb-btns button.primary { min-width: 0; width: 100%; }
