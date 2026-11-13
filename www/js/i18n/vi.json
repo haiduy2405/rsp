@@ -11,7 +11,7 @@
   "battle.menu": "Về menu",
   "battle.combo": "{n} combo",
   "battle.turn": "Lượt {n}",
-  "battle.attackIn": "Đánh sau {n}",
+  "battle.attackIn": "Hành động sau {n} lượt",
   "battle.skillReady": "Sẵn sàng",
   "battle.skillCd": "Chờ {n}",
   "battle.seed": "Seed: {seed}",

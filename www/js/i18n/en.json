@@ -11,7 +11,7 @@
   "battle.menu": "Back to menu",
   "battle.combo": "{n} combo",
   "battle.turn": "Turn {n}",
-  "battle.attackIn": "Attacks in {n}",
+  "battle.attackIn": "Acts in {n} turns",
   "battle.skillReady": "Ready",
   "battle.skillCd": "Wait {n}",
   "battle.seed": "Seed: {seed}",

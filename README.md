@@ -552,6 +552,10 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.99.1
+
+- Ô quái: chữ "Hành động sau {n} lượt" (thay "Đánh sau"), icon hệ ngay bên dưới; bỏ dải màu hệ bên trái ô; huy hiệu hiệu ứng dời xuống dưới ô. Tag rollback cục bộ: `pre-enemy-el-v0.99.0`.
+
 ## v0.99.0
 
 - Màn chọn cửa: bỏ 3 nút vật phẩm; thay bằng nút Túi đồ (huy hiệu số món) mở bảng lưới vật phẩm + Di Vật đang giữ trong chuyến, chọn ô để xem chi tiết/dùng. Nút "Về màn chính" làm lại dạng viên thuốc vàng nổi trên nền.

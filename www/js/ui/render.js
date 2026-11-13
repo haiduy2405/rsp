@@ -811,15 +811,14 @@ export function draw(g, view, t) {
     g.globalAlpha = dead ? 1 - dk : 1;
     panel(g, cx - 82, 244, 164, 76, null);
     brackets(g, cx - 82, 244, 164, 76, 9, view.focus === i ? '#ff4d5e' : '#cfe6ff');
-    g.fillStyle = COLORS[e.element];
-    g.fillRect(cx - 82, 244, 4, 76);
-    text(g, view.t(`monster.${e.id}`), cx + 2, 258, 15, '#fff8e6', 'center', '700', SERIF);
-    bar(g, cx - 70, 270, 140, 11, (e.hpShow ?? e.hp) / e.maxHp, '#e8475b', '#ff9aa6');
-    text(g, `${Math.max(0, Math.round(e.hp))}`, cx, 276, 9, '#ffffff', 'center', '800');
+    text(g, view.t(`monster.${e.id}`), cx, 257, 15, '#fff8e6', 'center', '700', SERIF);
+    bar(g, cx - 70, 268, 140, 11, (e.hpShow ?? e.hp) / e.maxHp, '#e8475b', '#ff9aa6');
+    text(g, `${Math.max(0, Math.round(e.hp))}`, cx, 274, 9, '#ffffff', 'center', '800');
     if (!dead) {
       const off = e.effects?.some((x) => x.key === 'stun' || x.key === 'freeze');
-      text(g, off ? view.t('effect.stun.name') : view.t('battle.attackIn', { n: e.cd }), cx, 294, 12, off ? '#9ad0ff' : '#ffc27a');
-      if (e.effects?.length) badges(g, e.effects, cx, 302, view, 'center');
+      text(g, off ? view.t('effect.stun.name') : view.t('battle.attackIn', { n: e.cd }), cx, 290, 12, off ? '#9ad0ff' : '#ffc27a');
+      drawOrb(g, e.element, cx, 307, 10);
+      if (e.effects?.length) badges(g, e.effects, cx, 322, view, 'center');
     }
     g.globalAlpha = 1;
   });
