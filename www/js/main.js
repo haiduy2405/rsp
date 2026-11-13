@@ -226,7 +226,9 @@ function hubScene() {
   return box;
 }
 
+let updateReady = false;
 function showHub() {
+  if (updateReady) { location.reload(); return; }
   run = null;
   record = null;
   { const before = progress; track('login'); if (progress !== before) save(); }
@@ -1115,7 +1117,7 @@ function startTutorial(retry = false) {
     audio.sfx('tick');
   };
   // Người chơi làm đúng chỉ dẫn → bỏ lớp tối/đèn rọi và đường gợi ý ngay để thấy trọn màn hình trong lúc đòn diễn ra.
-  const guard = (fn) => (a) => { const ok = fn(a); if (ok) { game.setDim(false); game.hideHint?.(); } return ok; };
+  const guard = (fn) => (a) => { const ok = fn(a); if (ok) { game.setDim(false); game.hideHint?.(); bubble.classList.add('go'); veil.classList.remove('on'); } return ok; };
   const samePath = (a, b) => a.length === b.length && a.every((c, i) => c === b[i]);
   let lockIdx = -1;
   const startLesson = (i) => {
@@ -1592,11 +1594,17 @@ Object.assign(app, ui);
 Object.assign(ui, installWish(app));
 Object.assign(app, ui);
 
-if ('serviceWorker' in navigator && !DEBUG && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator && !DEBUG && location.protocol.startsWith('http')) {
+  // Bản mới: SW mới chiếm quyền → đánh dấu, tự nạp lại ở lần vào Hub kế tiếp (không ngắt giữa trận).
+  const hadSW = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadSW) { updateReady = true; if (atHub) location.reload(); } });
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => { setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000); document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); }); }).catch(() => {});
+}
 
 if (DEBUG) {
   window.__showSkillAsk = (i, f, d, du) => showSkillAsk(i, f, d, du);
   window.__ctx = ctx;
+  window.__ui = ui;
   window.__progress = () => progress;
   window.__cheat = (ids = []) => {
     const p = structuredClone(progress);

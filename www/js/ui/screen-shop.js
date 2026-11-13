@@ -24,38 +24,65 @@ export function install(app) {
     return t('shop.give.fragment', { name: t('res.fragment', { name: t(`char.${g.key}`) }), n });
   }
 
+  const TABS = [
+    { id: 'all', icon: 'gold', kinds: null },
+    { id: 'currency', icon: 'spirit', kinds: ['spirit', 'soulTicket'] },
+    { id: 'elixir', icon: 'elixir1', kinds: ['elixir'] },
+    { id: 'material', icon: 'stoneR', kinds: ['stoneN', 'stoneR', 'offering'] },
+    { id: 'fragment', icon: 'fragment', kinds: ['fragment'] },
+  ];
+  let tab = 'all', sel = null;
+
   function showShop() {
     app.progress = ensureShop(ctx, app.progress, app.dayKey());
     save();
     const p = app.progress;
     const fmt = (n) => new Intl.NumberFormat(app.lang).format(n);
-    const cards = p.shop.offers.map((o) => {
+    const offers = p.shop.offers;
+    const inTab = (o) => { const k = TABS.find((x) => x.id === tab).kinds; return !k || k.includes(o.give.kind); };
+    const shown = offers.filter(inTab);
+    if (!shown.find((o) => o.id === sel)) sel = (shown.find((o) => leftStock(p, o) > 0) || shown[0])?.id ?? null;
+    const buyOf = (o) => (ev) => {
+      const r = buyOffer(ctx, app.progress, app.dayKey(), o.id);
+      if (r.ok) { app.progress = r.progress; if (o.price.cur === 'free') app.trackQuest('shop_free'); save(); app.rewardPop([{ k: iconOf(o.give)[0], n: o.give.count }], ev); msg = nameOf(o.give); } else msg = t(`err.${r.reason}`);
+      showShop();
+    };
+    const hasKind = (tb) => !tb.kinds || offers.some((o) => tb.kinds.includes(o.give.kind));
+    const tabs = h('nav', { class: 'shop-tabs', role: 'tablist' }, TABS.filter(hasKind).map((tb) => h('button', { class: 'shop-tab' + (tb.id === tab ? ' on' : ''), role: 'tab', 'aria-selected': String(tb.id === tab), 'data-tab': tb.id, onclick: () => { tab = tb.id; sel = null; app.audio?.sfx?.('tick'); showShop(); } }, itemIcon(tb.icon, 'sm'), h('span', {}, t(`shop.tab.${tb.id}`)))));
+    const cells = shown.map((o, i) => {
       const left = leftStock(p, o);
       const [icon, tint] = iconOf(o.give);
-      const free = o.price.cur === 'free';
-      const label = left <= 0 ? t('shop.soldOut') : free ? t('shop.free') : `${t('shop.buy')} · ${fmt(o.price.amount)} ${t(`res.${o.price.cur}`)}`;
-      const buy = (ev) => {
-        const r = buyOffer(ctx, app.progress, app.dayKey(), o.id);
-        if (r.ok) { app.progress = r.progress; if (free) app.trackQuest('shop_free'); save(); app.rewardPop([{ k: iconOf(o.give)[0], n: o.give.count }], ev); msg = nameOf(o.give); } else msg = t(`err.${r.reason}`);
-        showShop();
-      };
-      return h('div', { class: 'card shop-offer', 'data-offer': o.id, style: `--rc:${RARITY_COL[rarityOf(o.give)]}` },
-        itemIcon(icon, 'lg', tint), h('div', { class: 'so-info' }, h('b', {}, nameOf(o.give)), h('small', { class: 'muted' }, t('shop.left', { n: Math.max(0, left) }))),
-        btn(label, buy, !free || left <= 0 ? '' : 'primary', { id: `buy-${o.id}`, ...(left <= 0 ? { disabled: '' } : {}) }));
+      const free = o.price.cur === 'free', r = rarityOf(o.give);
+      const price = left <= 0 ? h('span', { class: 'sc-price out' }, t('shop.soldOut')) : free ? h('span', { class: 'sc-price free' }, t('shop.free')) : h('span', { class: 'sc-price' }, itemIcon(o.price.cur, 'sm'), fmt(o.price.amount));
+      return h('button', { class: 'shop-cell' + (o.id === sel ? ' sel' : '') + (left <= 0 ? ' out' : '') + (free && left > 0 ? ' isfree' : '') + (r >= 5 ? ' gold' : ''), 'data-offer': o.id, style: `--rc:${RARITY_COL[r]};--i:${i}`, onclick: () => { sel = o.id; app.audio?.sfx?.('tick'); showShop(); } },
+        h('div', { class: 'sc-art' }, itemIcon(icon, 'lg', tint), h('i', { class: 'sc-n' }, `×${o.give.count}`), free && left > 0 ? h('em', { class: 'sc-ribbon' }, 'FREE') : null),
+        price);
     });
+    const so = offers.find((o) => o.id === sel);
+    let detail = null;
+    if (so) {
+      const left = leftStock(p, so), free = so.price.cur === 'free';
+      const label = left <= 0 ? t('shop.soldOut') : free ? t('shop.free') : `${t('shop.buy')} · ${fmt(so.price.amount)} ${t(`res.${so.price.cur}`)}`;
+      detail = h('div', { class: 'shop-detail', style: `--rc:${RARITY_COL[rarityOf(so.give)]}` }, h('div', { class: 'sd-info' }, h('b', {}, nameOf(so.give)), h('small', { class: 'muted' }, t('shop.left', { n: Math.max(0, left) }))),
+        btn(label, buyOf(so), !free || left <= 0 ? 'gold' : 'primary', { id: `buy-${so.id}`, ...(left <= 0 ? { disabled: '' } : {}) }));
+    }
     music('shop');
     screen(
       h('h2', {}, t('shop.daily')),
       h('div', { class: 'row' }, h('div', { class: 'res', id: 'shop-gold' }, itemIcon('gold', 'sm'), t('res.gold'), h('b', {}, fmt(p.inventory.gold))), h('div', { class: 'res', id: 'shop-spirit' }, itemIcon('spirit', 'sm'), t('res.spirit'), h('b', {}, fmt(p.inventory.spirit)))),
       h('div', { class: 'muted' }, t('shop.resetNote')),
       msg ? h('div', { class: 'notice', id: 'shop-msg' }, msg) : null,
-      cards,
+      h('div', { class: 'shop2' }, tabs, h('div', { class: 'shop-grid' }, cells)),
+      detail,
       btn(t('hub.items'), () => app.showItems(), '', { id: 'shop-items' }),
       btn(t('back'), () => { if (app.guideStep() === 'claim') app.guideSet('battle'); showHub(); }, '', { id: 'back' }),
     );
     msg = null;
     if (app.guideStep() === 'claim') {
-      const free = document.querySelector('#screen .shop-offer button.primary:not([disabled])');
+      const freeO = offers.find((o) => o.price.cur === 'free' && leftStock(p, o) > 0);
+      if (freeO && tab !== 'all') { tab = 'all'; showShop(); return; }
+      if (freeO && sel !== freeO.id) { sel = freeO.id; showShop(); return; }
+      const free = document.querySelector('#screen .shop-detail button.primary:not([disabled])');
       app.guidePoint(free || '#back-top', free ? 'guide.claim' : 'guide.back');
     }
   }
