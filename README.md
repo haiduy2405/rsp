@@ -762,3 +762,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 ## v0.106.1
 - Sửa màn tràn sau khi chạm vào game (toàn màn hình): chiều cao app đo từ viewport thật (`--app-h`), cập nhật khi resize / đổi toàn màn hình / quay lại app. Chưa kiểm chứng trên điện thoại thật, cần Duy thử.
 - Rollback: tag local `pre-fs-v0.106.0`.
+
+## v0.106.2
+- Màn chọn ải vừa đúng một trang (không cuộn cả màn); chỉ đường ải bên trong cuộn như cũ. Đo ở cao 667/800/900: không tràn. Thêm hook debug `__showStages`.
+- Rollback: tag local `pre-stagefit-v0.106.1`.

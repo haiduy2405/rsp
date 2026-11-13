@@ -148,7 +148,7 @@ const screen = (...kids) => {
     b.innerHTML = '<img src="assets/ui/icons/back.webp" alt="" draggable="false">';
     el.prepend(h('div', { class: 'back-wrap' }, b));
   }
-  el.classList.remove('hub', 'mapscreen', 'hubin');
+  el.classList.remove('hub', 'mapscreen', 'hubin', 'fitscreen');
   el.classList.add('show');
   el.scrollTop = 0;
 };
@@ -367,6 +367,7 @@ function showStages(zoneId, tier) {
   $('screen').style.setProperty('--zbg', `url(../assets/bg/${zoneId}.webp)`);
   $('screen').style.setProperty('--zbgt', `url(../assets/bg/${zoneId}_tall.webp)`); // nền dài cho đường ải: tranh phủ tới ải 1, chỉ chút mây ở chân
   screen(head, tabs, h('div', { class: 'muted tier-note' }, t('diff.reward', { gold: df.gold, drop: df.drop })), path, h('div', { class: 'muted hold-hint' }, t('stage.hold')), btn(t('back'), showZones, '', { id: 'back' }));
+  $('screen').classList.add('fitscreen');
   // cuộn tới ải đang chơi (ải kế tiếp), để người chơi luôn thấy nút cần bấm
   requestAnimationFrame(() => { const sc = $('screen').querySelector('.stagepath'); if (sc) sc.scrollTop = Math.max(0, posOf(Math.min(total, done + 1)).y - sc.clientHeight * 0.55); });
   if (gst) { guideSet('stage'); guidePoint(`#screen [data-stage="${done + 1 > total ? 1 : done + 1}"]`, 'guide.stage'); }
@@ -1729,6 +1730,7 @@ if (DEBUG) {
   window.__ui = ui;
   window.__showUpdate = () => { updateReady = true; showUpdatePill(); };
   window.__showTeam = (...a) => showTeam(...a);
+  window.__showStages = (...a) => showStages(...a);
   window.__startRun = (o) => startRun(o);
   window.__runItems = (o) => { Object.assign(run.items, o); render(); };
   window.__runRelics = (ids) => { run.relics.push(...ids); render(); };
