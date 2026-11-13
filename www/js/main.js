@@ -339,6 +339,7 @@ function showStages(zoneId, tier) {
   music(zoneTrack('map', zoneId));
   $('screen').style.setProperty('--zc', zc);
   $('screen').style.setProperty('--zbg', `url(../assets/bg/${zoneId}.webp)`);
+  $('screen').style.setProperty('--zbgt', `url(../assets/bg/${zoneId}_tall.webp)`); // nền dài cho đường ải: tranh phủ tới ải 1, chỉ chút mây ở chân
   screen(head, tabs, h('div', { class: 'muted tier-note' }, t('diff.reward', { gold: df.gold, drop: df.drop })), path, h('div', { class: 'muted hold-hint' }, t('stage.hold')), btn(t('back'), showZones, '', { id: 'back' }));
   // cuộn tới ải đang chơi (ải kế tiếp), để người chơi luôn thấy nút cần bấm
   requestAnimationFrame(() => { const sc = $('screen').querySelector('.stagepath'); if (sc) sc.scrollTop = Math.max(0, posOf(Math.min(total, done + 1)).y - sc.clientHeight * 0.55); });

@@ -1024,7 +1024,7 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .zhead { padding-left: 56px; min-height: 64px; }
 .stagepath { -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 6%, #000 94%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 6%, #000 94%, transparent 100%); }
 
-.sp-inner { background: linear-gradient(180deg, rgba(28, 16, 9, .30), rgba(28, 16, 9, .55)), var(--zbg) center top / cover no-repeat, rgba(28, 16, 9, .5); }
+.sp-inner { background: linear-gradient(180deg, rgba(28, 16, 9, .30), rgba(28, 16, 9, .55)), var(--zbgt) center bottom / cover no-repeat, rgba(28, 16, 9, .5); }
 .stagepath { border: 2px solid color-mix(in srgb, var(--zc, #ffb25a) 55%, #1c1009); background: none; }
 .zhead { background: linear-gradient(90deg, rgba(28, 16, 9, .62), rgba(28, 16, 9, .25)), var(--zbg) center 30% / cover no-repeat; }
 .zhead h2 { text-shadow: 0 2px 6px rgba(0, 0, 0, .7); }
@@ -1032,7 +1032,7 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .snode .sn-label { padding: 3px 10px; border-radius: 10px; background: rgba(28, 16, 9, .68); border: 1px solid rgba(255, 217, 138, .25); }
 
 /* v0.65 nút ải: huy hiệu nét viền nâu, bóng đổ, ruy băng nhãn, đường mòn có viền */
-.sp-inner { background: linear-gradient(180deg, rgba(28, 16, 9, .06), rgba(28, 16, 9, .30)), var(--zbg) center top / cover no-repeat, rgba(28, 16, 9, .5); }
+.sp-inner { background: linear-gradient(180deg, rgba(28, 16, 9, .06), rgba(28, 16, 9, .30)), var(--zbgt) center bottom / cover no-repeat, rgba(28, 16, 9, .5); }
 .sp-bg { fill: none; stroke: #3b2314; stroke-width: 12; stroke-linecap: round; opacity: .55; vector-effect: non-scaling-stroke; }
 .sp-seg { stroke: #fff1cf; stroke-width: 6; stroke-dasharray: 0.1 14; opacity: .95; }
 .sp-seg.lit { stroke: #ffd35e; stroke-width: 7; stroke-dasharray: none; filter: drop-shadow(0 0 4px rgba(255, 200, 90, .9)); }
