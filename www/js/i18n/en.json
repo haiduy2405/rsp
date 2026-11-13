@@ -583,6 +583,7 @@
   "intro.boss": "WARNING · BOSS",
   "intro.elite": "WARNING · ELITE",
   "skill.ok": "Use skill",
+  "skill.ready": "Skill ready",
   "skill.cancel": "Cancel",
   "run.leave": "Back to menu (save run)",
   "run.resume": "Resume run",

@@ -1297,14 +1297,24 @@ function showSkillAsk(idx, confirm, duoGo = null, duo = null) {
   const kit = resolveKit(ctx, m.id, m.skillLv, formOf(m.awaken));
   const keys = keysOf(kit.skill.units);
   const close = () => $('info')?.remove();
+  const col = COLORS[m.element];
+  const orbImg = getImg(`orb:${m.element}`);
+  const hero = h('div', { class: 'sk-hero', style: `--c:${col};--card:url(assets/characters/${m.id}_card.webp)` },
+    h('i', { class: 'sk-rays' }),
+    h('div', { class: 'sk-art' }, h('img', { src: `assets/characters/${m.id}_icon.webp`, alt: '' })),
+    h('span', { class: 'sk-ready' }, t('skill.ready')),
+    h('span', { class: 'sk-gem' }, orbImg ? h('img', { src: orbImg.src, alt: '' }) : null),
+    h('div', { class: 'sk-who' }, h('b', {}, t(`char.${m.id}`)), h('small', {}, t('char.cooldown', { n: m.skillMax }))));
   const body = [
-    h('div', { class: 'charrow' }, portrait(m.id, 72), h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`skill.${m.id}`)), h('div', { class: 'muted' }, t(`char.${m.id}`), ' · ', t('char.cooldown', { n: m.skillMax })))),
-    h('div', { class: 'card' }, kit.skill.units.map((u) => h('div', {}, unitText(u, m.element)))),
-    keys.length ? h('div', { class: 'card' }, keywordBlock(keys)) : null,
+    hero,
+    h('h3', { class: 'sk-name' }, t(`skill.${m.id}`)),
+    h('div', { class: 'sk-fx' }, kit.skill.units.map((u) => h('div', { class: 'sk-row' }, h('i', { class: 'sk-bolt' }, '✦'), h('span', {}, unitText(u, m.element))))),
+    keys.length ? h('div', { class: 'sk-kw' }, keywordBlock(keys)) : null,
     duoGo && duo ? duoAskCard(duo, st) : null,
-    h('div', { class: 'row' }, ...(duoGo ? [btn(t('skill.duoOk'), () => { close(); duoGo(); }, 'primary duo', { id: 'duo-ok' }), btn(t('skill.single'), () => { close(); confirm(); }, '', { id: 'skill-ok' })] : [btn(t('skill.ok'), () => { close(); confirm(); }, 'primary', { id: 'skill-ok' })]), btn(t('skill.cancel'), close, '', { id: 'skill-cancel' })),
+    h('div', { class: 'sk-btns' }, ...(duoGo ? [btn(t('skill.duoOk'), () => { close(); duoGo(); }, 'primary duo', { id: 'duo-ok' }), btn(t('skill.single'), () => { close(); confirm(); }, '', { id: 'skill-ok' })] : [btn(t('skill.ok'), () => { close(); confirm(); }, 'primary', { id: 'skill-ok' })]), btn(t('skill.cancel'), close, '', { id: 'skill-cancel' })),
   ];
-  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox' }, body)));
+  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox sk-ask' }, body)));
+  audio.sfx('reveal');
 }
 
 function showInspect(kind, idx) {

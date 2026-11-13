@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.95.0
+- Bảng xác nhận kỹ năng làm lại: khung vàng, ảnh tướng lớn trong khung viền màu hệ trên nền tia sáng xoay, nhãn "Kỹ năng sẵn sàng", ngọc hệ, tên kỹ năng chữ vàng, hiệu ứng từng dòng, nút dùng kỹ năng lớn; xuất hiện có hiệu ứng nảy + âm thanh. Dùng tranh có sẵn của tướng (chưa cần ảnh sinh thêm). Rollback cục bộ: tag `pre-skillask-v0.94.0`.
+
 ## v0.94.0
 - Lợi/bất lợi hệ: khi tới lượt từng tướng ra đòn, mỗi quái hiện icon tròn phía trên bên phải đầu: xanh ▲ = tướng đó có lợi thế, đỏ ▼ = bất lợi (cùng hệ thì không hiện), kèm chấm hệ của tướng. Tướng kế tiếp khác hệ thì icon đổi theo. Bỏ mũi tên lợi/bất lợi cũ trên ô tướng (so với quái đang nhắm, gây hiểu sai). Rollback cục bộ: tag `pre-adv-v0.93.2`.
 
