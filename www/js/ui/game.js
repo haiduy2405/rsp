@@ -149,10 +149,10 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
           const lbl = h.amount === 0 && h.absorbed ? t('battle.blocked') : `${strong ? '▲' : weak ? '▼' : ''}${fmt(h.amount)}`;
           floater(lbl, ex + ((n % 3) - 1) * 40, 128 - Math.min(3, n) * 26, strong ? '#ffd84a' : weak ? '#b9b2a8' : LIGHT[src.el] || '#ffd84a', h.amount === 0 ? 24 : Math.round(dmgSize(h.amount, en.maxHp) * (strong ? 1.25 : weak ? 0.8 : 1)), 'dmg', strong ? 1300 : 1100);
           if (strong && n === 0) {
-            floater(t('battle.strong'), ex, 92, '#86ebff', 22, 'text', 1000);
+            floater(t('battle.strong'), ex, 92, '#ff9a3c', 22, 'text', 1000);
             view.rings.push({ x: ex, y: 160, col: src.el, age: 0, life: 520 });
             view.rings.push({ x: ex, y: 160, col: 3, age: 0, life: 380 });
-            for (let p = 0; p < 12; p++) { const a = (p / 12) * 6.283; view.particles.push({ x: ex, y: 160, vx: Math.cos(a) * 0.28, vy: Math.sin(a) * 0.28, color: p % 2 ? '#c4f5ff' : '#8decff', age: 0, life: 520 }); }
+            for (let p = 0; p < 12; p++) { const a = (p / 12) * 6.283; view.particles.push({ x: ex, y: 160, vx: Math.cos(a) * 0.28, vy: Math.sin(a) * 0.28, color: p % 2 ? '#fff0a0' : '#ffb347', age: 0, life: 520 }); }
             view.camShake = Math.max(view.camShake || 0, 5);
             en.hit = 1.4;
             fx.sfx('combo', 1.15);
@@ -174,7 +174,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         k++;
       } else if (h.kind === 'reflect') {
         view.hp = Math.max(0, view.hp - h.amount);
-        floater(`-${fmt(h.amount)}`, W / 2, 350, '#a3f0ff', 34, 'dmg');
+        floater(`-${fmt(h.amount)}`, W / 2, 350, '#ff9f6b', 34, 'dmg');
       } else if (h.amount > 0) {
         fx.sfx('heal');
         view.hp = Math.min(view.maxHp, view.hp + h.amount);
@@ -286,7 +286,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   function blastGroup(g, boardBefore, cx, cy) {
     const R = Math.random, P = view.particles;
     const tier = g.size >= 5 ? 3 : g.size === 4 ? 2 : 1;
-    const hot = ['#ffffff', '#c4f5ff'];
+    const hot = ['#ffffff', '#fff0a0'];
     g.cells.forEach((i, n) => {
       const c = cellCenter(i);
       const type = boardBefore.cells[i];
@@ -307,7 +307,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       view.rings.push({ x: cx, y: cy, col: g.type, age: 0, life: 620, r0: 10, r1: 220 });
       for (let k = 0; k < 18; k++) {
         const a = (k / 18) * 6.283 + R() * 0.2, sp = 0.35 + R() * 0.3;
-        P.push({ shape: 'glint', x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 0, size: 7 + R() * 7, color: k % 2 ? '#c4f5ff' : '#ffffff', age: 0, life: 520 + R() * 200 });
+        P.push({ shape: 'glint', x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 0, size: 7 + R() * 7, color: k % 2 ? '#fff0a0' : '#ffffff', age: 0, life: 520 + R() * 200 });
       }
       view.whiteFlash = Math.max(view.whiteFlash || 0, 0.35);
     }
@@ -320,7 +320,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   function bigMatchFx(g, cx, cy, keep) {
     const el = g.type;
     const five = g.size >= 5;
-    floater(five ? t('battle.enhance') : t('battle.four', { n: g.size }), cx, cy - 34, five ? '#adf1ff' : '#ffffff', five ? 30 : 24, 'text', 1200);
+    floater(five ? t('battle.enhance') : t('battle.four', { n: g.size }), cx, cy - 34, five ? '#ffe27a' : '#ffffff', five ? 30 : 24, 'text', 1200);
     view.rings.push({ x: cx, y: cy, col: el, age: 0, life: five ? 620 : 420 });
     view.camShake = Math.max(view.camShake || 0, five ? 7 : 4);
     fx.sfx(five ? 'enhance' : 'combo', 1.1);
@@ -329,7 +329,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
       const to = cellCenter(keep);
       for (const i of g.cells) {
         const c = cellCenter(i);
-        view.particles.push({ x: c.x, y: c.y, vx: (to.x - c.x) / 520, vy: (to.y - c.y) / 520, color: '#adf1ff', age: 0, life: 520 });
+        view.particles.push({ x: c.x, y: c.y, vx: (to.x - c.x) / 520, vy: (to.y - c.y) / 520, color: '#ffe27a', age: 0, life: 520 });
       }
       pendEnh.push(keep);
     }
@@ -439,9 +439,9 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
           // hợp lực: hai hệ cùng bung, chữ DUO, vòng sáng hội tụ giữa hai tướng, rung màn
           setTimeout(() => castFx(state.members[e.slot + 1]?.element ?? 5), 160);
           const mx = 12 + e.slot * 104 + 101;
-          floater(t('battle.duoCast'), W / 2, 250, '#c4f5ff', 46, 'text', 1500);
+          floater(t('battle.duoCast'), W / 2, 250, '#fff0a0', 46, 'text', 1500);
           view.rings.push({ x: mx, y: 416, col: 3, age: 0, life: 820 }, { x: mx, y: 416, col: state.members[e.slot]?.element ?? 3, age: 0, life: 640 });
-          for (let q = 0; q < 26; q++) { const a = (q / 26) * 6.283; view.particles.push({ x: mx, y: 416, vx: Math.cos(a) * 0.3, vy: Math.sin(a) * 0.3 - 0.05, color: q % 2 ? '#c4f5ff' : '#ffffff', age: 0, life: 650 }); }
+          for (let q = 0; q < 26; q++) { const a = (q / 26) * 6.283; view.particles.push({ x: mx, y: 416, vx: Math.cos(a) * 0.3, vy: Math.sin(a) * 0.3 - 0.05, color: q % 2 ? '#fff0a0' : '#ffffff', age: 0, life: 650 }); }
           view.camShake = Math.max(view.camShake || 0, 9);
           fx.vibrate?.([40, 30, 80]);
         }
@@ -478,7 +478,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         fx.sfx('reflect');
         if (e.to === 'enemy') {
           view.enemies[e.enemy].hp = Math.max(0, view.enemies[e.enemy].hp - e.amount);
-          floater(`-${e.amount}`, enemyX(e.enemy), 150, '#a3f0ff');
+          floater(`-${e.amount}`, enemyX(e.enemy), 150, '#ff9f6b');
         }
       } else if (e.type === 'revive') {
         fx.sfx('revive');

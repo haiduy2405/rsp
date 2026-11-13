@@ -27,12 +27,9 @@ export function createLoading({ t, title, subtitle, version = '', auto = false }
   box.className = 'ld-box';
   const h1 = document.createElement('h1');
   h1.textContent = title;
-  // Logo thật; nếu ảnh không tải được thì giữ chữ tiêu đề.
-  const logo = new Image();
-  logo.className = 'ld-logo';
-  logo.alt = title;
-  logo.onload = () => h1.replaceChildren(logo);
-  logo.src = 'assets/ui/logo.webp';
+  // Tên game: chữ vàng gold 3D, có ánh đèn quét ngang (CSS .gold3d)
+  h1.className = 'gold3d';
+  h1.dataset.t = title;
   const sub = document.createElement('div');
   sub.className = 'ld-sub';
   sub.textContent = subtitle;

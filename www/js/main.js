@@ -193,7 +193,7 @@ function dockBtn(icon, label, onclick, id, cls = '', dot = false) {
   if (dot) b.append(h('i', { class: 'red-dot', 'aria-hidden': 'true' }));
   return b;
 }
-const CUR_COL = { gold: '#ffd24a', spirit: '#b58bff', ticket: '#8fecff', shard: '#ff9acb' };
+const CUR_COL = { gold: '#ffd24a', spirit: '#b58bff', ticket: '#ff9a4a', shard: '#ff9acb' };
 const lastCur = {};
 const curPill = (k, v, id) => h('button', { class: 'cur-pill' + (lastCur[k] !== undefined && lastCur[k] !== v ? ' bump' : '') + ((lastCur[k] = v), ''), ...(id ? { id } : {}), onclick: () => ui.showItems(), 'aria-label': t(`res.${k}`) }, h('img', { src: `assets/ui/items/${k}.webp`, alt: '', draggable: 'false' }), h('b', {}, new Intl.NumberFormat(lang).format(v)));
 const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } : {}) }, label, h('b', {}, String(value)));
@@ -209,12 +209,12 @@ function hubScene() {
     const open = progress.unlocked.includes(z.id);
     const col = COLORS[z.element];
     const S = open ? 66 : 60;
-    const lock = open ? '' : `<g transform="translate(${x - 9} ${y - 8})"><rect x="0" y="7" width="18" height="13" rx="3" fill="#182534" stroke="#e6f6f9" stroke-width="1.6"/><path d="M4 7V4.5a5 5 0 0 1 10 0V7" fill="none" stroke="#e6f6f9" stroke-width="1.8"/></g>`;
+    const lock = open ? '' : `<g transform="translate(${x - 9} ${y - 8})"><rect x="0" y="7" width="18" height="13" rx="3" fill="#3a2416" stroke="#f6edd6" stroke-width="1.6"/><path d="M4 7V4.5a5 5 0 0 1 10 0V7" fill="none" stroke="#f6edd6" stroke-width="1.8"/></g>`;
     return `<g class="zorb${open ? ' open' : ''}" ${open ? `data-zone="${z.id}" role="button" tabindex="0" aria-label="${t(`zone.${z.id}`)}"` : ''} style="animation-delay:${(i * 0.7).toFixed(1)}s;--c:${col}">${open ? `<ellipse cx="${x}" cy="${y + S * 0.34}" rx="${S * 0.46}" ry="${S * 0.12}" fill="${col}" opacity=".35" class="halo"/>` : ''}<image href="assets/ui/zones/${z.id}.webp" x="${x - S / 2}" y="${y - S / 2}" width="${S}" height="${S}" ${open ? '' : 'filter="url(#zlock)" opacity=".7"'}/>${lock}</g>`;
   }).join('');
   const svg = `<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice" xmlns="${NS}" aria-hidden="true">
 <defs><filter id="zlock"><feColorMatrix type="saturate" values="0.1"/></filter></defs>
-<rect width="400" height="800" fill="#c9f4fd"/>
+<rect width="400" height="800" fill="#fbd9a8"/>
 <image href="assets/bg/hub.webp" x="0" y="0" width="400" height="711" preserveAspectRatio="xMidYMin slice"/>
 ${orbs}
 </svg>`;
@@ -296,7 +296,7 @@ function showStages(zoneId, tier) {
   }));
   // Con đường leo tháp: ải 1 ở đáy, ải cuối (boss) ở đỉnh; các nút zích-zắc nối bằng đường nét đứt, đoạn đã qua sáng vàng.
   const zone = ctx.zones[zoneId];
-  const zc = COLORS[zone.element] || '#99eeff';
+  const zc = COLORS[zone.element] || '#ffb25a';
   const bossId = zone.monsters.boss[0];
   const ROW = 104;
   const PADY = 56;
@@ -441,7 +441,7 @@ function charCard(id, onclick, extra) {
   return h(
     'div',
     { class: 'card btn charrow' + (c ? '' : ' locked'), 'data-char': id, onclick: c ? onclick : null },
-    c ? portrait(id, 64) : h('div', { style: 'width:64px;height:64px;border-radius:12px;border:3px solid #2d445f;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px' }, '?'),
+    c ? portrait(id, 64) : h('div', { style: 'width:64px;height:64px;border-radius:12px;border:3px solid #6a4529;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px' }, '?'),
     h(
       'div',
       { style: 'flex:1;min-width:0' },
@@ -825,11 +825,11 @@ const floorTitle = () => h('h2', {}, `${stageLabel(run)} · ${t('run.floor', { n
 // ---- Bản đồ leo tháp (kiểu đường đi Slay the Spire): đáy là cổng vào, đỉnh là trùm; mỗi tầng chọn một trong các cửa.
 const NODE = {
   normal: { col: '#6f86ff', ring: '#c9d3ff', icon: '<path d="M6 18L17 7M7 7l11 11M5 19l2.5-.5M19 19l-2.5-.5M5 5l.5 2.5M19 5l-.5 2.5"/>' },
-  elite: { col: '#86ebff', ring: '#cef7ff', icon: '<path d="M6 10c0-4 3-6 6-6s6 2 6 6v3l-2 2v3H8v-3l-2-2zM9 11h2M13 11h2M10 18v2M14 18v2"/>' },
-  boss: { col: '#ff4b5c', ring: '#cef7ff', icon: '<path d="M4 18l1.5-9 4 4 2.5-7 2.5 7 4-4 1.5 9zM4 21h16"/>' },
+  elite: { col: '#ff7a3c', ring: '#ffd0b0', icon: '<path d="M6 10c0-4 3-6 6-6s6 2 6 6v3l-2 2v3H8v-3l-2-2zM9 11h2M13 11h2M10 18v2M14 18v2"/>' },
+  boss: { col: '#ff4b5c', ring: '#ffe0b0', icon: '<path d="M4 18l1.5-9 4 4 2.5-7 2.5 7 4-4 1.5 9zM4 21h16"/>' },
   swarm: { col: '#8fb3ff', ring: '#dbe6ff', icon: '<path d="M12 5a3 3 0 1 0 0 .1M5.500 14a3 3 0 1 0 0 .1M18.500 14a3 3 0 1 0 0 .1M8 20h8M3 20h2M19 20h2"/>' },
   shrine: { col: '#ff8fd0', ring: '#ffd6ee', icon: '<path d="M12 3l5 6-5 12-5-12zM7 9h10M12 3v18"/>' },
-  chest: { col: '#85ebff', ring: '#d5f6fd', icon: '<path d="M4 11h16v8H4zM4 11a8 6 0 0 1 16 0M12 11v3M10.5 14h3"/>' },
+  chest: { col: '#ffc83a', ring: '#fff1b8', icon: '<path d="M4 11h16v8H4zM4 11a8 6 0 0 1 16 0M12 11v3M10.5 14h3"/>' },
   rest: { col: '#4ed08a', ring: '#c9ffe0', icon: '<path d="M12 4c2 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3.500 2-4.500 0 1.500 1 2 1.500 2C10.500 8 11 6 12 4zM9 21h6"/>' },
   event: { col: '#b07cff', ring: '#e6d4ff', icon: '<path d="M9 9a3 3 0 1 1 4.500 2.600C12.500 12.200 12 13 12 14.500M12 18v.5"/>' },
   shop: { col: '#3cc7c0', ring: '#c8fffb', icon: '<path d="M6 9h12l1 11H5zM9 9V7a3 3 0 0 1 6 0v2M12 12v5M10.500 14h3"/>' },
@@ -879,7 +879,7 @@ function runMapSVG() {
   // đường tới các cửa đang chọn (sáng nhẹ)
   const curRow = rows.find((x) => x.cur);
   if (curRow) curRow.xs.forEach((x, i) => (gold += link(last, [x, curRow.y], 'lk now')));
-  let nodes = `<g class="nd start"><circle cx="${start.x}" cy="${start.y}" r="15" fill="#191b20" stroke="#99dfed" stroke-width="2"/><path d="M${start.x - 6} ${start.y + 7}v-8a6 6 0 0 1 12 0v8z" fill="none" stroke="#99dfed" stroke-width="1.8"/></g>`;
+  let nodes = `<g class="nd start"><circle cx="${start.x}" cy="${start.y}" r="15" fill="#191b20" stroke="#e2b75a" stroke-width="2"/><path d="M${start.x - 6} ${start.y + 7}v-8a6 6 0 0 1 12 0v8z" fill="none" stroke="#e2b75a" stroke-width="1.8"/></g>`;
   const label = (x, y, k, strong) => `<text x="${x}" y="${y}" text-anchor="middle" class="nl${strong ? ' strong' : ''}">${k === '?' || k === 'f?' ? '' : t(`door.${k}`)}</text>`;
   for (const row of rows) {
     row.kinds.forEach((k, i) => {
@@ -895,24 +895,24 @@ function runMapSVG() {
       const skipped = row.past && row.pick !== i;
       const cls = 'nd' + (row.cur ? ' cur' : '') + (taken ? ' taken' : '') + (skipped ? ' skipped' : '') + (big ? ' big' : '');
       const attr = row.cur ? ` data-door="${i}" role="button" tabindex="0" aria-label="${t(`door.${k}`)}"` : '';
-      nodes += `<g class="${cls}"${attr} style="--c:${d.col}">${row.cur ? `<circle class="pulse" cx="${x}" cy="${y}" r="${rad + 8}" fill="${d.col}"/>` : ''}<circle cx="${x}" cy="${y}" r="${rad + 3}" fill="none" stroke="#9bd8e4" stroke-opacity="${row.cur || taken ? 0.85 : 0.35}" stroke-width="1.4"/><circle cx="${x}" cy="${y}" r="${rad}" fill="#0c131a" stroke="${taken || row.cur ? d.ring : d.col}" stroke-width="${row.cur ? 3 : 2}"/><circle cx="${x}" cy="${y}" r="${rad - 5}" fill="${d.col}" opacity="${skipped ? 0.1 : taken ? 0.55 : 0.3}"/><g transform="translate(${x - 12 * (rad / 23)} ${y - 12 * (rad / 23)}) scale(${rad / 23})" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="${skipped ? 0.35 : 1}">${d.icon}</g>${row.cur || big ? label(x, y + rad + 17, k, row.cur) : ''}</g>`;
+      nodes += `<g class="${cls}"${attr} style="--c:${d.col}">${row.cur ? `<circle class="pulse" cx="${x}" cy="${y}" r="${rad + 8}" fill="${d.col}"/>` : ''}<circle cx="${x}" cy="${y}" r="${rad + 3}" fill="none" stroke="#d39a5e" stroke-opacity="${row.cur || taken ? 0.85 : 0.35}" stroke-width="1.4"/><circle cx="${x}" cy="${y}" r="${rad}" fill="#1d120b" stroke="${taken || row.cur ? d.ring : d.col}" stroke-width="${row.cur ? 3 : 2}"/><circle cx="${x}" cy="${y}" r="${rad - 5}" fill="${d.col}" opacity="${skipped ? 0.1 : taken ? 0.55 : 0.3}"/><g transform="translate(${x - 12 * (rad / 23)} ${y - 12 * (rad / 23)}) scale(${rad / 23})" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="${skipped ? 0.35 : 1}">${d.icon}</g>${row.cur || big ? label(x, y + rad + 17, k, row.cur) : ''}</g>`;
     });
   }
   if (curRow || true) {
     // dấu vị trí đội: viên ngọc phát sáng ở điểm vừa đi tới
-    nodes += `<g class="you"><circle cx="${last[0] + 26}" cy="${last[1] - 4}" r="6" fill="#ccf7ff"/><circle cx="${last[0] + 26}" cy="${last[1] - 4}" r="11" fill="#ccf7ff" opacity=".25"/></g>`;
+    nodes += `<g class="you"><circle cx="${last[0] + 26}" cy="${last[1] - 4}" r="6" fill="#ffe9ad"/><circle cx="${last[0] + 26}" cy="${last[1] - 4}" r="11" fill="#ffe9ad" opacity=".25"/></g>`;
   }
   let stars = '';
   for (let i = 0; i < 40; i++) stars += `<circle cx="${(i * 97.3) % 400}" cy="${(i * 53.7) % 600}" r="${0.6 + (i % 3) * 0.4}" fill="#fff" opacity="${0.15 + (i % 4) * 0.1}"/>`;
   let cols = '';
   for (const x of [26, 374]) {
-    cols += `<g class="pillar"><rect x="${x - 13}" y="62" width="26" height="520" fill="url(#col)" stroke="#2d445f" stroke-opacity=".7"/><rect x="${x - 19}" y="52" width="38" height="12" rx="2" fill="#1f2f42" stroke="#9bd8e4" stroke-opacity=".6"/><rect x="${x - 19}" y="578" width="38" height="12" rx="2" fill="#1f2f42" stroke="#9bd8e4" stroke-opacity=".6"/>`;
-    for (const y of [150, 270, 390, 500]) cols += `<path d="M${x} ${y - 9}l7 9-7 9-7-9z" fill="none" stroke="var(--zc,#99eeff)" stroke-width="1.4" opacity=".55" class="rune"/>`;
-    cols += `<path d="M${x - 15} 52h30l-4 -9h-22z" fill="#121b25" stroke="#9bd8e4" stroke-opacity=".6"/><g transform="translate(${x} 43) scale(1.7) translate(${-x} -43)"><g class="flame" style="transform-origin:${x}px 43px"><path d="M${x} 14c5 7 8 11 8 17a8 8 0 0 1-16 0c0-4 2-6 4-9 0 3 1 4 2 4-1-4-1-8 2-12z" fill="var(--zc,#99eeff)"/><path d="M${x} 24c3 4 4 6 4 9a4 4 0 0 1-8 0c0-2 1-3 2-5 0 2 1 2 2 2z" fill="#dcf8fd"/></g></g><circle cx="${x}" cy="30" r="34" fill="url(#zg)" class="torchglow"/></g>`;
+    cols += `<g class="pillar"><rect x="${x - 13}" y="62" width="26" height="520" fill="url(#col)" stroke="#6a4529" stroke-opacity=".7"/><rect x="${x - 19}" y="52" width="38" height="12" rx="2" fill="#4a2f1c" stroke="#d39a5e" stroke-opacity=".6"/><rect x="${x - 19}" y="578" width="38" height="12" rx="2" fill="#4a2f1c" stroke="#d39a5e" stroke-opacity=".6"/>`;
+    for (const y of [150, 270, 390, 500]) cols += `<path d="M${x} ${y - 9}l7 9-7 9-7-9z" fill="none" stroke="var(--zc,#ffb25a)" stroke-width="1.4" opacity=".55" class="rune"/>`;
+    cols += `<path d="M${x - 15} 52h30l-4 -9h-22z" fill="#2a1810" stroke="#d39a5e" stroke-opacity=".6"/><g transform="translate(${x} 43) scale(1.7) translate(${-x} -43)"><g class="flame" style="transform-origin:${x}px 43px"><path d="M${x} 14c5 7 8 11 8 17a8 8 0 0 1-16 0c0-4 2-6 4-9 0 3 1 4 2 4-1-4-1-8 2-12z" fill="var(--zc,#ffb25a)"/><path d="M${x} 24c3 4 4 6 4 9a4 4 0 0 1-8 0c0-2 1-3 2-5 0 2 1 2 2 2z" fill="#fff2c4"/></g></g><circle cx="${x}" cy="30" r="34" fill="url(#zg)" class="torchglow"/></g>`;
   }
   return `<svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" aria-hidden="false">
 <defs><linearGradient id="col" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#111216"/><stop offset=".5" stop-color="#424753"/><stop offset="1" stop-color="#111216"/></linearGradient>
-<radialGradient id="zg"><stop offset="0" stop-color="var(--zc,#99eeff)" stop-opacity=".45"/><stop offset="1" stop-color="var(--zc,#99eeff)" stop-opacity="0"/></radialGradient><radialGradient id="tg" cx=".5" cy=".12" r=".7"><stop offset="0" stop-color="var(--zc,#99eeff)" stop-opacity=".22"/><stop offset="1" stop-color="var(--zc,#99eeff)" stop-opacity="0"/></radialGradient><radialGradient id="rg" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#626878" stop-opacity=".55"/><stop offset="1" stop-color="#626878" stop-opacity="0"/></radialGradient></defs>
+<radialGradient id="zg"><stop offset="0" stop-color="var(--zc,#ffb25a)" stop-opacity=".45"/><stop offset="1" stop-color="var(--zc,#ffb25a)" stop-opacity="0"/></radialGradient><radialGradient id="tg" cx=".5" cy=".12" r=".7"><stop offset="0" stop-color="var(--zc,#ffb25a)" stop-opacity=".22"/><stop offset="1" stop-color="var(--zc,#ffb25a)" stop-opacity="0"/></radialGradient><radialGradient id="rg" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#626878" stop-opacity=".55"/><stop offset="1" stop-color="#626878" stop-opacity="0"/></radialGradient></defs>
 <rect width="400" height="600" fill="url(#rg)"/><rect width="400" height="600" fill="url(#tg)"/>${stars}${cols}${faint}${gold}${nodes}</svg>`;
 }
 
@@ -952,7 +952,7 @@ function showRelicPick() {
 }
 // Tiêu đề bản đồ: huy hiệu vùng, tên ải, chấm tầng, thanh máu có tim.
 function mapHeader() {
-  const zc = COLORS[ctx.zones[run.zoneId].element] || '#99eeff';
+  const zc = COLORS[ctx.zones[run.zoneId].element] || '#ffb25a';
   const pips = Array.from({ length: run.floors }, (_, i) => h('i', { class: 'pip' + (i < run.floor ? ' done' : i === run.floor ? ' cur' : '') + (i === run.floors - 1 ? ' boss' : '') }));
   const pct = Math.max(0, (run.hp / run.maxHp) * 100);
   const heart = h('span', { class: 'heart' });
@@ -1060,7 +1060,7 @@ function showDoors() {
   const focusMap = () => { map.scrollTop = Math.max(0, (vy / 600) * svg.clientHeight - map.clientHeight * 0.55); };
   focusMap();
   requestAnimationFrame(focusMap);
-  $('screen').style.setProperty('--zc', COLORS[ctx.zones[run.zoneId].element] || '#99eeff');
+  $('screen').style.setProperty('--zc', COLORS[ctx.zones[run.zoneId].element] || '#ffb25a');
 }
 
 function battleIntro() {
@@ -1351,8 +1351,8 @@ function lootRows(l) {
 }
 const CHEST_SVG = `<svg viewBox="0 0 200 170" aria-hidden="true">
   <ellipse cx="100" cy="158" rx="78" ry="9" fill="#000" opacity=".35"/>
-  <g class="chest-lid"><path d="M30 84C30 26 170 26 170 84Z" fill="#29486c" stroke="#0d1825" stroke-width="5" stroke-linejoin="round"/><path d="M30 84C34 52 62 40 100 40" fill="none" stroke="#70c6d7" stroke-width="5" opacity=".7"/><rect x="44" y="40" width="13" height="44" fill="#99dfed" stroke="#0d1825" stroke-width="3.5"/><rect x="143" y="40" width="13" height="44" fill="#99dfed" stroke="#0d1825" stroke-width="3.5"/></g>
-  <g class="chest-body"><rect x="30" y="82" width="140" height="68" rx="7" fill="#203a58" stroke="#0d1825" stroke-width="5"/><path d="M34 106H166M34 128H166" stroke="#0d1825" stroke-width="3" opacity=".5"/><rect x="44" y="82" width="13" height="68" fill="#99dfed" stroke="#0d1825" stroke-width="3.5"/><rect x="143" y="82" width="13" height="68" fill="#99dfed" stroke="#0d1825" stroke-width="3.5"/><rect x="88" y="78" width="24" height="34" rx="5" fill="#ffd24a" stroke="#0d1825" stroke-width="4"/><circle cx="100" cy="94" r="4.500" fill="#0d1825"/></g>
+  <g class="chest-lid"><path d="M30 84C30 26 170 26 170 84Z" fill="#7a4822" stroke="#2a160a" stroke-width="5" stroke-linejoin="round"/><path d="M30 84C34 52 62 40 100 40" fill="none" stroke="#a8692f" stroke-width="5" opacity=".7"/><rect x="44" y="40" width="13" height="44" fill="#e2b75a" stroke="#2a160a" stroke-width="3.5"/><rect x="143" y="40" width="13" height="44" fill="#e2b75a" stroke="#2a160a" stroke-width="3.5"/></g>
+  <g class="chest-body"><rect x="30" y="82" width="140" height="68" rx="7" fill="#64391a" stroke="#2a160a" stroke-width="5"/><path d="M34 106H166M34 128H166" stroke="#2a160a" stroke-width="3" opacity=".5"/><rect x="44" y="82" width="13" height="68" fill="#e2b75a" stroke="#2a160a" stroke-width="3.5"/><rect x="143" y="82" width="13" height="68" fill="#e2b75a" stroke="#2a160a" stroke-width="3.5"/><rect x="88" y="78" width="24" height="34" rx="5" fill="#ffd24a" stroke="#2a160a" stroke-width="4"/><circle cx="100" cy="94" r="4.500" fill="#2a160a"/></g>
 </svg>`;
 
 function lootScene({ title, sub, loot, onContinue }) {
@@ -1385,7 +1385,7 @@ function lootScene({ title, sub, loot, onContinue }) {
       if (k < 1) requestAnimationFrame(tick);
     };
     tick();
-    if (row.rare) spark(22, '#d8f7fd');
+    if (row.rare) spark(22, '#fff0bd');
   };
   let done = false;
   const finish = () => {
