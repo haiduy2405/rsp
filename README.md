@@ -509,3 +509,11 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Biểu tượng thở nhẹ (±4%, chu kỳ 2,6s) và nảy lên một cái mỗi ~4,8s; mọi viên cùng pha (`embPose` trong `render.js`). Tôn trọng `prefers-reduced-motion`.
 - Art cũ `orb{i}.webp`/`orb{i}e.webp` giữ làm fallback và cho icon hệ nhỏ ở hero.
 - Hoàn tác: `git checkout pre-emblem-anim-v0.75.0 -- www tools tests package.json README.md`
+
+## v0.77.0 — Nổ ngọc nhanh + đẹp, 3 cấp
+- Nhả tay là nổ ngay: bỏ bước "xem trước" (900ms → 0), giữ nhóm 320 → 30ms, nổ 200 → 110ms, rơi 560 → 300ms, nghỉ sau rơi 220 → 50ms (`ANIM` trong `game.js`).
+- Hiệu ứng nổ (`blastGroup`): ngọc phình lên + mờ dần kèm lóe sáng cộng màu hệ, mảnh vỡ pha lê xoay rơi, tia sáng lấp lánh, vòng sóng, rung màn, rung máy.
+  - 3 ngọc: gọn (1 vòng sóng, ít mảnh).
+  - 4 ngọc: nhiều mảnh hơn, thêm vòng sóng vàng + lóe lớn hơn.
+  - 5+ ngọc: bùng nổ nhất (vòng sóng lớn, tia sao tỏa 18 hướng, lóe trắng toàn màn, rung mạnh).
+- Hoàn tác: `git checkout pre-blast-v0.76.0 -- www package.json README.md`

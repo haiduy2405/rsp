@@ -1066,8 +1066,36 @@ export function draw(g, view, t) {
     g.strokeStyle = COLORS[r.col];
     g.lineWidth = 8 * (1 - k) + 2;
     g.beginPath();
-    g.arc(r.x, r.y, 20 + k * 120, 0, Math.PI * 2);
+    g.arc(r.x, r.y, (r.r0 ?? 20) + easeOut(k) * ((r.r1 ?? 140) - (r.r0 ?? 20)), 0, Math.PI * 2);
     g.stroke();
+  }
+  // Ngọc đang nổ: phình to + mờ dần, lóe sáng trắng-màu (cộng sáng), rồi mảnh vỡ/tia (particles) bay ra
+  for (const b of view.blasts || []) {
+    const a = b.age - b.delay;
+    if (a < 0) continue;
+    const k = Math.min(1, a / b.life);
+    if (k < 0.55) drawOrb(g, b.type, b.x, b.y, 34 * (1 + 0.5 * easeOut(k / 0.55)), b.enh, 1 - k / 0.55);
+    g.save();
+    g.globalCompositeOperation = 'lighter';
+    const rad = 34 * (0.8 + k * (1.2 + b.tier * 0.5));
+    const gr = g.createRadialGradient(b.x, b.y, 0, b.x, b.y, rad);
+    gr.addColorStop(0, `rgba(255,255,255,${0.9 * (1 - k)})`);
+    gr.addColorStop(0.45, COLORS[b.type] + '');
+    gr.addColorStop(1, 'rgba(0,0,0,0)');
+    g.globalAlpha = 0.85 * (1 - k) * (1 - k);
+    g.fillStyle = gr;
+    g.beginPath(); g.arc(b.x, b.y, rad, 0, Math.PI * 2); g.fill();
+    g.restore();
+  }
+  if (view.blastFlash) {
+    const f = view.blastFlash, k = f.age / f.life, rad = 60 + f.tier * 55 + k * 70;
+    g.save();
+    g.globalCompositeOperation = 'lighter';
+    g.globalAlpha = (1 - k) * (0.35 + f.tier * 0.12);
+    const gr = g.createRadialGradient(f.x, f.y, 0, f.x, f.y, rad);
+    gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.5, COLORS[f.col]); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = gr; g.beginPath(); g.arc(f.x, f.y, rad, 0, Math.PI * 2); g.fill();
+    g.restore();
   }
   g.globalAlpha = 1;
   if (view.tint) {
@@ -1092,6 +1120,15 @@ export function draw(g, view, t) {
       const sz = q.size * (0.6 + 0.4 * Math.sin(k * Math.PI)); // nhấp nháy: nở rồi tắt
       g.beginPath(); g.moveTo(q.x, q.y - sz); g.lineTo(q.x + sz * 0.22, q.y - sz * 0.22); g.lineTo(q.x + sz, q.y); g.lineTo(q.x + sz * 0.22, q.y + sz * 0.22);
       g.lineTo(q.x, q.y + sz); g.lineTo(q.x - sz * 0.22, q.y + sz * 0.22); g.lineTo(q.x - sz, q.y); g.lineTo(q.x - sz * 0.22, q.y - sz * 0.22); g.closePath(); g.fill();
+    } else if (q.shape === 'shard') {
+      g.save(); g.translate(q.x, q.y); g.rotate(q.rot); g.globalAlpha = Math.min(1, (1 - k) * 1.6);
+      g.beginPath(); g.moveTo(0, -q.size); g.lineTo(q.size * 0.55, 0); g.lineTo(0, q.size * 0.9); g.lineTo(-q.size * 0.55, 0); g.closePath(); g.fill();
+      g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.moveTo(0, -q.size); g.lineTo(q.size * 0.55, 0); g.lineTo(0, -q.size * 0.1); g.closePath(); g.fill(); g.restore();
+    } else if (q.shape === 'glint') {
+      const sz = q.size * (1 - k * 0.7);
+      g.save(); g.globalCompositeOperation = 'lighter';
+      g.beginPath(); g.moveTo(q.x, q.y - sz); g.lineTo(q.x + sz * 0.2, q.y - sz * 0.2); g.lineTo(q.x + sz, q.y); g.lineTo(q.x + sz * 0.2, q.y + sz * 0.2);
+      g.lineTo(q.x, q.y + sz); g.lineTo(q.x - sz * 0.2, q.y + sz * 0.2); g.lineTo(q.x - sz, q.y); g.lineTo(q.x - sz * 0.2, q.y - sz * 0.2); g.closePath(); g.fill(); g.restore();
     } else if (q.shape === 'wisp') {
       g.globalAlpha = (1 - k) * 0.35; g.beginPath(); g.arc(q.x, q.y, q.size * (1 + k * 0.6), 0, Math.PI * 2); g.fill();
     } else if (q.shape === 'heart') {

@@ -60,6 +60,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     hint: null,
     shots: [],
     rings: [],
+    blasts: [], // ngọc đang nổ: bóng ngọc phình + lóe sáng
     tint: null, // lóe màu hệ phủ cả màn khi tung kỹ năng
     comboPop: 0, // 1→0: số combo nảy to mỗi lần tăng
     hurt: 0,
@@ -199,7 +200,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     if (finalKill) view.freeze = 160;
   }
   // Nhịp hoạt ảnh (ms): người chơi được "chiêm ngưỡng" từng combo rồi mới thấy đòn đánh.
-  const ANIM = { popHold: 380, flyTime: 280, preview: 900, previewNext: 450, groupHold: 320, groupPop: 200, fall: 560, afterFall: 220, finale: 800, preShot: 200, stagger: 170, postShot: 350 };
+  const ANIM = { popHold: 380, flyTime: 280, preview: 0, previewNext: 0, groupHold: 30, groupPop: 110, fall: 300, afterFall: 50, finale: 800, preShot: 200, stagger: 170, postShot: 350 };
   const tally = (add) => {
     const ty = (view.tally ||= { shown: 0, target: 0, pulse: 0 });
     ty.target = add == null ? 0 : ty.target + add;
@@ -281,6 +282,39 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     return res.concat(out);
   };
   // Nhóm 4 ngọc: nhân hệ số lớn; nhóm 5+ ngọc: sinh ra Ngọc Nâng Cấp (mỗi ngọc nâng cấp trong nhóm sau này +25% sát thương).
+  // NỔ NGỌC: cấp 1 (3 ngọc) gọn; cấp 2 (4 ngọc) thêm vòng sóng + tia sáng; cấp 3 (5+ ngọc) bùng lớn, sao nổ, lóe màn, rung mạnh.
+  function blastGroup(g, boardBefore, cx, cy) {
+    const R = Math.random, P = view.particles;
+    const tier = g.size >= 5 ? 3 : g.size === 4 ? 2 : 1;
+    const hot = ['#ffffff', '#fff0a0'];
+    g.cells.forEach((i, n) => {
+      const c = cellCenter(i);
+      const type = boardBefore.cells[i];
+      view.blasts.push({ x: c.x, y: c.y, type, enh: !!boardBefore.enh[i], tier, age: 0, delay: n * 14, life: 260 });
+      const shards = 5 + tier * 3;
+      for (let k = 0; k < shards; k++) {
+        const a = R() * 6.283, sp = 0.14 + R() * (0.16 + tier * 0.07);
+        P.push({ shape: 'shard', x: c.x, y: c.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 0.1, g: 0.0007, size: 4 + R() * (3 + tier * 1.5), rot: R() * 6, vr: (R() - 0.5) * 0.03, col: type, age: 0, life: 420 + R() * 260 });
+      }
+      for (let k = 0; k < 2 + tier * 2; k++) {
+        const a = R() * 6.283, sp = 0.08 + R() * 0.28;
+        P.push({ shape: 'glint', x: c.x, y: c.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 0.0001, size: 4 + R() * 6, color: hot[k % 2], age: 0, life: 300 + R() * 300 });
+      }
+    });
+    view.rings.push({ x: cx, y: cy, col: g.type, age: 0, life: 300 + tier * 90, r0: 14, r1: 70 + tier * 45 });
+    if (tier >= 2) view.rings.push({ x: cx, y: cy, col: 3, age: 0, life: 420, r0: 6, r1: 120 + tier * 30 });
+    if (tier >= 3) {
+      view.rings.push({ x: cx, y: cy, col: g.type, age: 0, life: 620, r0: 10, r1: 220 });
+      for (let k = 0; k < 18; k++) {
+        const a = (k / 18) * 6.283 + R() * 0.2, sp = 0.35 + R() * 0.3;
+        P.push({ shape: 'glint', x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 0, size: 7 + R() * 7, color: k % 2 ? '#fff0a0' : '#ffffff', age: 0, life: 520 + R() * 200 });
+      }
+      view.whiteFlash = Math.max(view.whiteFlash || 0, 0.35);
+    }
+    view.camShake = Math.max(view.camShake || 0, 2 + tier * 2.5);
+    view.blastFlash = { x: cx, y: cy, col: g.type, tier, age: 0, life: 200 + tier * 60 };
+    fx.vibrate?.(8 + tier * 8);
+  }
   const i0keep = (g) => (g.size >= 5 ? g.cells[0] : -1);
   let pendEnh = []; // ô sẽ có Ngọc Nâng Cấp mới sau khi bàn rơi xong
   function bigMatchFx(g, cx, cy, keep) {
@@ -364,7 +398,6 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         pendingHits.push(...e.hits);
         const ng = st.groups.length;
         // xem lại thành quả: sáng đồng thời mọi nhóm vừa ghép được, rồi mới nổ từng nhóm
-        view.hl = new Set(st.groups.flatMap((x) => x.cells));
         fx.sfx(isFirstStep ? 'preview' : 'match');
         await sleep(isFirstStep ? ANIM.preview : ANIM.previewNext);
         isFirstStep = false;
@@ -385,15 +418,8 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
           if (g.type === 5) spawnHealPops(e.hits, gi, g);
           if (g.size >= 4) bigMatchFx(g, cx, cy, i0keep(g));
           const cleared = view.board;
-          for (const i of g.cells) {
-            const c = cellCenter(i);
-            const col = st.boardBefore.cells[i];
-            for (let k = 0; k < 6; k++) {
-              const ang = (k / 6) * Math.PI * 2 + i;
-              view.particles.push({ x: c.x, y: c.y, vx: Math.cos(ang) * 0.2, vy: Math.sin(ang) * 0.2 - 0.05, col, age: 0, life: 460 });
-            }
-            cleared.cells[i] = -1;
-          }
+          for (const i of g.cells) cleared.cells[i] = -1;
+          blastGroup(g, st.boardBefore, cx, cy);
           view.hl = null;
           await sleep(ANIM.groupPop);
         }
@@ -794,6 +820,9 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.particles = view.particles.filter((q) => q.age < q.life);
     view.hurt = Math.max(0, view.hurt - dt / 450);
     if (view.lunge) { view.lunge.age += dt; if (view.lunge.age > 520) view.lunge = null; }
+    for (const b of view.blasts) b.age += dt;
+    view.blasts = view.blasts.filter((b) => b.age < b.delay + b.life);
+    if (view.blastFlash && (view.blastFlash.age += dt) > view.blastFlash.life) view.blastFlash = null;
     for (const r of view.rings) r.age += dt;
     view.rings = view.rings.filter((r) => r.age < r.life);
     for (const sh of view.shots) {
