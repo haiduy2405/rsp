@@ -37,6 +37,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
 
   const view = {
     t,
+    rel2: (a, b) => elementMultiplier(a, b, ctx.config), actor: null,
     rel: (el) => { const e = view.enemies.find((x) => x.hp > 0); return e ? elementMultiplier(el, e.element, ctx.config) : 1; }, // khắc/bị khắc quái đang bị nhắm
     titleText,
     locked: [],
@@ -839,12 +840,14 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     view.rings = view.rings.filter((r) => r.age < r.life);
     for (const sh of view.shots) {
       sh.age += dt;
+      if (!sh.started && sh.age >= sh.delay) { sh.started = true; if (view.actor?.el !== sh.col) view.actor = { el: sh.col, age: 0 }; else view.actor.age = Math.max(view.actor.age, 300); } // tới lượt tướng này ra đòn
       if (!sh.done && sh.age >= sh.delay + sh.life) {
         sh.done = true;
         sh.onHit();
       }
     }
     view.shots = view.shots.filter((sh) => !sh.done);
+    if (view.actor) { view.actor.age += dt; if (!view.shots.length && view.actor.age > 650) view.actor = null; }
     for (const en of view.enemies) {
       en.hit = Math.max(0, (en.hit || 0) - dt / 260);
       en.hpShow = en.hpShow == null ? en.hp : en.hpShow + (en.hp - en.hpShow) * Math.min(1, real / 120);

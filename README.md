@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.94.0
+- Lợi/bất lợi hệ: khi tới lượt từng tướng ra đòn, mỗi quái hiện icon tròn phía trên bên phải đầu: xanh ▲ = tướng đó có lợi thế, đỏ ▼ = bất lợi (cùng hệ thì không hiện), kèm chấm hệ của tướng. Tướng kế tiếp khác hệ thì icon đổi theo. Bỏ mũi tên lợi/bất lợi cũ trên ô tướng (so với quái đang nhắm, gây hiểu sai). Rollback cục bộ: tag `pre-adv-v0.93.2`.
+
 ## v0.93.2
 - Màn tải: tên game đè lên dải cầu vồng, cong theo vòm; tên tiếng Việt ở trên, tên tiếng Anh nhỏ hơn bên dưới; đỉnh Tháp nằm đè lên chữ. Rollback cục bộ: tag `pre-arc2-v0.93.1`.
 
