@@ -1555,18 +1555,22 @@ function installRow() {
     canFs ? btn(t('app.fullscreen'), () => document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}), '', { id: 'b-fs' }) : null,
   );
 }
-function showInstallHelp() {
+function showInstallHelp(back = showHub) {
   screen(
     h('h2', {}, t('app.install')),
     h('div', { class: 'card' }, h('p', {}, t(isIOS ? 'app.helpIOS' : 'app.helpOther'))),
-    btn(t('back'), showHub, '', { id: 'back' }),
+    btn(t('back'), back, '', { id: 'back' }),
   );
+}
+// Cài app từ màn Cài đặt: có prompt gốc thì gọi, không thì hiện hướng dẫn rồi quay lại Cài đặt
+async function installFromSettings() {
+  if (installEvt) { installEvt.prompt(); await installEvt.userChoice.catch(() => {}); installEvt = null; ui.showSettings(); } else showInstallHelp(() => ui.showSettings());
 }
 // ---- Màn hình tách module: dùng chung trạng thái qua `app`, gọi chéo qua `app.*` / `ui.*`
 const ui = {};
 const rewardPop = installRewardFx({ audio, fxLayer: () => (fxl ||= createFxLayer($('fx'))) });
 const app = {
-  rewardPop,
+  rewardPop, installFromSettings, isStandalone,
   startTutorial: () => startTutorial(), enterHub: showHub, guideStep, guideSet, guidePoint, trackQuest: track,
   ctx, audio, music, storage, slots, enterSlot, dicts, h, btn, $, el, chip, portrait, CUR_COL, fodderName, offeringName, pct, save, screen, setLang, showHub,
   t: (...a) => t(...a),

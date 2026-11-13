@@ -500,6 +500,7 @@
   "set.title": "Settings",
   "set.volume": "Master volume: {n}%",
   "set.volumeNote": "Audio is temporary synthesized sound, to be replaced by real recordings.",
+  "set.install": "Install app",
   "set.delete": "Delete data",
   "set.deleteConfirm": "Delete all progress on this device? This cannot be undone (export a save first).",
   "set.deleteYes": "Delete everything",

@@ -552,6 +552,13 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.97.0
+
+- Số combo: huy hiệu lục giác viền vàng kép + ruy-băng COMBO, đổi màu theo mức (xanh → cam từ 6 → đỏ từ 10), nảy khi tăng.
+- Cài đặt: nút Manh mối đổi thành nút "Cài app" (icon điện thoại + mũi tên); ẩn khi app đã cài.
+- Icon app mới: tháp ngọc 3D lấp lánh (5 tầng màu 5 hệ + tinh thể trên đỉnh). Sinh bằng `tools/gen-icon.cjs` → `www/icons/*`.
+- Tag rollback cục bộ: `pre-icon-combo-v0.96.4`.
+
 ## v0.96.4
 
 - Màn chọn cửa: bỏ phần liệt kê mô tả 3 vật phẩm trong bảng thông tin (nút ×N vẫn dùng được). Tag rollback cục bộ: `pre-door-noitems-v0.96.3`.

@@ -832,11 +832,7 @@ export function draw(g, view, t) {
   const sh = (view.teamFx || []).find((e) => e.key === 'shield');
   if (sh) text(g, view.t('battle.shield', { n: sh.pool }), W - 16, 336, 15, '#6bd5ff', 'right', '700');
   if (view.teamFx?.length) badges(g, view.teamFx, 16, 326, view);
-  if (view.combo > 0) {
-    const heat = view.combo >= 10 ? ['#ffd9d0', '#ff3d2e'] : view.combo >= 6 ? ['#ffe6b0', '#ff8a1f'] : ['#fff3b0', '#e2a52a']; // combo cao: nóng dần
-    outlined(g, `${view.combo}`, W / 2 - 128, 338, Math.round((54 + Math.min(16, view.combo * 2)) * (1 + 0.32 * (view.comboPop || 0))), heat[0], heat[1], NUM, 5);
-    text(g, view.t('battle.comboWord'), W / 2 - 128, 364, 13, '#fff8e6', 'center', '700');
-  }
+  if (view.combo > 0) drawComboBadge(g, view, W / 2 - 128, 333);
   if (view.tally && view.tally.shown > 0) {
     const txt = new Intl.NumberFormat(document.documentElement.lang || 'vi').format(Math.round(view.tally.shown));
     const sz = Math.round(50 * (1 + 0.4 * Math.min(1, view.tally.pulse)));
@@ -1420,6 +1416,39 @@ function drawIntro(g, view) {
 
 // ---- Hiệu ứng đòn đánh (v0.93) ----
 const LIGHTER = (g, fn) => { g.save(); g.globalCompositeOperation = 'lighter'; fn(); g.restore(); };
+
+// Huy hiệu combo: lục giác viền vàng kép, nóng dần theo combo, dải ruy-băng "COMBO" phía dưới
+function drawComboBadge(g, view, cx, cy) {
+  const c = view.combo, pop = view.comboPop || 0;
+  const heat = c >= 10 ? { a: '#ff7a5c', b: '#8e1410', rim: '#ffd9a0', glow: '255,70,40' } : c >= 6 ? { a: '#ffae3d', b: '#a8480a', rim: '#fff0b0', glow: '255,150,40' } : { a: '#5aa7ff', b: '#1b3a86', rim: '#ffe28a', glow: '255,205,90' };
+  const r = 25 * (1 + 0.2 * pop);
+  const hex = (rad) => { g.beginPath(); for (let i = 0; i < 6; i++) { const an = Math.PI / 6 + i * Math.PI / 3 - Math.PI / 2 + Math.PI / 6; const px = cx + Math.cos(an) * rad, py = cy + Math.sin(an) * rad; i ? g.lineTo(px, py) : g.moveTo(px, py); } g.closePath(); };
+  g.save();
+  // hào quang
+  LIGHTER(g, () => { const gr = g.createRadialGradient(cx, cy, r * 0.5, cx, cy, r * 1.9); gr.addColorStop(0, `rgba(${heat.glow},${0.35 + 0.3 * pop})`); gr.addColorStop(1, `rgba(${heat.glow},0)`); g.fillStyle = gr; g.fillRect(cx - r * 2, cy - r * 2, r * 4, r * 4); });
+  // viền ngoài vàng
+  hex(r + 4); g.fillStyle = '#3a2208'; g.fill();
+  const rim = g.createLinearGradient(cx, cy - r, cx, cy + r); rim.addColorStop(0, heat.rim); rim.addColorStop(0.5, '#e0a52a'); rim.addColorStop(1, '#8a5a12');
+  hex(r + 2); g.fillStyle = rim; g.fill();
+  hex(r - 2); g.fillStyle = '#2a1706'; g.fill();
+  // mặt huy hiệu
+  const face = g.createLinearGradient(cx, cy - r, cx, cy + r); face.addColorStop(0, heat.a); face.addColorStop(1, heat.b);
+  hex(r - 4); g.fillStyle = face; g.fill();
+  // bóng kính nửa trên
+  g.save(); hex(r - 4); g.clip(); g.fillStyle = 'rgba(255,255,255,0.2)'; g.beginPath(); g.ellipse(cx, cy - r * 0.55, r * 0.95, r * 0.55, 0, 0, Math.PI * 2); g.fill(); g.restore();
+  // số
+  const str = `${c}`, sz = Math.round((str.length > 2 ? 20 : str.length > 1 ? 26 : 32) * (1 + 0.3 * pop));
+  outlined(g, str, cx, cy - 1, sz, '#ffffff', '#fff0c0', NUM, 4);
+  // ruy-băng
+  const rw = 56, rh = 13, ry = cy + 25 - 3;
+  g.beginPath(); g.moveTo(cx - rw / 2 - 7, ry + 2); g.lineTo(cx - rw / 2, ry); g.lineTo(cx - rw / 2, ry + rh); g.lineTo(cx - rw / 2 - 7, ry + rh + 2); g.lineTo(cx - rw / 2 - 2, ry + rh / 2 + 1); g.closePath(); g.fillStyle = heat.b; g.fill();
+  g.beginPath(); g.moveTo(cx + rw / 2 + 7, ry + 2); g.lineTo(cx + rw / 2, ry); g.lineTo(cx + rw / 2, ry + rh); g.lineTo(cx + rw / 2 + 7, ry + rh + 2); g.lineTo(cx + rw / 2 + 2, ry + rh / 2 + 1); g.closePath(); g.fill();
+  const rg = g.createLinearGradient(0, ry, 0, ry + rh); rg.addColorStop(0, heat.rim); rg.addColorStop(1, '#d99a22');
+  g.fillStyle = rg; g.fillRect(cx - rw / 2, ry, rw, rh);
+  g.strokeStyle = '#6a3e08'; g.lineWidth = 1.2; g.strokeRect(cx - rw / 2, ry, rw, rh);
+  text(g, view.t('battle.comboWord').toUpperCase(), cx, ry + rh / 2 + 0.5, 10, '#4a2606', 'center', '800');
+  g.restore();
+}
 const glow = (g, x, y, r, col, a) => {
   const gr = g.createRadialGradient(x, y, 0, x, y, r);
   gr.addColorStop(0, `rgba(255,255,255,${a})`);

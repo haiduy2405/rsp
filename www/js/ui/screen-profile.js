@@ -155,13 +155,20 @@ export function install(app) {
     ];
   }
 
+  function installBtn() {
+    const b = h('button', { class: 'set-install', id: 'set-install', onclick: () => app.installFromSettings() });
+    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.5 18.6h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 6.5v6m0 0-2.4-2.4M12 12.5l2.4-2.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    b.append(h('span', {}, t('set.install')), h('i', { 'aria-hidden': 'true' }, '→'));
+    return b;
+  }
+
   function showSettings(msg = null, confirmDelete = false) {
     const exportBox = h('textarea', { readonly: '', id: 'export-box' });
     const importBox = h('textarea', { placeholder: '…', id: 'import-box' });
     screen(
       h('h2', {}, t('set.title')),
       msg ? h('div', { class: 'notice' }, msg) : null,
-      btn(t('story.title'), showStory, '', { id: 'set-story' }),
+      app.isStandalone() ? null : installBtn(),
       h('label', {}, t('hub.lang'), h('select', { id: 'lang', onchange: (e) => setLang(e.target.value) }, h('option', { value: 'vi' }, 'Tiếng Việt'), h('option', { value: 'en' }, 'English'))),
       ...audioControls(),
       h('p', { class: 'muted' }, t('set.volumeNote')),

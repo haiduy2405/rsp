@@ -500,6 +500,7 @@
   "set.title": "Cài đặt",
   "set.volume": "Âm lượng tổng: {n}%",
   "set.volumeNote": "Âm thanh hiện là tiếng tổng hợp tạm, sẽ thay bằng bản thu thật.",
+  "set.install": "Cài app",
   "set.delete": "Xóa dữ liệu",
   "set.deleteConfirm": "Xóa toàn bộ tiến trình trên máy này? Không thể hoàn tác (nên xuất file lưu trước).",
   "set.deleteYes": "Xóa hết",
