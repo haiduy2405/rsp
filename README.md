@@ -494,3 +494,6 @@ Duo không còn hồi chiêu riêng: sẵn sàng khi hai tướng liền ô thu�
 - **Quái**: bóng đổ dưới chân (co lại khi nhảy) + quầng neon màu hệ nhịp thở.
 - **Ô tướng trong trận**: bóng đổ rơi, viền neon màu hệ, vạch sáng đầu ô.
 - **Giao diện DOM**: tiêu đề phát sáng, nút nổi khối, nút chính có quầng thở + vệt sáng quét, khung thẻ bóng sâu hơn và góc vàng phát sáng, ô tướng/thẻ triệu hồi có viền neon theo hệ (4-5★ sáng mạnh, 5★ nhấp nháy), icon quái/dock có bóng đổ. Tôn trọng `prefers-reduced-motion`.
+
+## v0.73.0 — Bộ ngọc 3D mới
+Thay 12 ảnh ngọc (`assets/orbs/orb0-5.webp` + `orb0-5e.webp`) bằng bộ 3D sinh bằng ChatGPT: Nước/Hỏa/Mộc/Ám chung khối lục giác khía cạnh, Quang hình thoi, Hồi hình tim; ngọc Nâng Cấp = cùng ngọc đó trong khung vàng có cánh, vương miện nhỏ, viên đá đáy. Bỏ lớp bóng kính/neon/lấp lánh vẽ bằng code của v0.72 (art đã có sẵn), chỉ giữ bóng chạm đất `orbShadow`. Ngọc Nâng Cấp vẽ cùng cỡ ngọc thường. Hoàn tác: `git checkout pre-orb3d-v0.72.0 -- www/assets/orbs www/js/ui/render.js` rồi tăng phiên bản.
