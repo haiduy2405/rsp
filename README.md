@@ -452,3 +452,8 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ### v0.61.1
 - **Sửa lỗi nhạc chồng lớp (nghe ồn, lộn xộn):** `unlock()` được gọi ở mỗi lần chạm nhưng bài nhạc từ file không có `timer`, nên mỗi lần chạm lại phát thêm một bản chồng lên bản đang chạy (8 lần chạm = 8 lớp). Nay `begin()` bỏ qua nếu bus đã có nguồn hoặc đang tải. Kiểm tra: `tests/e2e/music-layers.cjs` (8 lần chạm → đúng 1 nguồn; bản cũ ra 8).
+
+### v0.62.0
+- **Biểu tượng app + màn chờ khi mở:** icon mới cắt từ tranh Tòa Tháp (`icons/icon-192/512`, `apple-touch-icon`, bản `maskable` = tranh thu 82% trên nền mờ cùng màu để launcher cắt tròn không mất tháp). `background_color`/`theme_color` đổi sang nền trời cam của tranh (`#fb9b6f`) nên màn chờ của hệ điều hành (biểu tượng + tên game) hòa với màn tải trong game.
+- **Màn tải trong game dựng lại:** tranh Tòa Tháp toàn màn trôi chậm, logo ở giữa, thanh tiến độ vàng, mẹo xoay vòng và "chạm để vào" ở đáy. Bỏ tháp SVG tím cũ.
+- Lưu ý Android: màn chờ do hệ điều hành vẽ từ manifest, chỉ đổi sau khi WebAPK cập nhật; nếu vẫn thấy icon cũ thì gỡ app rồi cài lại từ trình duyệt.
