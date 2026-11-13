@@ -552,6 +552,10 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.87.1
+- Màn chính: dời nền xuống 40 đơn vị, đặt lại 6 ngọc ải lên đúng các đảo nổi + vách đá, không còn bị HUD/tháp che. Tag lùi: `pre-hub-layout-v0.87.0`.
+- Bảng Từ khóa hiệu ứng: dùng icon thay cho chữ lặp (Bỏng Bỏng).
+
 ## v0.87.0 — Logo tên game thiết kế lại, đồng bộ phong cách game
 - Bỏ các thử nghiệm graffiti/hộp/luxury (v0.82–v0.86). Logo mới (`goldTitle` trong `www/js/ui/title.js`, CSS `.lg*`): tên chính chữ serif Fraunces đậm, vàng-kem gradient, viền nâu đậm, khối 3D nâu nhẹ, đèn quét ngang; ruy băng nâu đất viền vàng có đuôi nhạn cho tên còn lại (giống dải băng tranh logo gốc); hàng 6 ngọc hệ của game lơ lửng nhẹ bên dưới.
 - Hai ngôn ngữ: tên chính theo ngôn ngữ đang chọn, ruy băng là tên ngôn ngữ kia (key i18n mới `game.subtitle`). Áp ở màn tải và màn giới thiệu.

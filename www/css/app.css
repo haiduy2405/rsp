@@ -1173,3 +1173,6 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 @keyframes lgBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 @media (prefers-reduced-motion: reduce) { .lg-main::after { animation: none; opacity: 0; } .lg-gems img { animation: none; } }
 .loading .lg { margin-bottom: 4px; }
+.card.kw { display: flex; align-items: center; gap: 12px; text-align: left; }
+.kw-ico { width: 40px; height: 40px; flex: none; object-fit: contain; }
+.kw-tx { min-width: 0; flex: 1; }

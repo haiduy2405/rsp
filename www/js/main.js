@@ -201,8 +201,8 @@ const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } 
 // Cảnh chính: Tòa Tháp giữa các đảo nổi. Mỗi khu mở là một viên ngọc phát sáng trên đảo (chạm để vào khu).
 function hubScene() {
   const zones = ctx.zoneList;
-  // Vị trí ngọc khu trên các đảo nổi của ảnh nền bg/hub.webp (viewBox 400 rộng, ảnh 400x711).
-  const pos = [[205, 372], [56, 168], [218, 130], [38, 280], [360, 270], [338, 108]];
+  // Vị trí ngọc khu trên các đảo nổi của ảnh nền bg/hub.webp (viewBox 400 rộng, ảnh 400x711 dời xuống 40 để HUD trên không che đảo).
+  const pos = [[205, 412], [66, 188], [336, 140], [36, 288], [362, 286], [330, 372]];
   const NS = 'http://www.w3.org/2000/svg';
   const orbs = zones.map((z, i) => {
     const [x, y] = pos[i % pos.length];
@@ -215,7 +215,7 @@ function hubScene() {
   const svg = `<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice" xmlns="${NS}" aria-hidden="true">
 <defs><filter id="zlock"><feColorMatrix type="saturate" values="0.1"/></filter></defs>
 <rect width="400" height="800" fill="#fbd9a8"/>
-<image href="assets/bg/hub.webp" x="0" y="0" width="400" height="711" preserveAspectRatio="xMidYMin slice"/>
+<image href="assets/bg/hub.webp" x="0" y="40" width="400" height="711" preserveAspectRatio="xMidYMin slice"/>
 ${orbs}
 </svg>`;
   const box = h('div', { class: 'hub-scene' + (DEBUG ? ' static' : '') });

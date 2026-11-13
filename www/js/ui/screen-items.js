@@ -109,7 +109,7 @@ export function install(app) {
         h('summary', {}, t(`help.${id}.title`)),
         Array.from({ length: n }, (_, i) => h('p', { class: 'muted' }, t(`help.${id}.${i + 1}`))))),
       h('h3', {}, t('hub.glossary')),
-      KEYS.map((k) => h('div', { class: 'card' }, h('b', {}, t(`effect.${k}.name`), ' ', h('small', {}, t(`effect.${k}.short`))), h('div', { class: 'muted' }, t(`effect.${k}.desc`)))),
+      KEYS.map((k) => h('div', { class: 'card kw' }, h('img', { class: 'kw-ico', src: `assets/ui/fx/${k}.webp`, alt: '', width: 40, height: 40 }), h('div', { class: 'kw-tx' }, h('b', {}, t(`effect.${k}.name`)), h('div', { class: 'muted' }, t(`effect.${k}.desc`))))),
       btn(t('back'), showHub, '', { id: 'back' }),
     );
   }
