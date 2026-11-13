@@ -517,3 +517,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
   - 4 ngọc: nhiều mảnh hơn, thêm vòng sóng vàng + lóe lớn hơn.
   - 5+ ngọc: bùng nổ nhất (vòng sóng lớn, tia sao tỏa 18 hướng, lóe trắng toàn màn, rung mạnh).
 - Hoàn tác: `git checkout pre-blast-v0.76.0 -- www package.json README.md`
+
+## v0.78.0 — Theme băng (xanh #9DF1FF → trắng) + bóng biểu tượng
+- Đổi theme chung từ vàng/nâu sang băng: nút chính gradient `--ice` #9DF1FF → trắng; viền, chữ, panel, hạt, SVG tháp chuyển hue vàng/nâu → cyan/navy (CSS `:root`, `render.js`, `game.js`, `main.js`...). Màu 6 hệ ngọc và màu ngữ nghĩa (đỏ nguy hiểm, xanh hồi máu, hệ Sáng vàng) giữ nguyên.
+- Art nền `bg/hub.webp`, `bg/battle.webp`, `ui/logo.webp` được nhuộm lại cùng hue.
+- Biểu tượng trên ngọc có bóng đổ chếch xuống-phải (đèn phía trước-trên-trái); khi nảy bóng ở lại mặt ngọc, nhạt và nhỏ lại (`emblemShadow` trong `render.js`).
+- Hoàn tác theme: `git checkout pre-icetheme-v0.77.0 -- www package.json README.md`; chỉ bóng: tag `pre-embshadow-v0.77.0`.

@@ -3,11 +3,11 @@
 import { itemIcon } from './icons.js';
 
 const KIND = {
-  gold: { sfx: 'coinGet', cols: ['#ffe9ad', '#ffd24a', '#e2b75a', '#fff7d6'] },
+  gold: { sfx: 'coinGet', cols: ['#ccf7ff', '#ffd24a', '#99dfed', '#e7fafe'] },
   spirit: { sfx: 'gemGet', cols: ['#b8fff0', '#5ee6d0', '#7fd6ff', '#ffffff'] },
-  ticket: { sfx: 'ticketGet', cols: ['#ffd9a0', '#ffb25a', '#ff8a4a', '#fff0d0'] },
+  ticket: { sfx: 'ticketGet', cols: ['#c4f5ff', '#99eeff', '#8fecff', '#e3f9fe'] },
 };
-const OTHER = { sfx: 'claim', cols: ['#ffe27a', '#ff9bd0', '#7fd6ff', '#9dffb0', '#ffffff'] };
+const OTHER = { sfx: 'claim', cols: ['#adf1ff', '#ff9bd0', '#7fd6ff', '#9dffb0', '#ffffff'] };
 
 // installRewardFx({ audio, fxLayer }) -> rewardPop(items, at, opts)
 // items: [{ k: 'gold'|'spirit'|'ticket'|<khóa icon>, n: số, label?: chuỗi thay cho "+n" }]

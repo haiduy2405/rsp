@@ -1,6 +1,6 @@
 // Lớp hiệu ứng ăn mừng phủ lên toàn game: pháo hoa, pháo giấy, tia lấp lánh. Chỉ là UI, không ảnh hưởng core.
-const GOLD = ['#ffe9ad', '#e2b75a', '#fff7d6', '#ffd24a'];
-const MIX = ['#ffe27a', '#ff6b8a', '#6bd5ff', '#7dffa0', '#b58bff', '#ff9a4a', '#ffffff'];
+const GOLD = ['#ccf7ff', '#99dfed', '#e7fafe', '#ffd24a'];
+const MIX = ['#adf1ff', '#ff6b8a', '#6bd5ff', '#7dffa0', '#b58bff', '#8fecff', '#ffffff'];
 const rnd = (a, b) => a + Math.random() * (b - a);
 const pick = (arr) => arr[(Math.random() * arr.length) | 0];
 
@@ -36,7 +36,7 @@ export function createFxLayer(canvas) {
       const k = Math.min(1, r.t / r.life);
       r.x = r.x0 + (r.x1 - r.x0) * k;
       r.y = r.y0 + (r.y1 - r.y0) * (1 - (1 - k) * (1 - k));
-      if (Math.random() < 0.8) parts.push({ kind: 'spark', x: r.x, y: r.y, vx: rnd(-0.02, 0.02), vy: rnd(0.02, 0.06), g: 0.0002, life: 420, age: 0, col: '#ffe9ad', size: 2 });
+      if (Math.random() < 0.8) parts.push({ kind: 'spark', x: r.x, y: r.y, vx: rnd(-0.02, 0.02), vy: rnd(0.02, 0.06), g: 0.0002, life: 420, age: 0, col: '#ccf7ff', size: 2 });
       if (k >= 1) {
         explode(r.x, r.y, r.col);
         return false;
@@ -100,7 +100,7 @@ export function createFxLayer(canvas) {
       const sp = rnd(0.12, 0.34);
       parts.push({ kind: 'ray', x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 0.00022, life: rnd(900, 1400), age: 0, col: i % 5 === 0 ? '#ffffff' : col, size: 2.4 });
     }
-    for (let i = 0; i < 16; i++) parts.push({ kind: 'dot', x, y, vx: rnd(-0.08, 0.08), vy: rnd(-0.08, 0.08), g: 0.00012, life: rnd(500, 900), age: 0, col: '#fff4c9', size: rnd(1.5, 3) });
+    for (let i = 0; i < 16; i++) parts.push({ kind: 'dot', x, y, vx: rnd(-0.08, 0.08), vy: rnd(-0.08, 0.08), g: 0.00012, life: rnd(500, 900), age: 0, col: '#dff8fd', size: rnd(1.5, 3) });
     kick();
   }
   const api = {
