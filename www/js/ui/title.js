@@ -1,7 +1,14 @@
 // Tên game: chữ hộp 3D vàng gold lấp lánh, một hàng. Lớp: nền+độ dày (text-shadow trên chính thẻ), mặt trước (::before), đèn quét (::after),
 // viền neon ở đáy chữ (lớp đổ bóng cuối) và vài ngôi sao lấp lánh. Chữ tự co để luôn vừa một hàng.
 const STARS = [[6, 22, 0], [19, 70, 0.7], [33, 18, 1.4], [47, 76, 0.3], [61, 24, 1.1], [74, 68, 1.9], [88, 28, 0.5], [95, 74, 1.5]];
+import { buildTitleSvg } from './title-svg.js';
+const isVi = (t) => /^thiên tháp dị điểm$/i.test((t || '').normalize('NFC').trim());
 export function goldTitle(el, text) {
+  if (isVi(text)) {
+    el.classList.add('gt-sketch');
+    el.innerHTML = buildTitleSvg();
+    return;
+  }
   el.classList.add('gt3d');
   el.dataset.t = text;
   el.textContent = text;
