@@ -275,17 +275,14 @@ function goldFrame(g, x, y, w, h, opts = {}) {
   g.strokeStyle = 'rgba(255,236,170,0.5)';
   g.strokeRect(x + lw + 1.5, y + lw + 1.5, w - lw * 2 - 3, h - lw * 2 - 3);
   if (orn) {
-    // hoa văn: thoi vàng ở 4 góc + vệt cong ngắn dọc hai cạnh, thoi nhỏ giữa cạnh trên/dưới
-    const dm = (cx, cy, s) => { g.beginPath(); g.moveTo(cx, cy - s); g.lineTo(cx + s, cy); g.lineTo(cx, cy + s); g.lineTo(cx - s, cy); g.closePath(); g.fill(); };
-    g.fillStyle = '#ffe9a0'; g.strokeStyle = '#6b410a';
-    g.lineWidth = 1;
-    for (const [cx, cy, sx, sy] of [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]]) {
-      dm(cx + sx * 4, cy + sy * 4, 4.2);
-      g.strokeStyle = '#f3c64e'; g.lineWidth = 1.4;
-      g.beginPath(); g.moveTo(cx + sx * 10, cy + sy * 4); g.quadraticCurveTo(cx + sx * 15, cy + sy * 4, cx + sx * 17, cy + sy * 8); g.moveTo(cx + sx * 4, cy + sy * 10); g.quadraticCurveTo(cx + sx * 4, cy + sy * 15, cx + sx * 8, cy + sy * 17); g.stroke();
+    // hoa văn góc cổ điển (ảnh ui:corner, lật 4 góc); cỡ theo chiều cao khung để không che chữ
+    const im = getImg('ui:corner');
+    const cs = Math.max(14, Math.min(34, h * 0.36));
+    if (im) {
+      for (const [cx, cy, sx, sy] of [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]]) {
+        g.save(); g.translate(cx, cy); g.scale(sx, sy); g.drawImage(im, -1, -1, cs, cs); g.restore();
+      }
     }
-    g.fillStyle = '#ffd96a';
-    if (w >= 120) { dm(x + w / 2, y + 1.5, 3.2); dm(x + w / 2, y + h - 1.5, 3.2); }
   }
   // đèn quét: dải sáng nghiêng, chạy từ trái sang phải toàn màn mỗi ~4,4s (cắt theo vành viền)
   if (!REDUCED) {

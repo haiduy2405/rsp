@@ -19,6 +19,7 @@ export function expected() {
   for (let i = 0; i < 6; i++) m[`orb:${i}`] = `assets/orbs/orb${i}.webp`;
   for (let i = 0; i < 6; i++) m[`orbE:${i}`] = `assets/orbs/orb${i}e.webp`; // ngọc nâng cấp
   for (let i = 0; i < 6; i++) { m[`blank:${i}`] = `assets/orbs/blank${i}.webp`; m[`blankE:${i}`] = `assets/orbs/blank${i}e.webp`; m[`emb:${i}`] = `assets/orbs/emb${i}.webp`; } // ngọc trống + biểu tượng động
+  m['ui:corner'] = 'assets/ui/corner.webp';
   for (const k of ['burn', 'poison', 'stun', 'freeze', 'shield', 'regen', 'atkUp', 'atkDown', 'reflect', 'pierce', 'lock', 'immune']) m[`fx:${k}`] = `assets/ui/fx/${k}.webp`;
   for (const z of JSON.parse(fs.readFileSync(path.join(root, 'js/data/zones.json'), 'utf8'))) m[`zone:${z.id}`] = `assets/ui/zones/${z.id}.webp`;
   m['bg:hub'] = 'assets/bg/hub.webp';

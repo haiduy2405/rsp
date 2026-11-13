@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.88.1
+- Khung vàng: thay hoa văn góc bằng ảnh hoa văn cổ điển Duy cấp (`assets/ui/corner.webp`, lật 4 góc), cỡ theo chiều cao khung nên bảng Lượt/Tầng không còn bị che chữ. Tag lùi: `pre-corner-v0.88.0`.
+
 ## v0.88.0
 - Logo: tên chính to, tách 2 dòng; tên phụ (ngôn ngữ còn lại) cùng kiểu chữ vàng 3D nhỏ hơn, ngăn cách bằng vạch vàng + viên kim cương; bỏ ruy băng. Sửa lệch tâm do `.loading h1 {margin:0}`. Tag lùi: `pre-title-v0.87.1`.
 

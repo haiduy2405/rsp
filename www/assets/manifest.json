@@ -121,6 +121,7 @@
     "blank:5": "assets/orbs/blank5.webp",
     "blankE:5": "assets/orbs/blank5e.webp",
     "emb:5": "assets/orbs/emb5.webp",
+    "ui:corner": "assets/ui/corner.webp",
     "fx:burn": "assets/ui/fx/burn.webp",
     "fx:poison": "assets/ui/fx/poison.webp",
     "fx:stun": "assets/ui/fx/stun.webp",
