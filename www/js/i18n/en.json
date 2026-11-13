@@ -970,8 +970,6 @@
   "guide.rules.ok": "Got it",
   "tut.l4lock": "Lesson 4: lock a target. Tap the foe with the least HP (the arrow) to lock it. Your skill will hit the locked foe.",
   "tut.wrongTarget": "Wrong foe. Lock the one with the arrow (lowest HP).",
-  "summon.launch": "Place the firework in the mortar to launch it!",
-  "summon.launch10": "Place the firework in the mortar to launch {n} fireworks!",
   "tut.done.1": "You did it, {name}! You twist orbs like a seasoned Tower climber.",
   "tut.done.2": "AIDA: The whole pack fell in a handful of moves. The Tower chose well.",
   "tut.done.3": "But you can't climb alone. Call the spirits who will fight beside you.",
@@ -1087,5 +1085,8 @@
   "help.tips.title": "Tips",
   "help.tips.1": "Before choosing a door, check the enemy element and put a hero that counters it first in the team.",
   "help.tips.2": "Low on HP? Pick a Rest door or pop Heart orbs. Don't risk an Elite without enough HP.",
-  "help.tips.3": "Lock the weakest enemy first to take fewer hits."
+  "help.tips.3": "Lock the weakest enemy first to take fewer hits.",
+  "summon.ritual": "Touch the circle to summon!",
+  "summon.ritual10": "Touch the circle to summon {n} times!",
+  "summon.skip": "Skip"
 }

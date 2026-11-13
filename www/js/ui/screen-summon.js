@@ -2,7 +2,7 @@
 import { $, h, btn } from './dom.js';
 import { itemIcon } from './icons.js';
 import { getImg } from './assets.js';
-import { playFireworks } from './fireworks.js';
+import { createRitual, ritualSeen } from './portal.js';
 import { summon, buyTickets, redeemCharacter, effectiveRates } from '../core/summon.js';
 
 export function install(app) {
@@ -111,82 +111,6 @@ export function install(app) {
     );
   }
 
-  // Bệ phóng pháo: ống pháo ở trên, viên ngọc ở dưới. Kéo ngọc lên ống (hoặc chạm ngọc) để bắn. Trong lúc chờ: khói lượn, ngọc thở, tay chỉ kéo lặp.
-  function launchPad(host, count, onLaunch) {
-    const puffs = Array.from({ length: 6 }, (_, k) => h('i', { class: 'lp-puff', style: `--k:${k}` }));
-    const orb = h('div', { class: 'lp-orb', id: 'lp-orb', role: 'button', tabindex: '0', 'aria-label': t('summon.launch') }, h('i', { class: 'lp-core' }), count > 1 ? h('b', {}, `×${count}`) : null);
-    const mortar = h('div', { class: 'lp-mortar' }, h('i', { class: 'lp-mouth' }), h('i', { class: 'lp-body' }));
-    const hand = h('div', { class: 'lp-hand', 'aria-hidden': 'true' }, '👆');
-    const tip = h('div', { class: 'lp-tip' }, count > 1 ? t('summon.launch10', { n: count }) : t('summon.launch'));
-    const lp = h('div', { class: 'lp' }, h('div', { class: 'lp-smoke' }, puffs), mortar, tip, orb, hand);
-    host.append(lp);
-    host.classList.add('lp-on');
-    const center = (el) => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
-    requestAnimationFrame(() => {
-      const o = center(orb);
-      const m = center(mortar);
-      lp.style.setProperty('--dist', `${Math.round(o.y - m.y - 50)}px`);
-    });
-    let dragging = null;
-    let fired = false;
-    const fire = () => {
-      if (fired) return;
-      fired = true;
-      lp.classList.add('fired');
-      hand.remove();
-      const o = center(orb);
-      const m = center(mortar);
-      orb.style.transition = 'transform .38s cubic-bezier(.5, 0, .9, .4), opacity .38s';
-      orb.style.transform = `translate(${m.x - (o.x - (dragging?.dx || 0))}px, ${m.y - (o.y - (dragging?.dy || 0))}px) scale(.25)`;
-      orb.style.opacity = '0.2';
-      audio.sfx('summon');
-      setTimeout(() => {
-        const f = $('flash');
-        f.classList.remove('go');
-        void f.offsetWidth;
-        f.classList.add('go');
-        audio.vibrate?.(50);
-        lp.remove();
-        host.classList.remove('lp-on');
-        onLaunch();
-      }, 420);
-    };
-    orb.addEventListener('pointerdown', (e) => {
-      if (fired) return;
-      orb.setPointerCapture?.(e.pointerId);
-      dragging = { x: e.clientX, y: e.clientY, dx: 0, dy: 0, moved: 0 };
-      lp.classList.add('grab');
-      audio.sfx('pick');
-    });
-    orb.addEventListener('pointermove', (e) => {
-      if (!dragging || fired) return;
-      dragging.dx = e.clientX - dragging.x;
-      dragging.dy = e.clientY - dragging.y;
-      dragging.moved = Math.max(dragging.moved, Math.hypot(dragging.dx, dragging.dy));
-      orb.style.transform = `translate(${dragging.dx}px, ${dragging.dy}px) scale(1.12)`;
-      const o = center(orb);
-      const m = center(mortar);
-      lp.classList.toggle('hot', Math.hypot(o.x - m.x, o.y - m.y) < 90);
-    });
-    const release = () => {
-      if (!dragging || fired) return;
-      const d = dragging;
-      const o = center(orb);
-      const m = center(mortar);
-      lp.classList.remove('grab');
-      if (d.moved < 10 || Math.hypot(o.x - m.x, o.y - m.y) < 90) return fire(); // chạm hoặc kéo tới ống: bắn
-      dragging = null;
-      lp.classList.remove('hot');
-      orb.style.transition = 'transform .3s cubic-bezier(.2, 1.4, .4, 1)';
-      orb.style.transform = '';
-      setTimeout(() => { if (!fired) orb.style.transition = ''; }, 320);
-      audio.sfx('back');
-    };
-    orb.addEventListener('pointerup', release);
-    orb.addEventListener('pointercancel', release);
-    orb.addEventListener('keydown', (e) => (e.key === 'Enter' || e.key === ' ') && fire());
-  }
-
   function showSummonResult(bannerId, results, onDone = null) {
     const shown = new Set();
     const single = results.length === 1;
@@ -198,13 +122,13 @@ export function install(app) {
         h('div', { class: 'muted' }, t('summon.tapReveal')),
       ),
     );
-    const paint = (i, el) => {
+    const paint = (i, el, quiet = false) => {
       const r = results[i];
       shown.add(i);
-      audio.sfx(r.rarity >= 4 ? 'rare' : 'reveal');
+      if (!quiet) audio.sfx(r.rarity >= 4 ? 'rare' : 'reveal');
       el.className = `card sumcard flip ${rarityCls(r.rarity)}`;
       el.style.setProperty('--d', `${(i % 10) * 40}ms`);
-      if (r.rarity >= 4) {
+      if (r.rarity >= 4 && !quiet) {
         const f = $('flash');
         f.classList.remove('go');
         void f.offsetWidth;
@@ -220,8 +144,8 @@ export function install(app) {
         ].filter(Boolean),
       );
     };
-    const reveal = (i, el) => {
-      if (!shown.has(i)) paint(i, el);
+    const reveal = (i, el, quiet = false) => {
+      if (!shown.has(i)) paint(i, el, quiet);
     };
     const wrap = h('div', { class: `sm-res anim${single ? ' one' : ''}` },
       h('h2', {}, t('summon.title')),
@@ -231,17 +155,15 @@ export function install(app) {
     music('summon');
     screen(wrap);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // Người chơi tự bắn pháo: kéo viên ngọc vào ống pháo (hoặc chạm viên ngọc). Chưa làm thì khói bay + bàn tay chỉ dẫn lặp.
-    launchPad(wrap, results.length, () => {
-      const fw = playFireworks(wrap, results.map((r, i) => ({ rarity: r.rarity, el: cards[i] })), {
-        big: single,
-        reduced,
-        sfx: (n) => audio.sfx(n),
-        onPop: (i) => cards[i].classList.remove('wait'),
-        onDone: () => wrap.classList.remove('anim'),
-      });
-      wrap.addEventListener('pointerdown', () => { if (wrap.classList.contains('anim')) fw.skip(); });
+    // Nghi thức: chạm pháp trận để kích hoạt; lần sau có nút Bỏ qua (5★ vẫn chiếu đủ nhịp).
+    const rit = createRitual(wrap, results.map((r, i) => ({ rarity: r.rarity, el: cards[i] })), {
+      big: single, reduced, seen: ritualSeen(),
+      tip: results.length > 1 ? t('summon.ritual10', { n: results.length }) : t('summon.ritual'), skipLabel: t('summon.skip'),
+      sfx: (n) => audio.sfx(n), vibrate: (v) => audio.vibrate?.(v),
+      onPop: (i) => { cards[i].classList.remove('wait'); reveal(i, cards[i], true); }, // cổng nhả thẻ ra là lật luôn, không bắt chạm từng thẻ
+      onDone: () => wrap.classList.remove('anim'),
     });
+    void rit;
   }
 
   function showHistory() {

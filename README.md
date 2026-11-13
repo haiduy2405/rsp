@@ -467,3 +467,6 @@ Tranh nền màn chọn ải mỗi vùng (thủy/hỏa/mộc/quang/ám/tâm) v�
 
 ## v0.65.0 — Nút ải trau chuốt
 Nút ải thành huy hiệu viền nâu dày + vòng vàng, bóng đổ, nhấp nhô nhẹ; ải đang chơi phát sáng theo màu vùng; ải xong có 3 sao; ải khóa xám đá; nhãn dạng ruy băng giấy; đường mòn có viền; nền sáng hơn để thấy tranh.
+
+## v0.66.0 — Nghi thức triệu hồi: cổng + pháp trận
+Thay bệ phóng pháo bằng pháp trận phát sáng: chạm để kích hoạt -> nạp năng lượng (màu ánh sáng báo trước độ hiếm), cột sáng + sóng + rung màn, cổng thu nhỏ lên đỉnh rồi nhả từng thẻ (thấp -> cao, 5★ ra cuối, có nhịp chờ riêng) và tự lật thẻ. Lần xem đầu đủ, từ lần sau có nút Bỏ qua (nhớ bằng localStorage); 5★ vẫn giữ nhịp khi bỏ qua. Code: ui/portal.js (bỏ fireworks.js). Id #lp-orb giữ nguyên cho test.
