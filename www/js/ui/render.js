@@ -334,7 +334,7 @@ function renaissanceFrame(g, x, y, w, h, strong) {
 }
 
 function bar(g, x, y, w, h, frac, color, light) {
-  g.fillStyle = 'rgba(28,16,9, 0.85)';
+  g.fillStyle = 'rgba(22, 58, 108, 0.85)';
   g.fillRect(x - 1, y - 1, w + 2, h + 2);
   const fw = Math.max(0, w * Math.min(1, frac));
   if (fw > 0) {
@@ -347,7 +347,7 @@ function bar(g, x, y, w, h, frac, color, light) {
     g.fillStyle = 'rgba(255,255,255,0.28)';
     g.fillRect(x, y, fw, Math.max(1, h * 0.28));
   }
-  g.fillStyle = 'rgba(28,16,9, 0.3)';
+  g.fillStyle = 'rgba(22, 58, 108, 0.3)';
   for (let k = 1; k < 10; k++) g.fillRect(x + (w * k) / 10 - 0.5, y, 1, h);
   goldFrame(g, x - 3, y - 3, w + 6, h + 6, h >= 14 ? { lw: 2.5, orn: w >= 120 } : { lw: 1.5, orn: false });
 }
@@ -368,8 +368,8 @@ function brackets(g, x, y, w, h, len, color, lw = 2) {
 }
 function panel(g, x, y, w, h, accent, ren) {
   const gr = g.createLinearGradient(0, y, 0, y + h);
-  gr.addColorStop(0, 'rgba(84, 52, 30, 0.9)');
-  gr.addColorStop(1, 'rgba(34,20,12, 0.94)');
+  gr.addColorStop(0, 'rgba(66, 124, 196, 0.9)');
+  gr.addColorStop(1, 'rgba(20, 52, 100, 0.94)');
   g.save();
   g.shadowColor = 'rgba(0,0,0,0.55)'; // bóng đổ xuống nền
   g.shadowBlur = 10;
@@ -417,7 +417,7 @@ function outlined(g, str, x, y, size, top, bottom, family, lw = 5, weight = '700
   g.lineJoin = 'round';
   g.miterLimit = 2;
   g.lineWidth = lw;
-  g.strokeStyle = 'rgba(28,16,9, 0.95)';
+  g.strokeStyle = 'rgba(22, 58, 108, 0.95)';
   // viền sáng giả bằng nét mờ rộng hơn (shadowBlur trên chữ rất tốn CPU khi có nhiều số bay)
   const w0 = g.globalAlpha;
   g.globalAlpha = w0 * 0.35;
@@ -426,7 +426,7 @@ function outlined(g, str, x, y, size, top, bottom, family, lw = 5, weight = '700
   g.strokeText(str, x, y);
   g.globalAlpha = w0;
   g.lineWidth = lw;
-  g.strokeStyle = 'rgba(28,16,9, 0.95)';
+  g.strokeStyle = 'rgba(22, 58, 108, 0.95)';
   g.strokeText(str, x, y);
   const gr = g.createLinearGradient(0, y - size * 0.5, 0, y + size * 0.5);
   gr.addColorStop(0, top);
@@ -454,7 +454,7 @@ const NUM = 'Oswald, "Be Vietnam Pro", system-ui, sans-serif'; // số: chữ ca
 // Thanh đầu trận: bảng "Lượt" (số lớn) và bảng "Tầng" (kèm chấm tiến độ) trên nền gỗ tối viền vàng.
 function plaque(g, x, y, w, h) {
   const gr = g.createLinearGradient(0, y, 0, y + h);
-  gr.addColorStop(0, 'rgba(84, 52, 30, 0.92)');
+  gr.addColorStop(0, 'rgba(66, 124, 196, 0.92)');
   gr.addColorStop(1, 'rgba(34, 19, 11, 0.92)');
   g.beginPath();
   g.roundRect ? g.roundRect(x, y, w, h, 10) : g.rect(x, y, w, h);
@@ -476,7 +476,7 @@ function hud(g, view) {
   // Lượt
   plaque(g, 10, 8, 104, 40);
   text(g, view.t('battle.turnWord'), 22, 28, 12, '#c9a678', 'left', '700');
-  text(g, String(view.turn + 1), 100, 29, 26, '#ffe29a', 'right', '800', NUM);
+  text(g, String(view.turn + 1), 100, 29, 26, '#fff0a8', 'right', '800', NUM);
   // Tầng: số + chấm tiến độ; không khớp dạng "n/tổng" thì in nguyên chữ
   const m = /(\d+)\s*\/\s*(\d+)/.exec(view.titleText || '');
   if (m) {
@@ -485,16 +485,16 @@ function hud(g, view) {
     const w = Math.max(132, 44 + tot * 16);
     plaque(g, 122, 8, w, 40);
     if (/^[\d\s/]+$/.test(view.titleText)) {
-      text(g, `${n}/${tot}`, 134, 22, 15, '#f6edd6', 'left', '800'); // bài hướng dẫn: chỉ "n/tổng", không chữ "Tầng"
+      text(g, `${n}/${tot}`, 134, 22, 15, '#fff8e6', 'left', '800'); // bài hướng dẫn: chỉ "n/tổng", không chữ "Tầng"
     } else {
       text(g, view.t('battle.floorWord'), 134, 22, 11, '#c9a678', 'left', '700');
-      text(g, `${n}/${tot}`, 134 + 52, 22, 13, '#f6edd6', 'left', '700');
+      text(g, `${n}/${tot}`, 134 + 52, 22, 13, '#fff8e6', 'left', '700');
     }
     for (let i = 0; i < tot; i++) {
       const px = 134 + i * 16 + 6;
       g.beginPath();
       g.arc(px, 38, 4.5, 0, Math.PI * 2);
-      g.fillStyle = i < n - 1 ? '#d39a5e' : i === n - 1 ? '#ffe29a' : 'rgba(255,255,255,0.14)';
+      g.fillStyle = i < n - 1 ? '#9fd4ff' : i === n - 1 ? '#fff0a8' : 'rgba(255,255,255,0.14)';
       g.fill();
       if (i === n - 1) {
         g.lineWidth = 1.5;
@@ -504,7 +504,7 @@ function hud(g, view) {
     }
   } else if (view.titleText) {
     plaque(g, 122, 8, 150, 40);
-    text(g, view.titleText, 197, 29, 14, '#f6edd6', 'center', '700');
+    text(g, view.titleText, 197, 29, 14, '#fff8e6', 'center', '700');
   }
 }
 
@@ -541,7 +541,7 @@ function badges(g, effects, x, y, view, align = 'left') {
     g.textBaseline = 'alphabetic';
     g.lineJoin = 'round';
     g.lineWidth = 3;
-    g.strokeStyle = '#1b0f08';
+    g.strokeStyle = '#173a6c';
     g.strokeText(n, bx + FXS + 1, y + FXS + 2);
     g.fillStyle = '#ffffff';
     g.fillText(n, bx + FXS + 1, y + FXS + 2);
@@ -650,13 +650,13 @@ export function draw(g, view, t) {
     g.scale(view.zoom, view.zoom);
     g.translate(-W / 2, -190);
   }
-  g.fillStyle = '#1b0f08';
+  g.fillStyle = '#173a6c';
   g.fillRect(0, 0, W, H);
   const bg = getImg('bg:battle');
   if (bg) {
     g.drawImage(bg, 0, 0, W, H);
     const ink = g.createLinearGradient(0, 0, 0, 372);
-    ink.addColorStop(0, 'rgba(28,16,9,0.12)');
+    ink.addColorStop(0, 'rgba(22, 58, 108,0.12)');
     ink.addColorStop(1, 'rgba(60,30,16,0.12)');
     g.fillStyle = ink;
     g.fillRect(0, 0, W, 372);
@@ -767,10 +767,10 @@ export function draw(g, view, t) {
     }
     g.globalAlpha = dead ? 1 - dk : 1;
     panel(g, cx - 82, 244, 164, 76, null);
-    brackets(g, cx - 82, 244, 164, 76, 9, view.focus === i ? '#ff4d5e' : '#dcc3a0');
+    brackets(g, cx - 82, 244, 164, 76, 9, view.focus === i ? '#ff4d5e' : '#cfe6ff');
     g.fillStyle = COLORS[e.element];
     g.fillRect(cx - 82, 244, 4, 76);
-    text(g, view.t(`monster.${e.id}`), cx + 2, 258, 15, '#f6edd6', 'center', '700', SERIF);
+    text(g, view.t(`monster.${e.id}`), cx + 2, 258, 15, '#fff8e6', 'center', '700', SERIF);
     bar(g, cx - 70, 270, 140, 11, (e.hpShow ?? e.hp) / e.maxHp, '#e8475b', '#ff9aa6');
     text(g, `${Math.max(0, Math.round(e.hp))}`, cx, 276, 9, '#ffffff', 'center', '800');
     if (!dead) {
@@ -812,7 +812,7 @@ export function draw(g, view, t) {
   if (view.combo > 0) {
     const heat = view.combo >= 10 ? ['#ffd9d0', '#ff3d2e'] : view.combo >= 6 ? ['#ffe6b0', '#ff8a1f'] : ['#fff3b0', '#e2a52a']; // combo cao: nóng dần
     outlined(g, `${view.combo}`, W / 2 - 128, 338, Math.round((54 + Math.min(16, view.combo * 2)) * (1 + 0.32 * (view.comboPop || 0))), heat[0], heat[1], NUM, 5);
-    text(g, view.t('battle.comboWord'), W / 2 - 128, 364, 13, '#f6edd6', 'center', '700');
+    text(g, view.t('battle.comboWord'), W / 2 - 128, 364, 13, '#fff8e6', 'center', '700');
   }
   if (view.tally && view.tally.shown > 0) outlined(g, new Intl.NumberFormat(document.documentElement.lang || 'vi').format(Math.round(view.tally.shown)), W / 2 + 90, 340, Math.round(50 * (1 + 0.4 * Math.min(1, view.tally.pulse))), '#fff0d0', '#ff7a2a', NUM, 5);
 
@@ -979,11 +979,11 @@ export function draw(g, view, t) {
   }
 
   // đồng hồ kéo
-  g.fillStyle = 'rgba(28,16,9, 0.9)';
+  g.fillStyle = 'rgba(22, 58, 108, 0.9)';
   g.fillRect(0, 466, W, 14);
   if (view.timer !== null) {
     const low = view.timer < 0.25;
-    g.fillStyle = low ? '#ff5468' : '#dcc3a0';
+    g.fillStyle = low ? '#ff5468' : '#cfe6ff';
     g.shadowColor = g.fillStyle;
     g.shadowBlur = low ? 14 : 8;
     g.fillRect(0, 468, W * view.timer, 10);
@@ -1007,7 +1007,7 @@ export function draw(g, view, t) {
   }
 
   // bàn: khung kính, mỗi ô là một hốc bo nhẹ
-  g.fillStyle = 'rgba(28,16,9, 0.92)';
+  g.fillStyle = 'rgba(22, 58, 108, 0.92)';
   g.fillRect(0, BOARD_Y, W, ROWS * CELL);
   for (let r = 0; r < ROWS; r++)
     for (let c = 0; c < COLS; c++) {
@@ -1131,7 +1131,7 @@ export function draw(g, view, t) {
     g.beginPath();
     g.arc(q.x, q.y, 28 + Math.sin(t * 0.01) * 4, 0, Math.PI * 2);
     g.stroke();
-    g.fillStyle = 'rgba(28,16,9, 0.85)';
+    g.fillStyle = 'rgba(22, 58, 108, 0.85)';
     g.fillRect(0, 932, W, 28);
     text(g, view.hint.text, W / 2, 946, 15, '#ffe9a0');
   }
@@ -1141,7 +1141,7 @@ export function draw(g, view, t) {
     const r = (i / COLS) | 0;
     const x = BOARD_X + c * CELL;
     const y = BOARD_Y + r * CELL;
-    g.fillStyle = 'rgba(28,16,9, 0.55)';
+    g.fillStyle = 'rgba(22, 58, 108, 0.55)';
     g.fillRect(x + 4, y + 4, CELL - 8, CELL - 8);
     g.strokeStyle = '#ff8a98';
     g.lineWidth = 3;
@@ -1326,7 +1326,7 @@ function drawIntro(g, view) {
   g.fillStyle = '#0a0b0d';
   g.fillRect(0, 0, W, bh);
   g.fillRect(0, H - bh, W, bh);
-  g.fillStyle = it.danger ? '#ff5a6a' : '#dcc3a0';
+  g.fillStyle = it.danger ? '#ff5a6a' : '#cfe6ff';
   g.fillRect(0, bh - 2, W, 2);
   g.fillRect(0, H - bh, W, 2);
   // biển tên giữa khu che
@@ -1336,14 +1336,14 @@ function drawIntro(g, view) {
     g.save();
     g.globalAlpha = bk;
     const lw = 250 * bk;
-    g.fillStyle = it.danger ? '#ff5a6a' : '#dcc3a0';
+    g.fillStyle = it.danger ? '#ff5a6a' : '#cfe6ff';
     g.fillRect(W / 2 - lw, cy - 52, lw * 2, 2);
     g.fillRect(W / 2 - lw, cy + 52, lw * 2, 2);
     if (it.danger) text(g, it.warn, W / 2, cy - 30, 15, '#ff8a96', 'center', '800');
-    else text(g, it.sub, W / 2, cy - 30, 15, '#dcc3a0', 'center', '800');
+    else text(g, it.sub, W / 2, cy - 30, 15, '#cfe6ff', 'center', '800');
     g.translate((1 - bk) * -40, 0);
     outlined(g, it.title, W / 2, cy + 8, it.title.length > 16 ? 30 : 38, '#ffffff', it.danger ? '#ff5a6a' : '#ffd24a', SERIF, 6, '700');
-    if (it.danger) text(g, it.sub, W / 2, cy + 38, 13, '#f6edd6', 'center', '700');
+    if (it.danger) text(g, it.sub, W / 2, cy + 38, 13, '#fff8e6', 'center', '700');
     g.restore();
   }
   // "Bắt đầu!"

@@ -9,6 +9,7 @@ import { stageInfo } from './core/stageinfo.js';
 import { applyRunResult, firstClearStageSpirit } from './core/progress.js';
 import { browserAdapter } from './save/storage.js';
 import { createSlots } from './save/slots.js';
+import { hubSky, ZONE_POS } from './ui/hub-art.js';
 import { install as installSlots } from './ui/screen-slots.js';
 import { levelCap, grantCharacter, expToMax, skillUp, skillUpCost, useElixir, feedFodder, sellFodder, fodderExp, awakenCost, awaken, setTeam, teamRoster, selectPreset, makeLeader, presetsOf, PRESET_COUNT, placeInSlot, clearTeam, autoTeam } from './core/upgrade.js';
 import { statsFor, skillCooldown } from './core/stats.js';
@@ -201,23 +202,17 @@ const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } 
 // Cảnh chính: Tòa Tháp giữa các đảo nổi. Mỗi khu mở là một viên ngọc phát sáng trên đảo (chạm để vào khu).
 function hubScene() {
   const zones = ctx.zoneList;
-  // Vị trí ngọc khu trên các đảo nổi của ảnh nền bg/hub.webp (viewBox 400 rộng, ảnh 400x711 dời xuống 40 để HUD trên không che đảo).
-  const pos = [[205, 412], [66, 188], [338, 178], [36, 288], [362, 286], [330, 372]];
+  const pos = ZONE_POS; // đảo khu vực đối xứng hai bên Tháp (ui/hub-art.js)
   const NS = 'http://www.w3.org/2000/svg';
   const orbs = zones.map((z, i) => {
     const [x, y] = pos[i % pos.length];
     const open = progress.unlocked.includes(z.id);
     const col = COLORS[z.element];
-    const S = open ? 66 : 60;
-    const lock = open ? '' : `<g transform="translate(${x - 9} ${y - 8})"><rect x="0" y="7" width="18" height="13" rx="3" fill="#3a2416" stroke="#f6edd6" stroke-width="1.6"/><path d="M4 7V4.5a5 5 0 0 1 10 0V7" fill="none" stroke="#f6edd6" stroke-width="1.8"/></g>`;
+    const S = open ? 88 : 80;
+    const lock = open ? '' : `<g transform="translate(${x - 9} ${y - 8})"><rect x="0" y="7" width="18" height="13" rx="3" fill="#2b66aa" stroke="#fff8e6" stroke-width="1.8"/><path d="M4 7V4.5a5 5 0 0 1 10 0V7" fill="none" stroke="#fff8e6" stroke-width="2"/></g>`;
     return `<g class="zorb${open ? ' open' : ''}" ${open ? `data-zone="${z.id}" role="button" tabindex="0" aria-label="${t(`zone.${z.id}`)}"` : ''} style="animation-delay:${(i * 0.7).toFixed(1)}s;--c:${col}">${open ? `<ellipse cx="${x}" cy="${y + S * 0.34}" rx="${S * 0.46}" ry="${S * 0.12}" fill="${col}" opacity=".35" class="halo"/>` : ''}<image href="assets/ui/zones/${z.id}.webp" x="${x - S / 2}" y="${y - S / 2}" width="${S}" height="${S}" ${open ? '' : 'filter="url(#zlock)" opacity=".7"'}/>${lock}</g>`;
   }).join('');
-  const svg = `<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice" xmlns="${NS}" aria-hidden="true">
-<defs><filter id="zlock"><feColorMatrix type="saturate" values="0.1"/></filter></defs>
-<rect width="400" height="800" fill="#fbd9a8"/>
-<image href="assets/bg/hub.webp" x="0" y="40" width="400" height="711" preserveAspectRatio="xMidYMin slice"/>
-${orbs}
-</svg>`;
+  const svg = `<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="${NS}" aria-hidden="true">${hubSky()}${orbs}</svg>`;
   const box = h('div', { class: 'hub-scene' + (DEBUG ? ' static' : '') });
   box.innerHTML = svg;
   if (!DEBUG) for (let i = 0; i < 12; i++) box.appendChild(h('i', { class: 'spark', style: `left:${(i * 37 + 11) % 92 + 3}%;top:${(i * 53 + 17) % 62 + 8}%;animation-delay:${(i * 0.83).toFixed(2)}s;animation-duration:${(5 + (i % 4)).toFixed(0)}s` })); // đom đóm bay quanh Tháp
@@ -442,7 +437,7 @@ function charCard(id, onclick, extra) {
   return h(
     'div',
     { class: 'card btn charrow' + (c ? '' : ' locked'), 'data-char': id, onclick: c ? onclick : null },
-    c ? portrait(id, 64) : h('div', { style: 'width:64px;height:64px;border-radius:12px;border:3px solid #6a4529;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px' }, '?'),
+    c ? portrait(id, 64) : h('div', { style: 'width:64px;height:64px;border-radius:12px;border:3px solid #5d9fe0;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px' }, '?'),
     h(
       'div',
       { style: 'flex:1;min-width:0' },
@@ -895,7 +890,7 @@ function runMapSVG() {
       const skipped = row.past && row.pick !== i;
       const cls = 'nd' + (row.cur ? ' cur' : '') + (taken ? ' taken' : '') + (skipped ? ' skipped' : '') + (big ? ' big' : '');
       const attr = row.cur ? ` data-door="${i}" role="button" tabindex="0" aria-label="${t(`door.${k}`)}"` : '';
-      nodes += `<g class="${cls}"${attr} style="--c:${d.col}">${row.cur ? `<circle class="pulse" cx="${x}" cy="${y}" r="${rad + 8}" fill="${d.col}"/>` : ''}<circle cx="${x}" cy="${y}" r="${rad + 3}" fill="none" stroke="#d39a5e" stroke-opacity="${row.cur || taken ? 0.85 : 0.35}" stroke-width="1.4"/><circle cx="${x}" cy="${y}" r="${rad}" fill="#1d120b" stroke="${taken || row.cur ? d.ring : d.col}" stroke-width="${row.cur ? 3 : 2}"/><circle cx="${x}" cy="${y}" r="${rad - 5}" fill="${d.col}" opacity="${skipped ? 0.1 : taken ? 0.55 : 0.3}"/><g transform="translate(${x - 12 * (rad / 23)} ${y - 12 * (rad / 23)}) scale(${rad / 23})" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="${skipped ? 0.35 : 1}">${d.icon}</g>${row.cur || big ? label(x, y + rad + 17, k, row.cur) : ''}</g>`;
+      nodes += `<g class="${cls}"${attr} style="--c:${d.col}">${row.cur ? `<circle class="pulse" cx="${x}" cy="${y}" r="${rad + 8}" fill="${d.col}"/>` : ''}<circle cx="${x}" cy="${y}" r="${rad + 3}" fill="none" stroke="#9fd4ff" stroke-opacity="${row.cur || taken ? 0.85 : 0.35}" stroke-width="1.4"/><circle cx="${x}" cy="${y}" r="${rad}" fill="#1d120b" stroke="${taken || row.cur ? d.ring : d.col}" stroke-width="${row.cur ? 3 : 2}"/><circle cx="${x}" cy="${y}" r="${rad - 5}" fill="${d.col}" opacity="${skipped ? 0.1 : taken ? 0.55 : 0.3}"/><g transform="translate(${x - 12 * (rad / 23)} ${y - 12 * (rad / 23)}) scale(${rad / 23})" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="${skipped ? 0.35 : 1}">${d.icon}</g>${row.cur || big ? label(x, y + rad + 17, k, row.cur) : ''}</g>`;
     });
   }
   if (curRow || true) {
@@ -906,9 +901,9 @@ function runMapSVG() {
   for (let i = 0; i < 40; i++) stars += `<circle cx="${(i * 97.3) % 400}" cy="${(i * 53.7) % 600}" r="${0.6 + (i % 3) * 0.4}" fill="#fff" opacity="${0.15 + (i % 4) * 0.1}"/>`;
   let cols = '';
   for (const x of [26, 374]) {
-    cols += `<g class="pillar"><rect x="${x - 13}" y="62" width="26" height="520" fill="url(#col)" stroke="#6a4529" stroke-opacity=".7"/><rect x="${x - 19}" y="52" width="38" height="12" rx="2" fill="#4a2f1c" stroke="#d39a5e" stroke-opacity=".6"/><rect x="${x - 19}" y="578" width="38" height="12" rx="2" fill="#4a2f1c" stroke="#d39a5e" stroke-opacity=".6"/>`;
+    cols += `<g class="pillar"><rect x="${x - 13}" y="62" width="26" height="520" fill="url(#col)" stroke="#5d9fe0" stroke-opacity=".7"/><rect x="${x - 19}" y="52" width="38" height="12" rx="2" fill="#4a2f1c" stroke="#9fd4ff" stroke-opacity=".6"/><rect x="${x - 19}" y="578" width="38" height="12" rx="2" fill="#4a2f1c" stroke="#9fd4ff" stroke-opacity=".6"/>`;
     for (const y of [150, 270, 390, 500]) cols += `<path d="M${x} ${y - 9}l7 9-7 9-7-9z" fill="none" stroke="var(--zc,#ffb25a)" stroke-width="1.4" opacity=".55" class="rune"/>`;
-    cols += `<path d="M${x - 15} 52h30l-4 -9h-22z" fill="#2a1810" stroke="#d39a5e" stroke-opacity=".6"/><g transform="translate(${x} 43) scale(1.7) translate(${-x} -43)"><g class="flame" style="transform-origin:${x}px 43px"><path d="M${x} 14c5 7 8 11 8 17a8 8 0 0 1-16 0c0-4 2-6 4-9 0 3 1 4 2 4-1-4-1-8 2-12z" fill="var(--zc,#ffb25a)"/><path d="M${x} 24c3 4 4 6 4 9a4 4 0 0 1-8 0c0-2 1-3 2-5 0 2 1 2 2 2z" fill="#fff2c4"/></g></g><circle cx="${x}" cy="30" r="34" fill="url(#zg)" class="torchglow"/></g>`;
+    cols += `<path d="M${x - 15} 52h30l-4 -9h-22z" fill="#20508c" stroke="#9fd4ff" stroke-opacity=".6"/><g transform="translate(${x} 43) scale(1.7) translate(${-x} -43)"><g class="flame" style="transform-origin:${x}px 43px"><path d="M${x} 14c5 7 8 11 8 17a8 8 0 0 1-16 0c0-4 2-6 4-9 0 3 1 4 2 4-1-4-1-8 2-12z" fill="var(--zc,#ffb25a)"/><path d="M${x} 24c3 4 4 6 4 9a4 4 0 0 1-8 0c0-2 1-3 2-5 0 2 1 2 2 2z" fill="#fff2c4"/></g></g><circle cx="${x}" cy="30" r="34" fill="url(#zg)" class="torchglow"/></g>`;
   }
   return `<svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" aria-hidden="false">
 <defs><linearGradient id="col" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#111216"/><stop offset=".5" stop-color="#424753"/><stop offset="1" stop-color="#111216"/></linearGradient>
