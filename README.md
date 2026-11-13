@@ -552,6 +552,10 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.99.3
+
+- Đổi chữ "ván lưu" thành "sao lưu" (màn chọn và nút Đổi sao lưu).
+
 ## v0.99.2
 
 - Bảng chi tiết quái (ấn giữ): thêm mục **Nội tại** liệt kê hiệu ứng quái áp lên đội mỗi lần đánh (tên, số lượt, giá trị). Trước đó bảng chỉ hiện trạng thái hiện tại nên không thấy debuff của quái. Tag rollback cục bộ: `pre-passive-info-v0.99.1`.

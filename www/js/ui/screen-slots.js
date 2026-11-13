@@ -1,4 +1,4 @@
-// Màn chọn ván lưu: 3 ô, mỗi ô là một tiến trình riêng. Chơi / ván mới, đổi tên, xóa (có xác nhận).
+// Màn chọn sao lưu: 3 ô, mỗi ô là một tiến trình riêng. Chơi / ván mới, đổi tên, xóa (có xác nhận).
 import { h, btn } from './dom.js';
 import { avatarNode } from './avatar.js';
 import { NAME_MAX } from '../save/slots.js';
