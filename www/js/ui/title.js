@@ -43,7 +43,7 @@ export function goldTitle(el, main, sub) {
   frame.append(gems);
   const fit = () => {
     const box = frame.clientWidth || el.clientWidth || 300;
-    const avail = (box - 44) * 0.98; // trừ phần đệm khung
+    const avail = (box - 6) * 0.98; // trừ phần đệm khung
     const size = (nodes, max) => {
       let k = max;
       nodes.forEach((n) => { n.style.fontSize = '40px'; k = Math.min(k, (40 * avail) / (n.scrollWidth || 1)); });

@@ -316,26 +316,20 @@ function renaissanceFrame(g, x, y, w, h, strong) {
     g.beginPath(); g.arc(px, y + 1.5, 1, 0, 6.283); g.fill();
     g.beginPath(); g.arc(px, y + h - 1.5, 1, 0, 6.283); g.fill();
   }
-  // hoa văn góc cổ điển (ảnh ui:corner), lấn nhẹ ra ngoài viền
-  const cim = getImg('ui:corner');
-  if (cim) {
-    const cs = strong ? 30 : 26;
-    for (const [cx, cy, sx, sy] of [[x - 3, y - 3, 1, 1], [x + w + 3, y - 3, -1, 1], [x - 3, y + h + 3, 1, -1], [x + w + 3, y + h + 3, -1, -1]]) {
-      g.save(); g.translate(cx, cy); g.scale(sx, sy); g.drawImage(cim, 0, 0, cs, cs); g.restore();
-    }
+  // viền hoa văn nằm gọn trong dải viền (không lấn vào nội dung thẻ): khung góc vát + thoi nhỏ ở 4 góc và giữa cạnh
+  const ins = 5, L = strong ? 13 : 11, c = 3.5;
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  for (const [cx, cy, sx, sy] of [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]]) {
+    g.beginPath();
+    g.moveTo(cx + sx * (ins + L), cy + sy * ins); g.lineTo(cx + sx * (ins + c), cy + sy * ins); g.lineTo(cx + sx * ins, cy + sy * (ins + c)); g.lineTo(cx + sx * ins, cy + sy * (ins + L));
+    g.strokeStyle = dk; g.lineWidth = 2.6; g.stroke();
+    g.strokeStyle = gold; g.lineWidth = 1.2; g.stroke();
+    g.fillStyle = hi; g.strokeStyle = dk; g.lineWidth = 0.8;
+    g.beginPath(); g.moveTo(cx + sx * 2, cy + sy * 2 - sy * 3.4); g.lineTo(cx + sx * 2 + sx * 3.4, cy + sy * 2); g.lineTo(cx + sx * 2, cy + sy * 2 + sy * 3.4); g.lineTo(cx + sx * 2 - sx * 3.4, cy + sy * 2); g.closePath(); g.fill(); g.stroke();
   }
-  // vỏ sò giữa cạnh trên
   const mx = x + w / 2;
-  g.fillStyle = gold; g.strokeStyle = dk; g.lineWidth = 0.9;
-  g.beginPath(); g.moveTo(mx - 9, y + 4); g.quadraticCurveTo(mx - 10, y - 5, mx, y - 6); g.quadraticCurveTo(mx + 10, y - 5, mx + 9, y + 4); g.closePath(); g.fill(); g.stroke();
-  g.strokeStyle = dk; g.lineWidth = 0.7;
-  for (let r = -3; r <= 3; r++) { g.beginPath(); g.moveTo(mx, y + 3.5); g.lineTo(mx + r * 2.8, y - 4.2 + Math.abs(r) * 0.6); g.stroke(); }
-  g.fillStyle = hi; g.beginPath(); g.arc(mx, y + 4.5, 2, 0, 6.283); g.fill();
-  // nút thoi giữa cạnh dưới + hai vệt cuộn nhỏ
-  g.fillStyle = gold; g.strokeStyle = dk; g.lineWidth = 0.9;
-  g.beginPath(); g.moveTo(mx, y + h - 5); g.lineTo(mx + 6, y + h); g.lineTo(mx, y + h + 5); g.lineTo(mx - 6, y + h); g.closePath(); g.fill(); g.stroke();
-  g.strokeStyle = gold; g.lineWidth = 1.3;
-  g.beginPath(); g.moveTo(mx + 8, y + h); g.quadraticCurveTo(mx + 14, y + h - 4, mx + 18, y + h - 1); g.moveTo(mx - 8, y + h); g.quadraticCurveTo(mx - 14, y + h - 4, mx - 18, y + h - 1); g.stroke();
+  g.fillStyle = gold; g.strokeStyle = dk; g.lineWidth = 0.8;
+  for (const my of [y + 1.5, y + h - 1.5]) { g.beginPath(); g.moveTo(mx, my - 3.4); g.lineTo(mx + 5, my); g.lineTo(mx, my + 3.4); g.lineTo(mx - 5, my); g.closePath(); g.fill(); g.stroke(); }
   g.restore();
 }
 
