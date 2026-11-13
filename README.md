@@ -464,3 +464,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 
 ## v0.64.0 — Tranh nền 6 vùng (AI)
 Tranh nền màn chọn ải mỗi vùng (thủy/hỏa/mộc/quang/ám/tâm) vẽ bằng ChatGPT, thay bản gradient tạm. Nhập bằng `tools/art-import-zone.py`; ô vuông ở trên, phần dưới kéo dài bằng mây mờ cho UI.
+
+## v0.65.0 — Nút ải trau chuốt
+Nút ải thành huy hiệu viền nâu dày + vòng vàng, bóng đổ, nhấp nhô nhẹ; ải đang chơi phát sáng theo màu vùng; ải xong có 3 sao; ải khóa xám đá; nhãn dạng ruy băng giấy; đường mòn có viền; nền sáng hơn để thấy tranh.

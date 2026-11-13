@@ -311,7 +311,7 @@ function showStages(zoneId, tier) {
   road.setAttribute('preserveAspectRatio', 'none');
   road.setAttribute('class', 'sp-road');
   road.setAttribute('aria-hidden', 'true');
-  road.innerHTML = pts.slice(0, -1).map((q, i) => `<path d="${seg(q, pts[i + 1])}" class="sp-seg${i + 1 <= done ? ' lit' : ''}"/>`).join('');
+  road.innerHTML = pts.slice(0, -1).map((q, i) => `<path d="${seg(q, pts[i + 1])}" class="sp-bg"/>`).join('') + pts.slice(0, -1).map((q, i) => `<path d="${seg(q, pts[i + 1])}" class="sp-seg${i + 1 <= done ? ' lit' : ''}"/>`).join('');
   const nodes = Array.from({ length: total }, (_, i) => {
     const n = total - i; // DOM từ đỉnh xuống: boss trước, ải 1 sau cùng
     const open = stageOpen(ctx, progress, zoneId, tier, n);
@@ -324,7 +324,7 @@ function showStages(zoneId, tier) {
     const node = h(
       'button',
       { class: 'snode' + (boss ? ' boss' : '') + (open ? '' : ' locked') + (clear ? ' clear' : ' ready'.repeat(open ? 1 : 0)), 'data-stage': String(n), style: `left:${q.x}%;top:${q.y}px`, 'aria-label': t(boss ? 'stage.boss' : 'stage.num', { n }), onclick: () => !heldFlag.v && open && showTeam(undefined, undefined, { zoneId, diff: tier, stage: n }) },
-      h('span', { class: 'sn-orb' }, face, boss ? h('b', { class: 'sn-crown' }, '★') : null),
+      h('span', { class: 'sn-orb' }, face, boss ? h('b', { class: 'sn-crown' }, '★') : null, clear && !boss ? h('i', { class: 'sn-stars' }, '★★★') : null),
       h('span', { class: 'sn-label' }, t(boss ? 'stage.boss' : 'stage.num', { n }), h('small', {}, clear ? t('stage.cleared') : open ? t('stage.next') : t('stage.lockedPrev'))),
     );
     onHold(node, () => showStageInfo(zoneId, tier, n));

@@ -1050,3 +1050,31 @@ button.ghost#leave-run { padding: 7px 20px; font-size: 13px; }
 .zhead h2 { text-shadow: 0 2px 6px rgba(0, 0, 0, .7); }
 .sp-seg { stroke: rgba(255, 244, 220, .6); }
 .snode .sn-label { padding: 3px 10px; border-radius: 10px; background: rgba(28, 16, 9, .68); border: 1px solid rgba(255, 217, 138, .25); }
+
+/* v0.65 nút ải: huy hiệu nét viền nâu, bóng đổ, ruy băng nhãn, đường mòn có viền */
+.sp-inner { background: linear-gradient(180deg, rgba(28, 16, 9, .06), rgba(28, 16, 9, .30)), var(--zbg) center top / cover no-repeat, rgba(28, 16, 9, .5); }
+.sp-bg { fill: none; stroke: #3b2314; stroke-width: 12; stroke-linecap: round; opacity: .55; vector-effect: non-scaling-stroke; }
+.sp-seg { stroke: #fff1cf; stroke-width: 6; stroke-dasharray: 0.1 14; opacity: .95; }
+.sp-seg.lit { stroke: #ffd35e; stroke-width: 7; stroke-dasharray: none; filter: drop-shadow(0 0 4px rgba(255, 200, 90, .9)); }
+.snode { gap: 2px; }
+.snode .sn-orb { width: 68px; height: 68px; border: 4px solid #3b2314; background: radial-gradient(circle at 50% 30%, #fff4d0, #e0a64a 55%, #b0701f 100%); box-shadow: 0 0 0 3px #f2cf86, 0 0 0 6px #3b2314, 0 9px 10px -2px rgba(0, 0, 0, .55), inset 0 -6px 8px rgba(120, 60, 10, .45), inset 0 3px 4px rgba(255, 255, 255, .6); animation: snBob 3.2s ease-in-out infinite; }
+.snode .sn-orb::after { content: ''; position: absolute; left: 14%; top: 8%; width: 46%; height: 28%; border-radius: 50%; background: linear-gradient(180deg, rgba(255, 255, 255, .75), rgba(255, 255, 255, 0)); pointer-events: none; }
+.snode .sn-num { font: 800 30px var(--serif, Georgia, serif); color: #5a2f0c; text-shadow: 0 2px 0 rgba(255, 240, 200, .8), 0 0 1px #fff; }
+.snode.ready .sn-orb { background: radial-gradient(circle at 50% 30%, #fffbe0, #ffc94d 52%, #e07d1c 100%); box-shadow: 0 0 0 3px #fff0b0, 0 0 0 6px #3b2314, 0 0 22px 6px color-mix(in srgb, var(--zc, #ffb25a) 70%, #ffd35e), 0 9px 10px -2px rgba(0, 0, 0, .55), inset 0 -6px 8px rgba(160, 70, 0, .4), inset 0 3px 4px rgba(255, 255, 255, .7); animation: snBob 3.2s ease-in-out infinite, snGlow 1.8s ease-in-out infinite; }
+.snode.clear .sn-orb { background: radial-gradient(circle at 50% 30%, #eaffd0, #6cc65a 55%, #2d7a36 100%); box-shadow: 0 0 0 3px #d6f5a8, 0 0 0 6px #3b2314, 0 9px 10px -2px rgba(0, 0, 0, .55), inset 0 -6px 8px rgba(10, 70, 20, .45), inset 0 3px 4px rgba(255, 255, 255, .6); }
+.snode.clear .sn-num { color: #fff; font-size: 34px; text-shadow: 0 2px 0 #1d5a26, 0 0 6px rgba(0, 60, 10, .6); }
+.sn-stars { position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); font: normal 13px var(--sans); letter-spacing: 1px; color: #ffd84a; -webkit-text-stroke: .6px #5a3510; text-shadow: 0 1px 0 #3b2314; white-space: nowrap; }
+.snode.clear .sn-label { margin-top: 12px; }
+.snode.locked .sn-orb { background: radial-gradient(circle at 50% 30%, #9a9288, #5f574e 60%, #3d3731); box-shadow: 0 0 0 3px #7d756b, 0 0 0 6px #3b2314, 0 8px 9px -2px rgba(0, 0, 0, .5), inset 0 -5px 7px rgba(0, 0, 0, .4); animation: none; }
+.snode.locked .sn-num { font-size: 24px; opacity: .8; text-shadow: none; }
+.snode .sn-label { margin-top: 8px; padding: 3px 14px 4px; border-radius: 8px; background: linear-gradient(180deg, #fff3d4, #e9c98d); border: 2px solid #3b2314; box-shadow: 0 3px 0 #3b2314, 0 5px 6px rgba(0, 0, 0, .35); color: #4a2a10; text-shadow: none; position: relative; }
+.snode .sn-label small { color: #8a5a22; font-weight: 700; }
+.snode.locked .sn-label { background: linear-gradient(180deg, #cfc6b8, #a79d8d); color: #5b5348; opacity: .85; }
+.snode.boss .sn-orb { width: 96px; height: 96px; background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--zc, #ffb25a) 45%, #fff2d0), color-mix(in srgb, var(--zc, #ffb25a) 70%, #20120a) 80%); box-shadow: 0 0 0 4px #f2cf86, 0 0 0 8px #3b2314, 0 11px 12px -2px rgba(0, 0, 0, .6), inset 0 -8px 10px rgba(0, 0, 0, .35); }
+.snode.boss.clear .sn-orb { box-shadow: 0 0 0 4px #d6f5a8, 0 0 0 8px #3b2314, 0 11px 12px -2px rgba(0, 0, 0, .6), inset 0 -8px 10px rgba(0, 0, 0, .35); }
+.snode.boss.locked .sn-orb { box-shadow: 0 0 0 4px #7d756b, 0 0 0 8px #3b2314, 0 11px 12px -2px rgba(0, 0, 0, .6); background: radial-gradient(circle at 50% 35%, #6d665d, #2b2622 80%); }
+.sn-crown { top: -22px; width: 30px; height: 30px; border: 2px solid #3b2314; font-size: 16px; }
+@keyframes snBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes snGlow { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.12); } }
+@media (prefers-reduced-motion: reduce) { .snode .sn-orb { animation: none !important; } }
+.snode.boss:not(.locked) .sn-orb { animation: snBob 3.2s ease-in-out infinite, snGlow 1.6s ease-in-out infinite; }
