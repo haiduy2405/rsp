@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.89.1
+- Nút "Tiếp tục chuyến leo": làm lại thành nút vàng `primary` như các nút khác (bỏ viền xanh bo tròn). Ngọc ải góc phải-trên dời xuống để không đè hàng tiền tệ trên máy có tai thỏ/thanh trạng thái. Tag lùi: `pre-resume-v0.89.0`.
+
 ## v0.89.0
 - Màn tải: sửa logo lệch tâm (đo theo khung logo, căn flex), thêm khung hoa văn góc Duy cấp + vạch vàng, nền tối mềm sau chữ, tia sáng xoay chậm sau Tháp, đom đóm vàng bay lên, vignette. Nền vẫn là `bg/hub.webp` (chưa tạo lại bằng ChatGPT). Tag lùi: `pre-loading-v0.88.2`.
 

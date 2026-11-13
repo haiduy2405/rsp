@@ -202,7 +202,7 @@ const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } 
 function hubScene() {
   const zones = ctx.zoneList;
   // Vị trí ngọc khu trên các đảo nổi của ảnh nền bg/hub.webp (viewBox 400 rộng, ảnh 400x711 dời xuống 40 để HUD trên không che đảo).
-  const pos = [[205, 412], [66, 188], [336, 140], [36, 288], [362, 286], [330, 372]];
+  const pos = [[205, 412], [66, 188], [338, 178], [36, 288], [362, 286], [330, 372]];
   const NS = 'http://www.w3.org/2000/svg';
   const orbs = zones.map((z, i) => {
     const [x, y] = pos[i % pos.length];
@@ -274,7 +274,7 @@ function showHub() {
 
 function resumeChip() {
   const r = activeRunInfo().run;
-  return h('button', { class: 'resume', id: 'b-resume', onclick: resumeRun }, h('span', { class: 'rs-t' }, t('run.resume')), h('small', {}, `${stageLabel(r)} · ${t('run.floor', { n: r.floor + 1, total: r.floors })}`));
+  return h('button', { class: 'primary resume', id: 'b-resume', onclick: resumeRun }, h('span', { class: 'rs-t' }, t('run.resume')), h('small', {}, `${stageLabel(r)} · ${t('run.floor', { n: r.floor + 1, total: r.floors })}`));
 }
 
 // Chọn khu vực (từ nút CHIẾN ĐẤU).
