@@ -293,23 +293,54 @@ function showStages(zoneId, tier) {
     const open = tierOpen(ctx, progress, zoneId, d);
     return h('button', { class: 'tier' + (d === tier ? ' on' : '') + (open ? '' : ' locked'), 'data-tier': d, onclick: () => open && showStages(zoneId, d) }, t(`diff.${d}`), h('small', {}, open ? t('stage.progress', { n: stagesDone(progress, zoneId, d), total }) : '🔒'));
   }));
-  const cards = Array.from({ length: total }, (_, i) => {
-    const n = i + 1;
+  // Con đường leo tháp: ải 1 ở đáy, ải cuối (boss) ở đỉnh; các nút zích-zắc nối bằng đường nét đứt, đoạn đã qua sáng vàng.
+  const zone = ctx.zones[zoneId];
+  const zc = COLORS[zone.element] || '#ffb25a';
+  const bossId = zone.monsters.boss[0];
+  const ROW = 104;
+  const PADY = 56;
+  const XS = [32, 68, 36, 70, 32, 64];
+  const posOf = (n) => ({ x: n === total ? 50 : XS[(n - 1) % XS.length], y: PADY + (total - n) * ROW + (n < total ? 26 : 0) }); // boss ở đỉnh có thêm khoảng thở
+  const heightPx = PADY * 2 + (total - 1) * ROW + 26;
+  const pts = Array.from({ length: total }, (_, i) => posOf(i + 1));
+  const toPx = (q) => [(q.x / 100) * 360, q.y];
+  const seg = (a, b) => { const [x0, y0] = toPx(a); const [x1, y1] = toPx(b); const my = (y0 + y1) / 2; return `M${x0} ${y0} C${x0} ${my} ${x1} ${my} ${x1} ${y1}`; };
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const road = document.createElementNS(svgNS, 'svg');
+  road.setAttribute('viewBox', `0 0 360 ${heightPx}`);
+  road.setAttribute('preserveAspectRatio', 'none');
+  road.setAttribute('class', 'sp-road');
+  road.setAttribute('aria-hidden', 'true');
+  road.innerHTML = pts.slice(0, -1).map((q, i) => `<path d="${seg(q, pts[i + 1])}" class="sp-seg${i + 1 <= done ? ' lit' : ''}"/>`).join('');
+  const nodes = Array.from({ length: total }, (_, i) => {
+    const n = total - i; // DOM từ đỉnh xuống: boss trước, ải 1 sau cùng
     const open = stageOpen(ctx, progress, zoneId, tier, n);
     const clear = n <= done;
     const boss = n === total;
-    const card = h(
-      'div',
-      { class: 'card btn gate stage' + (boss ? ' boss' : '') + (open ? '' : ' locked') + (clear ? ' clear' : ''), 'data-stage': String(n), onclick: () => !heldFlag.v && open && showTeam(undefined, undefined, { zoneId, diff: tier, stage: n }) },
-      h('div', { class: 'snum' }, boss ? '★' : String(n)),
-      h('div', { class: 'info' }, h('div', { class: 'name' }, t(boss ? 'stage.boss' : 'stage.num', { n })), h('small', {}, clear ? t('stage.cleared') : open ? t('stage.next') : t('stage.lockedPrev'))),
+    const q = posOf(n);
+    const face = boss
+      ? h('img', { class: 'sn-art', src: `assets/monsters/${bossId}.webp`, alt: '', draggable: 'false' })
+      : h('span', { class: 'sn-num' }, clear ? '✓' : open ? String(n) : '🔒');
+    const node = h(
+      'button',
+      { class: 'snode' + (boss ? ' boss' : '') + (open ? '' : ' locked') + (clear ? ' clear' : ' ready'.repeat(open ? 1 : 0)), 'data-stage': String(n), style: `left:${q.x}%;top:${q.y}px`, 'aria-label': t(boss ? 'stage.boss' : 'stage.num', { n }), onclick: () => !heldFlag.v && open && showTeam(undefined, undefined, { zoneId, diff: tier, stage: n }) },
+      h('span', { class: 'sn-orb' }, face, boss ? h('b', { class: 'sn-crown' }, '★') : null),
+      h('span', { class: 'sn-label' }, t(boss ? 'stage.boss' : 'stage.num', { n }), h('small', {}, clear ? t('stage.cleared') : open ? t('stage.next') : t('stage.lockedPrev'))),
     );
-    onHold(card, () => showStageInfo(zoneId, tier, n));
-    return card;
+    onHold(node, () => showStageInfo(zoneId, tier, n));
+    return node;
   });
+  const path = h('div', { class: 'stagepath' }, h('div', { class: 'sp-inner', style: `height:${heightPx}px` }, road, nodes));
+  const head = h('div', { class: 'zhead' },
+    h('img', { class: 'zh-emblem', src: `assets/ui/zones/${zoneId}.webp`, alt: '' }),
+    h('div', { class: 'zh-text' }, h('h2', {}, t(`zone.${zoneId}`)), h('small', {}, t('zone.clears', { n: zoneClears(progress, zoneId) }))));
   const gst = ['zone', 'stage', 'team'].includes(guideStep());
   music(zoneTrack('map', zoneId));
-  screen(h('h2', {}, t(`zone.${zoneId}`)), tabs, h('div', { class: 'muted tier-note' }, t('diff.reward', { gold: df.gold, drop: df.drop })), h('div', { class: 'stagelist' }, cards), h('div', { class: 'muted hold-hint' }, t('stage.hold')), btn(t('back'), showZones, '', { id: 'back' }));
+  $('screen').style.setProperty('--zc', zc);
+  $('screen').style.setProperty('--zbg', `url(../assets/bg/${zoneId}.webp)`);
+  screen(head, tabs, h('div', { class: 'muted tier-note' }, t('diff.reward', { gold: df.gold, drop: df.drop })), path, h('div', { class: 'muted hold-hint' }, t('stage.hold')), btn(t('back'), showZones, '', { id: 'back' }));
+  // cuộn tới ải đang chơi (ải kế tiếp), để người chơi luôn thấy nút cần bấm
+  requestAnimationFrame(() => { const sc = $('screen').querySelector('.stagepath'); if (sc) sc.scrollTop = Math.max(0, posOf(Math.min(total, done + 1)).y - sc.clientHeight * 0.55); });
   if (gst) { guideSet('stage'); guidePoint(`#screen [data-stage="${done + 1 > total ? 1 : done + 1}"]`, 'guide.stage'); }
 }
 

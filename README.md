@@ -457,3 +457,7 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 - **Biểu tượng app + màn chờ khi mở:** icon mới cắt từ tranh Tòa Tháp (`icons/icon-192/512`, `apple-touch-icon`, bản `maskable` = tranh thu 82% trên nền mờ cùng màu để launcher cắt tròn không mất tháp). `background_color`/`theme_color` đổi sang nền trời cam của tranh (`#fb9b6f`) nên màn chờ của hệ điều hành (biểu tượng + tên game) hòa với màn tải trong game.
 - **Màn tải trong game dựng lại:** tranh Tòa Tháp toàn màn trôi chậm, logo ở giữa, thanh tiến độ vàng, mẹo xoay vòng và "chạm để vào" ở đáy. Bỏ tháp SVG tím cũ.
 - Lưu ý Android: màn chờ do hệ điều hành vẽ từ manifest, chỉ đổi sau khi WebAPK cập nhật; nếu vẫn thấy icon cũ thì gỡ app rồi cài lại từ trình duyệt.
+
+### v0.63.0
+- **Màn chọn ải dựng lại thành con đường leo tháp:** ải 1 ở đáy, Boss ở đỉnh (ảnh quái boss của vùng trong khung vàng có ★), nút zích-zắc nối bằng đường nét đứt, đoạn đã qua sáng vàng. Ba trạng thái rõ: đã xong (xanh ✓), đang chơi (vàng, nhấp nháy, số ải), khóa (xám 🔒). Vùng đường đi cuộn riêng và tự cuộn tới ải kế tiếp; tiêu đề vùng, 3 tab độ khó, ghi chú thưởng và nút Quay lại luôn nằm cố định. Giữ lâu một nút vẫn xem thông tin ải.
+- Nền mỗi vùng `assets/bg/zone_<hệ>.webp` (6 file): tranh Tòa Tháp đổi tông màu theo hệ, sinh bằng `tools/make-zone-bg.py` (tạm thời; thay file bằng tranh vẽ riêng từng vùng là tự ăn, không cần sửa code).
