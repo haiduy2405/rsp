@@ -527,3 +527,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 ## v0.79.0 — Ngọc thở như nhịp tim
 - Thân ngọc phình/xẹp ±2,5% theo nhịp 100 nhịp/phút (600ms, `BEAT_MS`, `gemBreath` trong `render.js`), mọi viên cùng pha; biểu tượng và ánh sáng đi theo kích thước ngọc. Tôn trọng `prefers-reduced-motion`.
 - Hoàn tác: tag `pre-gembreath-v0.78.0`.
+
+## v0.79.1 — Thở tự nhiên có gia tốc
+- Bỏ nhịp 100/phút. Ngọc thở chu kỳ 3,4s: hít (ease in-out) → nghỉ thoáng → thở ra dài hơn → nghỉ (`breathCurve`, `BREATH_MS` trong `render.js`), biên độ ±3%. Biểu tượng thở cùng đường cong. Hoàn tác: tag `pre-breathcurve-v0.79.0`.
