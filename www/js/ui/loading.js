@@ -29,7 +29,7 @@ export function createLoading({ t, title, subtitle, version = '', auto = false }
   const h1 = document.createElement('h1');
   h1.textContent = title;
   // Tên game: chữ vàng gold 3D, có ánh đèn quét ngang (CSS .gold3d)
-  goldTitle(h1, title);
+  goldTitle(h1, title, subtitle);
   const sub = document.createElement('div');
   sub.className = 'ld-sub';
   sub.textContent = subtitle;
@@ -39,7 +39,7 @@ export function createLoading({ t, title, subtitle, version = '', auto = false }
   const top = document.createElement('div');
   top.className = 'ld-top';
   top.append(h1);
-  box.append(...(subtitle && subtitle !== title ? [sub] : []), track, pct, tip, tap);
+  box.append(track, pct, tip, tap);
   el.append(top, box);
   if (version) {
     const ver = document.createElement('div');

@@ -1623,7 +1623,7 @@ try {
 }
 document.title = t('game.title');
 document.documentElement.lang = lang;
-const loading = createLoading({ t, title: t('game.title'), subtitle: 'Rift Spire: Pantheon', version: `v${VERSION} · build ${BUILD}`, auto: DEBUG });
+const loading = createLoading({ t, title: t('game.title'), subtitle: t('game.subtitle'), version: `v${VERSION} · build ${BUILD}`, auto: DEBUG });
 screen(loading.el);
 const bootStart = performance.now();
 await preloadAssets((d, n) => loading.setProgress(n ? (d / n) * 0.95 : 0));

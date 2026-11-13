@@ -552,16 +552,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
-## v0.84.0 — Tên game chữ hộp 3D vàng lấp lánh
-- Theo phác thảo của Duy (chữ khối vuông, graffiti hộp): một hàng, font **Bungee** (OFL, có tiếng Việt) làm chữ hộp; độ dày 6 lớp vàng tối dần, mặt trước gradient vàng gold, đèn quét ngang chỉ ở mặt trước, viền neon xanh băng (#9DF1FF) + quầng sáng ở đáy chữ, 8 ngôi sao lấp lánh nhấp nháy. Helper `goldTitle` (`www/js/ui/title.js`) tự co cỡ chữ để luôn vừa một hàng. Dùng ở màn tải + onboarding.
-- Hoàn tác: tag `pre-box-title-v0.83.0`.
-
-## v0.85.0 — Tên game vẽ theo phác thảo (chữ hộp béo graffiti)
-- "THIÊN THÁP DỊ ĐIỂM" dựng bằng SVG (`www/js/ui/title-svg.js`), từng chữ vẽ tay theo phác thảo: khối béo, T tràn trái, H/N có nét vươn lên, mỗi chữ lệch cao/nghiêng/cỡ khác nhau, dấu mũ/sắc/hỏi là mảnh rời nổi phía trên, Ị có chấm dưới, Đ có gạch ngang.
-- Hộp 3D (8 lớp vàng tối dần), mặt trước gradient vàng, đèn quét ngang chỉ trên mặt trước (mask theo chữ), viền neon xanh băng ở đáy chữ, sao lấp lánh.
-- Chỉ áp cho tên tiếng Việt; tiếng Anh vẫn dùng chữ Bungee (`goldTitle` trong `title.js`). Hoàn tác: tag `pre-sketch-title-v0.84.0`.
-
-## v0.86.0 — Tên game phong cách luxury graffiti + kim cương trang trí
-- Tên game (SVG, `title-svg.js`): mặt vàng gradient có vết nứt + hoa văn chạm xoắn, khối đen dày có vành vàng, giọt vàng chảy (nhấp nhô) và giọt đen, vương miện vàng ngọc trai phía trên, mực đen bắn quanh, đèn quét ngang mặt trước, viền neon xanh băng mảnh ở đáy, sao lấp lánh.
-- Dưới tên có 5 viên kim cương vàng to nhỏ xen kẽ (`assets/ui/diamond.webp`, tách nền đen từ ảnh Duy cấp), lơ lửng nhấp nhô và tỏa sáng (`.gt-gems`).
-- Hoàn tác: tag `pre-luxury-title-v0.85.0`.
+## v0.87.0 — Logo tên game thiết kế lại, đồng bộ phong cách game
+- Bỏ các thử nghiệm graffiti/hộp/luxury (v0.82–v0.86). Logo mới (`goldTitle` trong `www/js/ui/title.js`, CSS `.lg*`): tên chính chữ serif Fraunces đậm, vàng-kem gradient, viền nâu đậm, khối 3D nâu nhẹ, đèn quét ngang; ruy băng nâu đất viền vàng có đuôi nhạn cho tên còn lại (giống dải băng tranh logo gốc); hàng 6 ngọc hệ của game lơ lửng nhẹ bên dưới.
+- Hai ngôn ngữ: tên chính theo ngôn ngữ đang chọn, ruy băng là tên ngôn ngữ kia (key i18n mới `game.subtitle`). Áp ở màn tải và màn giới thiệu.
+- Đã xóa font Bungee/Sedgwick và `diamond.webp`. Hoàn tác: tag `pre-logo-redesign-v0.86.0`.

@@ -1129,27 +1129,6 @@ button.primary::after { content: ''; position: absolute; top: 0; bottom: 0; widt
 @media (prefers-reduced-motion: reduce) { button.primary, button.primary::after, .tile.r5, .fan-card.r5 { animation: none; } }
 
 
-/* ===== v0.84: tên game chữ HỘP 3D vàng gold lấp lánh, một hàng; đèn quét ở mặt trước; viền neon ở đáy chữ ===== */
-.gt3d { position: relative; display: inline-block; margin: 0; white-space: nowrap; font-family: 'Bungee', 'Be Vietnam Pro', sans-serif; font-weight: 400; text-transform: none; letter-spacing: .02em; line-height: 1.25; text-align: center; font-size: 28px; color: #8a5a10;
-  /* độ dày hộp: các lớp vàng tối dần xuống-phải; lớp cuối là viền neon xanh băng ở đáy chữ kèm quầng sáng */
-  text-shadow: 1px 1px 0 #b27a14, 2px 2px 0 #a16d10, 3px 3px 0 #90600d, 4px 4px 0 #80540b, 5px 5px 0 #704809, 6px 6px 0 #5f3d07,
-    6px 8px 0 #9DF1FF, 6px 8px 3px #3fe6ff, 4px 11px 10px rgba(61, 230, 255, .85), 0 14px 18px rgba(30, 190, 230, .45); }
-.gt3d::before { content: attr(data-t); position: absolute; inset: 0; pointer-events: none; font: inherit; letter-spacing: inherit; line-height: inherit; white-space: nowrap; color: transparent; text-shadow: none;
-  background: linear-gradient(180deg, #fffbe2 0%, #ffe486 22%, #ffc531 46%, #d9941a 54%, #f6c545 76%, #ffe27a 100%); -webkit-background-clip: text; background-clip: text;
-  filter: drop-shadow(0 0 1px rgba(60, 30, 4, .9)); }
-.gt3d::after { content: attr(data-t); position: absolute; inset: 0; pointer-events: none; font: inherit; letter-spacing: inherit; line-height: inherit; white-space: nowrap; color: transparent; text-shadow: none;
-  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .95) 49%, rgba(255, 255, 255, .8) 52%, transparent 62%) no-repeat; background-size: 260% 100%; background-position: 125% 0;
-  -webkit-background-clip: text; background-clip: text; animation: goldSweep 3.4s ease-in-out infinite; }
-@keyframes goldSweep { 0% { background-position: 125% 0; } 55%, 100% { background-position: -25% 0; } }
-.gt3d .spk { position: absolute; width: 11px; height: 11px; margin: -5px 0 0 -5px; pointer-events: none; background: #fff; opacity: 0; z-index: 2;
-  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); filter: drop-shadow(0 0 3px #fff7c0); animation: twinkle 2.6s ease-in-out infinite; }
-@keyframes twinkle { 0%, 70%, 100% { opacity: 0; transform: scale(.3) rotate(0); } 82% { opacity: 1; transform: scale(1.15) rotate(25deg); } }
-.loading h1.gt3d, .ob-story h1.gt3d { text-shadow: 1px 1px 0 #b27a14, 2px 2px 0 #a16d10, 3px 3px 0 #90600d, 4px 4px 0 #80540b, 5px 5px 0 #704809, 6px 6px 0 #5f3d07, 6px 8px 0 #9DF1FF, 6px 8px 3px #3fe6ff, 4px 11px 10px rgba(61, 230, 255, .85), 0 14px 18px rgba(30, 190, 230, .45); font-family: 'Bungee', sans-serif; color: #8a5a10; }
-.ob-story h1.gt3d { margin: 6px 0 14px; }
-/* phụ đề cũng vàng gold iron */
-.loading .ld-sub { font-family: 'Sedgwick Ave Display', 'Fraunces', serif; font-size: 20px; letter-spacing: .06em; color: transparent; background: linear-gradient(180deg, #f1e3ad 0%, #d6b449 35%, #a58223 55%, #5c4513 62%, #b4912e 85%, #dfc366 100%); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(1px 0 0 #2b2008) drop-shadow(-1px 0 0 #2b2008) drop-shadow(0 1px 0 #3a2c0c) drop-shadow(0 2px 2px rgba(0, 0, 0, .35)); }
-@media (prefers-reduced-motion: reduce) { .gt3d::after, .gt3d .spk { animation: none; opacity: 0; } }
-
 /* ===== v0.80: băng xanh #9DF1FF -> trắng, chỉ điểm xuyết ===== */
 .loading .ld-track i { background: linear-gradient(90deg, var(--ice), var(--ice-2)); }
 button:focus-visible { outline: 2px solid var(--ice); outline-offset: 2px; }
@@ -1172,19 +1151,25 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .tile::before, .slot::before { content: ''; position: absolute; inset: -4px; pointer-events: none; z-index: 3;
   background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'><g transform='' fill='none' stroke-linecap='round'><path d='M1 3Q8 0 11 1M3 1Q0 8 1 11' stroke='%23f3c64e' stroke-width='1.8'/><path d='M4 4C9 4 11 8 8 10S4 9 5.5 7' stroke='%236b410a' stroke-width='2.8'/><path d='M4 4C9 4 11 8 8 10S4 9 5.5 7' stroke='%23f3c64e' stroke-width='1.4'/><circle cx='6' cy='7' r='1' fill='%23fff0a8' stroke='none'/></g></svg>") 0 0 / 18px 18px no-repeat, url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'><g transform='translate(20 0) scale(-1 1)' fill='none' stroke-linecap='round'><path d='M1 3Q8 0 11 1M3 1Q0 8 1 11' stroke='%23f3c64e' stroke-width='1.8'/><path d='M4 4C9 4 11 8 8 10S4 9 5.5 7' stroke='%236b410a' stroke-width='2.8'/><path d='M4 4C9 4 11 8 8 10S4 9 5.5 7' stroke='%23f3c64e' stroke-width='1.4'/><circle cx='6' cy='7' r='1' fill='%23fff0a8' stroke='none'/></g></svg>") 100% 0 / 18px 18px no-repeat, url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'><g transform='translate(0 20) scale(1 -1)' fill='none' stroke-linecap='round'><path d='M1 3Q8 0 11 1M3 1Q0 8 1 11' stroke='%23f3c64e' stroke-width='1.8'/><path d='M4 4C9 4 11 8 8 10S4 9 5.5 7' stroke='%236b410a' stroke-width='2.8'/><path d='M4 4C9 4 11 8 8 10S4 9 5.5 7' stroke='%23f3c64e' stroke-width='1.4'/><circle cx='6' cy='7' r='1' fill='%23fff0a8' stroke='none'/></g></svg>") 0 100% / 18px 18px no-repeat, url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'><g transform='translate(20 20) scale(-1 -1)' fill='none' stroke-linecap='round'><path d='M1 3Q8 0 11 1M3 1Q0 8 1 11' stroke='%23f3c64e' stroke-width='1.8'/><path d='M4 4C9 4 11 8 8 10S4 9 5.5 7' stroke='%236b410a' stroke-width='2.8'/><path d='M4 4C9 4 11 8 8 10S4 9 5.5 7' stroke='%23f3c64e' stroke-width='1.4'/><circle cx='6' cy='7' r='1' fill='%23fff0a8' stroke='none'/></g></svg>") 100% 100% / 18px 18px no-repeat; filter: drop-shadow(0 1px 1px rgba(0,0,0,.6)); }
 
-/* ===== v0.85: tên game vẽ tay theo phác thảo (SVG) ===== */
-.gt-sketch { display: block; margin: 0 auto; width: min(94%, 420px); }
-.gt-svg { display: block; width: 100%; height: auto; overflow: visible; }
-.gt-svg .sweep { animation: gtSweep 3.6s ease-in-out infinite; }
-@keyframes gtSweep { 0% { transform: skewX(-18deg) translateX(0); } 55%, 100% { transform: skewX(-18deg) translateX(1900px); } }
-.gt-svg .spk { fill: #fff; opacity: 0; transform-box: fill-box; transform-origin: center; filter: drop-shadow(0 0 3px #fff7c0); animation: gtTwinkle 2.6s ease-in-out infinite; }
-@keyframes gtTwinkle { 0%, 70%, 100% { opacity: 0; transform: scale(.3); } 82% { opacity: 1; transform: scale(1.1) rotate(20deg); } }
-@media (prefers-reduced-motion: reduce) { .gt-svg .sweep, .gt-svg .spk { animation: none; opacity: 0; } }
-
-/* ===== v0.86: phong cách luxury graffiti: giọt chảy, kim cương trang trí ===== */
-.gt-svg .drip { transform-box: fill-box; transform-origin: top; animation: gtDrip 5s ease-in-out infinite; }
-@keyframes gtDrip { 0%, 100% { transform: scaleY(.82); } 50% { transform: scaleY(1.08); } }
-.gt-gems { display: flex; align-items: flex-end; justify-content: center; gap: 6px; margin-top: 4px; }
-.gt-gems img { height: auto; filter: drop-shadow(0 0 7px rgba(255, 190, 60, .85)) drop-shadow(0 3px 3px rgba(0, 0, 0, .5)); animation: gemBob 3.2s ease-in-out infinite; }
-@keyframes gemBob { 0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 6px rgba(255, 190, 60, .7)) drop-shadow(0 3px 3px rgba(0, 0, 0, .5)); } 50% { transform: translateY(-5px) scale(1.04); filter: drop-shadow(0 0 13px rgba(255, 225, 120, 1)) drop-shadow(0 3px 3px rgba(0, 0, 0, .5)); } }
-@media (prefers-reduced-motion: reduce) { .gt-svg .drip, .gt-gems img { animation: none; } }
+/* ===== v0.87: logo tên game (thiết kế lại, đồng bộ phong cách game) ===== */
+.lg { display: block; margin: 0 auto; width: min(94%, 420px); text-align: center; text-shadow: none; }
+.lg-main { position: relative; display: inline-block; white-space: nowrap; font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif; font-weight: 900; text-transform: uppercase; letter-spacing: .03em; line-height: 1.15; font-size: 32px; color: #3a2010;
+  /* viền nâu đậm quanh chữ + khối 3D nâu dày 5 lớp + bóng mềm */
+  text-shadow: 2px 0 0 #2a1408, -2px 0 0 #2a1408, 0 -2px 0 #2a1408, 1.5px 1.5px 0 #2a1408, -1.5px -1.5px 0 #2a1408, 1.5px -1.5px 0 #2a1408, -1.5px 1.5px 0 #2a1408,
+    0 3px 0 #6a3a12, 0 4px 0 #5a3010, 0 5px 0 #4a260d, 0 6px 0 #3a1e0a, 0 7px 0 #2a1408, 0 12px 12px rgba(20, 8, 2, .55); }
+.lg-main::before, .lg-main::after { content: attr(data-t); position: absolute; inset: 0; pointer-events: none; font: inherit; letter-spacing: inherit; line-height: inherit; white-space: nowrap; color: transparent; text-shadow: none; }
+.lg-main::before { background: linear-gradient(180deg, #fffbe6 0%, #ffe9a0 26%, #ffd05a 48%, #e49a24 58%, #f4c24c 80%, #ffe08a 100%); -webkit-background-clip: text; background-clip: text; }
+.lg-main::after { background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .95) 49%, rgba(255, 255, 255, .8) 52%, transparent 62%) no-repeat; background-size: 260% 100%; background-position: 125% 0; -webkit-background-clip: text; background-clip: text; animation: lgSweep 3.6s ease-in-out infinite; }
+@keyframes lgSweep { 0% { background-position: 125% 0; } 55%, 100% { background-position: -25% 0; } }
+/* ruy băng phụ đề: nâu đất viền vàng, đuôi nhạn hai đầu, giống dải băng của tranh logo gốc */
+.lg-ribbon { position: relative; display: inline-block; margin: 14px 18px 0; padding: 4px 26px; background: linear-gradient(180deg, #a2502a, #7a3417); border-top: 2px solid #f3c64e; border-bottom: 2px solid #c58a24; box-shadow: 0 4px 8px rgba(20, 8, 2, .45); }
+.lg-ribbon::before, .lg-ribbon::after { content: ''; position: absolute; top: 6px; width: 20px; height: 100%; background: linear-gradient(180deg, #7a3417, #5a230e); z-index: -1; border-top: 2px solid #c58a24; border-bottom: 2px solid #9a6a1c; }
+.lg-ribbon::before { left: -16px; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 30% 50%); }
+.lg-ribbon::after { right: -16px; clip-path: polygon(0 0, 100% 0, 70% 50%, 100% 100%, 0 100%); }
+.lg-ribbon span { display: block; font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif; font-weight: 800; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: #fff1c9; text-shadow: 0 1px 0 #3a1608, 0 0 6px rgba(255, 220, 140, .35); white-space: nowrap; }
+/* hàng ngọc 6 hệ: nối logo với lối chơi chính */
+.lg-gems { display: flex; justify-content: center; align-items: flex-end; gap: 5px; margin-top: 12px; }
+.lg-gems img { width: 24px; height: 24px; filter: drop-shadow(0 3px 3px rgba(20, 8, 2, .55)); animation: lgBob 2.8s ease-in-out infinite; }
+@keyframes lgBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .lg-main::after { animation: none; opacity: 0; } .lg-gems img { animation: none; } }
+.loading .lg { margin-bottom: 4px; }
