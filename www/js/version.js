@@ -1,4 +1,4 @@
 // Tự sinh bởi tools/stamp-version.js, đừng sửa tay.
-export const VERSION = '0.63.0';
-export const BUILD = 128;
+export const VERSION = '0.64.0';
+export const BUILD = 129;
 export const BUILD_DATE = '2026-11-13';

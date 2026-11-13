@@ -461,3 +461,6 @@ Bảng màu mực/xương/đỏ con dấu: đỏ chỉ cho hành động chính 
 ### v0.63.0
 - **Màn chọn ải dựng lại thành con đường leo tháp:** ải 1 ở đáy, Boss ở đỉnh (ảnh quái boss của vùng trong khung vàng có ★), nút zích-zắc nối bằng đường nét đứt, đoạn đã qua sáng vàng. Ba trạng thái rõ: đã xong (xanh ✓), đang chơi (vàng, nhấp nháy, số ải), khóa (xám 🔒). Vùng đường đi cuộn riêng và tự cuộn tới ải kế tiếp; tiêu đề vùng, 3 tab độ khó, ghi chú thưởng và nút Quay lại luôn nằm cố định. Giữ lâu một nút vẫn xem thông tin ải.
 - Nền mỗi vùng `assets/bg/zone_<hệ>.webp` (6 file): tranh Tòa Tháp đổi tông màu theo hệ, sinh bằng `tools/make-zone-bg.py` (tạm thời; thay file bằng tranh vẽ riêng từng vùng là tự ăn, không cần sửa code).
+
+## v0.64.0 — Tranh nền 6 vùng (AI)
+Tranh nền màn chọn ải mỗi vùng (thủy/hỏa/mộc/quang/ám/tâm) vẽ bằng ChatGPT, thay bản gradient tạm. Nhập bằng `tools/art-import-zone.py`; ô vuông ở trên, phần dưới kéo dài bằng mây mờ cho UI.
