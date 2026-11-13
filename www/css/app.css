@@ -1172,7 +1172,16 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 .lg-gems img { width: 24px; height: 24px; filter: drop-shadow(0 3px 3px rgba(20, 8, 2, .55)); animation: lgBob 2.8s ease-in-out infinite; }
 @keyframes lgBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 @media (prefers-reduced-motion: reduce) { .lg-main::after { animation: none; opacity: 0; } .lg-gems img { animation: none; } }
-.loading .lg { margin-bottom: 4px; }
+.loading .lg { margin: 0 auto 4px; }
 .card.kw { display: flex; align-items: center; gap: 12px; text-align: left; }
 .kw-ico { width: 40px; height: 40px; flex: none; object-fit: contain; }
 .kw-tx { min-width: 0; flex: 1; }
+
+/* v0.88: tên chính 2 dòng to, tên phụ cùng kiểu vàng nhỏ hơn, ngăn cách bằng vạch vàng + ngọc */
+.lg-name { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+.lg-name .lg-main { line-height: 1.12; letter-spacing: .02em; }
+.lg-main.small { letter-spacing: .08em; }
+.lg-div { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 12px auto 6px; width: 70%; }
+.lg-div i { flex: 1; height: 2px; background: linear-gradient(90deg, transparent, #c58a24 55%, #7a3f12); border-radius: 2px; }
+.lg-div i:last-child { transform: scaleX(-1); }
+.lg-div b { width: 9px; height: 9px; background: linear-gradient(135deg, #fff1c9, #e49a24); transform: rotate(45deg); box-shadow: 0 0 0 1.5px #2a1408, 0 0 8px rgba(255, 215, 120, .7); }

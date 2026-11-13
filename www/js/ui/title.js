@@ -3,18 +3,28 @@
 export function goldTitle(el, main, sub) {
   el.classList.add('lg');
   el.textContent = '';
-  const m = document.createElement('div');
-  m.className = 'lg-main';
-  m.dataset.t = main;
-  m.textContent = main;
-  el.append(m);
+  // Tên chính tách 2 dòng cân nhau; tên phụ (ngôn ngữ còn lại) cùng kiểu chữ vàng, nhỏ hơn, để nhìn là một cặp tên.
+  const split = (str) => {
+    const w = str.split(' ');
+    if (w.length < 2) return [str];
+    let best = 1, d = 1e9;
+    for (let i = 1; i < w.length; i++) { const x = Math.abs(w.slice(0, i).join(' ').length - w.slice(i).join(' ').length); if (x < d) { d = x; best = i; } }
+    return [w.slice(0, best).join(' '), w.slice(best).join(' ')];
+  };
+  const mk = (txt, cls) => { const m = document.createElement('div'); m.className = `lg-main ${cls}`; m.dataset.t = txt; m.textContent = txt; return m; };
+  const mains = split(main).map((x) => mk(x, 'big'));
+  const wrap = document.createElement('div');
+  wrap.className = 'lg-name';
+  wrap.append(...mains);
+  el.append(wrap);
+  let subEl = null;
   if (sub) {
-    const r = document.createElement('div');
-    r.className = 'lg-ribbon';
-    const s = document.createElement('span');
-    s.textContent = sub;
-    r.append(s);
-    el.append(r);
+    const d = document.createElement('div');
+    d.className = 'lg-div';
+    d.innerHTML = '<i></i><b></b><i></i>';
+    el.append(d);
+    subEl = mk(sub, 'small');
+    el.append(subEl);
   }
   const gems = document.createElement('div');
   gems.className = 'lg-gems';
@@ -30,12 +40,20 @@ export function goldTitle(el, main, sub) {
   const fit = () => {
     const box = el.parentElement;
     if (!box) return;
-    const avail = Math.min(box.clientWidth || 340, 420) * 0.92;
-    m.style.fontSize = '40px';
-    const w = m.scrollWidth || 1;
-    m.style.fontSize = `${Math.max(16, Math.min(40, (40 * avail) / w))}px`;
+    const avail = Math.min(box.clientWidth || 340, 420) * 0.9;
+    const size = (nodes, max) => {
+      let k = max;
+      nodes.forEach((n) => { n.style.fontSize = '40px'; k = Math.min(k, (40 * avail) / (n.scrollWidth || 1)); });
+      nodes.forEach((n) => { n.style.fontSize = `${Math.max(14, k)}px`; });
+      const over = Math.max(...nodes.map((n) => n.scrollWidth)) / avail; // đo lại sau khi đặt cỡ (font có thể vừa tải xong)
+      if (over > 1) nodes.forEach((n) => { n.style.fontSize = `${Math.max(14, k / over)}px`; });
+    };
+    size(mains, 66);
+    if (subEl) size([subEl], 30);
   };
   requestAnimationFrame(fit);
   document.fonts?.ready.then(fit);
+  document.fonts?.load?.("900 40px Fraunces").then(fit).catch(() => {});
+  setTimeout(fit, 600);
   window.addEventListener('resize', fit);
 }

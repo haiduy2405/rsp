@@ -552,6 +552,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Ô tướng ở màn chọn đội (`.tile`) có volute vàng ở 4 góc (SVG data-URI trong CSS).
 - Chưa áp: các ô đội hình ở hàng trên màn chọn đội (`.slot`). Hoàn tác: tag `pre-renfr-v0.82.0`.
 
+## v0.88.0
+- Logo: tên chính to, tách 2 dòng; tên phụ (ngôn ngữ còn lại) cùng kiểu chữ vàng 3D nhỏ hơn, ngăn cách bằng vạch vàng + viên kim cương; bỏ ruy băng. Sửa lệch tâm do `.loading h1 {margin:0}`. Tag lùi: `pre-title-v0.87.1`.
+
 ## v0.87.1
 - Màn chính: dời nền xuống 40 đơn vị, đặt lại 6 ngọc ải lên đúng các đảo nổi + vách đá, không còn bị HUD/tháp che. Tag lùi: `pre-hub-layout-v0.87.0`.
 - Bảng Từ khóa hiệu ứng: dùng icon thay cho chữ lặp (Bỏng Bỏng).
