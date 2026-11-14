@@ -813,3 +813,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.112.0
 - Đội hình làm lại: tab đội dạng thanh trượt, ô tướng viền theo màu hệ (đội trưởng viền vàng + ♛), nút Tự lập đội nổi bật, thông tin đội trưởng và Duo thành hai hàng gọn (Duo kích hoạt có chip xanh), lời gợi ý một dòng, kho tướng 5 cột bỏ khung vàng quét (nhẹ hơn khi cuộn). Giữ nguyên hành vi và id. Tag cục bộ `pre-teamui-v0.111.0`.
+
+## v0.112.1
+- Sửa nhãn dock màn chính dính nhau: chữ 10px, nhích lệch hai bên.

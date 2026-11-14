@@ -1868,3 +1868,8 @@ canvas#cv { visibility: hidden; }
 .roster .tile.in { filter: saturate(.75); }
 .roster .tile.in > div:first-child { opacity: .5; }
 @media (prefers-reduced-motion: reduce) { .tm-duo.on .tm-ico { animation: none; } }
+.dock button[data-lbl]::after { font-size: 10px; letter-spacing: 0; max-width: none; }
+#b-shop[data-lbl]::after { translate: -56% 0; }
+#b-quest[data-lbl]::after { translate: -44% 0; }
+#b-team[data-lbl]::after { translate: -54% 0; }
+#b-summon[data-lbl]::after { translate: -46% 0; }
