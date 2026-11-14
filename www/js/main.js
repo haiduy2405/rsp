@@ -140,6 +140,14 @@ const guideSet = (step) => { if (step) progress.onboarding.guide = step; else de
 const guidePoint = (target, key, delay) => guide.point(target, t(key), delay);
 let sceneTrack = null; // bài nhạc cho màn sắp dựng (đặt NGAY TRƯỚC screen(...); gọi lại cùng màn thì nhạc không bị khởi động lại)
 const music = (name) => { sceneTrack = name; };
+// Canvas trận chỉ hiện khi đang đánh: ẩn ở mọi màn khác để khi chuyển cảnh không thoáng thấy bàn ngọc cũ.
+function showBattleCanvas(on) {
+  const c = $('cv');
+  if (!c) return;
+  if (!on) c.getContext('2d')?.clearRect(0, 0, c.width, c.height);
+  c.style.visibility = on ? 'visible' : 'hidden';
+  $('wrap')?.classList.toggle('inbattle', on);
+}
 const screen = (...kids) => {
   $('info')?.remove();
   $('coach')?.remove(); // lớp chỉ dẫn tutorial còn sót (vd thoát giữa chừng) sẽ chặn chạm ở mọi màn
@@ -155,6 +163,7 @@ const screen = (...kids) => {
   $('screen').style.backgroundImage = '';
   game?.destroy();
   game = null;
+  showBattleCanvas(false);
   const el = $('screen');
   const list = kids.flat().filter(Boolean);
   el.replaceChildren(...list);
@@ -1281,7 +1290,7 @@ function startTutorial(retry = false) {
   $('screen').classList.remove('show');
   game?.destroy();
   game = startGame({
-    canvas: $('cv'),
+    canvas: ($('cv').style.visibility = 'visible', $('wrap').classList.add('inbattle'), $('cv')),
     ctx,
     t,
     state: st0,
@@ -1322,7 +1331,7 @@ function startBattleUI() {
   $('screen').classList.remove('show');
   game?.destroy();
   game = startGame({
-    canvas: $('cv'),
+    canvas: ($('cv').style.visibility = 'visible', $('wrap').classList.add('inbattle'), $('cv')),
     ctx,
     t,
     state: run.battle,

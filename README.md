@@ -782,3 +782,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - AOE (nhóm 5 ngọc): các đòn của cùng một tướng vào nhiều quái bắn CÙNG LÚC (trước đây lần lượt từng con), kèm sóng màu hệ quét ngang hàng quái, tia sáng, rung, âm thanh; quả cầu AOE to hơn. Tướng khác nhau vẫn lệch nhịp.
 - Phần thừa trên/dưới màn trận (điện thoại dài hơn 9:16) dùng nền trận mờ thay vì xanh trơn.
 - Rollback: tags local `pre-aoe-v0.106.5`, `pre-letterbox-v0.107.0`.
+
+## v0.107.1
+- Chuyển cảnh mượt hơn: canvas bàn ngọc bị ẩn+xóa ở mọi màn ngoài trận (trước đây lộ mờ qua lúc màn mới fade-in, gây nháy "bàn ngọc"); nền mờ trận chỉ hiện trong trận; hiệu ứng vào màn bắt đầu từ độ mờ .55 thay vì 0 để không lóe nền.
+- Rollback: tag local `pre-trans-v0.107.0`.
