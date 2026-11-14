@@ -22,7 +22,7 @@ import { createT, detectLang } from './i18n/index.js';
 import { startGame } from './ui/game.js';
 import { preloadAssets, getImg } from './ui/assets.js';
 import { createLoading } from './ui/loading.js';
-import { hubSky, ZONE_POS } from './ui/hub-art.js';
+import { hubLayers, fitScene, ZONE_POS } from './ui/hub-art.js';
 import { createHeroUI, COLORS } from './ui/hero-ui.js';
 import { drawOrb } from './ui/render.js';
 import { resolveKit, maxSkillLevel, SKILL_KINDS, formOf } from './core/kit.js';
@@ -253,19 +253,17 @@ const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } 
 function hubScene() {
   const zones = ctx.zoneList;
   const pos = ZONE_POS; // đảo khu vực đối xứng hai bên Tháp (ui/hub-art.js)
-  const NS = 'http://www.w3.org/2000/svg';
   const orbs = zones.map((z, i) => {
     const [x, y] = pos[i % pos.length];
     const open = progress.unlocked.includes(z.id);
     const col = COLORS[z.element];
     const S = open ? 88 : 80;
-    const lock = open ? '' : `<g transform="translate(${x - 9} ${y - 8})"><rect x="0" y="7" width="18" height="13" rx="3" fill="#2b66aa" stroke="#fff8e6" stroke-width="1.8"/><path d="M4 7V4.5a5 5 0 0 1 10 0V7" fill="none" stroke="#fff8e6" stroke-width="2"/></g>`;
-    return `<g class="zorb${open ? ' open' : ''}" ${open ? `data-zone="${z.id}" role="button" tabindex="0" aria-label="${t(`zone.${z.id}`)}"` : ''} style="animation-delay:${(i * 0.7).toFixed(1)}s;--c:${col}">${open ? `<ellipse cx="${x}" cy="${y + S * 0.34}" rx="${S * 0.46}" ry="${S * 0.12}" fill="${col}" opacity=".35" class="halo"/>` : ''}<image href="assets/ui/zones/${z.id}.webp" x="${x - S / 2}" y="${y - S / 2}" width="${S}" height="${S}" ${open ? '' : 'filter="url(#zlock)" opacity=".7"'}/>${lock}</g>`;
+    const lock = open ? '' : '<svg class="zlockico" viewBox="0 0 18 20" aria-hidden="true"><rect x="0" y="7" width="18" height="13" rx="3" fill="#2b66aa" stroke="#fff8e6" stroke-width="1.8"/><path d="M4 7V4.5a5 5 0 0 1 10 0V7" fill="none" stroke="#fff8e6" stroke-width="2"/></svg>';
+    return `<div class="sp zorb${open ? ' open' : ''}" ${open ? `data-zone="${z.id}" role="button" tabindex="0" aria-label="${t(`zone.${z.id}`)}"` : ''} style="--x:${x};--y:${y};--w:${S};--h:${S};--c:${col};animation-delay:${(i * 0.7).toFixed(1)}s">${open ? '<i class="halo"></i>' : ''}<img src="assets/ui/zones/${z.id}.webp" alt=""${open ? '' : ' class="locked"'}>${lock}</div>`;
   }).join('');
-  const svg = `<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="${NS}" aria-hidden="true">${hubSky()}${orbs}</svg>`;
   const box = h('div', { class: 'hub-scene' + (DEBUG ? ' static' : '') });
-  box.innerHTML = svg;
-  if (!DEBUG) for (let i = 0; i < 12; i++) box.appendChild(h('i', { class: 'spark', style: `left:${(i * 37 + 11) % 92 + 3}%;top:${(i * 53 + 17) % 62 + 8}%;animation-delay:${(i * 0.83).toFixed(2)}s;animation-duration:${(5 + (i % 4)).toFixed(0)}s` })); // đom đóm bay quanh Tháp
+  box.innerHTML = hubLayers('0 0 400 800') + orbs;
+  fitScene(box, '0 0 400 800');
   box.querySelectorAll('[data-zone]').forEach((n) => {
     const go = () => showStages(n.getAttribute('data-zone'));
     n.addEventListener('click', go);
@@ -1823,6 +1821,7 @@ if ('serviceWorker' in navigator && !DEBUG && location.protocol.startsWith('http
 if (DEBUG) {
   window.__showSkillAsk = (i, f, d, du) => showSkillAsk(i, f, d, du);
   window.__ctx = ctx;
+  window.__showHub = () => showHub();
   window.__ui = ui;
   window.__showUpdate = () => { updateReady = true; showUpdatePill(); };
   window.__showTeam = (...a) => showTeam(...a);

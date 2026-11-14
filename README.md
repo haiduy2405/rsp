@@ -798,3 +798,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.108.1
 - Ép cập nhật: `checkVersion()` tải `js/version.js` (no-store) mỗi 2 phút/khi mở lại/3s sau khởi động; khác BUILD → hộp thoại chặn `#upd-force` (ngoài trận), trong trận chỉ nút nhỏ rồi ép khi thoát trận. Không còn phụ thuộc `controllerchange`.
+
+## v0.108.2
+- Hub hết giật: cảnh tách thành lớp SVG tĩnh + lớp opacity (cửa sổ, quầng sáng) + sprite HTML (mây, đảo, ngọc khu, tinh thể, cờ) animate bằng `transform` trên GPU. Trước đó animate phần tử SVG nên Chrome vẽ lại cả cảnh mỗi khung, và `transform` CSS đè thuộc tính `transform` của mây/đảo làm chúng nhảy. `fitScene()` tính hệ toạ độ slice cho sprite. Tag cục bộ `pre-hubanim-v0.108.1`.

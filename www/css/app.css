@@ -223,22 +223,32 @@ button.primary:not(.cont-hidden).pulse, #continue:not(.cont-hidden) { animation:
 #screen.hub > * { max-width: none; }
 .hub-scene { position: absolute; inset: 0; z-index: 0; }
 .hub-scene svg { width: 100%; height: 100%; display: block; }
-.hub-scene .zorb { cursor: default; transform-box: fill-box; transform-origin: center; animation: bob 4.6s ease-in-out infinite; }
-.hub-scene .zorb.open { cursor: pointer; }
-.hub-scene .zorb.open .halo { animation: halo 2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-.hub-scene .isl { animation: bob 5.2s ease-in-out infinite; }
-.hub-scene .isl.main { animation: none; }
-.hub-scene .crystal { animation: crystal 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-.hub-scene .breathe { animation: halo 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-.hub-scene .beam { animation: halo 3.2s ease-in-out infinite; }
-.hub-scene .win { animation: twinkle 3.4s ease-in-out infinite; }
+.hub-scene { --u: 1px; --ox: 0px; --oy: 0px; overflow: hidden; }
+.hub-scene .lay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hub-scene .sp { position: absolute; left: calc(var(--ox) + var(--x) * var(--u)); top: calc(var(--oy) + var(--y) * var(--u)); width: calc(var(--w) * var(--u)); height: calc(var(--h) * var(--u)); translate: -50% -50%; pointer-events: none; will-change: transform; }
+.hub-scene .sp svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.hub-scene .zorb { animation: bob 4.6s ease-in-out infinite; }
+.hub-scene .zorb img { position: relative; width: 100%; height: 100%; display: block; }
+.hub-scene .zorb img.locked { filter: saturate(.15); opacity: .7; }
+.hub-scene .zorb.open { cursor: pointer; pointer-events: auto; }
+.hub-scene .zorb .halo { position: absolute; left: 4%; width: 92%; top: 72%; height: 24%; border-radius: 50%; background: var(--c); opacity: .35; animation: halo 2s ease-in-out infinite; }
+.hub-scene .sp svg.zlockico { position: absolute; left: 50%; top: 50%; width: 22%; translate: -50% -42%; height: auto; }
+.hub-scene .islet { animation: bob 5.2s ease-in-out infinite; }
+.hub-scene .crystal { animation: crystal 3.2s ease-in-out infinite; }
+.hub-scene .flag { transform-origin: left center; animation: wave 1.6s ease-in-out infinite; }
 .hub-scene .cl1 { animation: drift 24s ease-in-out infinite alternate; }
 .hub-scene .cl2 { animation: drift 18s ease-in-out infinite alternate-reverse; }
-@keyframes bob { 50% { transform: translateY(-7px); } }
+.hub-scene .fade { animation: fade 5s ease-in-out infinite; will-change: opacity; }
+.hub-scene .fade.b { animation-duration: 3.4s; }
+.hub-scene .fade.c { animation: twinkle 3.4s ease-in-out infinite; }
+.hub-scene .fade.d { animation: twinkle 3.4s ease-in-out -1.1s infinite; }
+.hub-scene .fade.e { animation: twinkle 3.4s ease-in-out -2.2s infinite; }
+@keyframes bob { 50% { transform: translate3d(0, calc(var(--u) * -7), 0); } }
 @keyframes halo { 50% { transform: scale(1.25); opacity: .7; } }
-@keyframes crystal { 50% { transform: translateY(-9px) scale(1.06); } }
+@keyframes crystal { 50% { transform: translate3d(0, calc(var(--u) * -9), 0) scale(1.06); } }
 @keyframes twinkle { 50% { opacity: .35; } }
-@keyframes drift { to { transform: translateX(26px); } }
+@keyframes fade { 50% { opacity: .55; } }
+@keyframes drift { to { transform: translate3d(calc(var(--u) * 26), 0, 0); } }
 @media (prefers-reduced-motion: reduce) { .hub-scene * { animation: none !important; } }
 #screen.hub .hub-top { position: absolute; z-index: 2; left: 0; right: 0; top: 0; display: flex; align-items: center; gap: 8px; padding: calc(10px + var(--sat)) 12px 8px; background: linear-gradient(180deg, rgba(24, 74, 140, .55), transparent); width: auto; }
 #screen.hub .hub-top .avatar { width: 50px; height: 50px; font-size: 24px; flex: none; }
@@ -1256,7 +1266,6 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 
 /* v0.91.0: khôi phục cảnh màn chính SVG động (trời nắng, cầu vồng, Tháp 6 tầng, đảo nổi) */
 @keyframes wave { 0%, 100% { transform: skewY(0) scaleX(1); } 50% { transform: skewY(-8deg) scaleX(.86); } }
-.hub-scene .flag { transform-box: fill-box; transform-origin: left center; animation: wave 1.6s ease-in-out infinite; }
 /* v0.91.0: các màn phụ dùng cùng bầu trời với màn chính (xanh trời + mây trôi nhẹ) */
 #screen:not(.hub) {
   background:
