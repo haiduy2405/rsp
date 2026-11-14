@@ -1392,8 +1392,7 @@ function startTutorial(retry = false) {
 }
 
 function startBattleUI() {
-  const hint = progress.settings.hint !== false; // gợi ý đường kéo cho nước đi ĐẦU TIÊN của mỗi trận (người chơi tắt được bằng nút bóng đèn)
-  audio.playMusic(zoneTrack(run.node === 'boss' ? 'boss' : 'battle', run.zoneId));
+    audio.playMusic(zoneTrack(run.node === 'boss' ? 'boss' : 'battle', run.zoneId));
   if (run.node === 'boss') audio.sfx('bossIn');
   $('screen').classList.remove('show');
   game?.destroy();
@@ -1413,7 +1412,8 @@ function startBattleUI() {
       return { state: r.run.battle, events: r.events };
     },
     fx: audio,
-    hint,
+    hint: false,
+    autoHint: () => progress.settings.hint !== false && run?.node !== 'boss', // 3 giây không chạm thì gợi ý nước đi; màn boss không gợi ý
     onInspect: showInspect,
     onSkillAsk: showSkillAsk,
     celebrate,
@@ -1424,7 +1424,7 @@ function startBattleUI() {
     },
   });
   window.__game = game;
-  addBattleButtons(true);
+  addBattleButtons(run.node !== 'boss');
 }
 
 // Nút trên đầu trận: tạm dừng và (không phải màn hướng dẫn) bật/tắt gợi ý nước đầu mỗi ván.
@@ -1568,7 +1568,7 @@ function showSkillAsk(idx, confirm, duoGo = null, duo = null) {
   const btns = isDuo
     ? h('div', { class: 'sa-btns' },
       btn(t('skill.duoOk'), () => { close(); duoGo(); }, 'primary duo sa-go', { id: 'duo-ok' }),
-      h('div', { class: 'sa-btns2' }, btn(t('skill.single'), () => { close(); confirm(); }, '', { id: 'skill-ok' }), btn(t('skill.cancel'), close, '', { id: 'skill-cancel' })))
+      h('div', { class: 'sa-btns2' }, btn(t('skill.cancel'), close, '', { id: 'skill-cancel' }), btn(t('skill.single'), () => { close(); confirm(); }, '', { id: 'skill-ok' })))
     : h('div', { class: 'sa-btns' }, btn(t('skill.ok'), () => { close(); confirm(); }, 'primary sa-go', { id: 'skill-ok' }), btn(t('skill.cancel'), close, '', { id: 'skill-cancel' }));
   $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox sa' + (isDuo ? ' isduo' : ''), style: `--c:${col}` }, isDuo ? null : head, isDuo ? duoPart : null, isDuo ? h('details', { class: 'sa-more' }, h('summary', {}, t('sa.single')), single) : single, btns)));
   audio.sfx(isDuo ? 'enhance' : 'reveal');

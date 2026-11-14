@@ -19,7 +19,7 @@ export function install(app) {
   // Hộp xác nhận nổi (không vẽ lại cả màn): trả về null, mở sau khi màn gọi đã dựng xong.
   const confirmBox = (text, yes, no, yesLabel = t('summon.yes')) => {
     let close = () => {};
-    const card = h('div', { class: 'card', id: 'confirm' }, h('p', {}, text), h('div', { class: 'row' }, btn(yesLabel, (e) => { close(); yes(e); }, 'primary', { id: 'confirm-yes' }), btn(t('summon.no'), () => { close(); no(); }, '', { id: 'confirm-no' })));
+    const card = h('div', { class: 'card', id: 'confirm' }, h('p', {}, text), h('div', { class: 'row' }, btn(t('summon.no'), () => { close(); no(); }, '', { id: 'confirm-no' }), btn(yesLabel, (e) => { close(); yes(e); }, 'primary', { id: 'confirm-yes' })));
     queueMicrotask(() => { close = openModal(card, { dismiss: false }); });
     return null;
   };

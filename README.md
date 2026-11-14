@@ -857,3 +857,5 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.122.1
 - Thiếu Linh Thạch khi triệu hồi/mua vé: popup giữa màn hình (cần bao nhiêu, đang có bao nhiêu) thay cho dòng thông báo đẩy trang. Tag rollback cục bộ: `pre-warnpop-v0.122.0`.
+- Gợi ý nước đi tự động: sau 3 giây người chơi chưa chạm màn hình thì hiện đường gợi ý, lặp lại mỗi lượt; màn boss không gợi ý và ẩn nút bóng đèn (góc trên phải) bật/tắt. Tag rollback cục bộ (chỉ trên máy này): `pre-autohint-v0.122.1`.
+- Nút xác nhận thống nhất toàn game: Hủy/Thoát bên trái, Đồng ý/Mua/Lưu bên phải.

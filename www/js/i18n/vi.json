@@ -1006,7 +1006,7 @@
   "cut.2": "\"Tôi đã đợi một người như bạn, {name}. Từ giờ, tôi đi cùng bạn.\"",
   "cut.3": "Hành trình leo Tháp bắt đầu từ đây.",
   "cut.tap": "Chạm để tiếp tục",
-  "hint.toggle": "Bật/tắt gợi ý nước đầu mỗi ván",
+  "hint.toggle": "Bật/tắt tự gợi ý nước đi sau 3 giây",
   "pro.1": "Cổng Tòa Tháp mở ra trước mặt bạn.",
   "pro.2": "AIDA: Trong đó có rất nhiều linh hồn bị giam. Trận đầu tiên sẽ chỉ bạn cách neo họ.",
   "pro.3": "Sẵn sàng chưa? Bắt đầu thôi.",
@@ -1201,5 +1201,7 @@
   "cl.0_122.1": "Sự kiện, Cầu nguyện, Hướng dẫn và Cài đặt được làm lại: thẻ sự kiện nổi bật, vòng xoay mượt hơn (bỏ hiệu ứng gây giật), mục hướng dẫn có màu, cài đặt chia nhóm với công tắc",
   "summon.ok": "Đã hiểu",
   "summon.needSpirit": "Không đủ Linh Thạch. Cần {need}, bạn đang có {have}.",
-  "cl.0_122.2": "Thiếu Linh Thạch khi triệu hồi/mua vé: hiện popup giữa màn hình thay cho dòng thông báo đẩy trang"
+  "cl.0_122.2": "Thiếu Linh Thạch khi triệu hồi/mua vé: hiện popup giữa màn hình thay cho dòng thông báo đẩy trang",
+  "cl.0_123.1": "Gợi ý nước đi tự hiện sau 3 giây bạn chưa chạm màn hình (mọi lượt, không chỉ nước đầu); màn boss không gợi ý. Bật/tắt bằng nút bóng đèn góc trên phải",
+  "cl.0_123.2": "Các hộp xác nhận thống nhất: Hủy bên trái, Đồng ý bên phải (như hộp mua trong cửa hàng)"
 }

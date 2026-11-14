@@ -44,7 +44,7 @@ export function install(app) {
     setTimeout(() => { input.focus(); input.select(); }, 30);
     return h('div', { class: 'card slotcard', 'data-slot': s.n },
       h('label', {}, t('slot.nameLabel'), input),
-      h('div', { class: 'row' }, btn(t('slot.save'), done, 'primary', { id: 'slot-save' }), btn(t('slot.cancel'), () => showSlots(), '', { id: 'slot-cancel' })));
+      h('div', { class: 'row' }, btn(t('slot.cancel'), () => showSlots(), '', { id: 'slot-cancel' }), btn(t('slot.save'), done, 'primary', { id: 'slot-save' })));
   }
 
   return { showSlots };

@@ -25,11 +25,13 @@ const SKILL_SFX = ['water', 'fire', 'wood', 'light', 'dark', 'heart']; // chỉ 
 const NOFX = { sfx() {}, vibrate() {} };
 
 
-export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null, onSkillAsk = null, onSettled = null, hintOpts = {}, guard = null, onReject = null, onLock = null }) {
+export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, onEnd, fx = NOFX, hint = false, onInspect = null, celebrate = null, intro = null, onSkillAsk = null, onSettled = null, autoHint = null, hintOpts = {}, guard = null, onReject = null, onLock = null }) {
   let moveGuard = guard; // tutorial: chỉ cho đúng nước/hành động được chỉ định
   const g = canvas.getContext('2d');
   let state = initial;
   let busy = false;
+  let idleMs = 0; // thời gian người chơi chưa chạm: đủ 3 giây thì tự hiện gợi ý (autoHint)
+  let hintBusy = false;
   let alive = true;
   let drag = null;
   const dragMs = ctx.config.dragTimeMs + (initial.dragBonusMs || 0);
@@ -621,6 +623,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
   }
 
   function onDown(ev) {
+    idleMs = 0;
     const p0 = pos(ev);
     if (view.intro) {
       view.intro.age = Math.max(view.intro.age, view.intro.dur - 650); // bỏ qua tới "Bắt đầu!"
@@ -799,6 +802,18 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
     if (!alive) return;
     const real = now - last;
     last = now;
+    if (autoHint && autoHint() && !busy && !drag && view.canAct && !view.intro && state.status === 'playing' && !(state.freeze > 0) && !view.hint && !hintBusy) {
+      idleMs += real;
+      if (idleMs >= 3000) {
+        idleMs = 0;
+        hintBusy = true;
+        const s0 = state;
+        findHintAsync(ctx, s0, undefined, 4, hintOpts).then((hp) => {
+          hintBusy = false;
+          if (hp && alive && state === s0 && !busy && !drag && !view.hint && autoHint()) view.hint = { path: hp.path, text: t('tut.hint', { n: hp.combos }) };
+        });
+      }
+    } else if (busy || drag || view.hint) idleMs = 0;
     let dt = real;
     if (view.boardIn !== undefined && view.boardIn < 1) view.boardIn = Math.min(1, view.boardIn + real / 240);
     if (view.freeze > 0) { view.freeze -= real; dt = 0; } else dt = real * (view.slow ?? 1);
