@@ -861,3 +861,4 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Nút xác nhận thống nhất toàn game: Hủy/Thoát bên trái, Đồng ý/Mua/Lưu bên phải.
 - Mã `dluma` (thử nghiệm, xóa trước khi phát hành): thêm 100 lượt cầu nguyện thưởng (`progress.wishExtra`, dùng sau lượt hằng ngày); mã nhập lại được (`once:false`) để test.
 - Vòng khóa mục tiêu thu nhỏ, đặt giữa quái, thêm hiệu ứng thu vào/sóng xung. Tag rollback cục bộ (chỉ trên máy này): `pre-lockring-v0.124.0`.
+- Vòng khóa nhỏ còn 1/3, bỏ chữ "Mục tiêu". Tag rollback cục bộ: `pre-lockring2-v0.125.0`.

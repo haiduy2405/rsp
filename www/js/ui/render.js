@@ -765,38 +765,38 @@ export function draw(g, view, t) {
       const f = view.lockFlash || 0; // 1 → 0
       const k = 1 - f;
       const snap = f > 0 ? 1 + 1.15 * Math.pow(f, 2.2) - 0.12 * Math.sin(k * Math.PI * 2.2) * f : 1;
-      const R = 50 * snap + 1.6 * Math.sin(t * 0.007);
+      const R = 17 * snap + 0.6 * Math.sin(t * 0.007);
       g.save();
       g.translate(cx + sh, 165);
       g.lineCap = 'round';
       g.shadowColor = '#ff4d5e';
-      g.shadowBlur = 12 + f * 14;
+      g.shadowBlur = 8 + f * 10;
       if (f > 0) { // sóng xung lan ra + tia chớp trắng ở tâm
         g.globalAlpha = f * 0.9;
         g.strokeStyle = '#ffd2d8';
-        g.lineWidth = 2 + 4 * f;
+        g.lineWidth = 1.5 + 2.5 * f;
         g.beginPath();
-        g.arc(0, 0, 50 + 46 * k, 0, Math.PI * 2);
+        g.arc(0, 0, 17 + 22 * k, 0, Math.PI * 2);
         g.stroke();
         g.globalAlpha = f * 0.35;
         g.fillStyle = '#ff6a78';
         g.beginPath();
-        g.arc(0, 0, 50, 0, Math.PI * 2);
+        g.arc(0, 0, 17, 0, Math.PI * 2);
         g.fill();
         g.globalAlpha = 1;
       }
       g.save(); // bốn cung đỏ xoay
       g.rotate(t * 0.0018 + f * 2.4);
       g.strokeStyle = '#ff4d5e';
-      g.lineWidth = 3.2;
+      g.lineWidth = 2;
       for (let q = 0; q < 4; q++) {
         g.rotate(Math.PI / 2);
         g.beginPath();
         g.arc(0, 0, R, -0.42, 0.42);
         g.stroke();
         g.beginPath();
-        g.moveTo(R + 4, 0);
-        g.lineTo(R + 13 - 4 * f, 0);
+        g.moveTo(R + 2, 0);
+        g.lineTo(R + 6 - 2 * f, 0);
         g.stroke();
       }
       g.restore();
@@ -804,8 +804,8 @@ export function draw(g, view, t) {
       g.rotate(-t * 0.003);
       g.globalAlpha = 0.75;
       g.strokeStyle = '#ffd2d8';
-      g.lineWidth = 1.6;
-      g.setLineDash([5, 9]);
+      g.lineWidth = 1.1;
+      g.setLineDash([2, 4]);
       g.beginPath();
       g.arc(0, 0, R * 0.68, 0, Math.PI * 2);
       g.stroke();
@@ -814,10 +814,9 @@ export function draw(g, view, t) {
       g.fillStyle = '#fff2f4';
       g.globalAlpha = 0.65 + 0.35 * pu;
       g.beginPath();
-      g.arc(0, 0, 3 + 1.6 * pu + 3 * f, 0, Math.PI * 2);
+      g.arc(0, 0, 2 + 1 * pu + 2.5 * f, 0, Math.PI * 2);
       g.fill();
       g.restore();
-      text(g, view.t('battle.locked'), cx, 98, 13, '#ff8a96');
     }
     if (view.guideEnemy === i && !dead && view.focus !== i) {
       // bài hướng dẫn: mũi tên nảy + vòng vàng nhấp nháy trên quái cần khóa

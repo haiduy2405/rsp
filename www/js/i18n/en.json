@@ -1208,5 +1208,6 @@
   "wish.extraTail": "(+{n} bonus wishes)",
   "set.gift.wish": "+{n} wishes.",
   "cl.0_123.3": "Test gift code now also grants 100 bonus wishes (used after the daily wish)",
-  "cl.0_125.1": "Target-lock ring is smaller and centered on the monster, with a snap-in, shockwave and counter-rotating inner ring"
+  "cl.0_125.1": "Target-lock ring is smaller and centered on the monster, with a snap-in, shockwave and counter-rotating inner ring",
+  "cl.0_125.2": "Lock ring shrunk to 1/3 size, \"Target\" label removed"
 }
