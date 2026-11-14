@@ -238,8 +238,9 @@ const ICONS = {
   clues: '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/>',
 };
 const ART_ICONS = new Set(['team', 'summon', 'shop', 'quests', 'help', 'settings', 'collection', 'glossary', 'story', 'items', 'clues']);
-function dockBtn(icon, label, onclick, id, cls = '', dot = false) {
+function dockBtn(icon, label, onclick, id, cls = '', dot = false, showLabel = false) {
   const b = h('button', { onclick, id, class: cls, 'aria-label': label, title: label });
+  if (showLabel) b.dataset.lbl = label;
   b.innerHTML = ART_ICONS.has(icon) ? `<img src="assets/ui/icons/${icon}.webp" alt="" draggable="false">` : `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[icon]}</svg>`;
   if (dot) b.append(h('i', { class: 'red-dot', 'aria-hidden': 'true' }));
   return b;
@@ -253,13 +254,18 @@ const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } 
 function hubScene() {
   const zones = ctx.zoneList;
   const pos = ZONE_POS; // đảo khu vực đối xứng hai bên Tháp (ui/hub-art.js)
+  let hereNext = false;
   const orbs = zones.map((z, i) => {
     const [x, y] = pos[i % pos.length];
     const open = progress.unlocked.includes(z.id);
     const col = COLORS[z.element];
     const S = open ? 88 : 80;
     const lock = open ? '' : '<svg class="zlockico" viewBox="0 0 18 20" aria-hidden="true"><rect x="0" y="7" width="18" height="13" rx="3" fill="#2b66aa" stroke="#fff8e6" stroke-width="1.8"/><path d="M4 7V4.5a5 5 0 0 1 10 0V7" fill="none" stroke="#fff8e6" stroke-width="2"/></svg>';
-    return `<div class="sp zorb${open ? ' open' : ''}" ${open ? `data-zone="${z.id}" role="button" tabindex="0" aria-label="${t(`zone.${z.id}`)}"` : ''} style="--x:${x};--y:${y};--w:${S};--h:${S};--c:${col};animation-delay:${(i * 0.7).toFixed(1)}s">${open ? '<i class="halo"></i>' : ''}<img src="assets/ui/zones/${z.id}.webp" alt=""${open ? '' : ' class="locked"'}>${lock}</div>`;
+    const dn = open ? ctx.config.difficulty.order.reduce((a, d) => a + Math.min(ctx.config.run.stages, stagesDone(progress, z.id, d)), 0) : 0;
+    const dt = ctx.config.difficulty.order.length * ctx.config.run.stages;
+    const nextZ = open && !hereNext && dn < dt ? (hereNext = true) : false;
+    const label = open ? `<span class="zlabel"><b>${t(`zone.${z.id}`)}</b><i>${dn}/${dt}</i></span>${nextZ ? '<span class="znext">▼</span>' : ''}` : '';
+    return `<div class="sp zorb${open ? ' open' : ''}" ${open ? `data-zone="${z.id}" role="button" tabindex="0" aria-label="${t(`zone.${z.id}`)}"` : ''} style="--x:${x};--y:${y};--w:${S};--h:${S};--c:${col};animation-delay:${(i * 0.7).toFixed(1)}s">${open ? '<i class="halo"></i>' : ''}${label}<img src="assets/ui/zones/${z.id}.webp" alt=""${open ? '' : ' class="locked"'}>${lock}</div>`;
   }).join('');
   const box = h('div', { class: 'hub-scene' + (DEBUG ? ' static' : '') });
   box.innerHTML = hubLayers('0 0 400 800') + orbs;
@@ -318,7 +324,7 @@ function showHub() {
       'div',
       { class: 'hub-top' },
       h('div', { class: 'avatar', id: 'b-profile', role: 'button', tabindex: '0', 'aria-label': t('profile.title'), style: 'cursor:pointer', onclick: () => ui.showProfile() }, avatarNode(progress.player)),
-      h('div', { class: 'who', id: 'b-profile-name', style: 'cursor:pointer', onclick: () => ui.showProfile() }, h('b', {}, progress.player.name)),
+      h('div', { class: 'who', id: 'b-profile-name', style: 'cursor:pointer', onclick: () => ui.showProfile() }, h('b', {}, progress.player.name), h('small', { class: 'who-ver' }, `${t('hub.creditShort')} · v${VERSION} #${BUILD}`)),
       dockBtn('wish', t('hub.wish'), () => ui.showWish(), 'b-wish', 'help-btn', wishAvailable(progress, ui.dayKey())),
       dockBtn('help', t('hub.help'), () => ui.showGlossary(), 'b-help', 'help-btn'),
       dockBtn('settings', t('hub.settings'), () => ui.showSettings(), 'b-set', 'help-btn'),
@@ -327,15 +333,14 @@ function showHub() {
     notice ? h('div', { class: 'notice hub-notice' }, t(notice)) : null,
     installRow() ? h('div', { class: 'hub-install' }, installRow()) : null,
     activeRunInfo() ? resumeChip() : null,
-    h('div', { class: 'hub-foot' }, h('div', { class: 'credit' }, h('b', {}, t('hub.credit')), h('span', {}, t('hub.version', { v: VERSION, b: BUILD, d: BUILD_DATE })))),
     h(
       'nav',
       { class: 'dock' },
-      dockBtn('team', t('hub.team'), () => showTeam(), 'b-team'),
-      dockBtn('summon', t('hub.summon'), () => ui.showSummon('standard'), 'b-summon', 'sub', progress.summon.freeDay !== ui.dayKey()),
+      dockBtn('team', t('hub.team'), () => showTeam(), 'b-team', '', false, true),
+      dockBtn('summon', t('hub.summonShort'), () => ui.showSummon('standard'), 'b-summon', 'sub', progress.summon.freeDay !== ui.dayKey(), true),
       h('button', { class: 'battle', id: 'b-battle', onclick: () => { if (guideStep() === 'battle') guideSet('zone'); showZones(); }, 'aria-label': t('hub.battle') }, h('img', { src: 'assets/ui/icons/battle.webp', alt: '', draggable: 'false' }), h('span', {}, t('hub.battle'))),
-      dockBtn('shop', t('hub.shop'), () => { if (guideStep() === 'shop') guideSet('claim'); ui.showShop(); }, 'b-shop', '', hasFreeOffer(ctx, progress, ui.dayKey())),
-      dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest', '', hasClaimable(ctx, progress, ui.dayKey()) || hasAchvClaimable(ctx, progress)),
+      dockBtn('shop', t('hub.shop'), () => { if (guideStep() === 'shop') guideSet('claim'); ui.showShop(); }, 'b-shop', '', hasFreeOffer(ctx, progress, ui.dayKey()), true),
+      dockBtn('quests', t('hub.quests'), () => showQuests(), 'b-quest', '', hasClaimable(ctx, progress, ui.dayKey()) || hasAchvClaimable(ctx, progress), true),
     ),
   );
   $('screen').classList.add('hub');
@@ -352,7 +357,7 @@ function showHub() {
 
 function resumeChip() {
   const r = activeRunInfo().run;
-  return h('button', { class: 'primary resume', id: 'b-resume', onclick: resumeRun }, h('span', { class: 'rs-t' }, t('run.resume')), h('small', {}, `${stageLabel(r)} · ${t('run.floor', { n: r.floor + 1, total: r.floors })}`));
+  return h('button', { class: 'primary resume', id: 'b-resume', onclick: resumeRun }, h('i', { class: 'rs-play', 'aria-hidden': 'true' }, '▶'), h('span', { class: 'rs-b' }, h('span', { class: 'rs-t' }, t('run.resume')), h('small', {}, `${stageLabel(r)} · ${t('run.floor', { n: r.floor + 1, total: r.floors })}`)));
 }
 
 // Chọn khu vực (từ nút CHIẾN ĐẤU).

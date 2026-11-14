@@ -807,3 +807,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.110.0
 - Chọn khu vực làm lại (`.zc`): thẻ gọn, 3 thanh tiến độ độ khó, đá thường/hiếm có icon, tổng tiến độ n/21, đảo bồng bềnh + ánh quét, thanh tiến độ chạy lúc vào; thẻ khóa xám có ổ khóa; banner chuyến dở (`.zr`) gọn, nút Tiếp tục nhịp sáng. Vừa một màn, không cuộn. Tag cục bộ `pre-zonesui-v0.109.0`.
+
+## v0.111.0
+- Màn chính: nhãn dưới nút dock (Đội/Triệu hồi/Shop/Nhiệm vụ), tên khu + tiến độ n/21 dưới đảo đã mở, mũi tên nhún chỉ khu nên chơi tiếp, nút Tiếp tục chuyến leo dạng viên thuốc có ▶ và nhịp sáng, phiên bản chuyển lên dưới tên (`duyluma · vX #build`) thay khối credit che đảo chính. Tag cục bộ `pre-hubui-v0.110.0`.

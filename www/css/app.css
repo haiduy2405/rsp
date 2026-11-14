@@ -1807,3 +1807,21 @@ canvas#cv { visibility: hidden; }
 .zc.locked { padding: 8px 12px; }
 .zc.locked .zc-art { width: 60px; height: 60px; }
 .zc.locked small { line-height: 1.25; }
+
+/* ---- v0.111 Màn chính gọn hơn ---- */
+.who-ver { display: block; margin-top: 2px; font-size: 11px; font-weight: 700; letter-spacing: .02em; color: rgba(255, 255, 255, .85); text-shadow: 0 1px 3px rgba(10, 30, 70, .8); white-space: nowrap; }
+#screen.hub .dock { padding-bottom: calc(24px + var(--sab)); }
+.dock button[data-lbl] { position: relative; overflow: visible; }
+.dock button[data-lbl]::after { content: attr(data-lbl); position: absolute; left: 50%; top: calc(100% + 3px); translate: -50% 0; max-width: 78px; font-size: 11px; font-weight: 800; line-height: 1; white-space: nowrap; color: #fff; text-shadow: 0 1px 3px rgba(8, 24, 60, .95), 0 0 6px rgba(8, 24, 60, .8); pointer-events: none; }
+.dock button.battle span { max-width: 84px; }
+#screen.hub .resume { bottom: calc(158px + var(--sab)); flex-direction: row; align-items: center; gap: 10px; padding: 7px 20px 7px 12px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0, 0, 0, .4), 0 0 20px rgba(255, 210, 90, .7); animation: rsGlow 2s ease-in-out infinite; }
+@keyframes rsGlow { 50% { box-shadow: 0 4px 14px rgba(0, 0, 0, .4), 0 0 32px rgba(255, 225, 120, 1); } }
+.rs-play { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; font-style: normal; font-size: 13px; padding-left: 2px; color: #fff; background: linear-gradient(180deg, #ff9a6a, #d6502f); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5); animation: shCta 1.3s ease-in-out infinite; }
+.rs-b { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+#screen.hub .resume .rs-t { font-size: 15px; }
+.hub-scene .zlabel { position: absolute; left: 50%; top: 88%; translate: -50% 0; display: flex; flex-direction: column; align-items: center; gap: 0; padding: 2px 9px 3px; border-radius: 10px; white-space: nowrap; line-height: 1.1; background: rgba(14, 40, 84, .82); border: 1.5px solid rgba(255, 240, 170, .8); box-shadow: 0 2px 6px rgba(0, 0, 0, .4); z-index: 2; }
+.hub-scene .zlabel b { font-size: 12px; color: #fff3c8; }
+.hub-scene .zlabel i { font-style: normal; font-size: 10px; color: #bfe0ff; }
+.hub-scene .znext { position: absolute; left: 50%; top: -22px; translate: -50% 0; font-size: 20px; color: #ffe27a; text-shadow: 0 0 10px #ffb400, 0 2px 0 #7a4a00; animation: znBounce 1s ease-in-out infinite; z-index: 3; }
+@keyframes znBounce { 50% { transform: translateY(7px); } }
+@media (prefers-reduced-motion: reduce) { #screen.hub .resume, .rs-play, .znext { animation: none !important; } }

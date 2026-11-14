@@ -1,4 +1,7 @@
 {
+  "hub.summonShort": "Summon",
+  "hub.creditShort": "duyluma",
+  "cl.0_111.1": "Cleaner home screen: dock labels, zone names and progress under each island, arrow on the next zone, compact resume button",
   "cl.0_110.1": "Zone select redesigned: compact cards with Easy/Normal/Hard progress bars, floating islands, tidier resume banner",
   "shop.todayGift": "Today's free gift",
   "shop.claim": "Claim now",

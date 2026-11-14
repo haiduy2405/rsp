@@ -1,4 +1,7 @@
 {
+  "hub.summonShort": "Triệu hồi",
+  "hub.creditShort": "duyluma",
+  "cl.0_111.1": "Màn chính gọn hơn: nhãn nút dưới, tên khu và tiến độ dưới mỗi đảo, mũi tên chỉ khu nên chơi, nút tiếp tục chuyến gọn",
   "cl.0_110.1": "Chọn khu vực làm lại: thẻ gọn có thanh tiến độ Dễ/Vừa/Khó, đảo nổi bồng bềnh, banner chuyến dở gọn",
   "shop.todayGift": "Quà miễn phí hôm nay",
   "shop.claim": "Nhận ngay",
