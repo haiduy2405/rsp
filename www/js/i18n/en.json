@@ -1194,5 +1194,9 @@
   "cl.0_118.1": "Door details tidier: identical foes merged into one ×N card, smaller box, pill buttons",
   "cl.0_119.1": "Reward screen: fixed the overflowing/missing \"Victory\" title, tighter reward rows, smaller chest, bolder Continue button",
   "cl.0_120.1": "Smoother screen changes: blocks fade in one after another; Hub currency counts up to the new value",
-  "cl.0_121.1": "Smoother popups: confirm box no longer re-renders the screen, every popup fades and pops in/out, removed blur and spinning border that caused jank"
+  "cl.0_121.1": "Smoother popups: confirm box no longer re-renders the screen, every popup fades and pops in/out, removed blur and spinning border that caused jank",
+  "set.sec.general": "General",
+  "set.sec.sound": "Sound",
+  "set.sec.data": "Data",
+  "cl.0_122.1": "Event, Wish, Guide and Settings redone: bold event card, smoother wheel (removed jank-causing effects), colored guide sections, grouped settings with switches"
 }

@@ -104,13 +104,13 @@ export function install(app) {
   const HELP = [["fight", 7], ["heroes", 6], ["tower", 6], ["grow", 5], ["summon", 4], ["daily", 3], ["tips", 3]];
   function showGlossary() {
     screen(
-      h('h2', {}, t('hub.help')),
+      h('h2', { class: 'zones-title' }, t('hub.help')),
       HELP.map(([id, n], k) => h('details', { class: 'card help-sec', id: `help-${id}`, ...(k === 0 ? { open: '' } : {}) },
-        h('summary', {}, t(`help.${id}.title`)),
+        h('summary', {}, h('i', { class: 'hs-dot', 'aria-hidden': 'true' }), t(`help.${id}.title`)),
         Array.from({ length: n }, (_, i) => h('p', { class: 'muted' }, t(`help.${id}.${i + 1}`))))),
-      h('h3', {}, t('hub.glossary')),
+      h('h3', { class: 'pf-h' }, t('hub.glossary')),
       KEYS.map((k) => h('div', { class: 'card kw' }, h('img', { class: 'kw-ico', src: `assets/ui/fx/${k}.webp`, alt: '', width: 40, height: 40 }), h('div', { class: 'kw-tx' }, h('b', {}, t(`effect.${k}.name`)), h('div', { class: 'muted' }, t(`effect.${k}.desc`))))),
-      btn(t('back'), showHub, '', { id: 'back' }),
+      btn(t('back'), showHub, '', { id: 'back', class: 'zones-back-hid' }),
     );
   }
 

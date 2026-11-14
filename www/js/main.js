@@ -1724,12 +1724,14 @@ function showEvent() {
   const key = `ev.${run.event.id}`;
   const ev = ctx.events[run.event.id];
   music('mystery');
+  const ft = floorTitle();
+  ft.className = 'zones-title ev-ft';
   screen(
-    floorTitle(),
-    hpBar(),
-    h('div', { class: 'card' }, h('b', {}, t(`${key}.title`)), h('p', {}, t(`${key}.body`))),
-    h('p', { class: 'sub' }, t('event.choose')),
-    ev.choices.map((_, i) => btn(t(`${key}.c${i}`), () => act({ type: 'eventChoice', index: i }), '', { 'data-choice': i })),
+    ft,
+    h('div', { class: 'ev-hp' }, hpBar()),
+    h('div', { class: 'ev-card' }, h('i', { class: 'ev-medal', 'aria-hidden': 'true' }, '?'), h('h3', {}, t(`${key}.title`)), h('p', {}, t(`${key}.body`))),
+    h('p', { class: 'ev-sub' }, t('event.choose')),
+    h('div', { class: 'ev-choices' }, ev.choices.map((_, i) => btn(t(`${key}.c${i}`), () => act({ type: 'eventChoice', index: i }), 'ev-choice', { 'data-choice': i, style: `--i:${i}` }))),
   );
 }
 

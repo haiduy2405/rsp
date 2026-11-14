@@ -79,12 +79,12 @@ export function install(app) {
       }, 4250);
       setTimeout(done, 5400);
     }, used ? '' : 'primary', { id: 'wish-go', ...(used ? { disabled: '' } : {}) });
-    const back = btn(t('back'), showHub, '', { id: 'back' });
+    const back = btn(t('back'), showHub, '', { id: 'back', class: 'zones-back-hid' });
     const legend = [...slices].sort((a, b) => b.weight - a.weight).map((s) => h('div', { class: 'wl-row' }, itemIcon(ICON[s.give.kind], 'sm'), h('span', {}, full(s.give)), h('b', {}, `${Math.round((1000 * s.weight) / total) / 10}%`)));
     music('wish');
     screen(
-      h('h2', {}, t('hub.wish')),
-      h('div', { class: 'wheel-wrap' }, wheel, pointer),
+      h('h2', { class: 'zones-title' }, t('hub.wish')),
+      h('div', { class: 'wheel-wrap' + (used ? '' : ' ready') }, wheel, pointer),
       status,
       go,
       h('details', { class: 'card wish-rates' }, h('summary', {}, t('wish.rates')), legend),

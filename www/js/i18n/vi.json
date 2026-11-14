@@ -1194,5 +1194,9 @@
   "cl.0_118.1": "Chi tiết cửa gọn hơn: quái giống nhau gộp thành một thẻ ×N, hộp nhỏ, nút dạng viên",
   "cl.0_119.1": "Màn thưởng: sửa tiêu đề \"Chiến thắng\" bị tràn/mất, dòng thưởng gọn hơn, rương nhỏ lại, nút Tiếp tục nổi bật",
   "cl.0_120.1": "Chuyển màn mượt hơn: các khối xuất hiện lần lượt khi đổi màn; số tiền ở Hub chạy dần tới giá trị mới",
-  "cl.0_121.1": "Popup mượt hơn: hộp xác nhận không còn vẽ lại cả màn, mọi popup mở/đóng bằng mờ + bật nhẹ, bỏ làm mờ nền và viền xoay gây giật"
+  "cl.0_121.1": "Popup mượt hơn: hộp xác nhận không còn vẽ lại cả màn, mọi popup mở/đóng bằng mờ + bật nhẹ, bỏ làm mờ nền và viền xoay gây giật",
+  "set.sec.general": "Chung",
+  "set.sec.sound": "Âm thanh",
+  "set.sec.data": "Dữ liệu",
+  "cl.0_122.1": "Sự kiện, Cầu nguyện, Hướng dẫn và Cài đặt được làm lại: thẻ sự kiện nổi bật, vòng xoay mượt hơn (bỏ hiệu ứng gây giật), mục hướng dẫn có màu, cài đặt chia nhóm với công tắc"
 }

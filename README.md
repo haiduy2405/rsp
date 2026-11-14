@@ -848,3 +848,9 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.121.0
 - Popup mượt: hộp xác nhận (`openModal` trong ui/dom.js) mở không vẽ lại màn; popup #info mở/đóng có hiệu ứng (`dismissEl`); bỏ `backdrop-filter` và viền conic xoay (vẽ lại mỗi khung hình). Tag rollback cục bộ: `pre-popupfx-v0.120.0`.
+
+## v0.122.0
+- Sự kiện trong chuyến: thẻ sự kiện nổi bật + lựa chọn dạng nút lớn.
+- Cầu nguyện: bỏ animation filter/box-shadow trên vòng xoay (gây giật), thêm vòng sáng bằng opacity, nút Quay nổi bật.
+- Hướng dẫn chơi: mục có chấm màu, mở/đóng mượt.
+- Cài đặt: chia nhóm (Chung, Âm thanh, Dữ liệu), công tắc thay checkbox, thanh trượt gọn. Tag rollback cục bộ: `pre-4screens-v0.121.0`.

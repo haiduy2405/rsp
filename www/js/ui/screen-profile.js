@@ -134,26 +134,26 @@ export function install(app) {
   // Âm lượng + bật/tắt nhạc, hiệu ứng, rung: dùng chung cho Cài đặt và bảng Tạm dừng.
   function audioControls() {
     return [
-      h('label', {}, h('span', { id: 'vol-l' }, t('set.volume', { n: app.progress.settings.volume })), h('input', { id: 'vol', type: 'range', min: '0', max: '100', value: String(app.progress.settings.volume), oninput: (e) => {
+      h('label', { class: 'st-slider' }, h('span', { id: 'vol-l' }, t('set.volume', { n: app.progress.settings.volume })), h('input', { id: 'vol', type: 'range', min: '0', max: '100', value: String(app.progress.settings.volume), oninput: (e) => {
         app.progress.settings.volume = Number(e.target.value);
         $('vol-l').textContent = t('set.volume', { n: app.progress.settings.volume });
         audio.applyGains();
       }, onchange: () => save() })),
       ...[['musicVol', 'set.musicVol', 'vol-m'], ['sfxVol', 'set.sfxVol', 'vol-s']].map(([k, label, id]) => {
         const cur = () => (typeof app.progress.settings[k] === 'number' ? app.progress.settings[k] : 100);
-        return h('label', {}, h('span', { id: `${id}-l` }, t(label, { n: cur() })), h('input', { id, type: 'range', min: '0', max: '100', value: String(cur()), oninput: (e) => {
+        return h('label', { class: 'st-slider' }, h('span', { id: `${id}-l` }, t(label, { n: cur() })), h('input', { id, type: 'range', min: '0', max: '100', value: String(cur()), oninput: (e) => {
           app.progress.settings[k] = Number(e.target.value);
           $(`${id}-l`).textContent = t(label, { n: cur() });
           audio.applyGains();
         }, onchange: () => { save(); if (k === 'sfxVol') audio.sfx('coinGet'); } }));
       }),
       ...[['music', 'set.music'], ['sfx', 'set.sfx'], ['haptic', 'set.haptic']].map(([k, label]) =>
-        h('label', { style: 'flex-direction:row;gap:10px' }, h('input', { type: 'checkbox', id: `opt-${k}`, ...(app.progress.settings[k] !== false ? { checked: '' } : {}), onchange: (e) => {
+        h('label', { class: 'st-row st-switch' }, h('span', {}, t(label)), h('input', { type: 'checkbox', id: `opt-${k}`, ...(app.progress.settings[k] !== false ? { checked: '' } : {}), onchange: (e) => {
           app.progress.settings[k] = e.target.checked;
           audio.applyGains();
           save();
           if (k === 'haptic' && e.target.checked) audio.vibrate(30);
-        } }), t(label))),
+        } }))),
     ];
   }
 
@@ -167,15 +167,31 @@ export function install(app) {
   function showSettings(msg = null, confirmDelete = false) {
     const exportBox = h('textarea', { readonly: '', id: 'export-box' });
     const importBox = h('textarea', { placeholder: '…', id: 'import-box' });
+    const sec = (title, ...kids) => h('section', { class: 'st-card' }, h('h3', {}, title), ...kids);
     screen(
-      h('h2', {}, t('set.title')),
+      h('h2', { class: 'zones-title' }, t('set.title')),
       msg ? h('div', { class: 'notice' }, msg) : null,
       installBtn(),
-      h('label', {}, t('hub.lang'), h('select', { id: 'lang', onchange: (e) => setLang(e.target.value) }, h('option', { value: 'vi' }, 'Tiếng Việt'), h('option', { value: 'en' }, 'English'))),
-      ...audioControls(),
-      h('p', { class: 'muted' }, t('set.volumeNote')),
-      offlineSection(),
-      h('div', { class: 'card', id: 'gift' }, h('b', {}, t('set.gift.title')),
+      sec(t('set.sec.general'),
+        h('label', { class: 'st-row' }, h('span', {}, t('hub.lang')), h('select', { id: 'lang', onchange: (e) => setLang(e.target.value) }, h('option', { value: 'vi' }, 'Tiếng Việt'), h('option', { value: 'en' }, 'English')))),
+      sec(t('set.sec.sound'), ...audioControls(), h('p', { class: 'muted st-note' }, t('set.volumeNote'))),
+      sec(t('set.sec.data'),
+        offlineSection(),
+        h('div', { class: 'row st-btns' },
+          btn(t('hub.export'), () => (exportBox.value = storage.exportText(app.progress)), '', { id: 'export' }),
+          btn(t('hub.import'), () => {
+            try {
+              app.progress = storage.importText(importBox.value.trim());
+              save();
+              showSettings(t('hub.import.ok'));
+            } catch {
+              showSettings(t('hub.import.bad'));
+            }
+          }, '', { id: 'import' })),
+        exportBox,
+        importBox,
+        btn(t('slot.switch'), () => { save(); app.showSlots(); }, '', { id: 'set-slots' })),
+      h('div', { class: 'st-card', id: 'gift' }, h('h3', {}, t('set.gift.title')),
         h('div', { class: 'row' }, h('input', { id: 'gift-input', type: 'text', placeholder: t('set.gift.placeholder'), autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', maxlength: '40' }),
           btn(t('set.gift.btn'), (ev) => {
             const r = redeemGift(ctx, app.progress, $('gift-input').value);
@@ -185,27 +201,14 @@ export function install(app) {
             app.rewardPop([{ k: 'gold', n: r.reward.gold }, { k: 'spirit', n: r.reward.spirit }, { k: 'ticket', n: r.reward.tickets }], ev, { big: true });
             showSettings(t('set.gift.ok', { gold: r.reward.gold.toLocaleString(), spirit: r.reward.spirit.toLocaleString(), tickets: r.reward.tickets.toLocaleString() }));
           }, 'primary', { id: 'gift-btn' }))),
-      btn(t('hub.export'), () => (exportBox.value = storage.exportText(app.progress)), '', { id: 'export' }),
-      exportBox,
-      importBox,
-      btn(t('hub.import'), () => {
-        try {
-          app.progress = storage.importText(importBox.value.trim());
-          save();
-          showSettings(t('hub.import.ok'));
-        } catch {
-          showSettings(t('hub.import.bad'));
-        }
-      }, '', { id: 'import' }),
       confirmDelete
         ? app.confirmBox(t('set.deleteConfirm'), () => {
             storage.clear();
             app.progress = newProgress(ctx);
             showOnboarding();
           }, () => showSettings(), t('set.deleteYes'))
-        : btn(t('set.delete'), () => showSettings(null, true), '', { id: 'delete' }),
-      btn(t('slot.switch'), () => { save(); app.showSlots(); }, '', { id: 'set-slots' }),
-      btn(t('back'), showHub, '', { id: 'back' }),
+        : btn(t('set.delete'), () => showSettings(null, true), 'st-danger', { id: 'delete' }),
+      btn(t('back'), showHub, '', { id: 'back', class: 'zones-back-hid' }),
     );
     $('lang').value = app.lang;
   }
