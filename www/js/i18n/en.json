@@ -1214,5 +1214,6 @@
   "cl.0_126.2": "Lock ring is bolder with a dark outline so it stands out on any background",
   "cl.0_126.3": "Move hints now use only straight (up/down/left/right) moves, no diagonals, picking the highest-combo, highest-damage path",
   "cl.0_126.4": "Move hints weakened to about 50% effectiveness (max 5-cell path, still straight moves only)",
-  "cl.0_126.5": "Move hints weakened by another ~25% (max 4 combos)"
+  "cl.0_126.5": "Move hints weakened by another ~25% (max 4 combos)",
+  "cl.0_126.6": "Fixed popups breaking visually while closing (skill confirm and other overlay panels)"
 }

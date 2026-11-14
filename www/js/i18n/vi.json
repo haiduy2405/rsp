@@ -1214,5 +1214,6 @@
   "cl.0_126.2": "Vòng khóa đậm hơn, có viền tối nên nổi bật trên mọi nền",
   "cl.0_126.3": "Gợi ý nước đi chỉ dùng nước ngang/dọc (không đường chéo), chọn đường nhiều combo và sát thương cao nhất",
   "cl.0_126.4": "Gợi ý nước đi giảm hiệu quả còn khoảng 50% (đường tối đa 5 ô, vẫn chỉ ngang/dọc)",
-  "cl.0_126.5": "Gợi ý nước đi giảm thêm khoảng 25% hiệu quả (tối đa 4 combo)"
+  "cl.0_126.5": "Gợi ý nước đi giảm thêm khoảng 25% hiệu quả (tối đa 4 combo)",
+  "cl.0_126.6": "Sửa lỗi popup bị vỡ hình khi đóng (bảng hỏi dùng kỹ năng và các bảng dùng #info)"
 }

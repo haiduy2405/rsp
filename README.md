@@ -866,3 +866,4 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Gợi ý nước đi chỉ ngang/dọc (`config.hint.auto.orthogonal`), tối đa 12 ô.
 - Gợi ý nước đi giảm còn ~50% hiệu quả: `config.hint.auto.maxSteps` 5, `beam` 24 (đo trên 24 bàn: ~60% combo, ~50% sát thương so với bản 12 ô).
 - Gợi ý giảm thêm ~25%: `config.hint.auto.maxCombos` = 4 (đo 40 bàn: ~79% combo, ~69% sát thương so với bản trước).
+- Sửa: popup `#info` khi đóng bị mất style do đổi id sang `info-out`; CSS giờ áp dụng cho cả `#info-out` nên hiệu ứng đóng mượt.

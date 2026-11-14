@@ -135,7 +135,7 @@ details { width: 100%; font-size: 13px; color: var(--mute); }
 @keyframes fl { 0% { opacity: .9; } 100% { opacity: 0; } }
 
 /* ----- bảng chi tiết trong trận ----- */
-#info { position: absolute; inset: 0; z-index: 20; background: rgba(7, 8, 9, .78); display: flex; align-items: center; justify-content: center; padding: 14px; animation: enter .14s ease-out; }
+#info, #info-out { position: absolute; inset: 0; z-index: 20; background: rgba(7, 8, 9, .78); display: flex; align-items: center; justify-content: center; padding: 14px; animation: enter .14s ease-out; }
 .infobox { position: relative; width: 100%; max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 16px; border: 1px solid var(--line-hi); border-radius: 6px; background: linear-gradient(180deg, #202228, #111216); scrollbar-width: none; }
 .infobox .card { background: rgba(22, 58, 108, .55); }
 
@@ -1340,7 +1340,7 @@ button:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 0 14px rgb
 @media (prefers-reduced-motion: reduce) { .sk-art { animation: none !important; } }
 
 /* v0.95.1: bảng kỹ năng gọn hơn, hơi trong suốt */
-#info:has(.sk-ask) { background: rgba(7, 12, 26, .55); }
+#info:has(.sk-ask), #info-out:has(.sk-ask) { background: rgba(7, 12, 26, .55); }
 .infobox.sk-ask { width: min(100%, 330px); margin: 0 auto; background: linear-gradient(180deg, rgba(31, 79, 142, .92), rgba(21, 58, 112, .92) 60%, rgba(15, 44, 88, .94)); padding-bottom: 10px; }
 .sk-hero { height: 124px; }
 .sk-art { width: 86px; height: 86px; margin-top: -43px; border-radius: 16px; border-width: 3px; left: 12px; }
@@ -1626,7 +1626,7 @@ canvas#cv { visibility: hidden; }
 .pausebox.quit { max-width: 280px; }
 
 /* ---- v0.108 Bảng hỏi dùng skill (.sa) ---- */
-#info:has(.sa) { background: rgba(7, 12, 26, .6); }
+#info:has(.sa), #info-out:has(.sa) { background: rgba(7, 12, 26, .6); }
 @property --sa-ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 .infobox.sa { position: relative; width: min(100%, 330px); margin: 0 auto; padding: 0 0 12px; gap: 0; overflow: hidden; border: 2px solid #f3c64e; border-radius: 16px; background: linear-gradient(180deg, #1f4f8e, #153a70 62%, #0f2c58); box-shadow: 0 0 0 2px #14355f, 0 0 26px color-mix(in srgb, var(--c) 55%, transparent), 0 16px 36px rgba(0, 0, 0, .6); animation: saPop .34s cubic-bezier(.2, .9, .25, 1.12); max-height: 92%; overflow-y: auto; }
 @keyframes saPop { from { transform: scale(.88) translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -2033,11 +2033,11 @@ canvas#cv { visibility: hidden; }
 .mdl #confirm .row { gap: 8px; flex-wrap: nowrap; }
 .mdl #confirm .row button { flex: 1; min-height: 0; padding: 9px 6px; font-size: 14.5px; border-radius: 999px; }
 .mdl #confirm #confirm-yes { box-shadow: 0 0 16px rgba(255, 210, 90, .5); }
-#info { animation: mdlFade .18s ease-out both; background: rgba(5, 12, 30, .7); }
-#info.out { pointer-events: none; animation: mdlFade .16s ease-in reverse forwards; }
-#info.out > * { animation: mdlOut .16s ease-in forwards !important; }
+#info, #info-out { animation: mdlFade .18s ease-out both; background: rgba(5, 12, 30, .7); }
+#info.out, #info-out.out { pointer-events: none; animation: mdlFade .16s ease-in reverse forwards; }
+#info.out > *, #info-out.out > * { animation: mdlOut .16s ease-in forwards !important; }
 #upd-force { background: rgba(6, 12, 30, .9); }
-@media (prefers-reduced-motion: reduce) { .mdl, .mdl > *, #info, #info.out, #info.out > *, .mdl.out, .mdl.out > * { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .mdl, .mdl > *, #info, #info-out, #info.out, #info-out.out, #info.out > *, #info-out.out > *, .mdl.out, .mdl.out > * { animation: none !important; } }
 .mdl #confirm::before, .mdl #confirm::after { display: none; }
 
 /* ---- v0.122 sự kiện, cầu nguyện, hướng dẫn, cài đặt ---- */
