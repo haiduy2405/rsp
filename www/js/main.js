@@ -167,6 +167,8 @@ const screen = (...kids) => {
   showBattleCanvas(false);
   const el = $('screen');
   const list = kids.flat().filter(Boolean);
+  const wasShown = el.classList.contains('show');
+  const prevKey = el.dataset.k;
   el.replaceChildren(...list);
   // Nút quay lại cố định góc trái trên: cùng hành động với nút "Quay lại" ở cuối trang.
   const bottom = el.querySelector('#back:not(.primary)');
@@ -178,7 +180,19 @@ const screen = (...kids) => {
   el.classList.remove('hub', 'mapscreen', 'hubin', 'fitscreen');
   el.classList.add('show');
   el.scrollTop = 0;
+  // Chuyển màn: các khối xuất hiện lần lượt (chỉ khi đổi sang màn khác, không phải vẽ lại cùng màn)
+  const key = el.querySelector('h2, .zhead')?.textContent ?? '';
+  el.dataset.k = key;
+  if (wasShown && key !== prevKey) enterFx(el);
 };
+function enterFx(el) {
+  if (reducedMotion()) return;
+  requestAnimationFrame(() => {
+    if (el.classList.contains('hub') || el.classList.contains('mapscreen')) return;
+    [...el.children].filter((c) => !c.matches('.back-wrap, canvas') && getComputedStyle(c).position !== 'fixed' && getComputedStyle(c).animationName === 'none').slice(0, 14)
+      .forEach((c, i) => c.animate([{ opacity: 0, translate: '0 14px' }, { opacity: 1, translate: '0 0' }], { duration: 340, delay: i * 40, easing: 'cubic-bezier(.2,.9,.25,1)', fill: 'backwards' }));
+  });
+}
 const save = () => {
   if (!storage.save(progress)) notice = 'hub.saveFail';
   else if (activeSlot) slots.touch(activeSlot);
@@ -247,7 +261,20 @@ function dockBtn(icon, label, onclick, id, cls = '', dot = false, showLabel = fa
 }
 const CUR_COL = { gold: '#ffd24a', spirit: '#b58bff', ticket: '#ff9a4a', shard: '#ff9acb' };
 const lastCur = {};
-const curPill = (k, v, id) => h('button', { class: 'cur-pill' + (lastCur[k] !== undefined && lastCur[k] !== v ? ' bump' : '') + ((lastCur[k] = v), ''), ...(id ? { id } : {}), onclick: () => ui.showItems(), 'aria-label': t(`res.${k}`) }, h('img', { src: `assets/ui/items/${k}.webp`, alt: '', draggable: 'false' }), h('b', {}, new Intl.NumberFormat(lang).format(v)));
+const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const curPill = (k, v, id) => {
+  const prev = lastCur[k];
+  lastCur[k] = v;
+  const fmt = (n) => new Intl.NumberFormat(lang).format(n);
+  const changed = prev !== undefined && prev !== v;
+  const num = h('b', {}, fmt(changed ? prev : v));
+  if (changed && !reducedMotion()) { // số nhảy dần tới giá trị mới
+    const t0 = performance.now();
+    const tick = () => { const q = Math.min(1, (performance.now() - t0) / 700); num.textContent = fmt(Math.round(prev + (v - prev) * (1 - Math.pow(1 - q, 3)))); if (q < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  } else if (changed) num.textContent = fmt(v);
+  return h('button', { class: 'cur-pill' + (changed ? ' bump' : ''), ...(id ? { id } : {}), onclick: () => ui.showItems(), 'aria-label': t(`res.${k}`) }, h('img', { src: `assets/ui/items/${k}.webp`, alt: '', draggable: 'false' }), num);
+};
 const resPill = (label, value, id) => h('span', { class: 'res', ...(id ? { id } : {}) }, label, h('b', {}, String(value)));
 
 // Cảnh chính: Tòa Tháp 6 tầng giữa trời nắng, cầu vồng, mây, chim; mỗi khu mở là một viên ngọc phát sáng trên đảo nổi (chạm để vào khu).

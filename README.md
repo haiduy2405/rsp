@@ -841,3 +841,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.119.0
 - Màn thưởng: sửa tiêu đề "Chiến thắng" bị tràn/mất (bỏ hiệu ứng chữ gradient), dòng thưởng gọn, rương nhỏ lại. Tag rollback cục bộ: `pre-lootui-v0.118.0`.
+
+## v0.120.0
+- Rà soát hiệu ứng toàn game: xem `docs/FX-AUDIT.md`.
+- Chuyển màn: các khối xuất hiện lần lượt khi đổi màn; số tiền Hub chạy dần. Tag rollback cục bộ: `pre-fxpass-v0.119.0`.

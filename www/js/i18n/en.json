@@ -1192,5 +1192,6 @@
   "cl.0_116.2": "Buying tickets and every summon ask for confirmation; smaller, neater confirm box",
   "cl.0_117.1": "Player profile: compact identity card (photo + name + photo buttons), 6-column avatar grid, stat tiles",
   "cl.0_118.1": "Door details tidier: identical foes merged into one ×N card, smaller box, pill buttons",
-  "cl.0_119.1": "Reward screen: fixed the overflowing/missing \"Victory\" title, tighter reward rows, smaller chest, bolder Continue button"
+  "cl.0_119.1": "Reward screen: fixed the overflowing/missing \"Victory\" title, tighter reward rows, smaller chest, bolder Continue button",
+  "cl.0_120.1": "Smoother screen changes: blocks fade in one after another; Hub currency counts up to the new value"
 }
