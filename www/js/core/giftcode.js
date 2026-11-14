@@ -10,6 +10,7 @@ export function redeemGift(ctx, progress, input) {
   p.inventory.gold += def.gold || 0;
   p.inventory.spirit += def.spirit || 0;
   p.inventory.tickets += def.tickets || 0;
+  if (def.wish) p.wishExtra = (p.wishExtra || 0) + def.wish;
   p.redeemed = [...used, code];
-  return { ok: true, progress: p, reward: { gold: def.gold || 0, spirit: def.spirit || 0, tickets: def.tickets || 0 } };
+  return { ok: true, progress: p, reward: { gold: def.gold || 0, spirit: def.spirit || 0, tickets: def.tickets || 0, wish: def.wish || 0 } };
 }

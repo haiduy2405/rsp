@@ -51,3 +51,14 @@ test('cầu nguyện: tỉ lệ theo trọng số, quà hiếm ít hơn quà th�
   assert.ok(w('hero', 3) > w('hero', 4) && w('hero', 4) > w('hero', 5));
   for (const k of ['gold', 'spirit', 'generic', 'hero', 'ticket', 'soulTicket']) assert.ok(slices.some((s) => s.give.kind === k), k);
 });
+
+test('lượt thưởng thêm: dùng khi hết lượt ngày, trừ dần', () => {
+  const p0 = { ...newProgress(ctx), wishExtra: 2 };
+  const a = spinWish(ctx, p0, 900, 1);
+  const b = spinWish(ctx, a.progress, 900, 2);
+  assert.ok(b.ok);
+  assert.equal(b.progress.wishExtra, 1);
+  const c = spinWish(ctx, b.progress, 900, 3);
+  assert.equal(c.progress.wishExtra, 0);
+  assert.equal(spinWish(ctx, c.progress, 900, 4).reason, 'wish_used');
+});

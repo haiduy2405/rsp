@@ -1203,5 +1203,9 @@
   "summon.needSpirit": "Không đủ Linh Thạch. Cần {need}, bạn đang có {have}.",
   "cl.0_122.2": "Thiếu Linh Thạch khi triệu hồi/mua vé: hiện popup giữa màn hình thay cho dòng thông báo đẩy trang",
   "cl.0_123.1": "Gợi ý nước đi tự hiện sau 3 giây bạn chưa chạm màn hình (mọi lượt, không chỉ nước đầu); màn boss không gợi ý. Bật/tắt bằng nút bóng đèn góc trên phải",
-  "cl.0_123.2": "Các hộp xác nhận thống nhất: Hủy bên trái, Đồng ý bên phải (như hộp mua trong cửa hàng)"
+  "cl.0_123.2": "Các hộp xác nhận thống nhất: Hủy bên trái, Đồng ý bên phải (như hộp mua trong cửa hàng)",
+  "wish.extra": "Hôm nay đã ước. Còn {n} lượt thưởng thêm.",
+  "wish.extraTail": "(+{n} lượt thưởng thêm)",
+  "set.gift.wish": "+{n} lượt cầu nguyện.",
+  "cl.0_123.3": "Mã quà thử nghiệm tặng thêm 100 lượt cầu nguyện (dùng khi hết lượt hằng ngày)"
 }

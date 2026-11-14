@@ -1203,5 +1203,9 @@
   "summon.needSpirit": "Not enough Spirit Gems. Need {need}, you have {have}.",
   "cl.0_122.2": "Not enough Spirit Gems on summon/buy: shows a centered popup instead of a banner that pushed the page down",
   "cl.0_123.1": "Move hint now appears after 3 seconds without touching the screen (every turn, not just the first); no hints on boss floors. Toggle with the lightbulb at the top right",
-  "cl.0_123.2": "Confirm dialogs unified: Cancel on the left, Confirm on the right (like the shop purchase box)"
+  "cl.0_123.2": "Confirm dialogs unified: Cancel on the left, Confirm on the right (like the shop purchase box)",
+  "wish.extra": "Today's wish used. {n} bonus wishes left.",
+  "wish.extraTail": "(+{n} bonus wishes)",
+  "set.gift.wish": "+{n} wishes.",
+  "cl.0_123.3": "Test gift code now also grants 100 bonus wishes (used after the daily wish)"
 }

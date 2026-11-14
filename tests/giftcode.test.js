@@ -6,7 +6,7 @@ import { loadCtx } from './helpers.js';
 
 const ctx = await loadCtx();
 
-test('mã dluma: cộng vàng, Linh Thạch, vé; không phân biệt hoa thường; chỉ dùng một lần', () => {
+test('mã dluma: cộng vàng, Linh Thạch, vé; +100 lượt cầu nguyện; không phân biệt hoa thường; nhập lại được (mã thử nghiệm)', () => {
   const p0 = newProgress(ctx);
   const r = redeemGift(ctx, p0, '  DLuma ');
   assert.ok(r.ok);
@@ -14,7 +14,8 @@ test('mã dluma: cộng vàng, Linh Thạch, vé; không phân biệt hoa thư�
   assert.equal(r.progress.inventory.spirit, p0.inventory.spirit + 30000);
   assert.equal(r.progress.inventory.tickets, p0.inventory.tickets + 1000);
   assert.equal(p0.inventory.gold, newProgress(ctx).inventory.gold, 'không sửa bản gốc');
-  assert.deepEqual(redeemGift(ctx, r.progress, 'dluma'), { ok: false, reason: 'used' });
+  assert.equal(r.progress.wishExtra, 100);
+  assert.equal(redeemGift(ctx, r.progress, 'dluma').progress.wishExtra, 200);
 });
 
 test('mã sai hoặc rỗng bị từ chối, kể cả tên thuộc tính hệ thống', () => {

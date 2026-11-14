@@ -199,7 +199,7 @@ export function install(app) {
             app.progress = r.progress;
             save();
             app.rewardPop([{ k: 'gold', n: r.reward.gold }, { k: 'spirit', n: r.reward.spirit }, { k: 'ticket', n: r.reward.tickets }], ev, { big: true });
-            showSettings(t('set.gift.ok', { gold: r.reward.gold.toLocaleString(), spirit: r.reward.spirit.toLocaleString(), tickets: r.reward.tickets.toLocaleString() }));
+            showSettings(t('set.gift.ok', { gold: r.reward.gold.toLocaleString(), spirit: r.reward.spirit.toLocaleString(), tickets: r.reward.tickets.toLocaleString() }) + (r.reward.wish ? ' ' + t('set.gift.wish', { n: r.reward.wish }) : ''));
           }, 'primary', { id: 'gift-btn' }))),
       confirmDelete
         ? app.confirmBox(t('set.deleteConfirm'), () => {

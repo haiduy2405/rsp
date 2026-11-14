@@ -1668,7 +1668,8 @@
   },
   "giftcodes": {
     "dluma": {
-      "once": true,
+      "once": false,
+      "wish": 100,
       "gold": 8500000,
       "spirit": 30000,
       "tickets": 1000

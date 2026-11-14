@@ -6,7 +6,8 @@ import { addFragments } from './fragments.js';
 const fail = (reason) => ({ ok: false, reason });
 
 export const wishUsed = (progress, dayKey) => progress.wish?.day === dayKey;
-export const wishAvailable = (progress, dayKey) => !wishUsed(progress, dayKey);
+export const wishExtra = (progress) => progress.wishExtra || 0; // lượt thưởng thêm (mã quà), dùng khi lượt hằng ngày đã hết
+export const wishAvailable = (progress, dayKey) => !wishUsed(progress, dayKey) || wishExtra(progress) > 0;
 
 // Chọn ô theo trọng số.
 export function pickSlice(slices, rng) {
@@ -18,7 +19,8 @@ export function pickSlice(slices, rng) {
 
 // Trả { ok, progress, slice, prize } ; prize = { ...give, hero? } (hero: id tướng khi quà là mảnh riêng).
 export function spinWish(ctx, progress, dayKey, seed) {
-  if (wishUsed(progress, dayKey)) return fail('wish_used');
+  const useExtra = wishUsed(progress, dayKey);
+  if (useExtra && wishExtra(progress) <= 0) return fail('wish_used');
   const slices = ctx.config.wish.slices;
   const rng = mulberry32(seed);
   const slice = pickSlice(slices, rng);
@@ -42,6 +44,6 @@ export function spinWish(ctx, progress, dayKey, seed) {
     }
     default: return fail('bad_prize');
   }
-  p.wish = { day: dayKey, slice };
+  if (useExtra) { p.wishExtra = wishExtra(progress) - 1; p.wish = { ...p.wish, slice }; } else p.wish = { day: dayKey, slice };
   return { ok: true, progress: p, slice, prize };
 }

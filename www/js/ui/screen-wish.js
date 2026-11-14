@@ -1,7 +1,7 @@
 // Màn hình: Cầu nguyện (ước). Mỗi ngày 1 lượt quay vòng xoay; kết quả tính ở core/wish.js (seed do UI cấp), vòng xoay chỉ là hiệu ứng.
 import { h, btn } from './dom.js';
 import { itemIcon } from './icons.js';
-import { spinWish, wishUsed } from '../core/wish.js';
+import { spinWish, wishUsed, wishExtra } from '../core/wish.js';
 
 const TIER_COL = ['#7a6a52', '#4f8fe0', '#a066e8', '#e0a64a']; // phổ thông, hiếm, rất hiếm, cực hiếm
 const ICON = { gold: 'gold', spirit: 'spirit', ticket: 'ticket', soulTicket: 'soul', generic: 'generic', hero: 'fragment' };
@@ -20,7 +20,8 @@ export function install(app) {
 
   function showWish(res) {
     const day = app.dayKey();
-    const used = wishUsed(app.progress, day);
+    const extra = wishExtra(app.progress);
+    const used = wishUsed(app.progress, day) && extra <= 0;
     const step = 360 / slices.length;
     const grad = slices.map((s, i) => `${TIER_COL[tierOf(s)]} ${i * step}deg ${(i + 1) * step}deg`).join(',');
     const wheel = h('div', { class: 'wheel', id: 'wheel', style: `background:conic-gradient(${grad})` },
@@ -28,7 +29,7 @@ export function install(app) {
       h('div', { class: 'whub' }));
     const pointer = h('div', { class: 'wptr', 'aria-hidden': 'true' });
     const last = used && app.progress.wish.slice !== undefined ? slices[app.progress.wish.slice] : null;
-    const status = h('div', { class: 'notice', id: 'wish-msg' }, res ? res : used ? t('wish.used') : t('wish.ready'));
+    const status = h('div', { class: 'notice', id: 'wish-msg' }, res ? res : used ? t('wish.used') : wishUsed(app.progress, day) ? t('wish.extra', { n: extra }) : t('wish.ready') + (extra ? ' ' + t('wish.extraTail', { n: extra }) : ''));
     const go = btn(t('wish.spin'), () => {
       const r = spinWish(ctx, app.progress, day, (Math.random() * 4294967296) >>> 0);
       if (!r.ok) { status.textContent = t(`err.${r.reason}`); return; }
