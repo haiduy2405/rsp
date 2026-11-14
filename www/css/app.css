@@ -1687,3 +1687,11 @@ canvas#cv { visibility: hidden; }
 .dd-card .dd-orb { z-index: 4; }
 .dd-card .dd-pass { position: absolute; z-index: 4; left: 0; right: 0; bottom: 5px; margin: 0; }
 @media (prefers-reduced-motion: reduce) { .dd-spot, .dd-floor, .dd-shine { animation: none !important; } }
+
+/* ---- v0.108.1 ép cập nhật ---- */
+#upd-force { position: absolute; inset: 0; z-index: 90; display: grid; place-items: center; padding: 20px; background: rgba(6, 12, 30, .82); backdrop-filter: blur(4px); }
+.updbox { text-align: center; align-items: center; max-width: 290px; }
+.updbox h3 { margin: 0; color: #fff3c8; }
+.updbox p { margin: 0; font-size: 14px; line-height: 1.4; color: #dbe8ff; }
+.upd-big { font-style: normal; font-size: 46px; line-height: 1; color: #ffd24a; text-shadow: 0 0 18px rgba(255, 210, 90, .8); animation: updSpin 1.6s linear infinite; }
+.updbox button { width: 100%; min-height: 48px; font-size: 16px; }

@@ -1,7 +1,7 @@
 // Service worker: chơi offline. Mã/JSON ưu tiên mạng (luôn mới); ảnh/âm thanh/font lấy từ cache và làm mới ngầm.
 // Tên bộ nhớ đệm phải khớp CACHE_NAME trong js/ui/offline.js (nút "Tải dữ liệu offline" ghi vào cùng chỗ).
 const CACHE = 'rsp-v1';
-// build: 0.108.0 #216 (tools/stamp-version.js ghi đè dòng này mỗi bản dựng → sw.js đổi byte → trình duyệt cài SW mới)
+// build: 0.108.1 #217 (tools/stamp-version.js ghi đè dòng này mỗi bản dựng → sw.js đổi byte → trình duyệt cài SW mới)
 self.addEventListener('install', (e) => { self.skipWaiting(); });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));

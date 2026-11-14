@@ -795,3 +795,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Bảng xác nhận skill (`.sa`): hàng hiệu ứng theo loại (màu + icon), Duo có viền conic xoay, tia liên kết, tia lửa, ×150%.
 - Chi tiết cửa: thẻ quái chỉ còn hình, lơ lửng, bóng, ánh quét.
 - Tag cục bộ `pre-skillask-v0.107.2` (chỉ local).
+
+## v0.108.1
+- Ép cập nhật: `checkVersion()` tải `js/version.js` (no-store) mỗi 2 phút/khi mở lại/3s sau khởi động; khác BUILD → hộp thoại chặn `#upd-force` (ngoài trận), trong trận chỉ nút nhỏ rồi ép khi thoát trận. Không còn phụ thuộc `controllerchange`.

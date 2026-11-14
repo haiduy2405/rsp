@@ -163,6 +163,7 @@ const screen = (...kids) => {
   $('screen').style.backgroundImage = '';
   game?.destroy();
   game = null;
+  if (updateReady) setTimeout(showUpdatePill, 500);
   showBattleCanvas(false);
   const el = $('screen');
   const list = kids.flat().filter(Boolean);
@@ -274,12 +275,39 @@ function hubScene() {
 }
 
 let updateReady = false;
-// Có bản mới: hiện thông báo ở mọi màn (kể cả giữa trận); người chơi chạm thì game tự nạp lại thành bản mới.
+// Có bản mới: ngoài trận thì ÉP cập nhật (hộp thoại chặn, một nút); đang trong trận thì chỉ hiện nút nhỏ để khỏi mất ván.
+function doReload(btnEl) {
+  btnEl.disabled = true;
+  btnEl.textContent = t('app.updating');
+  audio.sfx('confirm');
+  setTimeout(() => location.reload(), 150);
+}
 function showUpdatePill() {
-  if (!updateReady || $('upd-pill') || !$('wrap')) return;
-  const b = h('button', { id: 'upd-pill', class: 'upd-pill', onclick: () => { b.disabled = true; b.textContent = t('app.updating'); audio.sfx('confirm'); setTimeout(() => location.reload(), 150); } }, h('i', { 'aria-hidden': 'true' }, '⟳'), h('span', {}, h('b', {}, t('app.update')), h('small', {}, t('app.updateSub'))));
-  $('wrap').appendChild(b);
+  if (!updateReady || !$('wrap')) return;
+  if (game) {
+    if ($('upd-pill')) return;
+    const b = h('button', { id: 'upd-pill', class: 'upd-pill', onclick: () => doReload(b) }, h('i', { 'aria-hidden': 'true' }, '⟳'), h('span', {}, h('b', {}, t('app.update')), h('small', {}, t('app.updateSub'))));
+    $('wrap').appendChild(b);
+    audio.sfx('reveal');
+    return;
+  }
+  $('upd-pill')?.remove();
+  if ($('upd-force')) return;
+  $('info')?.remove();
+  const go = btn(t('app.updateNow'), () => doReload(go), 'primary', { id: 'upd-go' });
+  $('wrap').appendChild(h('div', { id: 'upd-force' }, h('div', { class: 'infobox pausebox updbox' }, h('i', { class: 'upd-big', 'aria-hidden': 'true' }, '⟳'), h('h3', {}, t('app.update')), h('p', {}, t('app.updateForce')), go)));
   audio.sfx('reveal');
+}
+// Hỏi thẳng máy chủ số bản dựng (không phụ thuộc service worker): khác bản đang chạy → có bản mới.
+async function checkVersion() {
+  if (updateReady) return;
+  try {
+    const r = await fetch(`js/version.js?_=${Date.now()}`, { cache: 'no-store' });
+    const txt = await r.text();
+    const b = Number(/BUILD\s*=\s*(\d+)/.exec(txt)?.[1]);
+    const v = /VERSION\s*=\s*'([^']+)'/.exec(txt)?.[1];
+    if (b && (b !== BUILD || (v && v !== VERSION))) { updateReady = true; showUpdatePill(); }
+  } catch { /* offline: bỏ qua */ }
 }
 function showHub() {
   run = null;
@@ -1786,6 +1814,9 @@ if ('serviceWorker' in navigator && !DEBUG && location.protocol.startsWith('http
   // Bản mới: SW mới chiếm quyền → đánh dấu, tự nạp lại ở lần vào Hub kế tiếp (không ngắt giữa trận).
   const hadSW = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadSW) { updateReady = true; showUpdatePill(); } });
+  setTimeout(checkVersion, 3000);
+  setInterval(checkVersion, 2 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) checkVersion(); });
   navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => { setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000); document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); }); }).catch(() => {});
 }
 

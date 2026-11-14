@@ -1,4 +1,7 @@
 {
+  "app.updateNow": "Update now",
+  "app.updateForce": "A new version is available. Update to keep playing.",
+  "cl.0_108.3": "New versions now force an update: auto-checks every 2 min and when you reopen the game",
   "cl.0_108.1": "Skill panel redesigned: colour/icon-coded effects, Duo with glowing frame and link beam",
   "cl.0_108.2": "Door detail: large animated monster art only",
   "sa.both": "Both heroes go on cooldown",

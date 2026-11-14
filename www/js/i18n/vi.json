@@ -1,4 +1,7 @@
 {
+  "app.updateNow": "Cập nhật ngay",
+  "app.updateForce": "Đã có phiên bản mới. Cần cập nhật để tiếp tục chơi.",
+  "cl.0_108.3": "Bản mới giờ ép cập nhật: tự kiểm tra phiên bản mỗi 2 phút và khi mở lại game",
   "cl.0_108.1": "Bảng dùng skill thiết kế lại: hiệu ứng theo màu/biểu tượng, Duo có khung ánh sáng và tia liên kết",
   "cl.0_108.2": "Chi tiết cửa: chỉ hiện hình quái lớn, có chuyển động",
   "sa.both": "Cả hai tướng vào hồi chiêu",
