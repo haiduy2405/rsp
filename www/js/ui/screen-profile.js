@@ -20,7 +20,7 @@ export function install(app) {
     const d = profDraft;
     const st = app.progress.stats;
     const clears = Object.keys(app.progress.clears).reduce((a, z) => a + zoneClears(app.progress, z), 0);
-    const stat = (label, v) => h('div', { class: 'card item-row' }, h('span', {}, label), h('b', {}, new Intl.NumberFormat(app.lang).format(v)));
+    const stat = (label, v) => h('div', { class: 'pf-stat' }, h('b', {}, new Intl.NumberFormat(app.lang).format(v)), h('span', {}, label));
     const av = Array.from({ length: o.avatars }, (_, i) => h('div', { class: 'avatar' + (d.avatar === i && !d.photo ? ' sel' : ''), 'data-avatar': i, onclick: () => { d.avatar = i; d.photo = null; showProfile(); } }, avatarNode({ avatar: i })));
     const save1 = () => {
       const r = updateProfile(ctx, app.progress, d);
@@ -34,20 +34,24 @@ export function install(app) {
     const keep = (e, k) => { d[k] = e.target.value; };
     const dirty = d.name !== app.progress.player.name || d.avatar !== app.progress.player.avatar || (d.photo || null) !== (app.progress.player.photo || null);
     screen(
-      h('h2', {}, t('profile.title')),
-      h('div', { class: 'prof-head' }, h('div', { class: 'avatar big' }, avatarNode(d))),
+      h('h2', { class: 'zones-title' }, t('profile.title')),
       msg ? h('div', { class: 'notice' }, msg) : null,
-      h('div', { class: 'row' }, av),
-      photoPicker(d, () => showProfile(), 'pf'),
-      h('label', {}, t('ob.name'), h('input', { id: 'pf-name', maxlength: String(o.nameMax), value: d.name, oninput: (e) => keep(e, 'name') })),
-      btn(t('profile.save'), save1, 'primary', { id: 'pf-save' }),
-      h('h3', {}, t('profile.stats')),
-      stat(t('profile.runs'), st.runs),
-      stat(t('profile.wins'), st.wins),
-      stat(t('profile.clears'), clears),
-      stat(t('profile.owned'), Object.keys(app.progress.characters).length),
-      stat(t('profile.pulls'), app.progress.summon.pulls),
-      btn(t('back'), () => { profDraft = null; showHub(); }, '', { id: 'back' }),
+      h('div', { class: 'prof-card' },
+        h('div', { class: 'pf-id' },
+          h('div', { class: 'avatar big' }, avatarNode(d)),
+          h('div', { class: 'pf-fields' },
+            h('label', {}, t('ob.name'), h('input', { id: 'pf-name', maxlength: String(o.nameMax), value: d.name, oninput: (e) => keep(e, 'name') })),
+            photoPicker(d, () => showProfile(), 'pf'))),
+        h('div', { class: 'pf-avs' }, av),
+        btn(t('profile.save'), save1, dirty ? 'primary' : 'primary pf-idle', { id: 'pf-save' })),
+      h('h3', { class: 'pf-h' }, t('profile.stats')),
+      h('div', { class: 'pf-stats' },
+        stat(t('profile.runs'), st.runs),
+        stat(t('profile.wins'), st.wins),
+        stat(t('profile.clears'), clears),
+        stat(t('profile.owned'), Object.keys(app.progress.characters).length),
+        stat(t('profile.pulls'), app.progress.summon.pulls)),
+      btn(t('back'), () => { profDraft = null; showHub(); }, '', { id: 'back', class: 'zones-back-hid' }),
     );
     void dirty;
   }
@@ -64,7 +68,7 @@ export function install(app) {
         input.parentElement.append(h('div', { class: 'notice' }, t('ob.bad.bad_image')));
       }
     } });
-    return h('div', { class: 'row' }, input, btn(t('ob.photo'), () => input.click(), '', { id: `${pre}-photo` }), draft.photo ? btn(t('ob.photoClear'), () => { draft.photo = null; redraw(); }, '', { id: `${pre}-photo-clear` }) : null);
+    return h('div', { class: 'row photo-row' }, input, btn(t('ob.photo'), () => input.click(), '', { id: `${pre}-photo` }), draft.photo ? btn(t('ob.photoClear'), () => { draft.photo = null; redraw(); }, '', { id: `${pre}-photo-clear` }) : null);
   }
 
   function showStory() {

@@ -832,3 +832,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 ## v0.116.0
 - Chọn ải: thanh tiến độ trên từng độ khó, ải đang chơi nổi vàng, nhãn ải khóa rõ hơn, ẩn nút Quay lại dưới (còn nút trên).
 - Mua vé cũng hỏi xác nhận; hộp xác nhận nhỏ gọn hơn. Tag rollback cục bộ: `pre-stagesui-v0.115.0`.
+
+## v0.117.0
+- Hồ sơ người chơi: thẻ danh tính gọn, lưới avatar 6 cột, thống kê dạng ô. Tag rollback cục bộ: `pre-profileui-v0.116.0`.
