@@ -1413,6 +1413,7 @@ function startBattleUI() {
     },
     fx: audio,
     hint: false,
+    hintOpts: ctx.config.hint.auto, // gợi ý trong trận: nước tối ưu (nhiều combo nhất, sát thương cao nhất, đường ngắn)
     autoHint: () => progress.settings.hint !== false && run?.node !== 'boss', // 3 giây không chạm thì gợi ý nước đi; màn boss không gợi ý
     onInspect: showInspect,
     onSkillAsk: showSkillAsk,

@@ -37,3 +37,14 @@ test('hint: tìm nhanh (dưới 1 giây mỗi lần)', () => {
   findHint(ctx, s);
   assert.ok(Date.now() - t0 < 1000, `${Date.now() - t0}ms`);
 });
+
+test('hint tối ưu (config.hint.auto): hợp lệ, không kém gợi ý đơn giản về combo và sát thương', () => {
+  const auto = ctx.config.hint.auto;
+  for (let seed = 1; seed <= 4; seed++) {
+    const s = createBattle(ctx, { seed, team: TEAM, enemies: FOES });
+    const a = findHint(ctx, s, undefined, auto);
+    const b = findHint(ctx, s);
+    assert.ok(a && a.combos >= b.combos, `seed ${seed}`);
+    assert.notEqual(step(ctx, s, { type: 'move', path: a.path }).events[0].type, 'invalid');
+  }
+});

@@ -15,11 +15,15 @@ function score(r) {
   return { combos, cleared, dmg };
 }
 const better = (a, b) => !b || a.combos !== b.combos ? !b || a.combos > b.combos : a.cleared !== b.cleared ? a.cleared > b.cleared : a.dmg > b.dmg;
+// Chế độ tối ưu (gợi ý trong trận): nhiều combo nhất, rồi sát thương cao nhất, rồi số ngọc tan. Bằng điểm thì giữ đường NGẮN (dễ kéo) đã tìm trước.
+const betterMax = (a, b) => !b || a.combos !== b.combos ? !b || a.combos > b.combos : a.dmg !== b.dmg ? a.dmg > b.dmg : a.cleared > b.cleared;
 
 // Bản chia lát: generator nhường (yield) khi đã chạy quá sliceMs để không chặn khung hình.
 function* search(ctx, state, step, shouldYield, opts = {}) {
   const diag = ctx.config.board.allowDiagonal;
   const cap = opts.maxCombos ?? ctx.config.hint?.maxCombos ?? 6;
+  const beamW = opts.beam ?? BEAM;
+  const better_ = opts.maximize ? betterMax : better;
   const maxSteps = opts.maxSteps ?? ctx.config.hint?.maxSteps ?? 8;
   const N = state.board.cells.length;
   let best = null;
@@ -38,12 +42,12 @@ function* search(ctx, state, step, shouldYield, opts = {}) {
         if (sc && sc.combos > cap) continue; // quá nhiều combo: bỏ
         const entry = { path, sc: sc || { combos: 0, cleared: 0, dmg: 0 } };
         next.push(entry);
-        if (sc && better(sc, best?.sc)) best = entry; // bằng điểm thì giữ đường ngắn đã tìm trước
+        if (sc && better_(sc, best?.sc)) best = entry; // bằng điểm thì giữ đường ngắn đã tìm trước
       }
     }
     // giữ các đường triển vọng nhất; ưu tiên đường ngắn khi điểm bằng nhau
-    next.sort((x, y) => (better(x.sc, y.sc) ? -1 : better(y.sc, x.sc) ? 1 : 0));
-    beam = next.slice(0, BEAM);
+    next.sort((x, y) => (better_(x.sc, y.sc) ? -1 : better_(y.sc, x.sc) ? 1 : 0));
+    beam = next.slice(0, beamW);
   }
   return best ? { path: best.path, combos: best.sc.combos } : null;
 }

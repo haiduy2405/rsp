@@ -769,7 +769,7 @@ export function draw(g, view, t) {
       g.save();
       g.translate(cx + sh, 165);
       g.lineCap = 'round';
-      g.shadowColor = '#ff4d5e';
+      g.shadowColor = '#ff1f3d';
       g.shadowBlur = 8 + f * 10;
       if (f > 0) { // sóng xung lan ra + tia chớp trắng ở tâm
         g.globalAlpha = f * 0.9;
@@ -785,34 +785,38 @@ export function draw(g, view, t) {
         g.fill();
         g.globalAlpha = 1;
       }
-      g.save(); // bốn cung đỏ xoay
+      g.save(); // bốn cung đỏ xoay, có viền tối bên dưới cho nổi trên mọi nền
       g.rotate(t * 0.0018 + f * 2.4);
-      g.strokeStyle = '#ff4d5e';
-      g.lineWidth = 2;
-      for (let q = 0; q < 4; q++) {
-        g.rotate(Math.PI / 2);
-        g.beginPath();
-        g.arc(0, 0, R, -0.42, 0.42);
-        g.stroke();
-        g.beginPath();
-        g.moveTo(R + 2, 0);
-        g.lineTo(R + 6 - 2 * f, 0);
-        g.stroke();
+      for (const [col, lw] of [['rgba(60,0,10,.85)', 4.6], ['#ff1f3d', 2.6]]) {
+        g.strokeStyle = col;
+        g.lineWidth = lw;
+        g.save();
+        for (let q = 0; q < 4; q++) {
+          g.rotate(Math.PI / 2);
+          g.beginPath();
+          g.arc(0, 0, R, -0.42, 0.42);
+          g.stroke();
+          g.beginPath();
+          g.moveTo(R + 2, 0);
+          g.lineTo(R + 6 - 2 * f, 0);
+          g.stroke();
+        }
+        g.restore();
       }
       g.restore();
       g.save(); // vòng trong nét đứt xoay ngược
       g.rotate(-t * 0.003);
-      g.globalAlpha = 0.75;
-      g.strokeStyle = '#ffd2d8';
-      g.lineWidth = 1.1;
+      g.strokeStyle = '#ff3b55';
+      g.lineWidth = 1.5;
       g.setLineDash([2, 4]);
       g.beginPath();
       g.arc(0, 0, R * 0.68, 0, Math.PI * 2);
       g.stroke();
       g.restore();
       const pu = 0.5 + 0.5 * Math.sin(t * 0.009); // chấm tâm nhấp nháy
-      g.fillStyle = '#fff2f4';
-      g.globalAlpha = 0.65 + 0.35 * pu;
+      g.fillStyle = '#ff2a45';
+      g.shadowBlur = 6;
+      g.globalAlpha = 0.8 + 0.2 * pu;
       g.beginPath();
       g.arc(0, 0, 2 + 1 * pu + 2.5 * f, 0, Math.PI * 2);
       g.fill();

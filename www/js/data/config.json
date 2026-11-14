@@ -5,7 +5,8 @@
   "dragTimeMs": 5000,
   "hint": {
     "maxCombos": 3,
-    "maxSteps": 3
+    "maxSteps": 3,
+    "auto": { "maxCombos": 99, "maxSteps": 10, "beam": 24, "maximize": true }
   },
   "elements": [
     "water",

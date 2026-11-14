@@ -1209,5 +1209,7 @@
   "set.gift.wish": "+{n} lượt cầu nguyện.",
   "cl.0_123.3": "Mã quà thử nghiệm tặng thêm 100 lượt cầu nguyện (dùng khi hết lượt hằng ngày)",
   "cl.0_125.1": "Vòng khóa mục tiêu nhỏ gọn, khóa vào giữa quái; có hiệu ứng thu vòng, sóng xung và vòng trong xoay ngược",
-  "cl.0_125.2": "Vòng khóa nhỏ lại còn 1/3, bỏ chữ \"Mục tiêu\""
+  "cl.0_125.2": "Vòng khóa nhỏ lại còn 1/3, bỏ chữ \"Mục tiêu\"",
+  "cl.0_126.1": "Gợi ý nước đi giờ chọn nước tối ưu: nhiều combo nhất, sát thương cao nhất, ưu tiên đường kéo ngắn dễ thực hiện",
+  "cl.0_126.2": "Vòng khóa đậm hơn, có viền tối nên nổi bật trên mọi nền"
 }
