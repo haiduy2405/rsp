@@ -39,7 +39,8 @@ export function install(app) {
     };
     // Giá quy đổi bằng Linh Thạch: gói vé cùng số lượng trong config (1 vé = 100, 10 vé = 900). Thiếu vé thì trả bằng Linh Thạch.
     const spiritFor = (count) => cfg.ticketPacks.find((pk) => pk.tickets === count);
-    const ask = (count) => {
+    const ask = (count, free = false) => {
+      if (free) return showSummon(bannerId, { count: 1, cost: 0, spirit: 0, pack: -1, free: true });
       const cost = cfg.ticketsPerPull * count;
       const need = app.progress.inventory.tickets < cost ? spiritFor(count) : null;
       if (need && app.progress.inventory.spirit < need.spirit) return showSummon(bannerId, null, 'err.not_enough_tickets');
@@ -89,7 +90,9 @@ export function install(app) {
       btn(t('back'), showHub, '', { id: 'back', class: 'zones-back-hid' }),
       pending
         ? confirmBox(
-            pending.spirit
+            pending.free
+              ? t('summon.confirmFree', { banner: t(`banner.${bannerId}.name`) })
+              : pending.spirit
               ? t('summon.confirmSpirit', { spirit: pending.spirit, count: pending.count, banner: t(`banner.${bannerId}.name`) })
               : t('summon.confirm', { cost: pending.cost, count: pending.count, banner: t(`banner.${bannerId}.name`), left: app.progress.inventory.tickets - pending.cost }),
             () => {
@@ -99,13 +102,13 @@ export function install(app) {
                 app.progress = b.progress;
                 save();
               }
-              doSummon(pending.count, false);
+              doSummon(pending.count, !!pending.free);
             },
             () => showSummon(bannerId))
         : h(
             'div',
             { class: 'row pulls' },
-            freeAvail ? (() => { const b = btn(t('summon.free'), () => doSummon(1, true), 'primary free', { id: 'pull-free' }); b.append(h('i', { class: 'red-dot', 'aria-hidden': 'true' })); return b; })() : h('div', { class: 'muted' }, t('summon.freeUsed')),
+            freeAvail ? (() => { const b = btn(t('summon.free'), () => ask(1, true), 'primary free', { id: 'pull-free' }); b.append(h('i', { class: 'red-dot', 'aria-hidden': 'true' })); return b; })() : h('div', { class: 'muted' }, t('summon.freeUsed')),
             h('button', { id: 'pull-1', class: 'pull', onclick: () => ask(1) }, h('b', {}, t('summon.x1')), costLine(cfg.ticketsPerPull, spiritFor(1)?.spirit ?? 0)),
             h('button', { class: 'primary pull', id: 'pull-10', onclick: () => ask(cfg.multiCount) }, h('b', {}, t('summon.x10')), costLine(cfg.ticketsPerPull * cfg.multiCount, spiritFor(cfg.multiCount)?.spirit ?? 0)),
           ),

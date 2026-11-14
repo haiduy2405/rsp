@@ -1182,5 +1182,7 @@
   "battle.duoCast": "DUO!",
   "skill.duoOk": "Duo ✦",
   "skill.single": "Skill đơn",
-  "skill.duoInfo": "Hợp lực hai skill đơn ×{pct}% + hiệu ứng riêng của cặp. Cả hai tướng vào hồi chiêu."
+  "skill.duoInfo": "Hợp lực hai skill đơn ×{pct}% + hiệu ứng riêng của cặp. Cả hai tướng vào hồi chiêu.",
+  "summon.confirmFree": "Dùng lượt miễn phí hôm nay để triệu hồi ×1 ở \"{banner}\"?",
+  "cl.0_114.2": "Triệu hồi luôn hỏi xác nhận (kể cả lượt miễn phí), hộp xác nhận nổi giữa màn hình"
 }

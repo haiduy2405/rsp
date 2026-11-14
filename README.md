@@ -822,3 +822,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.114.0
 - Triệu hồi gọn hơn: sân khấu thu nhỏ, vé mua gói dạng chip icon, thanh kéo dưới kiểu kính. Tag rollback cục bộ (không đẩy lên GitHub): `pre-summonui-v0.113.0`.
+
+## v0.114.1
+- Triệu hồi luôn hỏi xác nhận (cả lượt miễn phí); hộp xác nhận nổi giữa màn hình thay vì nằm cuối trang.

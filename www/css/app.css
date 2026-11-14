@@ -1932,3 +1932,8 @@ canvas#cv { visibility: hidden; }
 .row.pulls > .muted { flex: 0 0 76px; font-size: 10.5px; line-height: 1.2; padding: 4px 6px; border-radius: 12px; background: rgba(8, 24, 60, .6); }
 .row.pulls button { border-radius: 16px; }
 .row.pulls button.primary { box-shadow: 0 0 18px rgba(255, 210, 90, .6); }
+
+/* ---- v0.114.1 hộp xác nhận nổi ---- */
+#screen #confirm { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(340px, 88vw); z-index: 60; margin: 0; text-align: center; border: 2.5px solid #fff0a8; background: #163a6c; box-shadow: 0 0 0 100vmax rgba(5, 14, 36, .66), 0 10px 30px rgba(0, 0, 0, .5); animation: shopPop .22s ease-out; }
+#screen #confirm .row { gap: 10px; }
+#screen #confirm .row button { flex: 1; }

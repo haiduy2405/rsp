@@ -1182,5 +1182,7 @@
   "battle.duoCast": "DUO!",
   "skill.duoOk": "Duo ✦",
   "skill.single": "Single skill",
-  "skill.duoInfo": "Both single skills combine at ×{pct}% plus the pair's own effect. Both heroes go on cooldown."
+  "skill.duoInfo": "Both single skills combine at ×{pct}% plus the pair's own effect. Both heroes go on cooldown.",
+  "summon.confirmFree": "Use today's free summon on \"{banner}\"?",
+  "cl.0_114.2": "Summon always asks for confirmation (free pull too); the dialog now floats mid-screen"
 }
