@@ -2015,3 +2015,16 @@ canvas#cv { visibility: hidden; }
 .dd-btns { gap: 8px; }
 .dd-btns button { padding: 8px 14px; border-radius: 999px; font-size: 14px; }
 .dd-btns #door-enter { font-size: 15px; box-shadow: 0 0 16px rgba(255, 210, 90, .55); }
+
+/* ---- v0.119 màn thưởng ---- */
+.victory-title { width: 100%; margin-top: 18px; font-size: 40px; color: #ffe08a; background: none; -webkit-background-clip: border-box; background-clip: border-box; -webkit-text-stroke: 1.5px #7a4a10; paint-order: stroke fill; text-shadow: 0 3px 0 #8a5a14, 0 6px 14px rgba(20, 30, 90, .55), 0 0 22px rgba(255, 220, 110, .55); filter: none; animation: titleIn .6s cubic-bezier(.2, 1.5, .4, 1) both; }
+.victory-title + .muted { align-self: center; padding: 3px 14px; border-radius: 999px; background: rgba(8, 24, 60, .4); color: #e3efff; font-size: 12.5px; margin-top: 4px; }
+.loot-stage { width: 180px; height: 152px; margin: 26px auto 0; }
+.loot-list { gap: 7px; }
+.reward { padding: 7px 14px 7px 10px; border-radius: 16px; border: 1.5px solid rgba(255, 232, 150, .55); box-shadow: 0 3px 8px rgba(0, 0, 0, .25); }
+.reward .ricon svg, .reward .ricon img { width: 30px; height: 30px; }
+.rlabel { font-size: 15px; }
+.rnum { font-size: 26px; }
+.reward.rare { position: relative; overflow: hidden; border-color: #ffe08a; }
+.reward.rare::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(110deg, transparent 35%, rgba(255, 245, 190, .35) 50%, transparent 65%); transform: translateX(-120%); animation: lnShine 1.6s .3s ease-out 1 forwards; }
+#continue { min-width: 210px; padding: 11px 28px; border-radius: 999px; font-size: 17px; box-shadow: 0 0 20px rgba(255, 210, 90, .6), 0 4px 0 rgba(120, 70, 10, .55); }

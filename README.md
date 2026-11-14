@@ -838,3 +838,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.118.0
 - Chi tiết cửa gọn hơn: quái giống nhau gộp một thẻ ×N, hộp nhỏ, nút viên. Tag rollback cục bộ: `pre-doorui-v0.117.0`.
+
+## v0.119.0
+- Màn thưởng: sửa tiêu đề "Chiến thắng" bị tràn/mất (bỏ hiệu ứng chữ gradient), dòng thưởng gọn, rương nhỏ lại. Tag rollback cục bộ: `pre-lootui-v0.118.0`.
