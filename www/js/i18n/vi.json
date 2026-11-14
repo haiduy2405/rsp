@@ -1207,5 +1207,6 @@
   "wish.extra": "Hôm nay đã ước. Còn {n} lượt thưởng thêm.",
   "wish.extraTail": "(+{n} lượt thưởng thêm)",
   "set.gift.wish": "+{n} lượt cầu nguyện.",
-  "cl.0_123.3": "Mã quà thử nghiệm tặng thêm 100 lượt cầu nguyện (dùng khi hết lượt hằng ngày)"
+  "cl.0_123.3": "Mã quà thử nghiệm tặng thêm 100 lượt cầu nguyện (dùng khi hết lượt hằng ngày)",
+  "cl.0_125.1": "Vòng khóa mục tiêu nhỏ gọn, khóa vào giữa quái; có hiệu ứng thu vòng, sóng xung và vòng trong xoay ngược"
 }

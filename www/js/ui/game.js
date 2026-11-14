@@ -848,7 +848,7 @@ export function startGame({ canvas, ctx, t, state: initial, stepper, titleText, 
         view.canAct = true;
       }
     }
-    if (view.lockFlash) view.lockFlash = Math.max(0, view.lockFlash - dt / 400);
+    if (view.lockFlash) view.lockFlash = Math.max(0, view.lockFlash - dt / 520);
     if (view.slides) for (const k in view.slides) { view.slides[k].age += dt; if (view.slides[k].age > 180) delete view.slides[k]; }
     for (const f of view.floaters) f.age += dt;
     if (view.healGlow > 0) view.healGlow = Math.max(0, view.healGlow - dt / 1100);

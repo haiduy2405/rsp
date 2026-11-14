@@ -761,25 +761,61 @@ export function draw(g, view, t) {
     }
     g.restore();
     if (view.focus === i && !dead) {
-      // khóa mục tiêu: vòng ngắm xoay + bốn góc
-      const R = 84 + (view.lockFlash || 0) * 14;
+      // khóa mục tiêu: vòng ngắm nhỏ gọn ngay giữa quái. Khi vừa khóa: vòng lớn thu nhanh vào (nảy nhẹ), sóng xung và tia chớp.
+      const f = view.lockFlash || 0; // 1 → 0
+      const k = 1 - f;
+      const snap = f > 0 ? 1 + 1.15 * Math.pow(f, 2.2) - 0.12 * Math.sin(k * Math.PI * 2.2) * f : 1;
+      const R = 50 * snap + 1.6 * Math.sin(t * 0.007);
       g.save();
       g.translate(cx + sh, 165);
-      g.rotate(t * 0.0012);
-      g.strokeStyle = '#ff4d5e';
-      g.lineWidth = 4;
+      g.lineCap = 'round';
       g.shadowColor = '#ff4d5e';
-      g.shadowBlur = 14;
+      g.shadowBlur = 12 + f * 14;
+      if (f > 0) { // sóng xung lan ra + tia chớp trắng ở tâm
+        g.globalAlpha = f * 0.9;
+        g.strokeStyle = '#ffd2d8';
+        g.lineWidth = 2 + 4 * f;
+        g.beginPath();
+        g.arc(0, 0, 50 + 46 * k, 0, Math.PI * 2);
+        g.stroke();
+        g.globalAlpha = f * 0.35;
+        g.fillStyle = '#ff6a78';
+        g.beginPath();
+        g.arc(0, 0, 50, 0, Math.PI * 2);
+        g.fill();
+        g.globalAlpha = 1;
+      }
+      g.save(); // bốn cung đỏ xoay
+      g.rotate(t * 0.0018 + f * 2.4);
+      g.strokeStyle = '#ff4d5e';
+      g.lineWidth = 3.2;
       for (let q = 0; q < 4; q++) {
         g.rotate(Math.PI / 2);
         g.beginPath();
-        g.arc(0, 0, R, -0.35, 0.35);
+        g.arc(0, 0, R, -0.42, 0.42);
         g.stroke();
         g.beginPath();
-        g.moveTo(R + 6, 0);
-        g.lineTo(R + 20, 0);
+        g.moveTo(R + 4, 0);
+        g.lineTo(R + 13 - 4 * f, 0);
         g.stroke();
       }
+      g.restore();
+      g.save(); // vòng trong nét đứt xoay ngược
+      g.rotate(-t * 0.003);
+      g.globalAlpha = 0.75;
+      g.strokeStyle = '#ffd2d8';
+      g.lineWidth = 1.6;
+      g.setLineDash([5, 9]);
+      g.beginPath();
+      g.arc(0, 0, R * 0.68, 0, Math.PI * 2);
+      g.stroke();
+      g.restore();
+      const pu = 0.5 + 0.5 * Math.sin(t * 0.009); // chấm tâm nhấp nháy
+      g.fillStyle = '#fff2f4';
+      g.globalAlpha = 0.65 + 0.35 * pu;
+      g.beginPath();
+      g.arc(0, 0, 3 + 1.6 * pu + 3 * f, 0, Math.PI * 2);
+      g.fill();
       g.restore();
       text(g, view.t('battle.locked'), cx, 98, 13, '#ff8a96');
     }

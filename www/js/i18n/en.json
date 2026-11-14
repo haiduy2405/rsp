@@ -1207,5 +1207,6 @@
   "wish.extra": "Today's wish used. {n} bonus wishes left.",
   "wish.extraTail": "(+{n} bonus wishes)",
   "set.gift.wish": "+{n} wishes.",
-  "cl.0_123.3": "Test gift code now also grants 100 bonus wishes (used after the daily wish)"
+  "cl.0_123.3": "Test gift code now also grants 100 bonus wishes (used after the daily wish)",
+  "cl.0_125.1": "Target-lock ring is smaller and centered on the monster, with a snap-in, shockwave and counter-rotating inner ring"
 }

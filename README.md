@@ -860,3 +860,4 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Gợi ý nước đi tự động: sau 3 giây người chơi chưa chạm màn hình thì hiện đường gợi ý, lặp lại mỗi lượt; màn boss không gợi ý và ẩn nút bóng đèn (góc trên phải) bật/tắt. Tag rollback cục bộ (chỉ trên máy này): `pre-autohint-v0.122.1`.
 - Nút xác nhận thống nhất toàn game: Hủy/Thoát bên trái, Đồng ý/Mua/Lưu bên phải.
 - Mã `dluma` (thử nghiệm, xóa trước khi phát hành): thêm 100 lượt cầu nguyện thưởng (`progress.wishExtra`, dùng sau lượt hằng ngày); mã nhập lại được (`once:false`) để test.
+- Vòng khóa mục tiêu thu nhỏ, đặt giữa quái, thêm hiệu ứng thu vào/sóng xung. Tag rollback cục bộ (chỉ trên máy này): `pre-lockring-v0.124.0`.
