@@ -1,4 +1,5 @@
 {
+  "cl.0_112.1": "Đội hình làm lại: ô tướng theo màu hệ, thông tin đội trưởng và Duo gọn, kho tướng 5 cột nhẹ hơn",
   "hub.summonShort": "Triệu hồi",
   "hub.creditShort": "duyluma",
   "cl.0_111.1": "Màn chính gọn hơn: nhãn nút dưới, tên khu và tiến độ dưới mỗi đảo, mũi tên chỉ khu nên chơi, nút tiếp tục chuyến gọn",
@@ -611,7 +612,7 @@
   "items.stones": "Tinh Thạch theo hệ",
   "team.selected": "Đang chọn",
   "team.inTeam": "Đang ở ô {n}",
-  "team.holdHint": "Chọn một ô rồi chạm tướng bên dưới để đưa vào đội (hoặc đổi chỗ). Nhấn giữ một tướng để xem chi tiết.",
+  "team.holdHint": "Chọn ô rồi chạm tướng để xếp. Giữ một tướng để xem chi tiết.",
   "hub.shop": "Cửa hàng",
   "hub.quests": "Nhiệm vụ",
   "hub.help": "Hướng dẫn chơi",

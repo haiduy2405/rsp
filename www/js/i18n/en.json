@@ -1,4 +1,5 @@
 {
+  "cl.0_112.1": "Team screen redesigned: element-coloured slots, compact leader and Duo info, lighter 5-column roster",
   "hub.summonShort": "Summon",
   "hub.creditShort": "duyluma",
   "cl.0_111.1": "Cleaner home screen: dock labels, zone names and progress under each island, arrow on the next zone, compact resume button",
@@ -611,7 +612,7 @@
   "items.stones": "Stones by element",
   "team.selected": "Selected",
   "team.inTeam": "In slot {n}",
-  "team.holdHint": "Pick a slot, then tap a character below to place or swap. Hold a character for details.",
+  "team.holdHint": "Pick a slot, then tap a hero. Hold a hero for details.",
   "hub.shop": "Shop",
   "hub.quests": "Quests",
   "hub.help": "How to play",

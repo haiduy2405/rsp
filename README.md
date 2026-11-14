@@ -810,3 +810,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.111.0
 - Màn chính: nhãn dưới nút dock (Đội/Triệu hồi/Shop/Nhiệm vụ), tên khu + tiến độ n/21 dưới đảo đã mở, mũi tên nhún chỉ khu nên chơi tiếp, nút Tiếp tục chuyến leo dạng viên thuốc có ▶ và nhịp sáng, phiên bản chuyển lên dưới tên (`duyluma · vX #build`) thay khối credit che đảo chính. Tag cục bộ `pre-hubui-v0.110.0`.
+
+## v0.112.0
+- Đội hình làm lại: tab đội dạng thanh trượt, ô tướng viền theo màu hệ (đội trưởng viền vàng + ♛), nút Tự lập đội nổi bật, thông tin đội trưởng và Duo thành hai hàng gọn (Duo kích hoạt có chip xanh), lời gợi ý một dòng, kho tướng 5 cột bỏ khung vàng quét (nhẹ hơn khi cuộn). Giữ nguyên hành vi và id. Tag cục bộ `pre-teamui-v0.111.0`.

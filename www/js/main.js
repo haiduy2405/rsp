@@ -755,7 +755,7 @@ function showTeam(slot, msg, stage) {
     const body = id
       ? [tag, h('div', { class: 'tm-ph' }, portrait(id, 64), h('b', { class: 'tm-lv' }, String(progress.characters[id].level))), h('small', { class: 'sn' }, t(`char.${id}`))]
       : [tag, h('div', { class: 'plus' }, '+'), h('small', { class: 'sn' }, lead ? t('team.leader') : t('team.empty'))];
-    const node = h('div', { class: cls, 'data-slot': i, onclick: () => again(i) }, ...body);
+    const node = h('div', { class: cls, 'data-slot': i, style: id ? `--el:${COLORS[ctx.characters[id].element]}` : null, onclick: () => again(i) }, ...body);
     return id ? longPress(node, () => showChar(id, undefined, () => again(i))) : node;
   }));
   const needLeader = team[0] === null;
@@ -773,9 +773,9 @@ function showTeam(slot, msg, stage) {
       btn(t('team.clear'), () => { apply(clearTeam(progress)); again(0); }, '', { id: 'team-clear', ...(members.length ? {} : { disabled: '' }) }),
       slot > 0 && team[slot] ? btn(t('team.makeLeader', { name: t(`char.${team[slot]}`) }), () => { apply(makeLeader(progress, slot)); again(0); }, '', { id: 'make-leader' }) : null,
     ),
-    h('div', { class: 'card tm-info' },
-      members.length ? h('div', {}, h('b', {}, '♛ ', t('char.leader')), h('span', { class: 'muted' }, ': ', leaderText(resolveKit(ctx, members[0], progress.characters[members[0]].skillLv, formOf(progress.characters[members[0]].awaken)).leader))) : null,
-      h('div', { class: duos.length ? 'tm-duo on' : 'tm-duo' }, h('b', {}, 'Duo'), h('span', { class: 'muted' }, ': ', members.length < 2 || !duos.length ? t('team.noDuo') : duos.map((d) => t(`duo.${d.id}`)).join(', ')))),
+    h('div', { class: 'tm-info' },
+      members.length ? h('div', { class: 'tm-row tm-lead' }, h('i', { class: 'tm-ico', 'aria-hidden': 'true' }, '♛'), h('span', {}, h('b', {}, t('char.leader')), ' ', h('em', {}, leaderText(resolveKit(ctx, members[0], progress.characters[members[0]].skillLv, formOf(progress.characters[members[0]].awaken)).leader)))) : null,
+      h('div', { class: 'tm-row tm-duo' + (duos.length ? ' on' : '') }, h('i', { class: 'tm-ico', 'aria-hidden': 'true' }, '✦'), duos.length ? h('span', { class: 'tm-chips' }, h('b', {}, 'Duo'), duos.map((d) => h('u', { class: 'tm-chip' }, t(`duo.${d.id}`)))) : h('span', { class: 'muted' }, h('b', {}, 'Duo'), ' · ', t('team.noDuo')))),
     stage ? [needLeader || !members.length ? h('div', { class: 'notice' }, t(members.length ? 'team.needLeader' : 'team.needAny')) : null, btn(t('team.go'), () => (activeRunInfo() ? askAbandon(stage) : startRun(stage)), 'primary', { id: 'team-go', ...(needLeader ? { disabled: '' } : {}) })] : null,
     h('p', { class: 'muted' }, t('team.holdHint')),
     h('div', { class: 'roster' }, sorted.map((c) => longPress(Object.assign(tile(c.id, team.indexOf(c.id) + 1 || 0), { onclick: () => pick(c.id) }), () => showChar(c.id, undefined, () => again(slot))))),
