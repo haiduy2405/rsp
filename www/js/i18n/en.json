@@ -1,4 +1,6 @@
 {
+  "quest.summary": "Claimed {n}/{m} quests",
+  "cl.0_113.1": "Quests redesigned: status medals, progress bars with counts, icon rewards, segmented tabs, overall progress bar",
   "cl.0_112.2": "Home dock labels no longer touch",
   "cl.0_112.1": "Team screen redesigned: element-coloured slots, compact leader and Duo info, lighter 5-column roster",
   "hub.summonShort": "Summon",

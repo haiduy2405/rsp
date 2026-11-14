@@ -800,15 +800,19 @@ function showQuests() {
     if (r.ok) { progress = r.progress; save(); rewardPop([{ k: 'spirit', n: r.reward.spirit }, { k: 'gold', n: r.reward.gold }, { k: 'ticket', n: r.reward.tickets }], ev); questMsg = `+ ${rewardText(r.reward)}`; } else questMsg = t(`err.${r.reason}`);
     showQuests();
   };
+  const chips = (r) => h('span', { class: 'q-rw' }, [['spirit', r.spirit], ['gold', r.gold], ['ticket', r.tickets]].filter(([, n]) => n).map(([k, n]) => h('span', { class: 'q-chip' }, itemIcon(k, 'sm'), String(n))));
+  const medal = (state) => h('i', { class: 'q-med ' + state, 'aria-hidden': 'true' }, state === 'claimed' ? '✓' : state === 'ready' ? '!' : '');
   const rows = q.list.map((x) => {
     const done = isDone(x);
     return h('div', { class: 'card quest' + (done ? ' done' : '') + (x.claimed ? ' claimed' : ''), 'data-quest': x.id },
-      h('div', { class: 'q-info' }, h('b', {}, t(`quest.${x.kind}`, { n: x.goal })), h('div', { class: 'q-bar' }, h('i', { style: `width:${Math.round((100 * x.count) / x.goal)}%` })), h('small', { class: 'muted' }, `${x.count}/${x.goal} · ${rewardText(x.reward)}`)),
+      medal(x.claimed ? 'claimed' : done ? 'ready' : 'todo'),
+      h('div', { class: 'q-info' }, h('b', {}, t(`quest.${x.kind}`, { n: x.goal })), h('div', { class: 'q-bar' }, h('i', { style: `width:${Math.min(100, Math.round((100 * x.count) / x.goal))}%` }), h('em', {}, `${Math.min(x.count, x.goal)}/${x.goal}`)), chips(x.reward)),
       x.claimed ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), (e) => claim(() => claimQuest(ctx, progress, day, x.id), e), done ? 'primary' : '', { id: `claim-${x.id}`, ...(done ? {} : { disabled: '' }) }));
   });
   const all = allClaimed(progress);
   const bonus = h('div', { class: 'card quest bonus' + (all && !q.bonusClaimed ? ' done' : '') + (q.bonusClaimed ? ' claimed' : '') },
-    h('div', { class: 'q-info' }, h('b', {}, t('quest.bonus')), h('small', { class: 'muted' }, rewardText(cfg.bonus))),
+    medal(q.bonusClaimed ? 'claimed' : all ? 'ready' : 'todo'),
+    h('div', { class: 'q-info' }, h('b', {}, t('quest.bonus')), chips(cfg.bonus)),
     q.bonusClaimed ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), (e) => claim(() => claimBonus(ctx, progress, day), e), all ? 'primary' : '', { id: 'claim-bonus', ...(all ? {} : { disabled: '' }) }));
   const goTab = (tab) => { questTab = tab; questMsg = null; showQuests(); };
   const achvRows = listAchievements(ctx, progress).map((a) => {
@@ -816,19 +820,20 @@ function showQuests() {
     const goal = a.next ? a.next.goal : a.tiers[a.tiers.length - 1].goal;
     const pct = a.next ? Math.round((100 * Math.max(0, Math.min(a.value, goal) - prev)) / (goal - prev)) : 100;
     return h('div', { class: 'card quest achv' + (a.ready ? ' done' : '') + (!a.next ? ' claimed' : ''), 'data-achv': a.id },
-      h('div', { class: 'q-info' }, h('b', {}, t(`achv.${a.id}`)), h('div', { class: 'q-bar' }, h('i', { style: `width:${pct}%` })),
-        h('small', { class: 'muted' }, a.next ? `${Math.min(a.value, goal)}/${goal} · ${rewardText(a.next.reward)} · ${t('achv.tier', { n: a.claimed + 1, m: a.tiers.length })}` : `${t('achv.max')} · ${a.tiers.length}/${a.tiers.length}`)),
+      medal(!a.next ? 'claimed' : a.ready ? 'ready' : 'todo'),
+      h('div', { class: 'q-info' }, h('b', {}, t(`achv.${a.id}`)), h('div', { class: 'q-bar' }, h('i', { style: `width:${pct}%` }), h('em', {}, a.next ? `${Math.min(a.value, goal)}/${goal}` : 'MAX')),
+        h('span', { class: 'q-sub' }, a.next ? [chips(a.next.reward), h('small', {}, t('achv.tier', { n: a.claimed + 1, m: a.tiers.length }))] : h('small', {}, `${t('achv.max')} · ${a.tiers.length}/${a.tiers.length}`))),
       !a.next ? h('span', { class: 'q-done' }, t('quest.claimed')) : btn(t('quest.claim'), (e) => claim(() => claimAchievement(ctx, progress, a.id), e), a.ready ? 'primary' : '', { id: `claim-achv-${a.id}`, ...(a.ready ? {} : { disabled: '' }) }));
   });
   const dot = (on) => (on ? h('i', { class: 'red-dot' }) : null);
   const dailyDot = hasClaimable(ctx, progress, day), achvDot = hasAchvClaimable(ctx, progress);
   music('camp');
   screen(
-    h('h2', {}, t('hub.quests')),
-    h('div', { class: 'row' },
+    h('h2', { class: 'zones-title' }, t('hub.quests')),
+    h('div', { class: 'row q-seg' },
       h('button', { class: questTab === 'daily' ? 'primary' : '', id: 'tab-daily', onclick: () => goTab('daily') }, t('quest.daily'), dot(dailyDot)),
       h('button', { class: questTab === 'achv' ? 'primary' : '', id: 'tab-achv', onclick: () => goTab('achv') }, t('quest.achv'), dot(achvDot))),
-    questTab === 'daily' ? h('div', { class: 'muted' }, t('quest.resetNote')) : null,
+    questTab === 'daily' ? h('div', { class: 'q-sum' }, h('span', {}, t('quest.summary', { n: q.list.filter((x) => x.claimed).length, m: q.list.length })), h('i', {}, h('u', { style: `width:${Math.round((100 * q.list.filter((x) => x.claimed).length) / Math.max(1, q.list.length))}%` })), h('small', {}, t('quest.resetNote'))) : null,
     questMsg ? h('div', { class: 'notice', id: 'quest-msg' }, questMsg) : null,
     ...(questTab === 'daily' ? [...rows, bonus] : achvRows),
     btn(t('back'), showHub, '', { id: 'back' }),

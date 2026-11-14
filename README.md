@@ -816,3 +816,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.112.1
 - Sửa nhãn dock màn chính dính nhau: chữ 10px, nhích lệch hai bên.
+
+## v0.113.0
+- Nhiệm vụ làm lại: huy hiệu trạng thái (chưa/!/✓), thanh tiến độ có số bên trong, thưởng dạng chip icon, tab thanh trượt, thanh tổng tiến độ ngày, nút Nhận dạng viên thuốc nhịp sáng khi sẵn sàng. Giữ id. Tag cục bộ `pre-mapui-v0.112.1`.
