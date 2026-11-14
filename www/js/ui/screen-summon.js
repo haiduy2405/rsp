@@ -59,7 +59,7 @@ export function install(app) {
     const pityPct = Math.min(100, (sm.pity5 / cfg.pity5) * 100);
     music('summon');
     screen(
-      h('h2', {}, t('summon.title')),
+      h('h2', { class: 'zones-title' }, t('summon.title')),
       h('div', { class: 'sm-wallet' },
         h('div', { class: 'sm-cur', id: 'tickets' }, itemIcon('ticket', 'sm'), h('span', {}, t('summon.tickets', { n: app.progress.inventory.tickets }))),
         h('div', { class: 'sm-cur', id: 'spirit' }, itemIcon('spirit', 'sm'), h('span', {}, t('summon.spirit', { n: app.progress.inventory.spirit })))),
@@ -76,7 +76,7 @@ export function install(app) {
       h('div', { class: 'row packs' }, cfg.ticketPacks.map((pk, i) => h('button', { class: 'pack', id: `buy-${i}`, onclick: (ev) => {
         const r = buyTickets(ctx, app.progress, i);
         if (r.ok) { app.progress = r.progress; save(); app.rewardPop([{ k: 'ticket', n: cfg.ticketPacks[i].tickets }], ev); showSummon(bannerId, null, null); } else showSummon(bannerId, null, `err.${r.reason}`);
-      } }, itemIcon('ticket', 'sm'), h('span', {}, t('summon.buy', { t: pk.tickets, s: pk.spirit }))))),
+      } }, itemIcon('ticket', 'sm'), h('b', {}, `×${pk.tickets}`), h('span', { class: 'pk-sp' }, '=', itemIcon('spirit', 'sm'), String(pk.spirit))))),
       h(
         'details',
         { class: 'card', id: 'rates' },
@@ -85,8 +85,8 @@ export function install(app) {
         h('div', {}, t('summon.effRates', { r5: fmtPct(eff[5]), r4: fmtPct(eff[4]), r3: fmtPct(eff[3]) })),
         h('div', { class: 'muted' }, t('summon.pity4', { max: cfg.guarantee4Every, n: sm.pity4 })),
       ),
-      h('div', { class: 'row' }, btn(t('summon.history'), showHistory, '', { id: 'b-history' }), btn(t('summon.redeem'), () => showRedeem(), '', { id: 'b-redeem' })),
-      btn(t('back'), showHub, '', { id: 'back' }),
+      h('div', { class: 'row sm-links' }, btn(t('summon.history'), showHistory, '', { id: 'b-history' }), btn(t('summon.redeem'), () => showRedeem(), '', { id: 'b-redeem' })),
+      btn(t('back'), showHub, '', { id: 'back', class: 'zones-back-hid' }),
       pending
         ? confirmBox(
             pending.spirit

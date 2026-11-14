@@ -1,9 +1,9 @@
 {
   "name": "rift-spire-pantheon",
-  "version": "0.113.0",
+  "version": "0.114.0",
   "private": true,
   "type": "module",
-  "description": "Thi\u00ean Th\u00e1p D\u1ecb \u0110i\u1ec3m (Rift Spire: Pantheon) - puzzle RPG k\u00e9o ng\u1ecdc leo th\u00e1p",
+  "description": "Thiên Tháp Dị Điểm (Rift Spire: Pantheon) - puzzle RPG kéo ngọc leo tháp",
   "scripts": {
     "test": "node --test tests/*.test.js",
     "serve": "node tools/serve.js",
