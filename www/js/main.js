@@ -31,7 +31,7 @@ import { VERSION, BUILD, BUILD_DATE } from './version.js';
 import { createFxLayer } from './ui/fxlayer.js';
 import { installRewardFx } from './ui/rewardfx.js';
 import { createAudio } from './ui/audio.js';
-import { $, h, btn } from './ui/dom.js';
+import { $, h, btn, dismissEl } from './ui/dom.js';
 import { itemIcon, rewardIcon, REWARD_ICON } from './ui/icons.js';
 import { relicIconSvg } from './ui/relic-icons.js';
 import { install as installItems } from './ui/screen-items.js';
@@ -150,6 +150,7 @@ function showBattleCanvas(on) {
 }
 const screen = (...kids) => {
   $('info')?.remove();
+  document.querySelectorAll('#wrap .mdl').forEach((m) => m.remove());
   $('coach')?.remove(); // lớp chỉ dẫn tutorial còn sót (vd thoát giữa chừng) sẽ chặn chạm ở mọi màn
   $('coach-dim')?.remove();
   $('pause-btn')?.remove();
@@ -475,7 +476,7 @@ const pctText = (p) => (p <= 0 ? '0%' : p >= 0.995 ? '100%' : `${(p * 100).toFix
 const rangeText = ([a, b]) => (a === b ? `${a}` : `${a}–${b}`);
 function showStageInfo(zoneId, diff, stage = 1) {
   const si = stageInfo(ctx, zoneId, diff, stage);
-  const close = () => $('info')?.remove();
+  const close = () => dismissEl($('info'));
   const row = (k, v) => h('div', { class: 'si-row' }, h('span', {}, k), h('b', {}, v));
   const names = (ids) => ids.map((m) => t(`monster.${m}`)).join(', ');
   const dropLabel = (key) => (key === 'fragment' ? t('items.tab.frag') : key.startsWith('elixir.') ? t(`res.${key}`) : key.startsWith('stone.') ? `${t('res.stone')} ${t(`stone.${key.slice(6)}`)}` : t(`res.${key}`));
@@ -736,7 +737,7 @@ function tile(id, slotNo) {
 // Chọn kiểu tự lập đội: mỗi kiểu một cách xếp (core/upgrade.js autoTeam).
 function showAutoPicker(stage) {
   if ($('info')) return;
-  const close = () => $('info')?.remove();
+  const close = () => dismissEl($('info'));
   const go = (mode) => { const r = autoTeam(ctx, progress, mode); if (r.ok) { progress = r.progress; save(); } close(); showTeam(0, undefined, stage); };
   $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() },
     h('div', { class: 'infobox' }, h('h3', {}, t('team.auto.title')),
@@ -1079,7 +1080,7 @@ function showBag(selKey) {
   const entries = [];
   for (const it of ['potion', 'shield', 'time']) if (run.items[it] > 0 || run.armed[it]) entries.push({ key: it, kind: 'item', it, name: t(`item.${it}`), n: run.items[it], col: ITEM_COL[it], armed: !!run.armed[it] });
   for (const id of run.relics) entries.push({ key: `r_${id}`, kind: 'relic', id, name: relicName(id), n: 0, col: RELIC_COL[ctx.relics[id].rarity] });
-  const close = () => $('info')?.remove();
+  const close = () => dismissEl($('info'));
   const tabs = [['all', t('items.all')], ['item', t('run.bag.items')], ['relic', t('run.bag.relics')]];
   if (!tabs.some(([k]) => k === bagTab)) bagTab = 'all';
   const shown = entries.filter((e) => bagTab === 'all' || e.kind === bagTab);
@@ -1139,7 +1140,7 @@ const relicStrip = () =>
     : null;
 function showRelicSheet(id) {
   if ($('info')) return;
-  const close = () => $('info')?.remove();
+  const close = () => dismissEl($('info'));
   $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox' }, h('h3', {}, t('relic.sheet')), id ? relicCard(id) : run.relics.map((r) => relicCard(r)), btn(t('info.close'), close, 'primary', { id: 'info-close' }))));
 }
 function showRelicPick() {
@@ -1184,7 +1185,7 @@ function showDoorDetail(i) {
   const k = run.doors[i];
   const d = NODE[k] || NODE.normal;
   const foes = run.preview?.[i];
-  const close = () => $('info')?.remove();
+  const close = () => dismissEl($('info'));
   const ico = h('span', { class: 'dd-medal' });
   ico.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d.icon}</svg>`;
   const groups = foes ? [...foes.reduce((a, m) => a.set(m, (a.get(m) || 0) + 1), new Map())] : [];
@@ -1221,7 +1222,7 @@ function el_orb(e) {
 
 function showRules() {
   const close = () => {
-    $('info')?.remove();
+    dismissEl($('info'));
     doorHint = true;
     guidePoint('#screen [data-door]', 'guide.door', 300);
   };
@@ -1453,7 +1454,7 @@ let pending = null;
 // Tạm dừng giữa trận: chỉnh âm thanh hoặc thoát. Thoát bỏ trận đang đánh dở, giữ tiến trình các cửa đã xong.
 function showPause(confirmQuit = false) {
   if ($('info')) return;
-  const close = () => $('info')?.remove();
+  const close = () => dismissEl($('info'));
   const quit = () => {
     if (doorsSnap) progress.activeRun = structuredClone(doorsSnap);
     else delete progress.activeRun;
@@ -1533,7 +1534,7 @@ function showSkillAsk(idx, confirm, duoGo = null, duo = null) {
   if (!m) return;
   const kit = resolveKit(ctx, m.id, m.skillLv, formOf(m.awaken));
   const keys = keysOf(kit.skill.units);
-  const close = () => $('info')?.remove();
+  const close = () => dismissEl($('info'));
   const col = COLORS[m.element];
   const orbImg = getImg(`orb:${m.element}`);
   const isDuo = !!(duoGo && duo);
@@ -1608,7 +1609,7 @@ function showInspect(kind, idx) {
       h('div', { class: 'card' }, h('b', {}, t('info.effects')), effectRows(e.effects)),
     ];
   }
-  const close = () => $('info')?.remove();
+  const close = () => dismissEl($('info'));
   $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox' }, body, btn(t('info.close'), close, 'primary', { id: 'info-close' }))));
 }
 

@@ -1,5 +1,5 @@
 // Màn hình: summon (tách khỏi main.js). Trạng thái dùng chung đi qua `app`.
-import { $, h, btn } from './dom.js';
+import { $, h, btn, openModal } from './dom.js';
 import { itemIcon } from './icons.js';
 import { getImg } from './assets.js';
 import { COLORS } from './hero-ui.js';
@@ -16,8 +16,13 @@ export function install(app) {
 
   const rarityCls = (r) => `rar${r}`;
 
-  const confirmBox = (text, yes, no, yesLabel = t('summon.yes')) =>
-    h('div', { class: 'card', id: 'confirm' }, h('p', {}, text), h('div', { class: 'row' }, btn(yesLabel, yes, 'primary', { id: 'confirm-yes' }), btn(t('summon.no'), no, '', { id: 'confirm-no' })));
+  // Hộp xác nhận nổi (không vẽ lại cả màn): trả về null, mở sau khi màn gọi đã dựng xong.
+  const confirmBox = (text, yes, no, yesLabel = t('summon.yes')) => {
+    let close = () => {};
+    const card = h('div', { class: 'card', id: 'confirm' }, h('p', {}, text), h('div', { class: 'row' }, btn(yesLabel, (e) => { close(); yes(e); }, 'primary', { id: 'confirm-yes' }), btn(t('summon.no'), () => { close(); no(); }, '', { id: 'confirm-no' })));
+    queueMicrotask(() => { close = openModal(card, { dismiss: false }); });
+    return null;
+  };
 
   function showSummon(bannerId, pending = null, msg = null) {
     const cfg = ctx.config.summon;
@@ -39,12 +44,22 @@ export function install(app) {
     };
     // Giá quy đổi bằng Linh Thạch: gói vé cùng số lượng trong config (1 vé = 100, 10 vé = 900). Thiếu vé thì trả bằng Linh Thạch.
     const spiritFor = (count) => cfg.ticketPacks.find((pk) => pk.tickets === count);
+    const bn = t(`banner.${bannerId}.name`);
     const ask = (count, free = false) => {
-      if (free) return showSummon(bannerId, { count: 1, cost: 0, spirit: 0, pack: -1, free: true });
+      if (free) return confirmBox(t('summon.confirmFree', { banner: bn }), () => doSummon(1, true), () => {});
       const cost = cfg.ticketsPerPull * count;
       const need = app.progress.inventory.tickets < cost ? spiritFor(count) : null;
       if (need && app.progress.inventory.spirit < need.spirit) return showSummon(bannerId, null, 'err.not_enough_tickets');
-      showSummon(bannerId, { count, cost, spirit: need ? need.spirit : 0, pack: need ? cfg.ticketPacks.indexOf(need) : -1 });
+      const text = need ? t('summon.confirmSpirit', { spirit: need.spirit, count, banner: bn }) : t('summon.confirm', { cost, count, banner: bn, left: app.progress.inventory.tickets - cost });
+      confirmBox(text, () => {
+        if (need) {
+          const b = buyTickets(ctx, app.progress, cfg.ticketPacks.indexOf(need));
+          if (!b.ok) return showSummon(bannerId, null, `err.${b.reason}`);
+          app.progress = b.progress;
+          save();
+        }
+        doSummon(count, false);
+      }, () => {});
     };
     // Tướng đại diện của banner: văn hóa của banner, hoặc mỗi văn hóa một tướng cao sao nhất cho banner thường.
     const pool = ctx.characterList.filter((c) => !c.reserve && (!banner.culture || c.culture === banner.culture));
@@ -76,7 +91,10 @@ export function install(app) {
       h('div', { class: 'pity' }, h('div', { class: 'pity-row' }, h('div', { class: 'pity-bar' }, h('i', { style: `width:${pityPct}%` })), h('span', { class: 'pity-end' }, '5★')), h('small', {}, t('summon.pity5', { max: cfg.pity5, n: sm.pity5 }))),
       h('div', { class: 'row packs' }, cfg.ticketPacks.map((pk, i) => h('button', { class: 'pack', id: `buy-${i}`, onclick: () => {
         if (app.progress.inventory.spirit < pk.spirit) return showSummon(bannerId, null, 'err.not_enough_spirit');
-        showSummon(bannerId, { buy: i, spirit: pk.spirit, tickets: pk.tickets });
+        confirmBox(t('summon.confirmBuy', { tickets: pk.tickets, spirit: pk.spirit }), (ev) => {
+          const r = buyTickets(ctx, app.progress, i);
+          if (r.ok) { app.progress = r.progress; save(); app.rewardPop([{ k: 'ticket', n: pk.tickets }], ev); showSummon(bannerId, null, null); } else showSummon(bannerId, null, `err.${r.reason}`);
+        }, () => {}, t('summon.buyYes'));
       } }, itemIcon('ticket', 'sm'), h('b', {}, `×${pk.tickets}`), h('span', { class: 'pk-sp' }, '=', itemIcon('spirit', 'sm'), String(pk.spirit))))),
       h(
         'details',
@@ -88,29 +106,7 @@ export function install(app) {
       ),
       h('div', { class: 'row sm-links' }, btn(t('summon.history'), showHistory, '', { id: 'b-history' }), btn(t('summon.redeem'), () => showRedeem(), '', { id: 'b-redeem' })),
       btn(t('back'), showHub, '', { id: 'back', class: 'zones-back-hid' }),
-      pending
-        ? pending.buy != null
-          ? confirmBox(t('summon.confirmBuy', { tickets: pending.tickets, spirit: pending.spirit }), (ev) => {
-              const r = buyTickets(ctx, app.progress, pending.buy);
-              if (r.ok) { app.progress = r.progress; save(); app.rewardPop([{ k: 'ticket', n: pending.tickets }], ev); showSummon(bannerId, null, null); } else showSummon(bannerId, null, `err.${r.reason}`);
-            }, () => showSummon(bannerId), t('summon.buyYes'))
-          : confirmBox(
-            pending.free
-              ? t('summon.confirmFree', { banner: t(`banner.${bannerId}.name`) })
-              : pending.spirit
-              ? t('summon.confirmSpirit', { spirit: pending.spirit, count: pending.count, banner: t(`banner.${bannerId}.name`) })
-              : t('summon.confirm', { cost: pending.cost, count: pending.count, banner: t(`banner.${bannerId}.name`), left: app.progress.inventory.tickets - pending.cost }),
-            () => {
-              if (pending.spirit) {
-                const b = buyTickets(ctx, app.progress, pending.pack);
-                if (!b.ok) return showSummon(bannerId, null, `err.${b.reason}`);
-                app.progress = b.progress;
-                save();
-              }
-              doSummon(pending.count, !!pending.free);
-            },
-            () => showSummon(bannerId))
-        : h(
+      h(
             'div',
             { class: 'row pulls' },
             freeAvail ? (() => { const b = btn(t('summon.free'), () => ask(1, true), 'primary free', { id: 'pull-free' }); b.append(h('i', { class: 'red-dot', 'aria-hidden': 'true' })); return b; })() : h('div', { class: 'muted' }, t('summon.freeUsed')),

@@ -845,3 +845,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 ## v0.120.0
 - Rà soát hiệu ứng toàn game: xem `docs/FX-AUDIT.md`.
 - Chuyển màn: các khối xuất hiện lần lượt khi đổi màn; số tiền Hub chạy dần. Tag rollback cục bộ: `pre-fxpass-v0.119.0`.
+
+## v0.121.0
+- Popup mượt: hộp xác nhận (`openModal` trong ui/dom.js) mở không vẽ lại màn; popup #info mở/đóng có hiệu ứng (`dismissEl`); bỏ `backdrop-filter` và viền conic xoay (vẽ lại mỗi khung hình). Tag rollback cục bộ: `pre-popupfx-v0.120.0`.
