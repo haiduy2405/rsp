@@ -24,6 +24,14 @@ export function install(app) {
     return null;
   };
 
+  // Cảnh báo nổi giữa màn hình (không vẽ lại màn, không đẩy nội dung)
+  const warn = (text, icon = 'spirit') => {
+    let close = () => {};
+    const card = h('div', { class: 'card', id: 'confirm' }, h('div', { class: 'wn-ic' }, itemIcon(icon, 'lg')), h('p', {}, text), h('div', { class: 'row' }, btn(t('summon.ok'), () => close(), 'primary', { id: 'warn-ok' })));
+    close = openModal(card);
+  };
+  const needSpirit = (need) => warn(t('summon.needSpirit', { need, have: app.progress.inventory.spirit }));
+  
   function showSummon(bannerId, pending = null, msg = null) {
     const cfg = ctx.config.summon;
     const banner = ctx.banners[bannerId];
@@ -35,7 +43,7 @@ export function install(app) {
       : t('summon.noRateUp');
     const doSummon = (count, free) => {
       const r = summon(ctx, app.progress, { bannerId, count, free, dayKey: dayKey(), seed: (Math.random() * 4294967296) >>> 0 });
-      if (!r.ok) return showSummon(bannerId, null, `err.${r.reason}`);
+      if (!r.ok) return warn(t(`err.${r.reason}`));
       app.progress = r.progress;
       app.trackQuest('summon', count);
       save();
@@ -49,12 +57,12 @@ export function install(app) {
       if (free) return confirmBox(t('summon.confirmFree', { banner: bn }), () => doSummon(1, true), () => {});
       const cost = cfg.ticketsPerPull * count;
       const need = app.progress.inventory.tickets < cost ? spiritFor(count) : null;
-      if (need && app.progress.inventory.spirit < need.spirit) return showSummon(bannerId, null, 'err.not_enough_tickets');
+      if (need && app.progress.inventory.spirit < need.spirit) return needSpirit(need.spirit);
       const text = need ? t('summon.confirmSpirit', { spirit: need.spirit, count, banner: bn }) : t('summon.confirm', { cost, count, banner: bn, left: app.progress.inventory.tickets - cost });
       confirmBox(text, () => {
         if (need) {
           const b = buyTickets(ctx, app.progress, cfg.ticketPacks.indexOf(need));
-          if (!b.ok) return showSummon(bannerId, null, `err.${b.reason}`);
+          if (!b.ok) return warn(t(`err.${b.reason}`));
           app.progress = b.progress;
           save();
         }
@@ -90,10 +98,10 @@ export function install(app) {
       // Tiến độ bảo đảm 5★ một thanh; tỉ lệ đầy đủ nằm ngay dưới, mở một chạm
       h('div', { class: 'pity' }, h('div', { class: 'pity-row' }, h('div', { class: 'pity-bar' }, h('i', { style: `width:${pityPct}%` })), h('span', { class: 'pity-end' }, '5★')), h('small', {}, t('summon.pity5', { max: cfg.pity5, n: sm.pity5 }))),
       h('div', { class: 'row packs' }, cfg.ticketPacks.map((pk, i) => h('button', { class: 'pack', id: `buy-${i}`, onclick: () => {
-        if (app.progress.inventory.spirit < pk.spirit) return showSummon(bannerId, null, 'err.not_enough_spirit');
+        if (app.progress.inventory.spirit < pk.spirit) return needSpirit(pk.spirit);
         confirmBox(t('summon.confirmBuy', { tickets: pk.tickets, spirit: pk.spirit }), (ev) => {
           const r = buyTickets(ctx, app.progress, i);
-          if (r.ok) { app.progress = r.progress; save(); app.rewardPop([{ k: 'ticket', n: pk.tickets }], ev); showSummon(bannerId, null, null); } else showSummon(bannerId, null, `err.${r.reason}`);
+          if (r.ok) { app.progress = r.progress; save(); app.rewardPop([{ k: 'ticket', n: pk.tickets }], ev); showSummon(bannerId, null, null); } else warn(t(`err.${r.reason}`));
         }, () => {}, t('summon.buyYes'));
       } }, itemIcon('ticket', 'sm'), h('b', {}, `×${pk.tickets}`), h('span', { class: 'pk-sp' }, '=', itemIcon('spirit', 'sm'), String(pk.spirit))))),
       h(

@@ -2099,3 +2099,5 @@ canvas#cv { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { .ev-card, .ev-medal, .ev-choice, .wheel-wrap::before, #wish-go, .help-sec[open] > p { animation: none !important; } }
 #screen .st-card label.st-row { flex-direction: row; align-items: center; justify-content: space-between; text-align: left; }
 #screen .st-card label.st-slider { align-items: stretch; text-align: left; }
+.mdl #confirm .wn-ic { display: grid; place-items: center; margin: -4px 0 6px; }
+.mdl #confirm .wn-ic .ricon { width: 44px; height: 44px; filter: drop-shadow(0 0 10px rgba(94, 230, 208, .6)); animation: bob 2.4s ease-in-out infinite; }

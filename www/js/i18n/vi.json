@@ -1198,5 +1198,8 @@
   "set.sec.general": "Chung",
   "set.sec.sound": "Âm thanh",
   "set.sec.data": "Dữ liệu",
-  "cl.0_122.1": "Sự kiện, Cầu nguyện, Hướng dẫn và Cài đặt được làm lại: thẻ sự kiện nổi bật, vòng xoay mượt hơn (bỏ hiệu ứng gây giật), mục hướng dẫn có màu, cài đặt chia nhóm với công tắc"
+  "cl.0_122.1": "Sự kiện, Cầu nguyện, Hướng dẫn và Cài đặt được làm lại: thẻ sự kiện nổi bật, vòng xoay mượt hơn (bỏ hiệu ứng gây giật), mục hướng dẫn có màu, cài đặt chia nhóm với công tắc",
+  "summon.ok": "Đã hiểu",
+  "summon.needSpirit": "Không đủ Linh Thạch. Cần {need}, bạn đang có {have}.",
+  "cl.0_122.2": "Thiếu Linh Thạch khi triệu hồi/mua vé: hiện popup giữa màn hình thay cho dòng thông báo đẩy trang"
 }

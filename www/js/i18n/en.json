@@ -1198,5 +1198,8 @@
   "set.sec.general": "General",
   "set.sec.sound": "Sound",
   "set.sec.data": "Data",
-  "cl.0_122.1": "Event, Wish, Guide and Settings redone: bold event card, smoother wheel (removed jank-causing effects), colored guide sections, grouped settings with switches"
+  "cl.0_122.1": "Event, Wish, Guide and Settings redone: bold event card, smoother wheel (removed jank-causing effects), colored guide sections, grouped settings with switches",
+  "summon.ok": "Got it",
+  "summon.needSpirit": "Not enough Spirit Gems. Need {need}, you have {have}.",
+  "cl.0_122.2": "Not enough Spirit Gems on summon/buy: shows a centered popup instead of a banner that pushed the page down"
 }

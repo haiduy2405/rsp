@@ -854,3 +854,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Cầu nguyện: bỏ animation filter/box-shadow trên vòng xoay (gây giật), thêm vòng sáng bằng opacity, nút Quay nổi bật.
 - Hướng dẫn chơi: mục có chấm màu, mở/đóng mượt.
 - Cài đặt: chia nhóm (Chung, Âm thanh, Dữ liệu), công tắc thay checkbox, thanh trượt gọn. Tag rollback cục bộ: `pre-4screens-v0.121.0`.
+
+## v0.122.1
+- Thiếu Linh Thạch khi triệu hồi/mua vé: popup giữa màn hình (cần bao nhiêu, đang có bao nhiêu) thay cho dòng thông báo đẩy trang. Tag rollback cục bộ: `pre-warnpop-v0.122.0`.
