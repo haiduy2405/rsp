@@ -1185,5 +1185,9 @@
   "skill.duoInfo": "Hợp lực hai skill đơn ×{pct}% + hiệu ứng riêng của cặp. Cả hai tướng vào hồi chiêu.",
   "summon.confirmFree": "Dùng lượt miễn phí hôm nay để triệu hồi ×1 ở \"{banner}\"?",
   "cl.0_114.2": "Triệu hồi luôn hỏi xác nhận (kể cả lượt miễn phí), hộp xác nhận nổi giữa màn hình",
-  "cl.0_115.1": "Bảng \"Có gì mới\" gọn hơn: không che tên game, ẩn thanh 100%, nút \"Chạm để vào\" nổi bật"
+  "cl.0_115.1": "Bảng \"Có gì mới\" gọn hơn: không che tên game, ẩn thanh 100%, nút \"Chạm để vào\" nổi bật",
+  "cl.0_116.1": "Chọn ải: thanh tiến độ ngay trên từng độ khó, ải đang chơi nổi bật vàng, nhãn ải khóa dễ đọc hơn",
+  "summon.confirmBuy": "Mua {tickets} vé bằng {spirit} Linh Thạch?",
+  "summon.buyYes": "Mua",
+  "cl.0_116.2": "Mua vé và mọi lượt triệu hồi đều hỏi xác nhận; hộp xác nhận nhỏ gọn, tinh tế hơn"
 }

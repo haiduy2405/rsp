@@ -375,7 +375,7 @@ function showStages(zoneId, tier) {
   const df = ctx.config.difficulty[tier];
   const tabs = h('div', { class: 'tiertabs' }, order.map((d, i) => {
     const open = tierOpen(ctx, progress, zoneId, d);
-    return h('button', { class: 'tier' + (d === tier ? ' on' : '') + (open ? '' : ' locked'), 'data-tier': d, onclick: () => open && showStages(zoneId, d) }, t(`diff.${d}`), h('small', {}, open ? t('stage.progress', { n: stagesDone(progress, zoneId, d), total }) : '🔒'));
+    return h('button', { class: 'tier' + (d === tier ? ' on' : '') + (open ? '' : ' locked'), 'data-tier': d, onclick: () => open && showStages(zoneId, d) }, h('b', {}, (open && stagesDone(progress, zoneId, d) >= total ? '✓ ' : '') + t(`diff.${d}`)), h('small', {}, open ? t('stage.progress', { n: stagesDone(progress, zoneId, d), total }) : '🔒'), h('i', { class: 'tier-bar', 'aria-hidden': 'true' }, h('em', { style: `width:${open ? Math.min(100, (stagesDone(progress, zoneId, d) / total) * 100) : 0}%` })));
   }));
   // Con đường leo tháp: ải 1 ở đáy, ải cuối (boss) ở đỉnh; các nút zích-zắc nối bằng đường nét đứt, đoạn đã qua sáng vàng.
   const zone = ctx.zones[zoneId];
@@ -423,7 +423,7 @@ function showStages(zoneId, tier) {
   $('screen').style.setProperty('--zc', zc);
   $('screen').style.setProperty('--zbg', `url(../assets/bg/${zoneId}.webp)`);
   $('screen').style.setProperty('--zbgt', `url(../assets/bg/${zoneId}_tall.webp)`); // nền dài cho đường ải: tranh phủ tới ải 1, chỉ chút mây ở chân
-  screen(head, tabs, h('div', { class: 'muted tier-note' }, t('diff.reward', { gold: df.gold, drop: df.drop })), path, h('div', { class: 'muted hold-hint' }, t('stage.hold')), btn(t('back'), showZones, '', { id: 'back' }));
+  screen(head, tabs, h('div', { class: 'muted tier-note' }, t('diff.reward', { gold: df.gold, drop: df.drop })), path, h('div', { class: 'muted hold-hint' }, t('stage.hold')), btn(t('back'), showZones, '', { id: 'back', class: 'zones-back-hid' }));
   $('screen').classList.add('fitscreen');
   // cuộn tới ải đang chơi (ải kế tiếp), để người chơi luôn thấy nút cần bấm
   requestAnimationFrame(() => { const sc = $('screen').querySelector('.stagepath'); if (sc) sc.scrollTop = Math.max(0, posOf(Math.min(total, done + 1)).y - sc.clientHeight * 0.55); });

@@ -828,3 +828,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.115.0
 - Bảng "Có gì mới" gọn hơn, không che tên game; nút "Chạm để vào" nổi bật. Tag rollback cục bộ: `pre-notesui-v0.114.1`.
+
+## v0.116.0
+- Chọn ải: thanh tiến độ trên từng độ khó, ải đang chơi nổi vàng, nhãn ải khóa rõ hơn, ẩn nút Quay lại dưới (còn nút trên).
+- Mua vé cũng hỏi xác nhận; hộp xác nhận nhỏ gọn hơn. Tag rollback cục bộ: `pre-stagesui-v0.115.0`.

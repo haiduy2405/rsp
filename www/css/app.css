@@ -1954,3 +1954,22 @@ canvas#cv { visibility: hidden; }
 .ln-body summary { list-style: none; text-align: center; padding: 8px 0 2px; }
 .ln-body summary::-webkit-details-marker { display: none; }
 .loading.done .ld-tap { display: inline-block; margin-top: 10px; padding: 9px 28px; border-radius: 999px; font-size: 17px; color: #4a2a06; background: linear-gradient(180deg, #ffe88a, #f2a931); border: 2px solid #fff3c0; box-shadow: 0 0 20px rgba(255, 210, 90, .7), 0 4px 0 rgba(120, 70, 10, .6); animation: shCta 1.6s ease-in-out infinite; }
+
+/* ---- v0.116 chọn ải ---- */
+.tiertabs .tier { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 8px 6px 11px; overflow: hidden; }
+.tiertabs .tier b { font-size: 16px; }
+.tier-bar { position: absolute; left: 10px; right: 10px; bottom: 5px; height: 4px; border-radius: 3px; background: rgba(8, 24, 60, .55); overflow: hidden; }
+.tier-bar em { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, #ffe58a, #f1b93a); }
+.tiertabs .tier.on { box-shadow: 0 0 14px rgba(255, 200, 90, .55); }
+.tier-note { align-self: center; padding: 3px 12px; border-radius: 999px; background: rgba(8, 24, 60, .45); font-size: 12px; }
+.snode.locked .sn-label { opacity: .9; background: rgba(40, 36, 44, .72); color: #cfc7bd; }
+.snode.locked .sn-orb { filter: saturate(.7); }
+.snode.ready .sn-label { background: linear-gradient(180deg, #ffe88a, #f2a931); border-color: #fff3c0; color: #4a2a06; text-shadow: none; box-shadow: 0 0 14px rgba(255, 210, 90, .7); }
+.snode.ready .sn-label small { color: #7a4a10; font-weight: 800; }
+.mapscreen .hold-hint, .hold-hint { padding: 4px 12px; border-radius: 999px; background: rgba(8, 24, 60, .45); color: #e3efff; align-self: center; }
+
+/* ---- v0.116 hộp confirm nhỏ, tinh tế ---- */
+#screen #confirm { width: min(268px, 80vw); padding: 14px 14px 12px; border-radius: 16px; border: 1.5px solid rgba(255, 232, 150, .85); background: linear-gradient(180deg, #1c4580, #12305f); box-shadow: 0 0 0 100vmax rgba(5, 14, 36, .55), 0 8px 22px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .18); }
+#screen #confirm p { margin: 0 0 12px; font-size: 14px; line-height: 1.35; color: #eef5ff; }
+#screen #confirm .row { gap: 8px; }
+#screen #confirm .row button { min-height: 0; padding: 8px 6px; font-size: 14px; border-radius: 999px; }

@@ -1185,5 +1185,9 @@
   "skill.duoInfo": "Both single skills combine at ×{pct}% plus the pair's own effect. Both heroes go on cooldown.",
   "summon.confirmFree": "Use today's free summon on \"{banner}\"?",
   "cl.0_114.2": "Summon always asks for confirmation (free pull too); the dialog now floats mid-screen",
-  "cl.0_115.1": "\"What's new\" panel tidied: no longer covers the title, 100% bar hidden, bold \"Tap to enter\" button"
+  "cl.0_115.1": "\"What's new\" panel tidied: no longer covers the title, 100% bar hidden, bold \"Tap to enter\" button",
+  "cl.0_116.1": "Stage select: progress bar on each difficulty tab, current stage glows gold, locked-stage labels easier to read",
+  "summon.confirmBuy": "Buy {tickets} tickets for {spirit} Spirit Gems?",
+  "summon.buyYes": "Buy",
+  "cl.0_116.2": "Buying tickets and every summon ask for confirmation; smaller, neater confirm box"
 }

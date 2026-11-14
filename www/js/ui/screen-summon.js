@@ -74,9 +74,9 @@ export function install(app) {
         h('div', { class: 'rateup' }, rateUp)),
       // Tiến độ bảo đảm 5★ một thanh; tỉ lệ đầy đủ nằm ngay dưới, mở một chạm
       h('div', { class: 'pity' }, h('div', { class: 'pity-row' }, h('div', { class: 'pity-bar' }, h('i', { style: `width:${pityPct}%` })), h('span', { class: 'pity-end' }, '5★')), h('small', {}, t('summon.pity5', { max: cfg.pity5, n: sm.pity5 }))),
-      h('div', { class: 'row packs' }, cfg.ticketPacks.map((pk, i) => h('button', { class: 'pack', id: `buy-${i}`, onclick: (ev) => {
-        const r = buyTickets(ctx, app.progress, i);
-        if (r.ok) { app.progress = r.progress; save(); app.rewardPop([{ k: 'ticket', n: cfg.ticketPacks[i].tickets }], ev); showSummon(bannerId, null, null); } else showSummon(bannerId, null, `err.${r.reason}`);
+      h('div', { class: 'row packs' }, cfg.ticketPacks.map((pk, i) => h('button', { class: 'pack', id: `buy-${i}`, onclick: () => {
+        if (app.progress.inventory.spirit < pk.spirit) return showSummon(bannerId, null, 'err.not_enough_spirit');
+        showSummon(bannerId, { buy: i, spirit: pk.spirit, tickets: pk.tickets });
       } }, itemIcon('ticket', 'sm'), h('b', {}, `×${pk.tickets}`), h('span', { class: 'pk-sp' }, '=', itemIcon('spirit', 'sm'), String(pk.spirit))))),
       h(
         'details',
@@ -89,7 +89,12 @@ export function install(app) {
       h('div', { class: 'row sm-links' }, btn(t('summon.history'), showHistory, '', { id: 'b-history' }), btn(t('summon.redeem'), () => showRedeem(), '', { id: 'b-redeem' })),
       btn(t('back'), showHub, '', { id: 'back', class: 'zones-back-hid' }),
       pending
-        ? confirmBox(
+        ? pending.buy != null
+          ? confirmBox(t('summon.confirmBuy', { tickets: pending.tickets, spirit: pending.spirit }), (ev) => {
+              const r = buyTickets(ctx, app.progress, pending.buy);
+              if (r.ok) { app.progress = r.progress; save(); app.rewardPop([{ k: 'ticket', n: pending.tickets }], ev); showSummon(bannerId, null, null); } else showSummon(bannerId, null, `err.${r.reason}`);
+            }, () => showSummon(bannerId), t('summon.buyYes'))
+          : confirmBox(
             pending.free
               ? t('summon.confirmFree', { banner: t(`banner.${bannerId}.name`) })
               : pending.spirit
