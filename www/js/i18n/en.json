@@ -1,4 +1,8 @@
 {
+  "shop.todayGift": "Today's free gift",
+  "shop.claim": "Claim now",
+  "shop.claimed": "Claimed today",
+  "cl.0_109.1": "Shop redesigned: featured free gift, horizontal tabs, named rarity cards, low-funds feedback, new effects",
   "cl.0_108.4": "Smoother home screen: clouds, islands and crystal run on their own GPU layers",
   "app.updateNow": "Update now",
   "app.updateForce": "A new version is available. Update to keep playing.",
