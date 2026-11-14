@@ -467,31 +467,35 @@ function showStageInfo(zoneId, diff, stage = 1) {
 
 function showZones() {
   const inv = progress.inventory;
-  const zoneCards = ctx.zoneList.map((z) => {
+  const total = ctx.config.run.stages;
+  const order = ctx.config.difficulty.order;
+  const lockSvg = '<svg viewBox="0 0 18 20" aria-hidden="true"><rect x="0" y="7" width="18" height="13" rx="3" fill="#2b66aa" stroke="#fff8e6" stroke-width="1.8"/><path d="M4 7V4.5a5 5 0 0 1 10 0V7" fill="none" stroke="#fff8e6" stroke-width="2"/></svg>';
+  const zoneCards = ctx.zoneList.map((z, i) => {
     const open = progress.unlocked.includes(z.id);
     const st = inv.stones[z.element];
+    const done = order.reduce((a, d) => a + Math.min(total, stagesDone(progress, z.id, d)), 0);
+    const art = h('div', { class: 'zc-art' }, h('img', { src: `assets/ui/zones/${z.id}.webp`, alt: '', draggable: 'false' }));
+    if (!open) { const lk = h('i', { class: 'zc-lock' }); lk.innerHTML = lockSvg; art.append(lk); }
     return h(
       'div',
-      { class: 'card btn gate' + (open ? '' : ' locked'), 'data-zone-card': z.id, style: `--el:${COLORS[z.element]}`, onclick: open ? () => showStages(z.id) : null },
-      h('img', { src: `assets/ui/zones/${z.id}.webp`, alt: '', draggable: 'false' }),
-      h(
-        'div',
-        { class: 'info' },
-        h('div', { class: 'name' }, t(`zone.${z.id}`)),
-        h('small', {}, open ? t('zone.clears', { n: zoneClears(progress, z.id) }) : t('zone.locked')),
-        open ? h('div', { class: 'diffdots' }, ctx.config.difficulty.order.map((d) => h('span', { class: stagesDone(progress, z.id, d) >= ctx.config.run.stages ? 'on' : '' }, `${t(`diff.${d}`)} ${stagesDone(progress, z.id, d)}/${ctx.config.run.stages}`))) : null,
-        open ? h('div', { class: 'muted' }, `${t('stone.normal')}: ${st.normal} · ${t('stone.rare')}: ${st.rare}`) : null,
-      ),
+      { class: 'zc' + (open ? '' : ' locked'), 'data-zone-card': z.id, role: open ? 'button' : null, tabindex: open ? '0' : null, style: `--el:${COLORS[z.element]};--i:${i}`, onclick: open ? () => showStages(z.id) : null },
+      art,
+      open
+        ? h('div', { class: 'zc-info' },
+          h('div', { class: 'zc-top' }, h('b', { class: 'zc-name' }, t(`zone.${z.id}`)), h('span', { class: 'zc-clr' }, t('zone.clears', { n: zoneClears(progress, z.id) }))),
+          h('div', { class: 'zc-diffs' }, order.map((d) => { const n = Math.min(total, stagesDone(progress, z.id, d)); return h('div', { class: 'zc-d d-' + d + (n >= total ? ' full' : '') }, h('span', {}, `${t(`diff.${d}`)} ${n}/${total}`), h('i', {}, h('u', { style: `width:${Math.round((n / total) * 100)}%` }))); })),
+          h('div', { class: 'zc-loot' }, itemIcon('stoneN', 'sm', COLORS[z.element]), h('span', {}, String(st.normal)), itemIcon('stoneR', 'sm', COLORS[z.element]), h('span', {}, String(st.rare)), h('em', {}, `${done}/${total * order.length}`)))
+        : h('div', { class: 'zc-info' }, h('b', { class: 'zc-name' }, t(`zone.${z.id}`)), h('small', {}, t('zone.locked'))),
     );
   });
   const act0 = activeRunInfo();
   const gz = ['zone', 'stage', 'team'].includes(guideStep());
   screen(
-    h('h2', {}, t('hub.zones')),
-    act0 ? h('div', { class: 'card' }, h('b', {}, t('run.resume')), h('div', { class: 'muted' }, `${stageLabel(act0.run)} · ${t('run.floor', { n: act0.run.floor + 1, total: act0.run.floors })}`), h('div', { class: 'row' }, btn(t('run.resume'), resumeRun, 'primary', { id: 'zones-resume' }), btn(t('run.abandon'), () => { clearActiveRun(); showZones(); }, '', { id: 'zones-abandon' }))) : null,
-    zoneCards,
-    h('details', {}, h('summary', {}, t('hub.debug')), h('label', {}, t('hub.seed'), h('input', { id: 'seed', inputmode: 'numeric', value: seedText, oninput: (e) => (seedText = e.target.value) })), h('p', { class: 'muted' }, t('hub.progress'))),
-    btn(t('back'), showHub, '', { id: 'back' }),
+    h('h2', { class: 'zones-title' }, t('hub.zones')),
+    act0 ? h('div', { class: 'zr' }, h('i', { class: 'zr-glow' }), h('div', { class: 'zr-info' }, h('b', {}, stageLabel(act0.run)), h('small', {}, t('run.floor', { n: act0.run.floor + 1, total: act0.run.floors }))), h('div', { class: 'zr-btns' }, btn(t('run.resume'), resumeRun, 'primary', { id: 'zones-resume' }), btn(t('run.abandon'), () => { clearActiveRun(); showZones(); }, '', { id: 'zones-abandon' }))) : null,
+    h('div', { class: 'zc-list' }, zoneCards),
+    h('details', { class: 'zc-debug' }, h('summary', {}, t('hub.debug')), h('label', {}, t('hub.seed'), h('input', { id: 'seed', inputmode: 'numeric', value: seedText, oninput: (e) => (seedText = e.target.value) })), h('p', { class: 'muted' }, t('hub.progress'))),
+    btn(t('back'), showHub, '', { id: 'back', class: 'zones-back-hid' }),
   );
   if (gz) { guideSet('zone'); guidePoint('#screen [data-zone-card]:not(.locked)', 'guide.zone'); }
 }
@@ -1822,6 +1826,7 @@ if (DEBUG) {
   window.__showSkillAsk = (i, f, d, du) => showSkillAsk(i, f, d, du);
   window.__ctx = ctx;
   window.__showHub = () => showHub();
+  window.__showZones = () => showZones();
   window.__ui = ui;
   window.__showUpdate = () => { updateReady = true; showUpdatePill(); };
   window.__showTeam = (...a) => showTeam(...a);

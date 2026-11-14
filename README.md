@@ -804,3 +804,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.109.0
 - Shop làm lại: thẻ quà miễn phí lớn (tia xoay, nhịp sáng, nút Nhận), tab chip ngang, lưới 3 cột có tên + sao độ hiếm + giá (đỏ khi thiếu tiền, rung + toast không làm nhảy layout), ánh quét cho món hiếm, vào lần lượt. Giữ nguyên hành vi (chạm miễn phí = nhận; trả phí = hộp xác nhận Không/Có). Nút Hòm đồ lên hàng ví; `#back` ẩn nhưng vẫn nối với nút quay lại góc trái. Tag cục bộ `pre-shopui-v0.108.2`.
+
+## v0.110.0
+- Chọn khu vực làm lại (`.zc`): thẻ gọn, 3 thanh tiến độ độ khó, đá thường/hiếm có icon, tổng tiến độ n/21, đảo bồng bềnh + ánh quét, thanh tiến độ chạy lúc vào; thẻ khóa xám có ổ khóa; banner chuyến dở (`.zr`) gọn, nút Tiếp tục nhịp sáng. Vừa một màn, không cuộn. Tag cục bộ `pre-zonesui-v0.109.0`.
