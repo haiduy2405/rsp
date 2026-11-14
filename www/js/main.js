@@ -1129,10 +1129,8 @@ function showDoorDetail(i) {
       const ch = u.chance ?? ctx.config.monsterPassive.chance[kind] ?? 1;
       return h('span', { class: 'dd-pas', title: `${t(`effect.${u.key}.name`)} ${Math.round(ch * 100)}%` }, h('img', { src: `assets/ui/fx/${u.key}.webp`, alt: t(`effect.${u.key}.name`) }), h('i', {}, `${Math.round(ch * 100)}%`));
     });
-    return h('div', { class: 'dd-card', style: `--el:${COLORS[el]};--i:${n}` },
-      h('div', { class: 'dd-art' }, im ? h('img', { src: im.src, alt: '' }) : null, h('span', { class: 'dd-el' }, el_orb(el))),
-      h('b', { class: 'dd-name' }, t(`monster.${m}`)),
-      h('small', { class: 'dd-meta' }, t(`info.kind.${kind}`), mo?.attackEvery ? ` · ${t('info.every', { n: mo.attackEvery })}` : ''),
+    return h('div', { class: `dd-card k-${kind}`, title: t(`monster.${m}`), style: `--el:${COLORS[el]};--i:${n}` },
+      h('div', { class: 'dd-art' }, h('i', { class: 'dd-spot' }), h('i', { class: 'dd-shine' }), im ? h('img', { src: im.src, alt: t(`monster.${m}`) }) : null, h('i', { class: 'dd-floor' }), h('span', { class: 'dd-el' }, el_orb(el))),
       pas.length ? h('div', { class: 'dd-pass' }, pas) : null);
   };
   const body = foes ? h('div', { class: 'dd-foes n' + foes.length }, foes.map((m, n) => foeCard(m, n))) : h('div', { class: 'dd-plain' }, h('p', {}, t(`door.desc.${k}`)));
@@ -1439,13 +1437,25 @@ function passiveRows(list, monId) {
   });
 }
 // Khung giới thiệu Duo trong hộp hỏi dùng skill: hai tướng, hệ số, hiệu ứng riêng của cặp.
-function duoAskCard(d, st) {
-  const def = ctx.duos[d.id];
-  const a = st.members[d.slot];
-  const b = st.members[d.slot + 1];
-  return h('div', { class: 'card duo-ask' },
-    h('div', { class: 'charrow' }, portrait(a.id, 48), h('b', { class: 'duo-plus' }, '✦'), portrait(b.id, 48), h('div', { style: 'flex:1;min-width:0' }, h('h3', {}, t(`duo.${d.id}`)), h('div', { class: 'muted' }, t('skill.duoInfo', { pct: Math.round((ctx.config.duo?.mult ?? 1.5) * 100) })))),
-    def.skill.units.map((u) => h('div', { class: 'muted' }, '+ ', unitText(u, a.element))));
+// ---- Bảng hỏi dùng skill: mỗi loại hiệu ứng một màu + biểu tượng riêng; Duo có khung ánh sáng, tia liên kết và tia lửa.
+const SA_NEG = new Set(['burn', 'poison', 'stun', 'freeze', 'atkDown', 'lock']);
+const SA_ICON = {
+  damage: ['#ff6b5a', '<path d="M5 19L17 7M14 5h5v5M5 19l2.5-.5M8.5 15.5L6 18"/>'],
+  heal: ['#4fe08a', '<path d="M12 5v14M5 12h14"/>'],
+  buff: ['#ffd24a', '<path d="M12 19V6M6.5 11.5L12 6l5.5 5.5"/>'],
+  debuff: ['#b98cff', '<path d="M12 5v13M6.5 12.5L12 18l5.5-5.5"/>'],
+  convert: ['#5ec8ff', '<path d="M12 4l6 8-6 8-6-8z"/>'],
+  enhance: ['#ffe27a', '<path d="M12 4l2.4 5 5.6.8-4 4 1 5.6-5-2.7-5 2.7 1-5.6-4-4 5.6-.8z"/>'],
+  freeze: ['#7fe6ff', '<circle cx="12" cy="12" r="7.5"/><path d="M12 7.5V12l3 2"/>'],
+};
+const saCat = (u) => (u.type === 'applyEffect' ? (SA_NEG.has(u.key) ? 'debuff' : 'buff') : u.type === 'timeFreeze' ? 'freeze' : SA_ICON[u.type] ? u.type : 'buff');
+function saRows(units, el) {
+  return h('div', { class: 'sa-fx' }, units.map((u) => {
+    const c = saCat(u);
+    const ic = h('i', { class: 'sa-ic', style: `--k:${SA_ICON[c][0]}` });
+    ic.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${SA_ICON[c][1]}</svg>`;
+    return h('div', { class: `sa-row ${c}`, style: `--k:${SA_ICON[c][0]}` }, ic, h('span', {}, unitText(u, el)));
+  }));
 }
 // Chạm tướng đã sẵn sàng: hiện thông tin kỹ năng, chỉ dùng khi người chơi bấm Đồng ý.
 function showSkillAsk(idx, confirm, duoGo = null, duo = null) {
@@ -1458,22 +1468,41 @@ function showSkillAsk(idx, confirm, duoGo = null, duo = null) {
   const close = () => $('info')?.remove();
   const col = COLORS[m.element];
   const orbImg = getImg(`orb:${m.element}`);
-  const hero = h('div', { class: 'sk-hero', style: `--c:${col};--card:url(assets/characters/${m.id}_card.webp)` },
-    h('i', { class: 'sk-rays' }),
-    h('div', { class: 'sk-art' }, h('img', { src: `assets/characters/${m.id}_icon.webp`, alt: '' })),
-    h('span', { class: 'sk-ready' }, t('skill.ready')),
-    h('span', { class: 'sk-gem' }, orbImg ? h('img', { src: orbImg.src, alt: '' }) : null),
-    h('div', { class: 'sk-who' }, h('b', {}, t(`char.${m.id}`)), h('small', {}, t('char.cooldown', { n: m.skillMax }))));
-  const body = [
-    hero,
-    h('h3', { class: 'sk-name' }, t(`skill.${m.id}`)),
-    h('div', { class: 'sk-fx' }, kit.skill.units.map((u) => h('div', { class: 'sk-row' }, h('i', { class: 'sk-bolt' }, '✦'), h('span', {}, unitText(u, m.element))))),
-    keys.length ? h('div', { class: 'sk-kw' }, keywordBlock(keys)) : null,
-    duoGo && duo ? duoAskCard(duo, st) : null,
-    h('div', { class: 'sk-btns' }, ...(duoGo ? [btn(t('skill.duoOk'), () => { close(); duoGo(); }, 'primary duo', { id: 'duo-ok' }), btn(t('skill.single'), () => { close(); confirm(); }, '', { id: 'skill-ok' })] : [btn(t('skill.ok'), () => { close(); confirm(); }, 'primary', { id: 'skill-ok' })]), btn(t('skill.cancel'), close, '', { id: 'skill-cancel' })),
+  const isDuo = !!(duoGo && duo);
+  const head = h('div', { class: 'sa-head', style: `--c:${col}` },
+    h('div', { class: 'sa-port' }, portrait(m.id, 62)),
+    h('div', { class: 'sa-who' }, h('b', {}, t(`char.${m.id}`)), h('small', {}, t('char.cooldown', { n: m.skillMax }))),
+    h('span', { class: 'sa-gem' }, orbImg ? h('img', { src: orbImg.src, alt: '' }) : null),
+    h('span', { class: 'sa-ready' }, t('skill.ready')));
+  const single = [
+    h('h3', { class: 'sa-name' }, h('i', {}, '✦'), t(`skill.${m.id}`), h('i', {}, '✦')),
+    saRows(kit.skill.units, m.element),
+    keys.length ? h('div', { class: 'sa-kw' }, keywordBlock(keys)) : null,
   ];
-  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox sk-ask' }, body)));
-  audio.sfx('reveal');
+  let duoPart = null;
+  if (isDuo) {
+    const def = ctx.duos[duo.id];
+    const a = st.members[duo.slot];
+    const b = st.members[duo.slot + 1];
+    const pct = Math.round((ctx.config.duo?.mult ?? 1.5) * 100);
+    const sparks = Array.from({ length: 10 }, (_, i) => h('i', { class: 'sa-spark', style: `--x:${8 + ((i * 37) % 84)}%;--d:${(i * 0.45).toFixed(2)}s;--s:${3 + (i % 3)}px` }));
+    duoPart = h('div', { class: 'sa-duo' },
+      h('div', { class: 'sa-duo-top' },
+        h('div', { class: 'sa-duo-p l' }, portrait(a.id, 58), h('small', {}, t(`char.${a.id}`))),
+        h('div', { class: 'sa-link' }, h('i', { class: 'sa-beam' }), h('b', { class: 'sa-emblem' }, 'DUO'), h('em', { class: 'sa-mult' }, `×${pct}%`)),
+        h('div', { class: 'sa-duo-p r' }, portrait(b.id, 58), h('small', {}, t(`char.${b.id}`)))),
+      h('h3', { class: 'sa-duo-name' }, t(`duo.${duo.id}`)),
+      h('div', { class: 'sa-duo-note' }, t('sa.both')),
+      def.skill.units.length ? [h('div', { class: 'sa-sec' }, t('sa.pair')), saRows(def.skill.units, a.element)] : null,
+      sparks);
+  }
+  const btns = isDuo
+    ? h('div', { class: 'sa-btns' },
+      btn(t('skill.duoOk'), () => { close(); duoGo(); }, 'primary duo sa-go', { id: 'duo-ok' }),
+      h('div', { class: 'sa-btns2' }, btn(t('skill.single'), () => { close(); confirm(); }, '', { id: 'skill-ok' }), btn(t('skill.cancel'), close, '', { id: 'skill-cancel' })))
+    : h('div', { class: 'sa-btns' }, btn(t('skill.ok'), () => { close(); confirm(); }, 'primary sa-go', { id: 'skill-ok' }), btn(t('skill.cancel'), close, '', { id: 'skill-cancel' }));
+  $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() }, h('div', { class: 'infobox sa' + (isDuo ? ' isduo' : ''), style: `--c:${col}` }, isDuo ? null : head, isDuo ? duoPart : null, isDuo ? h('details', { class: 'sa-more' }, h('summary', {}, t('sa.single')), single) : single, btns)));
+  audio.sfx(isDuo ? 'enhance' : 'reveal');
 }
 
 function showInspect(kind, idx) {

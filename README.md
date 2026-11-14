@@ -790,3 +790,8 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 ## v0.107.2
 - Hộp Tạm dừng thiết kế lại: nhỏ gọn (300px), tiêu đề có biểu tượng, 3 thanh âm lượng gọn, 3 công tắc dạng ô, 2 nút cạnh nhau. Nút "Thoát về trang chính" → "Thoát về Hub"; hộp xác nhận thoát cũng gọn, Hủy bên trái, Thoát về Hub bên phải.
 - Rollback: tag local `pre-pause-v0.107.1`.
+
+## v0.108.0
+- Bảng xác nhận skill (`.sa`): hàng hiệu ứng theo loại (màu + icon), Duo có viền conic xoay, tia liên kết, tia lửa, ×150%.
+- Chi tiết cửa: thẻ quái chỉ còn hình, lơ lửng, bóng, ánh quét.
+- Tag cục bộ `pre-skillask-v0.107.2` (chỉ local).

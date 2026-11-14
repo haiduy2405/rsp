@@ -1,4 +1,9 @@
 {
+  "cl.0_108.1": "Bảng dùng skill thiết kế lại: hiệu ứng theo màu/biểu tượng, Duo có khung ánh sáng và tia liên kết",
+  "cl.0_108.2": "Chi tiết cửa: chỉ hiện hình quái lớn, có chuyển động",
+  "sa.both": "Cả hai tướng vào hồi chiêu",
+  "sa.pair": "Hiệu ứng của cặp",
+  "sa.single": "Skill đơn của tướng này",
   "cl.0_107.1": "Đòn AOE đánh tất cả quái cùng lúc, kèm sóng quét ngang",
   "cl.0_107.2": "Phần thừa trên/dưới màn trận dùng nền trận mờ thay vì xanh trơn",
   "cl.0_106.4": "Sửa lỗi vào trận bị màn xanh trống khi đội có cặp Duo",
