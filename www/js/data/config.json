@@ -6,7 +6,7 @@
   "hint": {
     "maxCombos": 3,
     "maxSteps": 3,
-    "auto": { "maxCombos": 99, "maxSteps": 10, "beam": 24, "maximize": true }
+    "auto": { "maxCombos": 99, "maxSteps": 12, "beam": 40, "maximize": true, "orthogonal": true }
   },
   "elements": [
     "water",

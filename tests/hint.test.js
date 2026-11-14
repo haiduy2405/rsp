@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createBattle, step } from '../www/js/core/battle.js';
 import { findHint } from '../www/js/ui/hint.js';
+import { areAdjacent } from '../www/js/core/board.js';
 import { loadCtx, TEAM, FOES } from './helpers.js';
 
 const ctx = loadCtx();
@@ -46,5 +47,13 @@ test('hint tối ưu (config.hint.auto): hợp lệ, không kém gợi ý đơn 
     const b = findHint(ctx, s);
     assert.ok(a && a.combos >= b.combos, `seed ${seed}`);
     assert.notEqual(step(ctx, s, { type: 'move', path: a.path }).events[0].type, 'invalid');
+  }
+});
+
+test('hint tối ưu chỉ đi ngang/dọc, không chéo', () => {
+  for (let seed = 1; seed <= 6; seed++) {
+    const s = createBattle(ctx, { seed, team: TEAM, enemies: FOES });
+    const a = findHint(ctx, s, undefined, ctx.config.hint.auto);
+    for (let i = 1; i < a.path.length; i++) assert.ok(areAdjacent(a.path[i - 1], a.path[i], false), `seed ${seed} bước ${i}`);
   }
 });

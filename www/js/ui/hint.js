@@ -20,7 +20,7 @@ const betterMax = (a, b) => !b || a.combos !== b.combos ? !b || a.combos > b.com
 
 // Bản chia lát: generator nhường (yield) khi đã chạy quá sliceMs để không chặn khung hình.
 function* search(ctx, state, step, shouldYield, opts = {}) {
-  const diag = ctx.config.board.allowDiagonal;
+  const diag = opts.orthogonal ? false : ctx.config.board.allowDiagonal; // orthogonal: chỉ gợi ý nước ngang/dọc, không chéo
   const cap = opts.maxCombos ?? ctx.config.hint?.maxCombos ?? 6;
   const beamW = opts.beam ?? BEAM;
   const better_ = opts.maximize ? betterMax : better;
