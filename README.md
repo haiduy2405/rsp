@@ -864,3 +864,4 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 - Vòng khóa nhỏ còn 1/3, bỏ chữ "Mục tiêu". Tag rollback cục bộ: `pre-lockring2-v0.125.0`.
 - Gợi ý nước đi trong trận: tối ưu (tìm chùm đến 10 ô, không giới hạn combo; xếp hạng combo > sát thương > ngọc tan, hòa thì đường ngắn). Số liệu ở `config.hint.auto`. Màn hướng dẫn vẫn dùng gợi ý đơn giản.
 - Gợi ý nước đi chỉ ngang/dọc (`config.hint.auto.orthogonal`), tối đa 12 ô.
+- Gợi ý nước đi giảm còn ~50% hiệu quả: `config.hint.auto.maxSteps` 5, `beam` 24 (đo trên 24 bàn: ~60% combo, ~50% sát thương so với bản 12 ô).

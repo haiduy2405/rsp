@@ -1212,5 +1212,6 @@
   "cl.0_125.2": "Lock ring shrunk to 1/3 size, \"Target\" label removed",
   "cl.0_126.1": "Move hints now pick the optimal move: most combos, highest damage, shortest easy-to-drag path",
   "cl.0_126.2": "Lock ring is bolder with a dark outline so it stands out on any background",
-  "cl.0_126.3": "Move hints now use only straight (up/down/left/right) moves, no diagonals, picking the highest-combo, highest-damage path"
+  "cl.0_126.3": "Move hints now use only straight (up/down/left/right) moves, no diagonals, picking the highest-combo, highest-damage path",
+  "cl.0_126.4": "Move hints weakened to about 50% effectiveness (max 5-cell path, still straight moves only)"
 }
