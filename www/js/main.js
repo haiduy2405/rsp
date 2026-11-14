@@ -1910,6 +1910,12 @@ window.addEventListener('pointerdown', () => { if (histBuf < 3) refillHist(); },
 window.addEventListener('popstate', () => {
   histBuf = Math.max(0, histBuf - 1);
   refillHist();
+  if (atHub && !run) { // Màn chính: hỏi xác nhận thoát thay vì rời trang ngay
+    if (document.querySelector('#wrap .mdl, #info')) return;
+    audio.sfx('back');
+    ui.confirmBox(t('exit.ask'), () => { try { window.close(); } catch { /* bỏ qua */ } history.go(-(histBuf + 1)); }, () => {}, t('exit.yes'));
+    return;
+  }
   if (run || atHub) return;
   const back = $('back-top') || $('back');
   if (back) {
