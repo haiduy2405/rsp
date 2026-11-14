@@ -708,7 +708,7 @@
   "err.unknown_fodder": "Invalid spirit",
   "pause.title": "Paused",
   "pause.resume": "Resume",
-  "pause.quit": "Quit to main screen",
+  "pause.quit": "Back to Hub",
   "pause.quitAsk": "Quitting discards the battle in progress. Doors already cleared are kept; you will restart from the door choice.",
   "run.quitSaved": "Quit. Progress on cleared doors was kept.",
   "passive.stat": "+{pct}% {stat} {scope}",

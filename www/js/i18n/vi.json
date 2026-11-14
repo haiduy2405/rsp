@@ -708,7 +708,7 @@
   "err.unknown_fodder": "Tiểu Linh không hợp lệ",
   "pause.title": "Tạm dừng",
   "pause.resume": "Tiếp tục",
-  "pause.quit": "Thoát về trang chính",
+  "pause.quit": "Thoát về Hub",
   "pause.quitAsk": "Thoát sẽ bỏ trận đang đánh dở. Các cửa đã vượt qua vẫn được giữ, vào lại sẽ chơi lại từ lúc chọn cửa.",
   "run.quitSaved": "Đã thoát. Tiến trình các cửa đã xong được giữ lại.",
   "passive.stat": "+{pct}% {stat} {scope}",

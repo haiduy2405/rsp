@@ -786,3 +786,7 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 ## v0.107.1
 - Chuyển cảnh mượt hơn: canvas bàn ngọc bị ẩn+xóa ở mọi màn ngoài trận (trước đây lộ mờ qua lúc màn mới fade-in, gây nháy "bàn ngọc"); nền mờ trận chỉ hiện trong trận; hiệu ứng vào màn bắt đầu từ độ mờ .55 thay vì 0 để không lóe nền.
 - Rollback: tag local `pre-trans-v0.107.0`.
+
+## v0.107.2
+- Hộp Tạm dừng thiết kế lại: nhỏ gọn (300px), tiêu đề có biểu tượng, 3 thanh âm lượng gọn, 3 công tắc dạng ô, 2 nút cạnh nhau. Nút "Thoát về trang chính" → "Thoát về Hub"; hộp xác nhận thoát cũng gọn, Hủy bên trái, Thoát về Hub bên phải.
+- Rollback: tag local `pre-pause-v0.107.1`.

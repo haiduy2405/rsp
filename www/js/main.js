@@ -1396,14 +1396,24 @@ function showPause(confirmQuit = false) {
     audio.sfx('back');
     showHub();
   };
-  const body = [
-    h('h3', {}, t('pause.title')),
-    run?.relics?.length && confirmQuit !== true ? h('div', { class: 'relic-strip' }, run.relics.map((id) => h('span', { class: 'rchip', style: `border-color:${RELIC_COL[ctx.relics[id].rarity]}`, title: modLines(id).join(' · ') }, relicName(id)))) : null,
-    confirmQuit === true
-      ? ui.confirmBox(t('pause.quitAsk'), quit, () => { close(); showPause(); }, t('pause.quit'))
-      : [...ui.audioControls(), btn(t('pause.resume'), close, 'primary', { id: 'pause-resume' }), btn(t('pause.quit'), () => { close(); showPause(true); }, '', { id: 'pause-quit' })],
-  ].flat();
-  $('wrap').appendChild(h('div', { id: 'info' }, h('div', { class: 'infobox' }, body)));
+  const ico = h('span', { class: 'pz-ico', 'aria-hidden': 'true' });
+  ico.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6.5" y="5" width="3.8" height="14" rx="1.4"/><rect x="13.7" y="5" width="3.8" height="14" rx="1.4"/></svg>';
+  let box;
+  if (confirmQuit === true) {
+    box = h('div', { class: 'infobox pausebox quit' },
+      h('div', { class: 'pz-head' }, ico, h('h3', {}, t('pause.quit'))),
+      h('p', { class: 'pz-ask' }, t('pause.quitAsk')),
+      h('div', { class: 'pz-btns' }, btn(t('slot.cancel'), () => { close(); showPause(); }, '', { id: 'quit-no' }), btn(t('pause.quit'), quit, 'primary', { id: 'quit-yes' })));
+  } else {
+    const au = ui.audioControls();
+    box = h('div', { class: 'infobox pausebox' },
+      h('div', { class: 'pz-head' }, ico, h('h3', {}, t('pause.title'))),
+      run?.relics?.length ? h('div', { class: 'relic-strip' }, run.relics.map((id) => h('span', { class: 'rchip', style: `border-color:${RELIC_COL[ctx.relics[id].rarity]}`, title: modLines(id).join(' · ') }, relicName(id)))) : null,
+      h('div', { class: 'pz-sl' }, au.slice(0, 3)),
+      h('div', { class: 'pz-tg' }, au.slice(3)),
+      h('div', { class: 'pz-btns' }, btn(t('pause.quit'), () => { close(); showPause(true); }, '', { id: 'pause-quit' }), btn(t('pause.resume'), close, 'primary', { id: 'pause-resume' })));
+  }
+  $('wrap').appendChild(h('div', { id: 'info' }, box));
 }
 
 // Bảng chi tiết khi nhấn giữ tướng/quái trong trận.
