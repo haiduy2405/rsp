@@ -1997,3 +1997,21 @@ canvas#cv { visibility: hidden; }
 .pf-stat { grid-column: span 2; }
 .pf-stat:nth-child(n+4) { grid-column: span 3; }
 .pf-fields label { text-align: left; align-items: flex-start; }
+
+/* ---- v0.118 chi tiết cửa gọn ---- */
+.dd { max-width: 320px; gap: 9px; padding: 14px 12px 12px; border-radius: 18px; }
+.dd-medal { width: 50px; height: 50px; }
+.dd-medal svg { width: 28px; height: 28px; }
+.dd-halo { width: 100px; height: 100px; left: -10px; top: -22px; }
+.dd-head { gap: 10px; }
+.dd-title h3 { font-size: 20px; }
+.dd-title small { font-size: 12px; margin-top: 2px; }
+.dd-sec { font-size: 12px; letter-spacing: 0; text-transform: none; font-weight: 700; color: #e9d29a; }
+.dd-foes { gap: 8px; justify-content: center; grid-template-columns: repeat(3, minmax(0, 110px)); }
+.dd-foes.n1 { grid-template-columns: minmax(0, 130px); max-width: none; }
+.dd-foes.n2 { grid-template-columns: repeat(2, minmax(0, 120px)); }
+.dd-card { border-radius: 14px; }
+.dd-cnt { position: absolute; left: 6px; top: 6px; z-index: 3; padding: 1px 8px; border-radius: 999px; font: 800 13px/1.4 system-ui, sans-serif; color: #3a2208; background: linear-gradient(180deg, #ffe88a, #f2a931); border: 1.5px solid #fff3c0; box-shadow: 0 2px 4px rgba(0, 0, 0, .45); }
+.dd-btns { gap: 8px; }
+.dd-btns button { padding: 8px 14px; border-radius: 999px; font-size: 14px; }
+.dd-btns #door-enter { font-size: 15px; box-shadow: 0 0 16px rgba(255, 210, 90, .55); }

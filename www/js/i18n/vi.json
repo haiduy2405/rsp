@@ -1190,5 +1190,6 @@
   "summon.confirmBuy": "Mua {tickets} vé bằng {spirit} Linh Thạch?",
   "summon.buyYes": "Mua",
   "cl.0_116.2": "Mua vé và mọi lượt triệu hồi đều hỏi xác nhận; hộp xác nhận nhỏ gọn, tinh tế hơn",
-  "cl.0_117.1": "Hồ sơ người chơi: thẻ danh tính gọn (ảnh + tên + nút ảnh), lưới avatar 6 cột, thống kê dạng ô"
+  "cl.0_117.1": "Hồ sơ người chơi: thẻ danh tính gọn (ảnh + tên + nút ảnh), lưới avatar 6 cột, thống kê dạng ô",
+  "cl.0_118.1": "Chi tiết cửa gọn hơn: quái giống nhau gộp thành một thẻ ×N, hộp nhỏ, nút dạng viên"
 }

@@ -1160,7 +1160,8 @@ function showDoorDetail(i) {
   const close = () => $('info')?.remove();
   const ico = h('span', { class: 'dd-medal' });
   ico.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d.icon}</svg>`;
-  const foeCard = (m, n) => {
+  const groups = foes ? [...foes.reduce((a, m) => a.set(m, (a.get(m) || 0) + 1), new Map())] : [];
+  const foeCard = (m, n, cnt = 1) => {
     const im = getImg(`monster:${m}`);
     const mo = ctx.monsters[m];
     const el = mo?.element ?? 0;
@@ -1170,10 +1171,10 @@ function showDoorDetail(i) {
       return h('span', { class: 'dd-pas', title: `${t(`effect.${u.key}.name`)} ${Math.round(ch * 100)}%` }, h('img', { src: `assets/ui/fx/${u.key}.webp`, alt: t(`effect.${u.key}.name`) }), h('i', {}, `${Math.round(ch * 100)}%`));
     });
     return h('div', { class: `dd-card k-${kind}`, title: t(`monster.${m}`), style: `--el:${COLORS[el]};--i:${n}` },
-      h('div', { class: 'dd-art' }, h('i', { class: 'dd-spot' }), h('i', { class: 'dd-shine' }), im ? h('img', { src: im.src, alt: t(`monster.${m}`) }) : null, h('i', { class: 'dd-floor' }), h('span', { class: 'dd-el' }, el_orb(el))),
+      h('div', { class: 'dd-art' }, h('i', { class: 'dd-spot' }), h('i', { class: 'dd-shine' }), im ? h('img', { src: im.src, alt: t(`monster.${m}`) }) : null, h('i', { class: 'dd-floor' }), h('span', { class: 'dd-el' }, el_orb(el)), cnt > 1 ? h('b', { class: 'dd-cnt' }, `×${cnt}`) : null),
       pas.length ? h('div', { class: 'dd-pass' }, pas) : null);
   };
-  const body = foes ? h('div', { class: 'dd-foes n' + foes.length }, foes.map((m, n) => foeCard(m, n))) : h('div', { class: 'dd-plain' }, h('p', {}, t(`door.desc.${k}`)));
+  const body = foes ? h('div', { class: 'dd-foes n' + groups.length }, groups.map(([m, c], n) => foeCard(m, n, c))) : h('div', { class: 'dd-plain' }, h('p', {}, t(`door.desc.${k}`)));
   $('wrap').appendChild(h('div', { id: 'info', onclick: (ev) => ev.target.id === 'info' && close() },
     h('div', { class: 'doordetail dd', style: `--c:${d.col};--ring:${d.ring}` },
       h('div', { class: 'dd-head' }, h('div', { class: 'dd-halo' }), ico, h('div', { class: 'dd-title' }, h('h3', {}, t(`door.${k}`)), h('small', {}, t(`door.desc.${k}`)))),

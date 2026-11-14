@@ -835,3 +835,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.117.0
 - Hồ sơ người chơi: thẻ danh tính gọn, lưới avatar 6 cột, thống kê dạng ô. Tag rollback cục bộ: `pre-profileui-v0.116.0`.
+
+## v0.118.0
+- Chi tiết cửa gọn hơn: quái giống nhau gộp một thẻ ×N, hộp nhỏ, nút viên. Tag rollback cục bộ: `pre-doorui-v0.117.0`.
