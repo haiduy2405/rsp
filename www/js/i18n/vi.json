@@ -1184,5 +1184,6 @@
   "skill.single": "Skill đơn",
   "skill.duoInfo": "Hợp lực hai skill đơn ×{pct}% + hiệu ứng riêng của cặp. Cả hai tướng vào hồi chiêu.",
   "summon.confirmFree": "Dùng lượt miễn phí hôm nay để triệu hồi ×1 ở \"{banner}\"?",
-  "cl.0_114.2": "Triệu hồi luôn hỏi xác nhận (kể cả lượt miễn phí), hộp xác nhận nổi giữa màn hình"
+  "cl.0_114.2": "Triệu hồi luôn hỏi xác nhận (kể cả lượt miễn phí), hộp xác nhận nổi giữa màn hình",
+  "cl.0_115.1": "Bảng \"Có gì mới\" gọn hơn: không che tên game, ẩn thanh 100%, nút \"Chạm để vào\" nổi bật"
 }

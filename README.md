@@ -825,3 +825,6 @@ Hai lớp: (1) chùm sáng chéo quét cả bàn từ góc trên trái sang dư�
 
 ## v0.114.1
 - Triệu hồi luôn hỏi xác nhận (cả lượt miễn phí); hộp xác nhận nổi giữa màn hình thay vì nằm cuối trang.
+
+## v0.115.0
+- Bảng "Có gì mới" gọn hơn, không che tên game; nút "Chạm để vào" nổi bật. Tag rollback cục bộ: `pre-notesui-v0.114.1`.
